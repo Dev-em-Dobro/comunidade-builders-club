@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+
+  --color-background: #f4f7f6;
+  --color-foreground: #0f172a;
+  --color-card: #ffffff;
+  --color-border: #e2e8e6;
+  --color-muted: #64748b;
+  --color-accent: #0d9488;
+  --color-accent-hover: #0f766e;
+  --color-accent-foreground: #ffffff;
+  --color-surface: #e8f0ee;
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 10% -10%, rgba(13, 148, 136, 0.12), transparent),
+      radial-gradient(ellipse 60% 40% at 100% 0%, rgba(15, 118, 110, 0.08), transparent);
+    min-height: 100dvh;
+  }
+
+  ::selection {
+    @apply bg-accent/25 text-foreground;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex cursor-pointer items-center justify-center rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground transition-colors hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:opacity-50;
+  }
+
+  .btn-ghost {
+    @apply inline-flex cursor-pointer items-center justify-center rounded-lg px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-surface hover:text-foreground;
+  }
+
+  .btn-outline {
+    @apply inline-flex cursor-pointer items-center justify-center rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-colors hover:bg-surface;
+  }
+
+  .input {
+    @apply w-full rounded-lg border border-border bg-card px-3 py-2 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/20;
+  }
+
+  .post-card {
+    @apply rounded-xl border border-border bg-card p-4 shadow-sm transition-shadow hover:shadow-md;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

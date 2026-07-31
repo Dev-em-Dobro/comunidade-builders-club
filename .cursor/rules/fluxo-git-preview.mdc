@@ -1,0 +1,37 @@
+---
+description: Fluxo Git e ambientes (feature → preview → main)
+alwaysApply: true
+---
+
+# Fluxo de desenvolvimento (Builders Club)
+
+## Branches
+
+```
+feature/<id-ou-descricao>  →  PR →  feature/preview  →  PR →  main
+```
+
+| Branch | Papel |
+|--------|--------|
+| `feature/*` | Desenvolvimento |
+| `feature/preview` | Staging / Preview Vercel |
+| `main` | Produção |
+
+## Regras
+
+- Não abrir PR direto de `feature/*` para `main` como caminho padrão.
+- Commits e PRs referenciam o ID da feature (`F00X`) quando houver.
+- Preview usa envs de Preview (Neon HML, `BETTER_AUTH_URL` de staging).
+- Produção só via merge em `main`.
+
+## Migrations
+
+- Features em andamento: somente Neon HML (`DATABASE_URL_STAGING` ou `DATABASE_URL_HML` via `npm run db:migrate:staging`).
+- Nunca migrar produção sem pedido explícito após validar no Preview.
+
+## Domínios
+
+- Produção: `https://builders-club.devemdobro.com`
+- Homologação: `https://staging.builders-club.devemdobro.com`
+
+Detalhes de envs Vercel: `docs/deploy-vercel.md`

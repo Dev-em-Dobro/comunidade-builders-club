@@ -1,0 +1,23 @@
+# Dev local — Postgres + Mailpit
+services:
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: builders
+      POSTGRES_PASSWORD: builders
+      POSTGRES_DB: builders_club
+    volumes:
+      - builders_pg:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  mailpit:
+    image: axllent/mailpit:v1.27
+    ports:
+      - "1026:1025"
+      - "8026:8025"
+    restart: unless-stopped
+
+volumes:
+  builders_pg:
