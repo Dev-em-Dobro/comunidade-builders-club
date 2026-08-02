@@ -98,7 +98,7 @@ export function PostCard({ post, showSpace = true }: PostCardProps) {
               loading="lazy"
             />
           ) : null}
-          {post.linkUrl ? (
+          {post.linkUrl && /^https?:\/\//i.test(post.linkUrl) ? (
             <a
               href={post.linkUrl}
               target="_blank"
