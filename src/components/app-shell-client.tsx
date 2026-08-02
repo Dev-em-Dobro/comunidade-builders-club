@@ -9,6 +9,7 @@ import {
   NotificationBell,
   type NotifPreview,
 } from "@/components/notification-bell";
+import { MateriaisNav } from "@/components/materiais-nav";
 
 type SpaceLink = { id: string; slug: string; name: string };
 
@@ -158,6 +159,8 @@ export function AppShellClient({
             Nova publicação
           </Link>
           <SpaceNav spaces={spaces} />
+          <div className="my-5 border-t border-border" />
+          <MateriaisNav />
         </div>
         <SidebarFooter
           unread={unread}
@@ -200,6 +203,8 @@ export function AppShellClient({
                 Nova publicação
               </Link>
               <SpaceNav spaces={spaces} onNavigate={() => setDrawerOpen(false)} />
+              <div className="my-5 border-t border-border" />
+              <MateriaisNav onNavigate={() => setDrawerOpen(false)} />
             </div>
             <SidebarFooter
               unread={unread}
