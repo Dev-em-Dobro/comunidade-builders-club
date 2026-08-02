@@ -22,7 +22,8 @@ export async function createPostAction(formData: FormData) {
   const post = await createPost(user.id, raw);
   revalidatePath("/");
   revalidatePath(`/spaces/${post.space.slug}`);
-  return { id: post.id };
+  revalidatePath("/nova");
+  return { id: post.id, spaceSlug: post.space.slug };
 }
 
 export async function deletePostAction(postId: string, spaceSlug: string) {

@@ -151,6 +151,12 @@ export function AppShellClient({
           </p>
         </div>
         <div className="mt-8 flex min-h-0 flex-1 flex-col overflow-y-auto">
+          <Link
+            href="/nova"
+            className={`nav-cta mb-5 ${pathname === "/nova" ? "nav-cta-active" : ""}`}
+          >
+            Nova publicação
+          </Link>
           <SpaceNav spaces={spaces} />
         </div>
         <SidebarFooter
@@ -186,6 +192,13 @@ export function AppShellClient({
               </button>
             </div>
             <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+              <Link
+                href="/nova"
+                className="nav-cta mb-5"
+                onClick={() => setDrawerOpen(false)}
+              >
+                Nova publicação
+              </Link>
               <SpaceNav spaces={spaces} onNavigate={() => setDrawerOpen(false)} />
             </div>
             <SidebarFooter

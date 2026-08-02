@@ -1,9 +1,9 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
-import { getSpaceBySlug, listSpaces } from "@/lib/spaces";
+import { getSpaceBySlug } from "@/lib/spaces";
 import { listPosts } from "@/lib/posts";
 import { AppShell } from "@/components/app-shell";
-import { Composer } from "@/components/composer";
 import { PostCard } from "@/components/post-card";
 import { EmptyState } from "@/components/empty-state";
 
@@ -16,10 +16,7 @@ export default async function SpacePage({ params }: Props) {
   const space = await getSpaceBySlug(slug);
   if (!space) notFound();
 
-  const [spaces, { posts }] = await Promise.all([
-    listSpaces(),
-    listPosts({ spaceId: space.id }),
-  ]);
+  const { posts } = await listPosts({ spaceId: space.id });
 
   return (
     <AppShell
@@ -28,17 +25,26 @@ export default async function SpacePage({ params }: Props) {
       displayName={member.profile.displayName}
     >
       <div className="feed-wrap">
-        <h1 className="page-title">{space.name}</h1>
-        {space.description ? (
-          <p className="mt-1.5 text-sm text-muted">{space.description}</p>
-        ) : null}
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h1 className="page-title">{space.name}</h1>
+            {space.description ? (
+              <p className="mt-1.5 text-sm text-muted">{space.description}</p>
+            ) : null}
+          </div>
+          <Link
+            href={`/nova?space=${space.slug}`}
+            className="btn-primary text-sm md:hidden"
+          >
+            Nova publicação
+          </Link>
+        </div>
 
-        <div className="mt-8 space-y-4">
-          <Composer spaces={spaces} defaultSpaceId={space.id} />
+        <div className="mt-8 space-y-3">
           {posts.length === 0 ? (
             <EmptyState
               title="Nenhum post neste space"
-              description="Comece a conversa — publique a primeira mensagem aqui."
+              description="Comece a conversa — use Nova publicação no menu."
             />
           ) : (
             posts.map((post) => (

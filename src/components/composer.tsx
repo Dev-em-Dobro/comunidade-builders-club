@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { createPostAction } from "@/actions/posts";
 
@@ -10,9 +11,9 @@ export function Composer({
   spaces: { id: string; name: string }[];
   defaultSpaceId?: string;
 }) {
+  const router = useRouter();
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  const [ok, setOk] = useState(false);
   const [openExtra, setOpenExtra] = useState(false);
 
   return (
@@ -20,17 +21,11 @@ export function Composer({
       className="post-card"
       action={(fd) => {
         setError(null);
-        setOk(false);
         start(async () => {
           try {
-            await createPostAction(fd);
-            const form = document.getElementById(
-              "composer-form",
-            ) as HTMLFormElement | null;
-            form?.reset();
-            setOpenExtra(false);
-            setOk(true);
-            window.setTimeout(() => setOk(false), 2500);
+            const result = await createPostAction(fd);
+            router.push(`/posts/${result.id}`);
+            router.refresh();
           } catch (e) {
             setError(e instanceof Error ? e.message : "Falha ao publicar.");
           }
@@ -39,6 +34,9 @@ export function Composer({
       id="composer-form"
     >
       <p className="text-sm font-semibold text-foreground">Nova publicação</p>
+      <p className="mt-1 text-xs text-muted">
+        O título é gerado automaticamente a partir do início do texto.
+      </p>
       <label className="mt-3 block text-xs font-medium text-muted">
         Space
         <select
@@ -56,7 +54,7 @@ export function Composer({
       </label>
       <textarea
         name="body"
-        className="input mt-3 min-h-28 resize-y text-[15px] leading-relaxed"
+        className="input mt-3 min-h-36 resize-y text-[15px] leading-relaxed"
         placeholder="O que você quer compartilhar? **negrito**, *itálico*, `código`, [link](https://…) e @Nome"
         required
         maxLength={10000}
@@ -81,11 +79,6 @@ export function Composer({
       {error ? (
         <p className="mt-3 text-sm text-red-600" role="alert">
           {error}
-        </p>
-      ) : null}
-      {ok ? (
-        <p className="mt-3 text-sm font-medium text-accent" role="status">
-          Publicado!
         </p>
       ) : null}
       <div className="mt-4 flex justify-end">

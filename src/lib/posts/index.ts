@@ -2,6 +2,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { notifyMany } from "@/lib/notifications";
 import { resolveMentionedUserIds } from "@/lib/mentions";
+import { titleFromBody } from "@/lib/posts/title";
 
 export const createPostSchema = z.object({
   spaceId: z.string().min(1),
@@ -69,10 +70,12 @@ export async function createPost(
   raw: z.infer<typeof createPostSchema>,
 ) {
   const data = createPostSchema.parse(raw);
+  const title = titleFromBody(data.body);
   const post = await prisma.post.create({
     data: {
       authorId,
       spaceId: data.spaceId,
+      title,
       body: data.body,
       imageUrl: data.imageUrl || null,
       linkUrl: data.linkUrl || null,
@@ -101,4 +104,48 @@ export async function setPostPinned(id: string, pinned: boolean) {
     where: { id },
     data: { pinnedAt: pinned ? new Date() : null },
   });
+}
+
+/** Registra leitura única; autor não conta. Retorna viewCount atualizado. */
+export async function recordPostView(postId: string, userId: string) {
+  const post = await prisma.post.findUnique({
+    where: { id: postId },
+    select: { authorId: true, viewCount: true },
+  });
+  if (!post) return null;
+  if (post.authorId === userId) return post.viewCount;
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      await tx.postView.create({
+        data: { postId, userId },
+      });
+      await tx.post.update({
+        where: { id: postId },
+        data: { viewCount: { increment: 1 } },
+      });
+    });
+  } catch {
+    // unique violation = já leu
+  }
+
+  const fresh = await prisma.post.findUnique({
+    where: { id: postId },
+    select: { viewCount: true },
+  });
+  return fresh?.viewCount ?? post.viewCount;
+}
+
+export async function backfillEmptyTitles() {
+  const posts = await prisma.post.findMany({
+    where: { OR: [{ title: "" }, { title: { equals: "" } }] },
+    select: { id: true, body: true },
+  });
+  for (const p of posts) {
+    await prisma.post.update({
+      where: { id: p.id },
+      data: { title: titleFromBody(p.body) },
+    });
+  }
+  return posts.length;
 }

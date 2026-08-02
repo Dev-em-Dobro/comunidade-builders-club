@@ -8,7 +8,12 @@ export async function searchAll(q: string) {
 
   const [posts, members, spaces] = await Promise.all([
     prisma.post.findMany({
-      where: { body: { contains: term, mode: "insensitive" } },
+      where: {
+        OR: [
+          { body: { contains: term, mode: "insensitive" } },
+          { title: { contains: term, mode: "insensitive" } },
+        ],
+      },
       include: {
         author: { include: { profile: true } },
         space: true,

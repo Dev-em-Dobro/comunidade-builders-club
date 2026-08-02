@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
-import { getPost } from "@/lib/posts";
+import { getPost, recordPostView } from "@/lib/posts";
 import { AppShell } from "@/components/app-shell";
 import {
   CommentForm,
@@ -10,6 +11,7 @@ import {
 } from "@/components/post-actions";
 import { EmptyState } from "@/components/empty-state";
 import { MarkdownBody } from "@/lib/markdown";
+import { previewFromBody } from "@/lib/posts/title";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -84,10 +86,15 @@ export default async function PostPage({ params }: Props) {
   const post = await getPost(id);
   if (!post) notFound();
 
+  const viewCount =
+    (await recordPostView(post.id, member.user.id)) ?? post.viewCount;
+
   const liked = post.reactions.some((r) => r.userId === member.user.id);
   const isAdmin = member.membership.role === "admin";
   const authorName = post.author.profile?.displayName ?? "Membro";
   const avatarUrl = post.author.profile?.avatarUrl;
+  const title =
+    post.title?.trim() || previewFromBody(post.body, 90) || "Publicação";
 
   return (
     <AppShell
@@ -96,7 +103,13 @@ export default async function PostPage({ params }: Props) {
       displayName={member.profile.displayName}
     >
       <div className="feed-wrap">
-        <article className="post-card">
+        <Link
+          href={`/spaces/${post.space.slug}`}
+          className="text-sm font-medium text-accent hover:underline"
+        >
+          ← {post.space.name}
+        </Link>
+        <article className="post-card mt-4">
           <div className="flex gap-3">
             {avatarUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -115,7 +128,12 @@ export default async function PostPage({ params }: Props) {
               <p className="mt-0.5 text-xs text-muted">
                 {post.space.name} · {post.createdAt.toLocaleString("pt-BR")}
                 {post.pinnedAt ? " · Fixado" : ""}
+                {" · "}
+                {viewCount} {viewCount === 1 ? "leitura" : "leituras"}
               </p>
+              <h1 className="mt-4 font-[family-name:var(--font-outfit)] text-2xl font-bold tracking-tight">
+                {title}
+              </h1>
               <div className="mt-4">
                 <MarkdownBody body={post.body} />
               </div>
