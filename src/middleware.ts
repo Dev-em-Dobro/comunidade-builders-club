@@ -9,6 +9,7 @@ function isProtectedPath(pathname: string): boolean {
     pathname.startsWith("/perfil") ||
     pathname.startsWith("/busca") ||
     pathname.startsWith("/notificacoes") ||
+    pathname.startsWith("/aulas") ||
     pathname.startsWith("/admin") ||
     pathname.startsWith("/aguardando")
   );
@@ -44,6 +45,8 @@ export const config = {
     "/perfil/:path*",
     "/busca",
     "/notificacoes",
+    "/aulas",
+    "/aulas/:path*",
     "/admin/:path*",
     "/aguardando",
     "/login",

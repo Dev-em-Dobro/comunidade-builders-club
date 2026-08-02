@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MarkdownBody } from "@/lib/markdown";
 
 type PostCardProps = {
   post: {
@@ -84,9 +85,9 @@ export function PostCard({ post, showSpace = true }: PostCardProps) {
             </div>
           </div>
 
-          <p className="mt-3 whitespace-pre-wrap text-[15px] leading-relaxed text-foreground/90">
-            {post.body}
-          </p>
+          <div className="mt-3">
+            <MarkdownBody body={post.body} />
+          </div>
 
           {post.imageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element

@@ -1,24 +1,26 @@
 # F011 — Aulas com Panda Video (Fase 2)
 
 ## Status
-Planejada — não implementar na Fase 1
+Em implementação (pré-lançamento da comunidade)
 
 ## Objetivo
 Catálogo de módulos/aulas com playback via Panda Video (ADR-005).
 
-## Modelo (previsto)
+## Modelo
 
-- `Module` — título, ordem
-- `Lesson` — título, descrição, `pandaVideoExternalId`, `pandaLibraryId`, ordem, `moduleId`
-- `LessonProgress` (opcional) — userId, lessonId, seconds, completedAt
+- `Module` — título, slug, descrição, ordem, publicado
+- `Lesson` — título, descrição, `pandaVideoExternalId`, `pandaLibraryId`, ordem, `moduleId`, publicado
+- `LessonProgress` — userId, lessonId, seconds, completedAt (opcional no MVP)
 
-## Critérios (quando implementar)
+## Critérios
 
-- [ ] Membro active lista módulos/aulas
-- [ ] Player iframe Panda + allowfullscreen
-- [ ] Admin CRUD aulas com IDs Panda
-- [ ] Progresso opcional via Player API
+- [x] Membro active lista módulos/aulas publicados
+- [x] Player iframe Panda (`https://player-vz-{libraryId}.tv.pandavideo.com.br/embed/?v={externalId}`) + allowfullscreen
+- [x] Admin CRUD módulos e aulas com IDs Panda
+- [x] Nav “Aulas” no shell
+- [x] Progresso: marcar aula como concluída (sem Player API ainda)
+- [x] Doc de migração entregáveis Orion atualizado com checklist operacional
 
 ## Dependências
 
-ADR-005 · migração entregáveis Orion (`specs/06-migracao-entregaveis-orion.md`)
+ADR-005 · `specs/06-migracao-entregaveis-orion.md`

@@ -57,10 +57,13 @@ export function Composer({
       <textarea
         name="body"
         className="input mt-3 min-h-28 resize-y text-[15px] leading-relaxed"
-        placeholder="O que você quer compartilhar com a comunidade?"
+        placeholder="O que você quer compartilhar? **negrito**, *itálico*, `código`, [link](https://…) e @Nome"
         required
         maxLength={10000}
       />
+      <p className="mt-1.5 text-[11px] text-muted">
+        Markdown básico e @menções pelo display name do membro.
+      </p>
       <button
         type="button"
         className="btn-ghost mt-2 -ml-1 text-xs"

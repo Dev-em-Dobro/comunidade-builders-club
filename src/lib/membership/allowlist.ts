@@ -40,3 +40,41 @@ export async function removeAllowedEmail(email: string) {
     where: { email: normalizarEmail(email) },
   });
 }
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** Parse lista colada (linha, vírgula ou ponto-e-vírgula). */
+export function parseEmailBulk(raw: string): string[] {
+  const parts = raw
+    .split(/[\n,;]+/)
+    .map((s) => normalizarEmail(s))
+    .filter(Boolean);
+  return [...new Set(parts)];
+}
+
+export async function addAllowedEmailsBulk(
+  raw: string,
+  source = "admin-bulk",
+): Promise<{
+  added: number;
+  existing: number;
+  invalid: string[];
+}> {
+  const emails = parseEmailBulk(raw);
+  const invalid: string[] = [];
+  const valid: string[] = [];
+  for (const e of emails) {
+    if (EMAIL_RE.test(e)) valid.push(e);
+    else invalid.push(e);
+  }
+
+  let added = 0;
+  let existing = 0;
+  for (const email of valid) {
+    const before = await prisma.allowedEmail.findUnique({ where: { email } });
+    await addAllowedEmail({ email, source });
+    if (before) existing += 1;
+    else added += 1;
+  }
+  return { added, existing, invalid };
+}

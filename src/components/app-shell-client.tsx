@@ -5,6 +5,10 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { NOME_PRODUTO } from "@/lib/produto";
 import { LogoutButton } from "@/components/logout-button";
+import {
+  NotificationBell,
+  type NotifPreview,
+} from "@/components/notification-bell";
 
 type SpaceLink = { id: string; slug: string; name: string };
 
@@ -50,29 +54,28 @@ function SpaceNav({
 function SidebarFooter({
   unread,
   isAdmin,
+  notifPreview,
   onNavigate,
 }: {
   unread: number;
   isAdmin: boolean;
+  notifPreview: NotifPreview[];
   onNavigate?: () => void;
 }) {
+  const pathname = usePathname();
   return (
     <div className="mt-auto flex flex-col gap-0.5 border-t border-border pt-4">
+      <Link
+        href="/aulas"
+        className={`btn-ghost justify-start ${pathname.startsWith("/aulas") ? "text-accent" : ""}`}
+        onClick={onNavigate}
+      >
+        Aulas
+      </Link>
       <Link href="/busca" className="btn-ghost justify-start" onClick={onNavigate}>
         Busca
       </Link>
-      <Link
-        href="/notificacoes"
-        className="btn-ghost justify-start"
-        onClick={onNavigate}
-      >
-        Notificações
-        {unread > 0 ? (
-          <span className="ml-2 inline-flex min-w-5 items-center justify-center rounded-full bg-accent px-1.5 py-0.5 text-[10px] font-bold text-white">
-            {unread > 99 ? "99+" : unread}
-          </span>
-        ) : null}
-      </Link>
+      <NotificationBell unread={unread} items={notifPreview} />
       <Link href="/perfil" className="btn-ghost justify-start" onClick={onNavigate}>
         Perfil
       </Link>
@@ -93,6 +96,7 @@ export function AppShellClient({
   unread,
   spaces,
   avatarUrl,
+  notifPreview,
 }: {
   children: React.ReactNode;
   displayName: string;
@@ -100,6 +104,7 @@ export function AppShellClient({
   unread: number;
   spaces: SpaceLink[];
   avatarUrl?: string | null;
+  notifPreview: NotifPreview[];
 }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const pathname = usePathname();
@@ -121,7 +126,6 @@ export function AppShellClient({
 
   return (
     <div className="flex min-h-dvh w-full">
-      {/* Desktop sidebar */}
       <aside className="sticky top-0 hidden h-dvh w-[260px] shrink-0 flex-col border-r border-border bg-sidebar/95 p-5 backdrop-blur-md md:flex">
         <Link
           href="/"
@@ -149,10 +153,13 @@ export function AppShellClient({
         <div className="mt-8 flex min-h-0 flex-1 flex-col overflow-y-auto">
           <SpaceNav spaces={spaces} />
         </div>
-        <SidebarFooter unread={unread} isAdmin={isAdmin} />
+        <SidebarFooter
+          unread={unread}
+          isAdmin={isAdmin}
+          notifPreview={notifPreview}
+        />
       </aside>
 
-      {/* Mobile drawer */}
       {drawerOpen ? (
         <div className="fixed inset-0 z-40 md:hidden">
           <button
@@ -184,6 +191,7 @@ export function AppShellClient({
             <SidebarFooter
               unread={unread}
               isAdmin={isAdmin}
+              notifPreview={notifPreview}
               onNavigate={() => setDrawerOpen(false)}
             />
           </aside>
@@ -206,12 +214,7 @@ export function AppShellClient({
           >
             {NOME_PRODUTO}
           </Link>
-          <Link href="/notificacoes" className="btn-ghost relative text-xs">
-            Bell
-            {unread > 0 ? (
-              <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-accent" />
-            ) : null}
-          </Link>
+          <NotificationBell unread={unread} items={notifPreview} compact />
         </header>
 
         <main className="flex-1 px-4 py-6 md:px-8 md:py-10">{children}</main>

@@ -11,9 +11,11 @@ import {
 
 export async function createCommentAction(formData: FormData) {
   const { user } = await requireActiveMember();
+  const parentRaw = String(formData.get("parentId") ?? "").trim();
   const raw = {
     postId: String(formData.get("postId") ?? ""),
     body: String(formData.get("body") ?? ""),
+    parentId: parentRaw || null,
   };
   createCommentSchema.parse(raw);
   await createComment(user.id, raw);

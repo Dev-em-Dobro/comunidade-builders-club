@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { prisma } from "@/lib/db";
+import { notifyMany } from "@/lib/notifications";
+import { resolveMentionedUserIds } from "@/lib/mentions";
 
 export const createPostSchema = z.object({
   spaceId: z.string().min(1),
@@ -47,7 +49,14 @@ export async function getPost(id: string) {
     include: {
       ...postInclude,
       comments: {
-        include: { author: { include: { profile: true } } },
+        where: { parentId: null },
+        include: {
+          author: { include: { profile: true } },
+          replies: {
+            include: { author: { include: { profile: true } } },
+            orderBy: { createdAt: "asc" },
+          },
+        },
         orderBy: { createdAt: "asc" },
       },
       reactions: { select: { userId: true, type: true } },
@@ -60,7 +69,7 @@ export async function createPost(
   raw: z.infer<typeof createPostSchema>,
 ) {
   const data = createPostSchema.parse(raw);
-  return prisma.post.create({
+  const post = await prisma.post.create({
     data: {
       authorId,
       spaceId: data.spaceId,
@@ -71,6 +80,16 @@ export async function createPost(
     },
     include: postInclude,
   });
+
+  const mentioned = await resolveMentionedUserIds(data.body, authorId);
+  await notifyMany(mentioned, {
+    actorId: authorId,
+    type: "mention_in_post",
+    postId: post.id,
+    snippet: data.body,
+  });
+
+  return post;
 }
 
 export async function deletePost(id: string) {

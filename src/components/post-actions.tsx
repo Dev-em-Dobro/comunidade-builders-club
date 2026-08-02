@@ -69,35 +69,51 @@ export function PostActions({
   );
 }
 
-export function CommentForm({ postId }: { postId: string }) {
+export function CommentForm({
+  postId,
+  parentId,
+  placeholder,
+  onDone,
+}: {
+  postId: string;
+  parentId?: string;
+  placeholder?: string;
+  onDone?: () => void;
+}) {
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [ok, setOk] = useState(false);
+  const formId = parentId ? `comment-form-${parentId}` : "comment-form";
 
   return (
     <form
-      className="mt-4"
+      className="mt-3"
       action={(fd) => {
         setError(null);
         setOk(false);
         start(async () => {
           try {
             await createCommentAction(fd);
-            (document.getElementById("comment-form") as HTMLFormElement)?.reset();
+            (document.getElementById(formId) as HTMLFormElement)?.reset();
             setOk(true);
+            onDone?.();
             window.setTimeout(() => setOk(false), 2000);
           } catch (e) {
             setError(e instanceof Error ? e.message : "Falha ao comentar.");
           }
         });
       }}
-      id="comment-form"
+      id={formId}
     >
       <input type="hidden" name="postId" value={postId} />
+      {parentId ? <input type="hidden" name="parentId" value={parentId} /> : null}
       <textarea
         name="body"
-        className="input min-h-24"
-        placeholder="Escreva um comentário…"
+        className="input min-h-20"
+        placeholder={
+          placeholder ??
+          "Comente… Markdown e @Nome do membro funcionam"
+        }
         required
         maxLength={5000}
       />
@@ -112,9 +128,38 @@ export function CommentForm({ postId }: { postId: string }) {
         </p>
       ) : null}
       <button type="submit" className="btn-primary mt-3" disabled={pending}>
-        {pending ? "Enviando…" : "Comentar"}
+        {pending ? "Enviando…" : parentId ? "Responder" : "Comentar"}
       </button>
     </form>
+  );
+}
+
+export function ReplyToggle({
+  postId,
+  parentId,
+}: {
+  postId: string;
+  parentId: string;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="mt-2">
+      <button
+        type="button"
+        className="text-xs font-medium text-accent hover:underline"
+        onClick={() => setOpen((v) => !v)}
+      >
+        {open ? "Cancelar" : "Responder"}
+      </button>
+      {open ? (
+        <CommentForm
+          postId={postId}
+          parentId={parentId}
+          placeholder="Responder… use @Nome para mencionar"
+          onDone={() => setOpen(false)}
+        />
+      ) : null}
+    </div>
   );
 }
 

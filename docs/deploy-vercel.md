@@ -123,3 +123,17 @@ Authorized JavaScript origins: os três hosts acima (sem path).
 feature/<id> → PR → feature/preview → PR → main
 ```
 
+## Checklist de lançamento (comunidade)
+
+Só liberar alunos quando **tudo** abaixo estiver ok:
+
+1. [ ] Branch `feature/preview` com F013–F017 + F011 (aulas) deployada na Vercel Preview
+2. [ ] Envs Preview + Production preenchidas (matriz acima, incl. `HUBLA_*`)
+3. [ ] Domínios staging + prod apontados (Cloudflare → Vercel)
+4. [ ] `npm run db:migrate:staging` (e prod só após merge em `main` + confirmação)
+5. [ ] Seed spaces + allowlist nos Neons
+6. [ ] Webhook Hubla apontando staging (teste compra/cancelamento) e depois prod
+7. [ ] Smoke: login magic link + Google, feed, reply, @menção, Markdown, bell, admin bulk, aula Panda
+8. [ ] PR `feature/preview` → `main` após QA
+9. [ ] Comunicação aos alunos / liberação pública
+

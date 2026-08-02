@@ -11,10 +11,12 @@ export async function markReadAction(id: string) {
   const { user } = await requireActiveMember();
   await markNotificationRead(id, user.id);
   revalidatePath("/notificacoes");
+  revalidatePath("/", "layout");
 }
 
 export async function markAllReadAction() {
   const { user } = await requireActiveMember();
   await markAllNotificationsRead(user.id);
   revalidatePath("/notificacoes");
+  revalidatePath("/", "layout");
 }

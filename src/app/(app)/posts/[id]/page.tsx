@@ -6,10 +6,76 @@ import {
   CommentForm,
   DeleteCommentButton,
   PostActions,
+  ReplyToggle,
 } from "@/components/post-actions";
 import { EmptyState } from "@/components/empty-state";
+import { MarkdownBody } from "@/lib/markdown";
 
 type Props = { params: Promise<{ id: string }> };
+
+function CommentBlock({
+  comment,
+  postId,
+  isAdmin,
+  nested = false,
+}: {
+  comment: {
+    id: string;
+    body: string;
+    createdAt: Date;
+    author: {
+      profile: { displayName: string; avatarUrl: string | null } | null;
+    };
+    replies?: Array<{
+      id: string;
+      body: string;
+      createdAt: Date;
+      author: {
+        profile: { displayName: string; avatarUrl: string | null } | null;
+      };
+    }>;
+  };
+  postId: string;
+  isAdmin: boolean;
+  nested?: boolean;
+}) {
+  const name = comment.author.profile?.displayName ?? "Membro";
+  return (
+    <li className={`post-card !p-4 ${nested ? "ml-6 !bg-surface/40" : ""}`}>
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium">{name}</p>
+          <div className="mt-1.5 text-sm leading-relaxed">
+            <MarkdownBody
+              body={comment.body}
+              className="space-y-1 text-sm leading-relaxed [&_p]:my-0"
+            />
+          </div>
+          <p className="mt-2 text-xs text-muted">
+            {comment.createdAt.toLocaleString("pt-BR")}
+          </p>
+          {!nested ? <ReplyToggle postId={postId} parentId={comment.id} /> : null}
+        </div>
+        {isAdmin ? (
+          <DeleteCommentButton commentId={comment.id} postId={postId} />
+        ) : null}
+      </div>
+      {comment.replies && comment.replies.length > 0 ? (
+        <ul className="mt-3 space-y-2">
+          {comment.replies.map((r) => (
+            <CommentBlock
+              key={r.id}
+              comment={r}
+              postId={postId}
+              isAdmin={isAdmin}
+              nested
+            />
+          ))}
+        </ul>
+      ) : null}
+    </li>
+  );
+}
 
 export default async function PostPage({ params }: Props) {
   const { id } = await params;
@@ -50,9 +116,9 @@ export default async function PostPage({ params }: Props) {
                 {post.space.name} · {post.createdAt.toLocaleString("pt-BR")}
                 {post.pinnedAt ? " · Fixado" : ""}
               </p>
-              <p className="mt-4 whitespace-pre-wrap text-[15px] leading-relaxed">
-                {post.body}
-              </p>
+              <div className="mt-4">
+                <MarkdownBody body={post.body} />
+              </div>
               {post.imageUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -88,24 +154,12 @@ export default async function PostPage({ params }: Props) {
           ) : (
             <ul className="mt-4 space-y-3">
               {post.comments.map((c) => (
-                <li key={c.id} className="post-card !p-4">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <p className="text-sm font-medium">
-                        {c.author.profile?.displayName ?? "Membro"}
-                      </p>
-                      <p className="mt-1.5 whitespace-pre-wrap text-sm leading-relaxed">
-                        {c.body}
-                      </p>
-                      <p className="mt-2 text-xs text-muted">
-                        {c.createdAt.toLocaleString("pt-BR")}
-                      </p>
-                    </div>
-                    {isAdmin ? (
-                      <DeleteCommentButton commentId={c.id} postId={post.id} />
-                    ) : null}
-                  </div>
-                </li>
+                <CommentBlock
+                  key={c.id}
+                  comment={c}
+                  postId={post.id}
+                  isAdmin={isAdmin}
+                />
               ))}
             </ul>
           )}

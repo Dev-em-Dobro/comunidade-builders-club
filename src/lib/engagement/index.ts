@@ -1,10 +1,12 @@
 import { z } from "zod";
 import { prisma } from "@/lib/db";
-import { createNotification } from "@/lib/notifications";
+import { createNotification, notifyMany } from "@/lib/notifications";
+import { resolveMentionedUserIds } from "@/lib/mentions";
 
 export const createCommentSchema = z.object({
   postId: z.string().min(1),
   body: z.string().trim().min(1).max(5000),
+  parentId: z.string().min(1).optional().nullable(),
 });
 
 export async function createComment(
@@ -16,12 +18,27 @@ export async function createComment(
   const post = await prisma.post.findUnique({ where: { id: data.postId } });
   if (!post) throw new Error("Post não encontrado.");
 
+  let parentAuthorId: string | null = null;
+  if (data.parentId) {
+    const parent = await prisma.comment.findUnique({
+      where: { id: data.parentId },
+    });
+    if (!parent || parent.postId !== data.postId) {
+      throw new Error("Comentário pai inválido.");
+    }
+    if (parent.parentId) {
+      throw new Error("Só é permitido um nível de resposta.");
+    }
+    parentAuthorId = parent.authorId;
+  }
+
   const comment = await prisma.$transaction(async (tx) => {
     const c = await tx.comment.create({
       data: {
         postId: data.postId,
         authorId,
         body: data.body,
+        parentId: data.parentId || null,
       },
       include: { author: { include: { profile: true } } },
     });
@@ -32,28 +49,58 @@ export async function createComment(
     return c;
   });
 
-  if (post.authorId !== authorId) {
+  if (data.parentId && parentAuthorId && parentAuthorId !== authorId) {
+    await createNotification({
+      recipientId: parentAuthorId,
+      actorId: authorId,
+      type: "reply_on_comment",
+      postId: post.id,
+      commentId: comment.id,
+      snippet: data.body,
+    });
+  } else if (post.authorId !== authorId) {
     await createNotification({
       recipientId: post.authorId,
       actorId: authorId,
       type: "comment_on_post",
       postId: post.id,
       commentId: comment.id,
+      snippet: data.body,
     });
   }
+
+  const mentioned = await resolveMentionedUserIds(data.body, authorId);
+  const skip = new Set(
+    [authorId, post.authorId, parentAuthorId].filter(Boolean) as string[],
+  );
+  await notifyMany(
+    mentioned.filter((id) => !skip.has(id)),
+    {
+      actorId: authorId,
+      type: "mention_in_comment",
+      postId: post.id,
+      commentId: comment.id,
+      snippet: data.body,
+    },
+  );
 
   return comment;
 }
 
 export async function deleteComment(id: string) {
-  const comment = await prisma.comment.findUnique({ where: { id } });
+  const comment = await prisma.comment.findUnique({
+    where: { id },
+    include: { replies: { select: { id: true } } },
+  });
   if (!comment) return;
+
+  const decrement = 1 + comment.replies.length;
 
   await prisma.$transaction(async (tx) => {
     await tx.comment.delete({ where: { id } });
     await tx.post.update({
       where: { id: comment.postId },
-      data: { commentCount: { decrement: 1 } },
+      data: { commentCount: { decrement } },
     });
   });
 }
@@ -93,6 +140,7 @@ export async function togglePostReaction(userId: string, postId: string) {
       actorId: userId,
       type: "reaction_on_post",
       postId,
+      snippet: post.body,
     });
   }
 
