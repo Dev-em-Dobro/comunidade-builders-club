@@ -3,37 +3,37 @@
 ## Referência
 
 **Circle** — minimalista, Spaces na navegação, foco em leitura e mobile.
+F013 eleva o shell e o feed sem abandonar o teal.
 
 ## Princípios
 
 - Mobile first; feed como composição principal.
-- Spaces: sidebar (desktop) / drawer (mobile).
+- Spaces: sidebar fixa desktop (~260px) / drawer mobile.
+- Feed central `max-w-2xl`; shell full-bleed (não coluna estreita flutuante).
 - Cards só onde há interação (composer, post).
-- Tipografia expressiva; hierarquia clara nome → body → meta.
-- Fundo com leve textura ou gradiente (atmosfera de comunidade).
+- Tipografia: Outfit (display) + DM Sans (corpo); hierarquia nome → body → meta.
+- Fundo com leve textura/gradiente (atmosfera de comunidade).
 - **Não** clonar a UI do Orion Lead Hunter.
 - Evitar look genérico “AI purple”, cream+serif terracotta, ou broadsheet denso.
 
-## Tokens (MVP)
+## Tokens
 
-Definir em CSS variables / Tailwind theme:
-
-- Fundo: tom frio escuro suave ou claro quente-neutro (escolher uma direção e manter).
-- Direção escolhida: **claro neutro com acento teal/verde-água** (comunidade, frescor), tipografia sans com display levemente geométrica.
-- Acento: teal (`--accent`).
-- Texto: near-black / muted gray.
-- Raio moderado (não pill excessivo).
+- Fundo: claro neutro `#f3f6f5`
+- Card: `#ffffff` com borda suave e sombra leve
+- Acento: teal `#0d9488` / hover `#0f766e`
+- Surface: `#e7efed`
+- Radius: 12–16px (não pill excessivo)
+- Sidebar: fundo card sólido, space ativo com surface + accent
 
 ## Superfícies
 
-| Superfície | Conteúdo do primeiro viewport |
-|------------|-------------------------------|
-| Login | Marca Builders Club, CTA Google + magic link |
-| Feed | Lista de posts + composer; nav spaces |
-| Post | Conteúdo + reações + comentários |
-| Perfil | Foto, nome, bio |
-| Admin | Lista simples de ações de moderação |
+| Superfície | Notas F013 |
+|------------|------------|
+| Login | Hero tipográfico + painel auth com ar |
+| Feed | Composer destacado; empty state tipográfico |
+| Post | Avatar, meta, barra de ações discreta |
+| Mobile | Header sticky + drawer Spaces |
 
 ## Motion
 
-2–3 motions sutis: entrada do feed, hover em post, abertura do drawer de spaces.
+Entrada fade dos posts; drawer slide; hover suave no post-card.

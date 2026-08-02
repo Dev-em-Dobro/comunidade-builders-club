@@ -2,10 +2,12 @@
 
 ## Domínios (Cloudflare → Vercel)
 
-| Ambiente | Domínio | Branch Vercel |
-|----------|---------|---------------|
-| Produção | `builders-club.devemdobro.com` | `main` |
+
+| Ambiente    | Domínio                                | Branch Vercel     |
+| ----------- | -------------------------------------- | ----------------- |
+| Produção    | `builders-club.devemdobro.com`         | `main`            |
 | Homologação | `staging.builders-club.devemdobro.com` | `feature/preview` |
+
 
 Sugestão alinhada ao Orion (`staging.orion-lead-hunter…`). Alternativas: `hml.builders-club…` ou `preview.builders-club…`.
 
@@ -24,6 +26,8 @@ Na Vercel → Project → Settings → Domains:
 
 ---
 
+
+
 ## Variáveis de ambiente
 
 Na Vercel, **não** use `DATABASE_URL_HML` / `DATABASE_URL_PROD` como nomes de runtime.
@@ -33,32 +37,50 @@ As chaves `DATABASE_URL_HML` / `DATABASE_URL_PROD` / `ORION_DATABASE_URL` são s
 
 ### Matriz (obrigatórias)
 
-| Variável | Production | Preview (staging) | Local |
-|----------|------------|-------------------|-------|
-| `DATABASE_URL` | Neon **prod** | Neon **HML** | Docker `127.0.0.1:5433` |
-| `BETTER_AUTH_SECRET` | secret forte (único) | secret forte (**outro** do prod) | gerado local |
-| `BETTER_AUTH_URL` | `https://builders-club.devemdobro.com` | `https://staging.builders-club.devemdobro.com` | `http://localhost:3000` |
-| `EMAIL_PROVIDER` | `resend` | `resend` (ou mailpit só local) | `mailpit` |
-| `BOOTSTRAP_ADMIN_EMAIL` | seu e-mail admin | mesmo ou de teste | seu e-mail |
+
+| Variável                | Production                             | Preview (staging)                              | Local                   |
+| ----------------------- | -------------------------------------- | ---------------------------------------------- | ----------------------- |
+| `DATABASE_URL`          | Neon **prod**                          | Neon **HML**                                   | Docker `127.0.0.1:5433` |
+| `BETTER_AUTH_SECRET`    | secret forte (único)                   | secret forte (**outro** do prod)               | gerado local            |
+| `BETTER_AUTH_URL`       | `https://builders-club.devemdobro.com` | `https://staging.builders-club.devemdobro.com` | `http://localhost:3000` |
+| `EMAIL_PROVIDER`        | `resend`                               | `resend` (ou mailpit só local)                 | `mailpit`               |
+| `BOOTSTRAP_ADMIN_EMAIL` | seu e-mail admin                       | mesmo ou de teste                              | seu e-mail              |
+| `HUBLA_WEBHOOK_TOKEN`   | token do webhook Hubla                 | mesmo ou dedicado de staging                   | opcional local          |
+| `HUBLA_PRODUCT_ID`      | ID produto Builders Club               | mesmo                                          | opcional local          |
+
+
+### Hubla (F014)
+
+Na Hubla, configure o webhook apontando para:
+
+- Prod: `https://builders-club.devemdobro.com/api/webhooks/hubla`
+- Staging: `https://staging.builders-club.devemdobro.com/api/webhooks/hubla`
+
+Header esperado: `x-hubla-token` = valor de `HUBLA_WEBHOOK_TOKEN`.
+
 
 ### E-mail (Resend) — Production + Preview
 
-| Variável | Exemplo |
-|----------|---------|
+
+| Variável                 | Exemplo                                       |
+| ------------------------ | --------------------------------------------- |
 | `RESEND_SMTP_FROM_EMAIL` | `Builders Club <noreply@mail.devemdobro.com>` |
-| `RESEND_SMTP_HOST` | `smtp.resend.com` |
-| `RESEND_SMTP_PORT` | `465` |
-| `RESEND_SMTP_USER` | `resend` |
-| `RESEND_SMTP_PASS` | API key Resend |
+| `RESEND_SMTP_HOST`       | `smtp.resend.com`                             |
+| `RESEND_SMTP_PORT`       | `465`                                         |
+| `RESEND_SMTP_USER`       | `resend`                                      |
+| `RESEND_SMTP_PASS`       | API key Resend                                |
+
 
 Domínio de envio precisa estar verificado no Resend (SPF/DKIM).
 
 ### Google OAuth (opcional)
 
-| Variável | Production / Preview |
-|----------|----------------------|
-| `GOOGLE_CLIENT_ID` | mesmo projeto GCP ou um por ambiente |
-| `GOOGLE_CLIENT_SECRET` | correspondente |
+
+| Variável               | Production / Preview                 |
+| ---------------------- | ------------------------------------ |
+| `GOOGLE_CLIENT_ID`     | mesmo projeto GCP ou um por ambiente |
+| `GOOGLE_CLIENT_SECRET` | correspondente                       |
+
 
 No Google Cloud Console → Authorized redirect URIs (Better Auth):
 
@@ -70,15 +92,19 @@ Authorized JavaScript origins: os três hosts acima (sem path).
 
 ### Só local / scripts (não precisa na Vercel)
 
-| Variável | Uso |
-|----------|-----|
-| `EMAIL_FROM` / `MAILPIT_URL` | Mailpit local |
-| `DATABASE_URL_HML` | scripts `--target=hml` |
-| `DATABASE_URL_PROD` | scripts `--target=prod` |
-| `ORION_DATABASE_URL` | `db:import-allowed --orion` |
-| `DATABASE_URL_STAGING` | alias de HML no `db:migrate:staging` (pode apontar pro mesmo Neon HML) |
+
+| Variável                     | Uso                                                                    |
+| ---------------------------- | ---------------------------------------------------------------------- |
+| `EMAIL_FROM` / `MAILPIT_URL` | Mailpit local                                                          |
+| `DATABASE_URL_HML`           | scripts `--target=hml`                                                 |
+| `DATABASE_URL_PROD`          | scripts `--target=prod`                                                |
+| `ORION_DATABASE_URL`         | `db:import-allowed --orion`                                            |
+| `DATABASE_URL_STAGING`       | alias de HML no `db:migrate:staging` (pode apontar pro mesmo Neon HML) |
+
 
 ---
+
+
 
 ## Checklist pós-domínio
 
@@ -89,8 +115,11 @@ Authorized JavaScript origins: os três hosts acima (sem path).
 5. Rodar migrate + seed + allowlist no Neon de cada ambiente (já feito em HML/prod localmente; repetir se criar Neon novo)
 6. Branch `feature/preview` para homolog; `main` para produção
 
+
+
 ## Fluxo Git
 
 ```
 feature/<id> → PR → feature/preview → PR → main
 ```
+

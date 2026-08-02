@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { toggleReactionAction, createCommentAction } from "@/actions/engagement";
 import { deletePostAction, togglePinAction } from "@/actions/posts";
 import { deleteCommentAction } from "@/actions/engagement";
@@ -71,14 +71,24 @@ export function PostActions({
 
 export function CommentForm({ postId }: { postId: string }) {
   const [pending, start] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+  const [ok, setOk] = useState(false);
 
   return (
     <form
       className="mt-4"
       action={(fd) => {
+        setError(null);
+        setOk(false);
         start(async () => {
-          await createCommentAction(fd);
-          (document.getElementById("comment-form") as HTMLFormElement)?.reset();
+          try {
+            await createCommentAction(fd);
+            (document.getElementById("comment-form") as HTMLFormElement)?.reset();
+            setOk(true);
+            window.setTimeout(() => setOk(false), 2000);
+          } catch (e) {
+            setError(e instanceof Error ? e.message : "Falha ao comentar.");
+          }
         });
       }}
       id="comment-form"
@@ -86,13 +96,23 @@ export function CommentForm({ postId }: { postId: string }) {
       <input type="hidden" name="postId" value={postId} />
       <textarea
         name="body"
-        className="input min-h-20"
+        className="input min-h-24"
         placeholder="Escreva um comentário…"
         required
         maxLength={5000}
       />
-      <button type="submit" className="btn-primary mt-2" disabled={pending}>
-        Comentar
+      {error ? (
+        <p className="mt-2 text-sm text-red-600" role="alert">
+          {error}
+        </p>
+      ) : null}
+      {ok ? (
+        <p className="mt-2 text-sm font-medium text-accent" role="status">
+          Comentário enviado
+        </p>
+      ) : null}
+      <button type="submit" className="btn-primary mt-3" disabled={pending}>
+        {pending ? "Enviando…" : "Comentar"}
       </button>
     </form>
   );

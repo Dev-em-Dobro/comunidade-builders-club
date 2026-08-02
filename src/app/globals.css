@@ -4,15 +4,16 @@
   --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
 
-  --color-background: #f4f7f6;
+  --color-background: #f3f6f5;
   --color-foreground: #0f172a;
   --color-card: #ffffff;
-  --color-border: #e2e8e6;
+  --color-border: #dde5e2;
   --color-muted: #64748b;
   --color-accent: #0d9488;
   --color-accent-hover: #0f766e;
   --color-accent-foreground: #ffffff;
-  --color-surface: #e8f0ee;
+  --color-surface: #e7efed;
+  --color-sidebar: #fafcfb;
 }
 
 @layer base {
@@ -23,8 +24,9 @@
   body {
     @apply bg-background text-foreground antialiased;
     background-image:
-      radial-gradient(ellipse 80% 50% at 10% -10%, rgba(13, 148, 136, 0.12), transparent),
-      radial-gradient(ellipse 60% 40% at 100% 0%, rgba(15, 118, 110, 0.08), transparent);
+      radial-gradient(ellipse 90% 55% at 8% -15%, rgba(13, 148, 136, 0.14), transparent 55%),
+      radial-gradient(ellipse 70% 45% at 100% 0%, rgba(15, 118, 110, 0.09), transparent 50%),
+      linear-gradient(180deg, #f7faf9 0%, #f3f6f5 40%, #eef3f1 100%);
     min-height: 100dvh;
   }
 
@@ -35,33 +37,64 @@
 
 @layer components {
   .btn-primary {
-    @apply inline-flex cursor-pointer items-center justify-center rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground transition-colors hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:opacity-50;
+    @apply inline-flex cursor-pointer items-center justify-center rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground shadow-sm transition-all hover:bg-accent-hover hover:shadow focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:opacity-50;
   }
 
   .btn-ghost {
-    @apply inline-flex cursor-pointer items-center justify-center rounded-lg px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-surface hover:text-foreground;
+    @apply inline-flex cursor-pointer items-center justify-center rounded-xl px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-surface hover:text-foreground;
   }
 
   .btn-outline {
-    @apply inline-flex cursor-pointer items-center justify-center rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-colors hover:bg-surface;
+    @apply inline-flex cursor-pointer items-center justify-center rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-medium shadow-sm transition-colors hover:bg-surface;
   }
 
   .input {
-    @apply w-full rounded-lg border border-border bg-card px-3 py-2 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/20;
+    @apply w-full rounded-xl border border-border bg-card px-3.5 py-2.5 text-sm outline-none transition-shadow focus:border-accent focus:ring-2 focus:ring-accent/20;
   }
 
   .post-card {
-    @apply rounded-xl border border-border bg-card p-4 shadow-sm transition-shadow hover:shadow-md;
+    @apply rounded-2xl border border-border/80 bg-card p-5 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-all duration-200 hover:border-border hover:shadow-[0_8px_24px_rgba(15,23,42,0.06)];
+  }
+
+  .nav-space {
+    @apply rounded-xl px-3 py-2 text-sm text-foreground/75 transition-colors hover:bg-surface hover:text-foreground;
+  }
+
+  .nav-space-active {
+    @apply bg-surface font-semibold text-accent;
+  }
+
+  .feed-wrap {
+    @apply mx-auto w-full max-w-2xl;
+  }
+
+  .page-title {
+    @apply font-[family-name:var(--font-outfit)] text-2xl font-bold tracking-tight md:text-[1.75rem];
+  }
+
+  .empty-state {
+    @apply rounded-2xl border border-dashed border-border bg-card/60 px-6 py-14 text-center;
   }
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }

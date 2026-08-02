@@ -40,7 +40,6 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
       const { error: err } = await authClient.signIn.magicLink({
         email,
         callbackURL: callbackUrl,
-        // Falha de token volta pro login (não pra home com ?error=)
         errorCallbackURL: `/login?callbackUrl=${encodeURIComponent(callbackUrl)}`,
       });
       if (err) {
@@ -70,57 +69,80 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
   }
 
   return (
-    <div className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-4">
-      <div className="rounded-2xl border border-border bg-card p-8 shadow-sm">
-        <p className="font-[family-name:var(--font-outfit)] text-3xl font-bold tracking-tight">
+    <div className="relative flex min-h-dvh items-center justify-center px-4 py-12">
+      <div
+        className="pointer-events-none absolute inset-0 opacity-90"
+        aria-hidden
+      />
+      <div className="relative w-full max-w-md animate-[fadeIn_0.4s_ease-out]">
+        <p className="font-[family-name:var(--font-outfit)] text-4xl font-bold tracking-tight text-foreground md:text-5xl">
           {NOME_PRODUTO}
         </p>
-        <p className="mt-2 text-sm text-muted">
-          Entre para acessar a comunidade dos builders.
+        <p className="mt-3 max-w-sm text-base leading-relaxed text-muted">
+          A comunidade dos builders da Dev em Dobro — conversas, dúvidas e
+          conquistas em um só lugar.
         </p>
 
-        {sent ? (
-          <p className="mt-8 text-sm text-foreground">
-            Enviamos um link para <strong>{email}</strong>. Abra o e-mail para
-            entrar.
-          </p>
-        ) : (
-          <div className="mt-8 flex flex-col gap-4">
-            {googleEnabled ? (
-              <button
-                type="button"
-                className="btn-outline w-full"
-                disabled={loading}
-                onClick={onGoogle}
-              >
-                Entrar com Google
-              </button>
-            ) : null}
-
-            <form onSubmit={onMagicLink} className="flex flex-col gap-3">
-              <label className="text-xs font-medium text-muted">
-                E-mail (magic link)
-                <input
-                  className="input mt-1"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="voce@email.com"
-                />
-              </label>
-              <button type="submit" className="btn-primary w-full" disabled={loading}>
-                {loading ? "Enviando…" : "Receber link"}
-              </button>
-            </form>
-
-            {error ? (
-              <p className="text-sm text-red-600" role="alert">
-                {error}
+        <div className="mt-8 rounded-2xl border border-border/80 bg-card p-7 shadow-[0_12px_40px_rgba(15,23,42,0.06)]">
+          {sent ? (
+            <div>
+              <p className="text-sm font-semibold text-foreground">
+                Link enviado
               </p>
-            ) : null}
-          </div>
-        )}
+              <p className="mt-2 text-sm leading-relaxed text-muted">
+                Enviamos um link para <strong className="text-foreground">{email}</strong>.
+                Abra o e-mail para entrar. O link vale por poucos minutos.
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-4">
+              <p className="text-sm font-medium text-foreground">
+                Entre na comunidade
+              </p>
+              {googleEnabled ? (
+                <button
+                  type="button"
+                  className="btn-outline w-full"
+                  disabled={loading}
+                  onClick={onGoogle}
+                >
+                  Entrar com Google
+                </button>
+              ) : null}
+
+              {googleEnabled ? (
+                <p className="text-center text-xs text-muted">ou use e-mail</p>
+              ) : null}
+
+              <form onSubmit={onMagicLink} className="flex flex-col gap-3">
+                <label className="text-xs font-medium text-muted">
+                  E-mail
+                  <input
+                    className="input mt-1.5"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="voce@email.com"
+                  />
+                </label>
+                <button
+                  type="submit"
+                  className="btn-primary w-full"
+                  disabled={loading}
+                >
+                  {loading ? "Enviando…" : "Receber magic link"}
+                </button>
+              </form>
+
+              {error ? (
+                <p className="text-sm text-red-600" role="alert">
+                  {error}
+                </p>
+              ) : null}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

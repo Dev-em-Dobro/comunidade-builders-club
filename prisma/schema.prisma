@@ -146,6 +146,15 @@ model AllowedEmail {
   @@map("allowed_email")
 }
 
+/// F014 — idempotência do webhook Hubla.
+model HublaWebhookDelivery {
+  idempotencyKey String   @id @map("idempotency_key")
+  eventType      String   @map("event_type")
+  processedAt    DateTime @default(now()) @map("processed_at")
+
+  @@map("hubla_webhook_delivery")
+}
+
 model Space {
   id          String   @id @default(cuid())
   slug        String   @unique
