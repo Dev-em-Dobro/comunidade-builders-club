@@ -123,6 +123,17 @@ Authorized JavaScript origins: os três hosts acima (sem path).
 feature/<id> → PR → feature/preview → PR → main
 ```
 
+## Fluxo de migrations (espelha o Git)
+
+```
+feature/*  →  db:migrate:staging (Neon HML)
+     ↓ merge em feature/preview (QA)
+main       →  db:migrate:prod -- --confirm (Neon prod)
+```
+
+- Em feature / preview: só HML.
+- Em produção: só após merge em `main` + confirmação explícita (`--confirm`).
+
 ## Checklist de lançamento (comunidade)
 
 Só liberar alunos quando **tudo** abaixo estiver ok:
@@ -130,10 +141,11 @@ Só liberar alunos quando **tudo** abaixo estiver ok:
 1. [ ] Branch `feature/preview` com F013–F017 + F011 (aulas) deployada na Vercel Preview
 2. [ ] Envs Preview + Production preenchidas (matriz acima, incl. `HUBLA_*`)
 3. [ ] Domínios staging + prod apontados (Cloudflare → Vercel)
-4. [ ] `npm run db:migrate:staging` (e prod só após merge em `main` + confirmação)
-5. [ ] Seed spaces + allowlist nos Neons
+4. [x] `npm run db:migrate:staging` (HML)
+5. [ ] Seed spaces + allowlist nos Neons (repetir se Neon novo)
 6. [ ] Webhook Hubla apontando staging (teste compra/cancelamento) e depois prod
 7. [ ] Smoke: login magic link + Google, feed, reply, @menção, Markdown, bell, admin bulk, aula Panda
 8. [ ] PR `feature/preview` → `main` após QA
-9. [ ] Comunicação aos alunos / liberação pública
+9. [ ] `npm run db:migrate:prod -- --confirm` após merge em `main`
+10. [ ] Comunicação aos alunos / liberação pública
 

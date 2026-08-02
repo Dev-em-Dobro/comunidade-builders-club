@@ -26,8 +26,16 @@ feature/<id-ou-descricao>  →  PR →  feature/preview  →  PR →  main
 
 ## Migrations
 
-- Features em andamento: somente Neon HML (`DATABASE_URL_STAGING` ou `DATABASE_URL_HML` via `npm run db:migrate:staging`).
-- Nunca migrar produção sem pedido explícito após validar no Preview.
+Espelham o fluxo de branch:
+
+| Momento | Comando | Banco |
+|---------|---------|--------|
+| Feature / merge em `feature/preview` | `npm run db:migrate:staging` | Neon HML |
+| Após merge em `main` + confirmação | `npm run db:migrate:prod -- --confirm` | Neon prod |
+
+- Features em andamento: **somente** HML (`db:migrate:staging`).
+- **Nunca** migrar produção sem pedido explícito após validar no Preview.
+- Produção: só depois do merge em `main` **e** confirmação do usuário.
 
 ## Domínios
 
