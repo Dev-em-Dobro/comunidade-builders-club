@@ -87,7 +87,8 @@ As postagens pertencem a uma categoria. Categorias iniciais:
 - Freelas
 - Conquistas
 - Projetos
-- Vagas
+
+> Space **Vagas** fora do escopo da comunidade — prospecção fica no Orion Lead Hunter.
 
 Cada categoria possui seu próprio feed.
 

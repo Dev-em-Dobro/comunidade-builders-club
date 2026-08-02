@@ -7,7 +7,7 @@ Em implementação
 CRUD admin de Spaces + seed das 7 categorias + feed por space.
 
 ## Critérios
-- [x] Seed: avisos, geral, duvidas, freelas, conquistas, projetos, vagas
+- [x] Seed: avisos, geral, duvidas, freelas, conquistas, projetos (sem `vagas` — Orion)
 - [x] Navegação lista spaces
 - [x] Admin cria/edita/remove
 - [x] Feed filtrado por `spaceId`/`slug`

@@ -1,9 +1,13 @@
 import { config } from "dotenv";
 import { PrismaClient } from "@prisma/client";
 
-// Garante que o .env do projeto prevalece sobre DATABASE_URL herdado do shell
-config({ path: ".env", override: true });
-config({ path: ".env.local", override: true });
+// Não sobrescrever DATABASE_URL já definido por scripts (db:seed:envs).
+const databaseUrlFromParent = process.env.DATABASE_URL;
+config({ path: ".env" });
+config({ path: ".env.local" });
+if (databaseUrlFromParent) {
+  process.env.DATABASE_URL = databaseUrlFromParent;
+}
 
 const prisma = new PrismaClient();
 
@@ -14,7 +18,6 @@ const SPACES = [
   { slug: "freelas", name: "Freelas", description: "Oportunidades de freela", sortOrder: 3 },
   { slug: "conquistas", name: "Conquistas", description: "Vitórias da galera", sortOrder: 4 },
   { slug: "projetos", name: "Projetos", description: "Mostre o que está construindo", sortOrder: 5 },
-  { slug: "vagas", name: "Vagas", description: "Vagas e indicações", sortOrder: 6 },
 ] as const;
 
 async function main() {
@@ -28,6 +31,12 @@ async function main() {
         sortOrder: space.sortOrder,
       },
     });
+  }
+
+  // Removido do produto — prospecção de vagas fica no Orion.
+  const removed = await prisma.space.deleteMany({ where: { slug: "vagas" } });
+  if (removed.count > 0) {
+    console.log(`Space vagas removido (${removed.count})`);
   }
 
   const adminEmail = process.env.BOOTSTRAP_ADMIN_EMAIL?.trim().toLowerCase();

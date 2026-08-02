@@ -25,10 +25,11 @@ Aqui ficam conversas, dúvidas, conquistas e avisos oficiais. Use este post como
 - **Avisos** — comunicados oficiais (leia sempre)
 - **Geral** — papo aberto do dia a dia
 - **Dúvidas** — perguntas técnicas e de carreira
-- **Freelas** — oportunidades de freela
+- **Freelas** — oportunidades de freela entre a comunidade
 - **Conquistas** — celebre vitórias (job, projeto, cliente)
 - **Projetos** — mostre o que está construindo
-- **Vagas** — vagas e indicações
+
+Prospecção de clientes e hunting de freelas fica no **Orion Lead Hunter** — não use a comunidade como board de vagas.
 
 Escolha o space certo antes de publicar — facilita quem vai te ajudar.
 
