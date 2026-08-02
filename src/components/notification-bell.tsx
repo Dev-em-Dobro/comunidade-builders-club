@@ -15,6 +15,24 @@ export type NotifPreview = {
   label: string;
 };
 
+function BellIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+      className={className ?? "h-5 w-5"}
+    >
+      <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+      <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+    </svg>
+  );
+}
+
 export function NotificationBell({
   unread,
   items,
@@ -51,20 +69,32 @@ export function NotificationBell({
         type="button"
         className={
           compact
-            ? "btn-ghost relative text-xs"
-            : "btn-ghost justify-start w-full"
+            ? "btn-ghost relative px-2"
+            : "btn-ghost w-full justify-start gap-2"
         }
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-haspopup="true"
+        aria-label={
+          unread > 0
+            ? `Notificações (${unread} não lidas)`
+            : "Notificações"
+        }
       >
-        {compact ? "Bell" : "Notificações"}
+        {compact ? (
+          <BellIcon />
+        ) : (
+          <>
+            <BellIcon className="h-4 w-4" />
+            Notificações
+          </>
+        )}
         {unread > 0 ? (
           <span
             className={
               compact
                 ? "absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-accent"
-                : "ml-2 inline-flex min-w-5 items-center justify-center rounded-full bg-accent px-1.5 py-0.5 text-[10px] font-bold text-white"
+                : "ml-auto inline-flex min-w-5 items-center justify-center rounded-full bg-accent px-1.5 py-0.5 text-[10px] font-bold text-white"
             }
           >
             {compact ? null : unread > 99 ? "99+" : unread}
