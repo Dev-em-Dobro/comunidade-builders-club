@@ -10,6 +10,15 @@ import {
   type NotifPreview,
 } from "@/components/notification-bell";
 import { MateriaisNav } from "@/components/materiais-nav";
+import {
+  ICON_ADMIN,
+  ICON_AULAS,
+  ICON_BUSCA,
+  ICON_NOVA,
+  ICON_PERFIL,
+  ICON_TODOS,
+  iconForSpace,
+} from "@/components/nav-icons";
 
 type SpaceLink = { id: string; slug: string; name: string };
 
@@ -30,9 +39,10 @@ function SpaceNav({
       <Link
         href="/"
         onClick={onNavigate}
-        className={`nav-space ${pathname === "/" ? "nav-space-active" : ""}`}
+        className={`nav-space flex items-center gap-2 ${pathname === "/" ? "nav-space-active" : ""}`}
       >
-        Todos
+        {ICON_TODOS}
+        <span className="truncate">Todos</span>
       </Link>
       {spaces.map((s) => {
         const href = `/spaces/${s.slug}`;
@@ -42,9 +52,10 @@ function SpaceNav({
             key={s.id}
             href={href}
             onClick={onNavigate}
-            className={`nav-space ${active ? "nav-space-active" : ""}`}
+            className={`nav-space flex items-center gap-2 ${active ? "nav-space-active" : ""}`}
           >
-            {s.name}
+            {iconForSpace(s.slug)}
+            <span className="truncate">{s.name}</span>
           </Link>
         );
       })}
@@ -68,20 +79,36 @@ function SidebarFooter({
     <div className="mt-auto flex flex-col gap-0.5 border-t border-border pt-4">
       <Link
         href="/aulas"
-        className={`btn-ghost justify-start ${pathname.startsWith("/aulas") ? "text-accent" : ""}`}
+        className={`btn-ghost justify-start gap-2 ${pathname.startsWith("/aulas") ? "text-accent" : ""}`}
         onClick={onNavigate}
       >
+        {ICON_AULAS}
         Aulas
       </Link>
-      <Link href="/busca" className="btn-ghost justify-start" onClick={onNavigate}>
+      <Link
+        href="/busca"
+        className={`btn-ghost justify-start gap-2 ${pathname.startsWith("/busca") ? "text-accent" : ""}`}
+        onClick={onNavigate}
+      >
+        {ICON_BUSCA}
         Busca
       </Link>
       <NotificationBell unread={unread} items={notifPreview} />
-      <Link href="/perfil" className="btn-ghost justify-start" onClick={onNavigate}>
+      <Link
+        href="/perfil"
+        className={`btn-ghost justify-start gap-2 ${pathname.startsWith("/perfil") ? "text-accent" : ""}`}
+        onClick={onNavigate}
+      >
+        {ICON_PERFIL}
         Perfil
       </Link>
       {isAdmin ? (
-        <Link href="/admin" className="btn-ghost justify-start" onClick={onNavigate}>
+        <Link
+          href="/admin"
+          className={`btn-ghost justify-start gap-2 ${pathname.startsWith("/admin") ? "text-accent" : ""}`}
+          onClick={onNavigate}
+        >
+          {ICON_ADMIN}
           Admin
         </Link>
       ) : null}
@@ -154,8 +181,9 @@ export function AppShellClient({
         <div className="mt-8 flex min-h-0 flex-1 flex-col overflow-y-auto">
           <Link
             href="/nova"
-            className={`nav-cta mb-5 ${pathname === "/nova" ? "nav-cta-active" : ""}`}
+            className={`nav-cta mb-5 inline-flex items-center justify-center gap-2 ${pathname === "/nova" ? "nav-cta-active" : ""}`}
           >
+            {ICON_NOVA}
             Nova publicação
           </Link>
           <SpaceNav spaces={spaces} />
@@ -197,9 +225,10 @@ export function AppShellClient({
             <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
               <Link
                 href="/nova"
-                className="nav-cta mb-5"
+                className="nav-cta mb-5 inline-flex items-center justify-center gap-2"
                 onClick={() => setDrawerOpen(false)}
               >
+                {ICON_NOVA}
                 Nova publicação
               </Link>
               <SpaceNav spaces={spaces} onNavigate={() => setDrawerOpen(false)} />
