@@ -1,5 +1,6 @@
-// F014 — POST /api/webhooks/hubla (Hubla → AllowedEmail + membership).
+// F014 / F021 — POST /api/webhooks/hubla (Hubla → AllowedEmail + membership).
 
+import { timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { processarWebhookHubla } from "@/lib/hubla";
 
@@ -14,6 +15,13 @@ function productIdFiltro(): string | null {
   return process.env.HUBLA_PRODUCT_ID?.trim() || null;
 }
 
+function tokenValido(recebido: string, esperado: string): boolean {
+  const a = Buffer.from(recebido);
+  const b = Buffer.from(esperado);
+  if (a.length !== b.length) return false;
+  return timingSafeEqual(a, b);
+}
+
 export async function POST(request: NextRequest) {
   const esperado = tokenEsperado();
   if (!esperado) {
@@ -23,8 +31,16 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const productId = productIdFiltro();
+  if (!productId) {
+    return NextResponse.json(
+      { ok: false, erro: "HUBLA_PRODUCT_ID não configurado" },
+      { status: 503 },
+    );
+  }
+
   const recebido = request.headers.get("x-hubla-token");
-  if (!recebido || recebido !== esperado) {
+  if (!recebido || !tokenValido(recebido, esperado)) {
     return NextResponse.json({ ok: false, erro: "Não autorizado" }, { status: 401 });
   }
 
@@ -47,7 +63,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const resultado = await processarWebhookHubla(payload, {
-      productIdFiltro: productIdFiltro(),
+      productIdFiltro: productId,
       idempotencyKey,
       eventType,
     });

@@ -29,7 +29,9 @@ export const auth = betterAuth({
   account: {
     accountLinking: {
       enabled: true,
+      // Só Google é trusted — evita link automático de providers não verificados.
       trustedProviders: ["google"],
+      allowDifferentEmails: false,
     },
   },
   databaseHooks: {

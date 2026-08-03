@@ -4,6 +4,7 @@ import { FormEvent, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { authClient } from "@/lib/auth/client";
 import { NOME_PRODUTO } from "@/lib/produto";
+import { safeCallbackPath } from "@/lib/security/urls";
 
 function mensagemErroCallback(code: string | null): string | null {
   if (!code) return null;
@@ -21,7 +22,7 @@ function mensagemErroCallback(code: string | null): string | null {
 
 export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/";
+  const callbackUrl = safeCallbackPath(searchParams.get("callbackUrl"));
   const erroCallback = useMemo(
     () => mensagemErroCallback(searchParams.get("error")),
     [searchParams],

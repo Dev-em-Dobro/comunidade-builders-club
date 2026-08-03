@@ -1,8 +1,16 @@
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 
+/** Só alfanumérico / hífen / underscore — evita host injection no embed. */
+const PANDA_ID_RE = /^[a-zA-Z0-9_-]+$/;
+
 export function pandaEmbedUrl(libraryId: string, externalId: string): string {
-  const lib = libraryId.replace(/^player-vz-/, "").replace(/\.tv\.pandavideo\.com\.br.*$/, "");
+  const lib = libraryId
+    .replace(/^player-vz-/, "")
+    .replace(/\.tv\.pandavideo\.com\.br.*$/, "");
+  if (!PANDA_ID_RE.test(lib) || !PANDA_ID_RE.test(externalId)) {
+    throw new Error("IDs Panda inválidos");
+  }
   return `https://player-vz-${lib}.tv.pandavideo.com.br/embed/?v=${encodeURIComponent(externalId)}`;
 }
 
@@ -29,8 +37,18 @@ export const lessonSchema = z.object({
     .regex(/^[a-z0-9-]+$/),
   title: z.string().trim().min(2).max(200),
   description: z.string().trim().max(5000).optional().nullable(),
-  pandaVideoExternalId: z.string().trim().min(1).max(200),
-  pandaLibraryId: z.string().trim().min(1).max(200),
+  pandaVideoExternalId: z
+    .string()
+    .trim()
+    .min(1)
+    .max(200)
+    .regex(PANDA_ID_RE, "ID externo Panda inválido"),
+  pandaLibraryId: z
+    .string()
+    .trim()
+    .min(1)
+    .max(200)
+    .regex(PANDA_ID_RE, "Library ID Panda inválido"),
   sortOrder: z.coerce.number().int().min(0).max(9999).default(0),
   published: z.boolean().default(false),
 });

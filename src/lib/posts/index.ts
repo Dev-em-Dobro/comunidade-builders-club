@@ -3,13 +3,14 @@ import { prisma } from "@/lib/db";
 import { notifyMany } from "@/lib/notifications";
 import { resolveMentionedUserIds } from "@/lib/mentions";
 import { titleFromBody } from "@/lib/posts/title";
+import { optionalHttpsUrl } from "@/lib/security/urls";
 
 export const createPostSchema = z.object({
   spaceId: z.string().min(1),
   body: z.string().trim().min(1).max(10000),
-  imageUrl: z.string().url().max(2000).optional().nullable().or(z.literal("")),
-  linkUrl: z.string().url().max(2000).optional().nullable().or(z.literal("")),
-  videoUrl: z.string().url().max(2000).optional().nullable().or(z.literal("")),
+  imageUrl: optionalHttpsUrl,
+  linkUrl: optionalHttpsUrl,
+  videoUrl: optionalHttpsUrl,
 });
 
 const postInclude = {

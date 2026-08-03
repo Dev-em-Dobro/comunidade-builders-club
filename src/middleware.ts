@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
+import { safeCallbackPath } from "@/lib/security/urls";
 
 function isProtectedPath(pathname: string): boolean {
   if (pathname === "/") return true;
@@ -28,8 +29,9 @@ export function middleware(request: NextRequest) {
 
   if (isProtectedPath(pathname) && !sessionCookie) {
     const loginUrl = new URL("/login", request.url);
-    const callback =
-      pathname + (request.nextUrl.search ? request.nextUrl.search : "");
+    const callback = safeCallbackPath(
+      pathname + (request.nextUrl.search ? request.nextUrl.search : ""),
+    );
     if (callback !== "/") {
       loginUrl.searchParams.set("callbackUrl", callback);
     }

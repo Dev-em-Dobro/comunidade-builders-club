@@ -58,7 +58,26 @@ export async function setMembershipStatus(
   });
 }
 
-export async function setMembershipRole(userId: string, role: Role) {
+export async function setMembershipRole(
+  actorUserId: string,
+  userId: string,
+  role: Role,
+) {
+  if (actorUserId === userId) {
+    throw new Error("Você não pode alterar o próprio papel.");
+  }
+
+  const target = await prisma.membership.findUnique({ where: { userId } });
+  if (!target) {
+    throw new Error("Membership não encontrada.");
+  }
+
+  if (target.role === "admin" && role !== "admin") {
+    throw new Error(
+      "Não é permitido demotar outro administrador. Use o banco/bootstrap se necessário.",
+    );
+  }
+
   return prisma.membership.update({
     where: { userId },
     data: { role },

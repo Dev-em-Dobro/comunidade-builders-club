@@ -45,8 +45,8 @@ As chaves `DATABASE_URL_HML` / `DATABASE_URL_PROD` / `ORION_DATABASE_URL` são s
 | `BETTER_AUTH_URL`       | `https://builders-club.devemdobro.com` | `https://staging.builders-club.devemdobro.com` | `http://localhost:3000` |
 | `EMAIL_PROVIDER`        | `resend`                               | `resend` (ou mailpit só local)                 | `mailpit`               |
 | `BOOTSTRAP_ADMIN_EMAIL` | seu e-mail admin                       | mesmo ou de teste                              | seu e-mail              |
-| `HUBLA_WEBHOOK_TOKEN`   | token do webhook Hubla                 | mesmo ou dedicado de staging                   | opcional local          |
-| `HUBLA_PRODUCT_ID`      | ID produto Builders Club               | mesmo                                          | opcional local          |
+| `HUBLA_WEBHOOK_TOKEN`   | token do webhook Hubla                 | mesmo ou dedicado de staging                   | obrigatório p/ webhook  |
+| `HUBLA_PRODUCT_ID`      | ID produto Builders Club (**obrigatório** no webhook) | mesmo                               | obrigatório p/ webhook  |
 
 
 ### Hubla (F014)
@@ -57,6 +57,8 @@ Na Hubla, configure o webhook apontando para:
 - Staging: `https://staging.builders-club.devemdobro.com/api/webhooks/hubla`
 
 Header esperado: `x-hubla-token` = valor de `HUBLA_WEBHOOK_TOKEN`.
+
+Sem `HUBLA_PRODUCT_ID` o endpoint responde **503** (não processa eventos de outros produtos).
 
 
 ### E-mail (Resend) — Production + Preview

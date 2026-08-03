@@ -184,13 +184,7 @@ export default async function AdminPage({ searchParams }: Props) {
                     </button>
                   </form>
                 ) : (
-                  <form
-                    action={setMemberRoleAction.bind(null, m.userId, "member")}
-                  >
-                    <button type="submit" className="btn-ghost text-xs">
-                      Remover admin
-                    </button>
-                  </form>
+                  <span className="text-xs text-muted">Admin</span>
                 )}
               </div>
             </li>

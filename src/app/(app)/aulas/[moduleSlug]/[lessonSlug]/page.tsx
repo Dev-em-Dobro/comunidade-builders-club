@@ -21,10 +21,15 @@ export default async function LessonPage({ params }: Props) {
   if (!lesson) notFound();
 
   const progress = await getLessonProgress(member.user.id, lesson.id);
-  const embed = pandaEmbedUrl(
-    lesson.pandaLibraryId,
-    lesson.pandaVideoExternalId,
-  );
+  let embed: string;
+  try {
+    embed = pandaEmbedUrl(
+      lesson.pandaLibraryId,
+      lesson.pandaVideoExternalId,
+    );
+  } catch {
+    notFound();
+  }
 
   return (
     <AppShell

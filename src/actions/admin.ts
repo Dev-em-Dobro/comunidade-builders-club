@@ -75,8 +75,8 @@ export async function setMemberStatusAction(
 }
 
 export async function setMemberRoleAction(userId: string, role: Role) {
-  await requireAdmin();
-  await setMembershipRole(userId, role);
+  const admin = await requireAdmin();
+  await setMembershipRole(admin.user.id, userId, role);
   revalidatePath("/admin");
 }
 

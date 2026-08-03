@@ -1,16 +1,11 @@
 import { z } from "zod";
 import { prisma } from "@/lib/db";
+import { optionalHttpsUrl } from "@/lib/security/urls";
 
 export const updateProfileSchema = z.object({
   displayName: z.string().trim().min(1).max(80),
   bio: z.string().trim().max(500).optional().nullable(),
-  avatarUrl: z
-    .string()
-    .url()
-    .max(2000)
-    .optional()
-    .nullable()
-    .or(z.literal("")),
+  avatarUrl: optionalHttpsUrl,
 });
 
 export async function updateProfile(
