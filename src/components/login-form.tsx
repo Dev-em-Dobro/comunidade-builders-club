@@ -140,6 +140,18 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
                   {error}
                 </p>
               ) : null}
+
+              <p className="pt-2 text-center text-xs text-muted">
+                Ao continuar, você concorda com os{" "}
+                <a href="/termos" className="text-accent hover:underline">
+                  Termos de Uso
+                </a>{" "}
+                e a{" "}
+                <a href="/privacidade" className="text-accent hover:underline">
+                  Política de Privacidade
+                </a>
+                .
+              </p>
             </div>
           )}
         </div>
