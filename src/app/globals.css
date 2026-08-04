@@ -73,7 +73,12 @@
   }
 
   .feed-wrap {
-    @apply mx-auto w-full max-w-2xl;
+    @apply mx-auto w-full max-w-5xl;
+  }
+
+  /* Boas-vindas / grades: usa mais a área ao lado do aside no desktop. */
+  .feed-wrap-wide {
+    @apply mx-auto w-full max-w-6xl;
   }
 
   .page-title {

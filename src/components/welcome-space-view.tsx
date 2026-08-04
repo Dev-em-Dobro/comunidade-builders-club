@@ -32,7 +32,7 @@ export function WelcomeSpaceView({
   const cards = posts.slice(hero ? 1 : 0);
 
   return (
-    <div className="feed-wrap">
+    <div className="feed-wrap-wide">
       <div>
         <h1 className="page-title">{spaceName}</h1>
         {spaceDescription ? (

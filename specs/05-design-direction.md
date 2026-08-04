@@ -9,7 +9,7 @@ F013 eleva o shell e o feed sem abandonar o teal.
 
 - Mobile first; feed como composição principal.
 - Spaces: sidebar fixa desktop (~260px) / drawer mobile.
-- Feed central `max-w-2xl`; shell full-bleed (não coluna estreita flutuante).
+- Feed central `max-w-5xl` (Boas-vindas `max-w-6xl`); shell full-bleed (não coluna estreita flutuante).
 - Cards só onde há interação (composer, post).
 - Tipografia: Outfit (display) + DM Sans (corpo); hierarquia nome → body → meta.
 - Fundo com leve textura/gradiente (atmosfera de comunidade).
