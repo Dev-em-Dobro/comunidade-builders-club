@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
 import { getSpaceBySlug } from "@/lib/spaces";
@@ -62,19 +61,13 @@ export default async function SpacePage({ params }: Props) {
               <p className="mt-1.5 text-sm text-muted">{space.description}</p>
             ) : null}
           </div>
-          <Link
-            href={`/nova?space=${space.slug}`}
-            className="btn-primary text-sm md:hidden"
-          >
-            Nova publicação
-          </Link>
         </div>
 
         <div className="mt-8">
           {posts.length === 0 ? (
             <EmptyState
               title="Nenhum post neste space"
-              description="Comece a conversa — use Nova publicação no menu."
+              description="Comece a conversa — use o botão Nova publicação."
             />
           ) : (
             <FeedList

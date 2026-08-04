@@ -41,16 +41,13 @@ export default async function HomePage({ searchParams }: Props) {
               </Link>
             </p>
           </div>
-          <Link href="/nova" className="btn-primary text-sm md:hidden">
-            Nova publicação
-          </Link>
         </div>
 
         <div className="mt-8">
           {posts.length === 0 ? (
             <EmptyState
               title="Nenhum post ainda"
-              description="Seja o primeiro a compartilhar algo com a comunidade — use Nova publicação no menu."
+              description="Seja o primeiro a compartilhar algo com a comunidade — use o botão Nova publicação."
             />
           ) : (
             <FeedList

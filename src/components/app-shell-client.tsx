@@ -22,6 +22,20 @@ import {
 
 type SpaceLink = { id: string; slug: string; name: string };
 
+function FeedLink({ onNavigate }: { onNavigate?: () => void }) {
+  const pathname = usePathname();
+  return (
+    <Link
+      href="/"
+      onClick={onNavigate}
+      className={`nav-space flex items-center gap-2 ${pathname === "/" ? "nav-space-active" : ""}`}
+    >
+      {ICON_TODOS}
+      <span className="truncate">Feed</span>
+    </Link>
+  );
+}
+
 function SpaceNav({
   spaces,
   onNavigate,
@@ -36,14 +50,6 @@ function SpaceNav({
       <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">
         Spaces
       </p>
-      <Link
-        href="/"
-        onClick={onNavigate}
-        className={`nav-space flex items-center gap-2 ${pathname === "/" ? "nav-space-active" : ""}`}
-      >
-        {ICON_TODOS}
-        <span className="truncate">Feed</span>
-      </Link>
       {spaces.map((s) => {
         const href = `/spaces/${s.slug}`;
         const active = pathname === href;
@@ -117,6 +123,24 @@ function SidebarFooter({
   );
 }
 
+function NovaPublicacaoFab() {
+  const pathname = usePathname();
+  if (pathname === "/nova" || pathname.startsWith("/entregaveis/")) {
+    return null;
+  }
+
+  return (
+    <Link
+      href="/nova"
+      className="fixed bottom-5 right-5 z-40 inline-flex h-14 items-center gap-2 rounded-full bg-accent px-5 text-sm font-semibold text-white shadow-lg shadow-accent/30 transition hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent md:bottom-8 md:right-8"
+      aria-label="Nova publicação"
+    >
+      {ICON_NOVA}
+      <span className="pr-0.5">Nova publicação</span>
+    </Link>
+  );
+}
+
 export function AppShellClient({
   children,
   displayName,
@@ -179,13 +203,8 @@ export function AppShellClient({
           </p>
         </div>
         <div className="mt-8 flex min-h-0 flex-1 flex-col overflow-y-auto">
-          <Link
-            href="/nova"
-            className={`nav-cta mb-5 inline-flex items-center justify-center gap-2 ${pathname === "/nova" ? "nav-cta-active" : ""}`}
-          >
-            {ICON_NOVA}
-            Nova publicação
-          </Link>
+          <FeedLink />
+          <div className="my-5 border-t border-border" />
           <SpaceNav spaces={spaces} />
           <div className="my-5 border-t border-border" />
           <MateriaisNav />
@@ -223,14 +242,8 @@ export function AppShellClient({
               </button>
             </div>
             <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-              <Link
-                href="/nova"
-                className="nav-cta mb-5 inline-flex items-center justify-center gap-2"
-                onClick={() => setDrawerOpen(false)}
-              >
-                {ICON_NOVA}
-                Nova publicação
-              </Link>
+              <FeedLink onNavigate={() => setDrawerOpen(false)} />
+              <div className="my-5 border-t border-border" />
               <SpaceNav spaces={spaces} onNavigate={() => setDrawerOpen(false)} />
               <div className="my-5 border-t border-border" />
               <MateriaisNav onNavigate={() => setDrawerOpen(false)} />
@@ -245,13 +258,13 @@ export function AppShellClient({
         </div>
       ) : null}
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="relative flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-border/80 bg-background/85 px-4 py-3 backdrop-blur-md md:hidden">
           <button
             type="button"
             className="btn-ghost -ml-1"
             onClick={() => setDrawerOpen(true)}
-            aria-label="Abrir spaces"
+            aria-label="Abrir menu"
           >
             Menu
           </button>
@@ -264,7 +277,10 @@ export function AppShellClient({
           <NotificationBell unread={unread} items={notifPreview} compact />
         </header>
 
-        <main className="flex-1 px-4 py-6 md:px-8 md:py-10">{children}</main>
+        <main className="flex-1 px-4 py-6 pb-24 md:px-8 md:py-10 md:pb-28">
+          {children}
+        </main>
+        <NovaPublicacaoFab />
       </div>
     </div>
   );

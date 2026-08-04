@@ -14,6 +14,7 @@
     "db:seed:envs": "npx tsx scripts/seed-envs.mts",
     "db:seed:aviso": "npx tsx scripts/seed-aviso-boas-vindas.mts",
     "db:seed:boas-vindas": "npx tsx scripts/seed-boas-vindas.mts",
+    "db:seed:welcome-cards": "npx tsx scripts/seed-welcome-cards.mts",
     "db:import-allowed": "npx tsx scripts/import-allowed-emails.mts",
     "db:studio": "prisma studio",
     "mailpit": "docker compose up -d mailpit",

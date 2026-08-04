@@ -64,7 +64,8 @@ export function WelcomeSpaceView({
 
       {posts.length === 0 ? (
         <p className="mt-10 text-sm text-muted">
-          Em breve: cards de orientação. Admins podem publicar neste space.
+          Em breve: cards de orientação. Admins podem publicar neste space ou
+          rodar o seed de welcome cards.
         </p>
       ) : (
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
