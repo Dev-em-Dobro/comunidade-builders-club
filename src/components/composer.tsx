@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { createPostAction } from "@/actions/posts";
+import { MentionTextarea } from "@/components/mention-textarea";
 
 export function Composer({
   spaces,
@@ -52,10 +53,10 @@ export function Composer({
           ))}
         </select>
       </label>
-      <textarea
+      <MentionTextarea
         name="body"
         className="input mt-3 min-h-36 resize-y text-[15px] leading-relaxed"
-        placeholder="O que você quer compartilhar? **negrito**, *itálico*, `código`, [link](https://…) e @Nome"
+        placeholder="O que você quer compartilhar? Digite @ para mencionar… Markdown básico também funciona."
         required
         maxLength={10000}
       />

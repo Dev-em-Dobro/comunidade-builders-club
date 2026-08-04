@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { toggleReactionAction, createCommentAction } from "@/actions/engagement";
 import { deletePostAction, togglePinAction } from "@/actions/posts";
 import { deleteCommentAction } from "@/actions/engagement";
+import { MentionTextarea } from "@/components/mention-textarea";
 
 export function PostActions({
   postId,
@@ -83,18 +84,20 @@ export function CommentForm({
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [ok, setOk] = useState(false);
+  const [formKey, setFormKey] = useState(0);
   const formId = parentId ? `comment-form-${parentId}` : "comment-form";
 
   return (
     <form
       className="mt-3"
+      key={formKey}
       action={(fd) => {
         setError(null);
         setOk(false);
         start(async () => {
           try {
             await createCommentAction(fd);
-            (document.getElementById(formId) as HTMLFormElement)?.reset();
+            setFormKey((k) => k + 1);
             setOk(true);
             onDone?.();
             window.setTimeout(() => setOk(false), 2000);
@@ -107,12 +110,11 @@ export function CommentForm({
     >
       <input type="hidden" name="postId" value={postId} />
       {parentId ? <input type="hidden" name="parentId" value={parentId} /> : null}
-      <textarea
+      <MentionTextarea
         name="body"
         className="input min-h-20"
         placeholder={
-          placeholder ??
-          "Comente… Markdown e @Nome do membro funcionam"
+          placeholder ?? "Comente… digite @ para mencionar um membro"
         }
         required
         maxLength={5000}
@@ -155,7 +157,7 @@ export function ReplyToggle({
         <CommentForm
           postId={postId}
           parentId={parentId}
-          placeholder="Responder… use @Nome para mencionar"
+          placeholder="Responder… digite @ para mencionar"
           onDone={() => setOpen(false)}
         />
       ) : null}

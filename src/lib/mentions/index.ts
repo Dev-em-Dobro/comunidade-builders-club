@@ -37,3 +37,28 @@ export async function resolveMentionedUserIds(
   }
   return [...ids];
 }
+
+export type MentionCandidate = {
+  userId: string;
+  displayName: string;
+  avatarUrl: string | null;
+};
+
+/** Sugestões para autocomplete de @ (membros active). */
+export async function searchMembersForMention(
+  q: string,
+  take = 8,
+): Promise<MentionCandidate[]> {
+  const term = q.trim();
+  return prisma.profile.findMany({
+    where: {
+      user: { membership: { status: "active" } },
+      ...(term.length > 0
+        ? { displayName: { contains: term, mode: "insensitive" as const } }
+        : {}),
+    },
+    select: { userId: true, displayName: true, avatarUrl: true },
+    take,
+    orderBy: { displayName: "asc" },
+  });
+}
