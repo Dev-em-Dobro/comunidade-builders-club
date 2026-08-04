@@ -12,12 +12,18 @@ if (databaseUrlFromParent) {
 const prisma = new PrismaClient();
 
 const SPACES = [
-  { slug: "avisos", name: "Avisos", description: "Comunicados oficiais", sortOrder: 0 },
-  { slug: "geral", name: "Geral", description: "Conversa aberta", sortOrder: 1 },
-  { slug: "duvidas", name: "Dúvidas", description: "Perguntas e respostas", sortOrder: 2 },
-  { slug: "freelas", name: "Freelas", description: "Oportunidades de freela", sortOrder: 3 },
-  { slug: "conquistas", name: "Conquistas", description: "Vitórias da galera", sortOrder: 4 },
-  { slug: "projetos", name: "Projetos", description: "Mostre o que está construindo", sortOrder: 5 },
+  {
+    slug: "boas-vindas",
+    name: "Boas-vindas",
+    description: "Orientações e primeiros passos na comunidade",
+    sortOrder: 0,
+  },
+  { slug: "avisos", name: "Avisos", description: "Comunicados oficiais", sortOrder: 1 },
+  { slug: "geral", name: "Geral", description: "Conversa aberta", sortOrder: 2 },
+  { slug: "duvidas", name: "Dúvidas", description: "Perguntas e respostas", sortOrder: 3 },
+  { slug: "freelas", name: "Freelas", description: "Oportunidades de freela", sortOrder: 4 },
+  { slug: "conquistas", name: "Conquistas", description: "Vitórias da galera", sortOrder: 5 },
+  { slug: "projetos", name: "Projetos", description: "Mostre o que está construindo", sortOrder: 6 },
 ] as const;
 
 async function main() {

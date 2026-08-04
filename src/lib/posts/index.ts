@@ -18,16 +18,24 @@ const postInclude = {
     include: { profile: true },
   },
   space: true,
+  reactions: { select: { userId: true } },
 } as const;
 
 export async function listPosts(opts: {
   spaceId?: string;
+  /** Exclui spaces por slug (ex.: boas-vindas no Feed global). */
+  excludeSpaceSlugs?: string[];
   cursor?: string;
   take?: number;
 }) {
   const take = opts.take ?? 20;
   const posts = await prisma.post.findMany({
-    where: opts.spaceId ? { spaceId: opts.spaceId } : undefined,
+    where: {
+      ...(opts.spaceId ? { spaceId: opts.spaceId } : {}),
+      ...(opts.excludeSpaceSlugs?.length
+        ? { space: { slug: { notIn: opts.excludeSpaceSlugs } } }
+        : {}),
+    },
     include: postInclude,
     orderBy: [{ pinnedAt: "desc" }, { createdAt: "desc" }],
     take: take + 1,

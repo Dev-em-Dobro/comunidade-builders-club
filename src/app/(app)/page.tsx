@@ -2,8 +2,9 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
 import { listPosts } from "@/lib/posts";
+import { WELCOME_SPACE_SLUG } from "@/lib/spaces/constants";
 import { AppShell } from "@/components/app-shell";
-import { PostCard } from "@/components/post-card";
+import { FeedList } from "@/components/feed-list";
 import { EmptyState } from "@/components/empty-state";
 
 type Props = { searchParams: Promise<{ error?: string }> };
@@ -14,12 +15,16 @@ export default async function HomePage({ searchParams }: Props) {
   const { error } = await searchParams;
   if (error) redirect("/");
 
-  const { posts } = await listPosts({});
+  const { posts } = await listPosts({
+    excludeSpaceSlugs: [WELCOME_SPACE_SLUG],
+    take: 40,
+  });
+  const isAdmin = member.membership.role === "admin";
 
   return (
     <AppShell
       userId={member.user.id}
-      isAdmin={member.membership.role === "admin"}
+      isAdmin={isAdmin}
       displayName={member.profile.displayName}
     >
       <div className="feed-wrap">
@@ -27,7 +32,7 @@ export default async function HomePage({ searchParams }: Props) {
           <div>
             <h1 className="page-title">Feed</h1>
             <p className="mt-1.5 text-sm text-muted">
-              Conversas de todos os spaces.{" "}
+              Timeline da comunidade.{" "}
               <Link
                 href="/busca"
                 className="font-medium text-accent hover:underline"
@@ -41,14 +46,18 @@ export default async function HomePage({ searchParams }: Props) {
           </Link>
         </div>
 
-        <div className="mt-8 space-y-3">
+        <div className="mt-8">
           {posts.length === 0 ? (
             <EmptyState
               title="Nenhum post ainda"
               description="Seja o primeiro a compartilhar algo com a comunidade — use Nova publicação no menu."
             />
           ) : (
-            posts.map((post) => <PostCard key={post.id} post={post} />)
+            <FeedList
+              posts={posts}
+              isAdmin={isAdmin}
+              currentUserId={member.user.id}
+            />
           )}
         </div>
       </div>

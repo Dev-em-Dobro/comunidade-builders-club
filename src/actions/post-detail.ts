@@ -1,0 +1,81 @@
+"use server";
+
+import { requireActiveMember } from "@/lib/membership/require-member";
+import { getPost, recordPostView } from "@/lib/posts";
+
+function serializeComment(c: {
+  id: string;
+  body: string;
+  createdAt: Date;
+  author: {
+    profile: { displayName: string; avatarUrl: string | null } | null;
+  };
+  replies?: Array<{
+    id: string;
+    body: string;
+    createdAt: Date;
+    author: {
+      profile: { displayName: string; avatarUrl: string | null } | null;
+    };
+  }>;
+}) {
+  return {
+    id: c.id,
+    body: c.body,
+    createdAt: c.createdAt.toISOString(),
+    authorName: c.author.profile?.displayName ?? "Membro",
+    avatarUrl: c.author.profile?.avatarUrl ?? null,
+    replies: (c.replies ?? []).map((r) => ({
+      id: r.id,
+      body: r.body,
+      createdAt: r.createdAt.toISOString(),
+      authorName: r.author.profile?.displayName ?? "Membro",
+      avatarUrl: r.author.profile?.avatarUrl ?? null,
+    })),
+  };
+}
+
+export type PostDetailDto = {
+  id: string;
+  title: string;
+  body: string;
+  imageUrl: string | null;
+  pinnedAt: string | null;
+  commentCount: number;
+  reactionCount: number;
+  viewCount: number;
+  createdAt: string;
+  space: { slug: string; name: string };
+  authorName: string;
+  avatarUrl: string | null;
+  liked: boolean;
+  comments: ReturnType<typeof serializeComment>[];
+};
+
+export async function getPostDetailAction(
+  postId: string,
+): Promise<PostDetailDto | null> {
+  const member = await requireActiveMember();
+  const post = await getPost(postId);
+  if (!post) return null;
+
+  const viewCount =
+    (await recordPostView(post.id, member.user.id)) ?? post.viewCount;
+
+  return {
+    id: post.id,
+    title: post.title,
+    body: post.body,
+    imageUrl: post.imageUrl,
+    pinnedAt: post.pinnedAt?.toISOString() ?? null,
+    commentCount: post.commentCount,
+    reactionCount: post.reactionCount,
+    viewCount,
+    createdAt: post.createdAt.toISOString(),
+    space: { slug: post.space.slug, name: post.space.name },
+    authorName: post.author.profile?.displayName ?? "Membro",
+    avatarUrl: post.author.profile?.avatarUrl ?? null,
+    liked: post.reactions.some((r) => r.userId === member.user.id),
+    comments: post.comments.map(serializeComment),
+  };
+}

@@ -3,8 +3,10 @@ import { notFound } from "next/navigation";
 import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
 import { getSpaceBySlug } from "@/lib/spaces";
 import { listPosts } from "@/lib/posts";
+import { WELCOME_SPACE_SLUG } from "@/lib/spaces/constants";
 import { AppShell } from "@/components/app-shell";
-import { PostCard } from "@/components/post-card";
+import { FeedList } from "@/components/feed-list";
+import { WelcomeSpaceView } from "@/components/welcome-space-view";
 import { EmptyState } from "@/components/empty-state";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -16,12 +18,40 @@ export default async function SpacePage({ params }: Props) {
   const space = await getSpaceBySlug(slug);
   if (!space) notFound();
 
-  const { posts } = await listPosts({ spaceId: space.id });
+  const { posts } = await listPosts({ spaceId: space.id, take: 40 });
+  const isAdmin = member.membership.role === "admin";
+
+  if (slug === WELCOME_SPACE_SLUG) {
+    return (
+      <AppShell
+        userId={member.user.id}
+        isAdmin={isAdmin}
+        displayName={member.profile.displayName}
+      >
+        <WelcomeSpaceView
+          spaceName={space.name}
+          spaceDescription={space.description}
+          isAdmin={isAdmin}
+          posts={posts.map((p) => ({
+            id: p.id,
+            title: p.title,
+            body: p.body,
+            imageUrl: p.imageUrl,
+            reactionCount: p.reactionCount,
+            commentCount: p.commentCount,
+            authorName: p.author.profile?.displayName ?? "Membro",
+            avatarUrl: p.author.profile?.avatarUrl ?? null,
+            createdAt: p.createdAt.toISOString(),
+          }))}
+        />
+      </AppShell>
+    );
+  }
 
   return (
     <AppShell
       userId={member.user.id}
-      isAdmin={member.membership.role === "admin"}
+      isAdmin={isAdmin}
       displayName={member.profile.displayName}
     >
       <div className="feed-wrap">
@@ -40,16 +70,19 @@ export default async function SpacePage({ params }: Props) {
           </Link>
         </div>
 
-        <div className="mt-8 space-y-3">
+        <div className="mt-8">
           {posts.length === 0 ? (
             <EmptyState
               title="Nenhum post neste space"
               description="Comece a conversa — use Nova publicação no menu."
             />
           ) : (
-            posts.map((post) => (
-              <PostCard key={post.id} post={post} showSpace={false} />
-            ))
+            <FeedList
+              posts={posts}
+              showSpace={false}
+              isAdmin={isAdmin}
+              currentUserId={member.user.id}
+            />
           )}
         </div>
       </div>

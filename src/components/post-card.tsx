@@ -1,23 +1,33 @@
+"use client";
+
 import Link from "next/link";
 import { previewFromBody } from "@/lib/posts/title";
+import { MarkdownBody } from "@/lib/markdown";
+import { PostActions } from "@/components/post-actions";
+
+export type PostCardData = {
+  id: string;
+  title: string;
+  body: string;
+  imageUrl: string | null;
+  pinnedAt: Date | string | null;
+  commentCount: number;
+  reactionCount: number;
+  viewCount: number;
+  createdAt: Date | string;
+  space: { slug: string; name: string };
+  author: {
+    profile: { displayName: string; avatarUrl: string | null } | null;
+  };
+  reactions?: { userId: string }[];
+};
 
 type PostCardProps = {
-  post: {
-    id: string;
-    title: string;
-    body: string;
-    imageUrl: string | null;
-    pinnedAt: Date | null;
-    commentCount: number;
-    reactionCount: number;
-    viewCount: number;
-    createdAt: Date;
-    space: { slug: string; name: string };
-    author: {
-      profile: { displayName: string; avatarUrl: string | null } | null;
-    };
-  };
+  post: PostCardData;
   showSpace?: boolean;
+  variant?: "compact" | "expanded";
+  isAdmin?: boolean;
+  currentUserId?: string;
 };
 
 function Avatar({
@@ -44,12 +54,109 @@ function Avatar({
   );
 }
 
-export function PostCard({ post, showSpace = true }: PostCardProps) {
+function formatDate(value: Date | string) {
+  const d = typeof value === "string" ? new Date(value) : value;
+  return d.toLocaleString("pt-BR", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+export function PostCard({
+  post,
+  showSpace = true,
+  variant = "compact",
+  isAdmin = false,
+  currentUserId,
+}: PostCardProps) {
   const name = post.author.profile?.displayName ?? "Membro";
   const avatarUrl = post.author.profile?.avatarUrl;
   const title =
     post.title?.trim() || previewFromBody(post.body, 90) || "Publicação";
   const preview = previewFromBody(post.body, 160);
+  const pinned = !!post.pinnedAt;
+  const liked = Boolean(
+    currentUserId && post.reactions?.some((r) => r.userId === currentUserId),
+  );
+
+  if (variant === "expanded") {
+    return (
+      <article className="post-card animate-[fadeIn_0.35s_ease-out] p-5">
+        <div className="flex gap-3">
+          <Avatar name={name} url={avatarUrl} />
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-start justify-between gap-2">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-foreground">
+                  {name}
+                </p>
+                <p className="mt-0.5 text-xs text-muted">
+                  {showSpace ? (
+                    <>
+                      <span className="font-medium text-accent/90">
+                        {post.space.name}
+                      </span>
+                      {" · "}
+                    </>
+                  ) : null}
+                  {formatDate(post.createdAt)}
+                  {pinned ? (
+                    <span className="ml-1 rounded-md bg-accent/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-accent">
+                      Fixado
+                    </span>
+                  ) : null}
+                </p>
+              </div>
+              <Link
+                href={`/posts/${post.id}`}
+                className="shrink-0 text-xs font-medium text-accent hover:underline"
+              >
+                Abrir →
+              </Link>
+            </div>
+
+            <h2 className="mt-3 font-[family-name:var(--font-outfit)] text-lg font-semibold leading-snug tracking-tight text-foreground">
+              {title}
+            </h2>
+            <div className="mt-3">
+              <MarkdownBody body={post.body} />
+            </div>
+            {post.imageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={post.imageUrl}
+                alt=""
+                className="mt-3 max-h-80 w-full rounded-xl object-cover"
+                loading="lazy"
+              />
+            ) : null}
+
+            <div className="mt-2 flex flex-wrap gap-3 text-xs text-muted">
+              <span>
+                {post.viewCount}{" "}
+                {post.viewCount === 1 ? "leitura" : "leituras"}
+              </span>
+              <span>
+                {post.commentCount}{" "}
+                {post.commentCount === 1 ? "comentário" : "comentários"}
+              </span>
+            </div>
+
+            <PostActions
+              postId={post.id}
+              spaceSlug={post.space.slug}
+              liked={liked}
+              reactionCount={post.reactionCount}
+              isAdmin={isAdmin}
+              pinned={pinned}
+            />
+          </div>
+        </div>
+      </article>
+    );
+  }
 
   return (
     <article className="post-card animate-[fadeIn_0.35s_ease-out] p-0">
@@ -73,13 +180,8 @@ export function PostCard({ post, showSpace = true }: PostCardProps) {
                     {" · "}
                   </>
                 ) : null}
-                {post.createdAt.toLocaleString("pt-BR", {
-                  day: "2-digit",
-                  month: "short",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-                {post.pinnedAt ? (
+                {formatDate(post.createdAt)}
+                {pinned ? (
                   <span className="ml-1 rounded-md bg-accent/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-accent">
                     Fixado
                   </span>

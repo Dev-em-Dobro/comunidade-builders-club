@@ -42,7 +42,7 @@ function SpaceNav({
         className={`nav-space flex items-center gap-2 ${pathname === "/" ? "nav-space-active" : ""}`}
       >
         {ICON_TODOS}
-        <span className="truncate">Todos</span>
+        <span className="truncate">Feed</span>
       </Link>
       {spaces.map((s) => {
         const href = `/spaces/${s.slug}`;
