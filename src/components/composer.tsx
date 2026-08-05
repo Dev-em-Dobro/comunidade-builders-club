@@ -5,14 +5,18 @@ import { useRef, useState, useTransition } from "react";
 import { createPostAction } from "@/actions/posts";
 import { MentionTextarea } from "@/components/mention-textarea";
 
-const IMAGE_ACCEPT = "image/jpeg,image/png,image/gif,.jpg,.jpeg,.png,.gif";
-const VIDEO_ACCEPT = "video/mp4,.mp4";
+const MEDIA_ACCEPT =
+  "image/jpeg,image/png,image/gif,video/mp4,.jpg,.jpeg,.png,.gif,.mp4";
 
 async function uploadFile(file: File): Promise<{ url: string; kind: string }> {
   const fd = new FormData();
   fd.set("file", file);
   const res = await fetch("/api/upload", { method: "POST", body: fd });
-  const data = (await res.json()) as { url?: string; kind?: string; error?: string };
+  const data = (await res.json()) as {
+    url?: string;
+    kind?: string;
+    error?: string;
+  };
   if (!res.ok || !data.url) {
     throw new Error(data.error ?? "Falha no upload.");
   }
@@ -33,28 +37,26 @@ export function Composer({
   const [imageUrl, setImageUrl] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
   const [linkUrl, setLinkUrl] = useState("");
-  const [uploading, setUploading] = useState<"image" | "video" | null>(null);
-  const imageInputRef = useRef<HTMLInputElement>(null);
-  const videoInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  async function onPick(
-    kind: "image" | "video",
-    file: File | undefined,
-  ) {
+  async function onPick(file: File | undefined) {
     if (!file) return;
     setError(null);
-    setUploading(kind);
+    setUploading(true);
     try {
       const result = await uploadFile(file);
-      if (result.kind === "video" || kind === "video") {
+      if (result.kind === "video") {
         setVideoUrl(result.url);
+        setImageUrl("");
       } else {
         setImageUrl(result.url);
+        setVideoUrl("");
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Falha no upload.");
     } finally {
-      setUploading(null);
+      setUploading(false);
     }
   }
 
@@ -116,22 +118,31 @@ export function Composer({
         {openExtra ? "Ocultar mídia" : "+ Imagem, vídeo ou link"}
       </button>
       {openExtra ? (
-        <div className="mt-2 grid gap-3 rounded-xl border border-border/80 bg-surface/40 p-3">
+        <div className="mt-2 space-y-3 rounded-xl border border-border/80 bg-surface/40 p-3">
           <div>
             <p className="text-xs font-medium text-muted">
-              Imagem (jpg, png, gif · máx. 1 MB)
+              Arquivo de mídia — imagens jpg/png/gif (máx. 1 MB) ou vídeo mp4
+              (máx. 50 MB)
             </p>
             <input
-              ref={imageInputRef}
+              ref={fileInputRef}
               type="file"
-              accept={IMAGE_ACCEPT}
-              className="mt-1.5 block w-full cursor-pointer text-sm"
-              disabled={!!uploading}
+              accept={MEDIA_ACCEPT}
+              className="hidden"
+              disabled={uploading}
               onChange={(e) => {
-                void onPick("image", e.target.files?.[0]);
+                void onPick(e.target.files?.[0]);
                 e.target.value = "";
               }}
             />
+            <button
+              type="button"
+              className="btn-outline mt-2 cursor-pointer text-xs"
+              disabled={uploading}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              {uploading ? "Enviando…" : "Escolher arquivo"}
+            </button>
             {imageUrl ? (
               <div className="mt-2 flex items-center gap-2">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -149,25 +160,9 @@ export function Composer({
                 </button>
               </div>
             ) : null}
-          </div>
-          <div>
-            <p className="text-xs font-medium text-muted">
-              Vídeo (mp4 · máx. 50 MB)
-            </p>
-            <input
-              ref={videoInputRef}
-              type="file"
-              accept={VIDEO_ACCEPT}
-              className="mt-1.5 block w-full cursor-pointer text-sm"
-              disabled={!!uploading}
-              onChange={(e) => {
-                void onPick("video", e.target.files?.[0]);
-                e.target.value = "";
-              }}
-            />
             {videoUrl ? (
               <div className="mt-2 flex items-center gap-2">
-                <span className="truncate text-xs text-muted">{videoUrl}</span>
+                <span className="truncate text-xs text-muted">Vídeo anexado</span>
                 <button
                   type="button"
                   className="cursor-pointer text-xs text-red-600 hover:underline"
@@ -188,11 +183,6 @@ export function Composer({
               maxLength={2000}
             />
           </label>
-          {uploading ? (
-            <p className="text-xs text-muted">
-              Enviando {uploading === "image" ? "imagem" : "vídeo"}…
-            </p>
-          ) : null}
         </div>
       ) : null}
       {error ? (
@@ -204,7 +194,7 @@ export function Composer({
         <button
           type="submit"
           className="btn-primary min-w-28"
-          disabled={pending || !!uploading}
+          disabled={pending || uploading}
         >
           {pending ? "Publicando…" : "Publicar"}
         </button>

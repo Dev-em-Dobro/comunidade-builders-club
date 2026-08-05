@@ -10,6 +10,7 @@ import {
 } from "@/actions/posts";
 import { deleteCommentAction } from "@/actions/engagement";
 import { MentionTextarea } from "@/components/mention-textarea";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 
 export function PostActions({
   postId,
@@ -23,6 +24,7 @@ export function PostActions({
   imageUrl,
   linkUrl,
   videoUrl,
+  compact = false,
 }: {
   postId: string;
   spaceSlug: string;
@@ -35,29 +37,39 @@ export function PostActions({
   imageUrl?: string | null;
   linkUrl?: string | null;
   videoUrl?: string | null;
+  /** Só gestão (editar/remover/fixar) — útil no card compacto. */
+  compact?: boolean;
 }) {
   const router = useRouter();
   const [pending, start] = useTransition();
   const [editing, setEditing] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
+  const [editLink, setEditLink] = useState(linkUrl ?? "");
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const canManage = Boolean(isAdmin || isAuthor);
 
   return (
-    <div className="mt-4">
+    <div
+      className={compact ? "mt-0" : "mt-4"}
+      onClick={(e) => e.stopPropagation()}
+      onKeyDown={(e) => e.stopPropagation()}
+    >
       <div className="flex flex-wrap items-center gap-2">
-        <button
-          type="button"
-          className="btn-outline cursor-pointer text-xs"
-          disabled={pending}
-          onClick={() =>
-            start(async () => {
-              await toggleReactionAction(postId);
-              router.refresh();
-            })
-          }
-        >
-          {liked ? "Remover reação" : "Reagir"} ({reactionCount})
-        </button>
+        {!compact ? (
+          <button
+            type="button"
+            className="btn-outline cursor-pointer text-xs"
+            disabled={pending}
+            onClick={() =>
+              start(async () => {
+                await toggleReactionAction(postId);
+                router.refresh();
+              })
+            }
+          >
+            {liked ? "Remover reação" : "Reagir"} ({reactionCount})
+          </button>
+        ) : null}
         {isAdmin ? (
           <button
             type="button"
@@ -79,22 +91,16 @@ export function PostActions({
               onClick={() => {
                 setEditing((v) => !v);
                 setEditError(null);
+                setEditLink(linkUrl ?? "");
               }}
             >
-              {editing ? "Cancelar edição" : "Editar"}
+              {editing ? "Cancelar" : "Editar"}
             </button>
             <button
               type="button"
               className="btn-ghost cursor-pointer text-xs text-red-600"
               disabled={pending}
-              onClick={() =>
-                start(async () => {
-                  if (confirm("Remover este post?")) {
-                    await deletePostAction(postId, spaceSlug);
-                    window.location.href = `/spaces/${spaceSlug}`;
-                  }
-                })
-              }
+              onClick={() => setConfirmDelete(true)}
             >
               Remover
             </button>
@@ -111,7 +117,7 @@ export function PostActions({
               try {
                 fd.set("postId", postId);
                 fd.set("imageUrl", imageUrl ?? "");
-                fd.set("linkUrl", linkUrl ?? "");
+                fd.set("linkUrl", editLink.trim());
                 fd.set("videoUrl", videoUrl ?? "");
                 await updatePostAction(fd);
                 setEditing(false);
@@ -131,6 +137,16 @@ export function PostActions({
             required
             maxLength={10000}
           />
+          <label className="block text-xs font-medium text-muted">
+            Link anexado (https://)
+            <input
+              className="input mt-1.5"
+              placeholder="https://github.com/…"
+              value={editLink}
+              onChange={(e) => setEditLink(e.target.value)}
+              maxLength={2000}
+            />
+          </label>
           {editError ? (
             <p className="text-sm text-red-600" role="alert">
               {editError}
@@ -141,6 +157,23 @@ export function PostActions({
           </button>
         </form>
       ) : null}
+
+      <ConfirmDialog
+        open={confirmDelete}
+        title="Remover publicação?"
+        message="Essa ação não pode ser desfeita. O post e os comentários serão removidos."
+        confirmLabel="Remover"
+        danger
+        pending={pending}
+        onCancel={() => setConfirmDelete(false)}
+        onConfirm={() =>
+          start(async () => {
+            await deletePostAction(postId, spaceSlug);
+            setConfirmDelete(false);
+            window.location.href = `/spaces/${spaceSlug}`;
+          })
+        }
+      />
     </div>
   );
 }
@@ -247,21 +280,33 @@ export function DeleteCommentButton({
 }) {
   const router = useRouter();
   const [pending, start] = useTransition();
+  const [open, setOpen] = useState(false);
   return (
-    <button
-      type="button"
-      className="cursor-pointer text-xs text-red-600 hover:underline"
-      disabled={pending}
-      onClick={() =>
-        start(async () => {
-          if (confirm("Remover comentário?")) {
+    <>
+      <button
+        type="button"
+        className="cursor-pointer text-xs text-red-600 hover:underline"
+        disabled={pending}
+        onClick={() => setOpen(true)}
+      >
+        Remover
+      </button>
+      <ConfirmDialog
+        open={open}
+        title="Remover comentário?"
+        message="Essa ação não pode ser desfeita."
+        confirmLabel="Remover"
+        danger
+        pending={pending}
+        onCancel={() => setOpen(false)}
+        onConfirm={() =>
+          start(async () => {
             await deleteCommentAction(commentId, postId);
+            setOpen(false);
             router.refresh();
-          }
-        })
-      }
-    >
-      Remover
-    </button>
+          })
+        }
+      />
+    </>
   );
 }

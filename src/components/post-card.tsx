@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { previewFromBody } from "@/lib/posts/title";
 import { MarkdownBody } from "@/lib/markdown";
 import { PostActions } from "@/components/post-actions";
@@ -69,6 +70,33 @@ function formatDate(value: Date | string) {
   });
 }
 
+function MetaLine({
+  post,
+  showSpace,
+  pinned,
+}: {
+  post: PostCardData;
+  showSpace: boolean;
+  pinned: boolean;
+}) {
+  return (
+    <p className="mt-0.5 text-xs text-muted">
+      {showSpace ? (
+        <>
+          <span className="font-medium text-accent/90">{post.space.name}</span>
+          {" · "}
+        </>
+      ) : null}
+      {formatDate(post.createdAt)}
+      {pinned ? (
+        <span className="ml-1 rounded-md bg-accent/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-accent">
+          Fixado
+        </span>
+      ) : null}
+    </p>
+  );
+}
+
 export function PostCard({
   post,
   showSpace = true,
@@ -76,6 +104,7 @@ export function PostCard({
   isAdmin = false,
   currentUserId,
 }: PostCardProps) {
+  const router = useRouter();
   const name = post.author.profile?.displayName ?? "Membro";
   const avatarUrl = post.author.profile?.avatarUrl;
   const title =
@@ -87,54 +116,70 @@ export function PostCard({
   );
   const authorId = post.authorId ?? post.author.id;
   const isAuthor = Boolean(currentUserId && authorId === currentUserId);
+  const canManage = isAdmin || isAuthor;
+  const href = `/posts/${post.id}`;
+
+  const actions = (
+    <PostActions
+      postId={post.id}
+      spaceSlug={post.space.slug}
+      liked={liked}
+      reactionCount={post.reactionCount}
+      isAdmin={isAdmin}
+      isAuthor={isAuthor}
+      pinned={pinned}
+      body={post.body}
+      imageUrl={post.imageUrl}
+      linkUrl={post.linkUrl}
+      videoUrl={post.videoUrl}
+      compact={variant === "compact"}
+    />
+  );
 
   if (variant === "expanded") {
     return (
-      <article className="post-card animate-[fadeIn_0.35s_ease-out] p-5">
+      <article
+        className="post-card animate-[fadeIn_0.35s_ease-out] cursor-pointer p-5 transition-colors hover:bg-surface/40"
+        role="link"
+        tabIndex={0}
+        onClick={() => router.push(href)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            router.push(href);
+          }
+        }}
+      >
         <div className="flex gap-3">
           <Avatar name={name} url={avatarUrl} />
           <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-start justify-between gap-2">
-              <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-foreground">
-                  {name}
-                </p>
-                <p className="mt-0.5 text-xs text-muted">
-                  {showSpace ? (
-                    <>
-                      <span className="font-medium text-accent/90">
-                        {post.space.name}
-                      </span>
-                      {" · "}
-                    </>
-                  ) : null}
-                  {formatDate(post.createdAt)}
-                  {pinned ? (
-                    <span className="ml-1 rounded-md bg-accent/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-accent">
-                      Fixado
-                    </span>
-                  ) : null}
-                </p>
-              </div>
-              <Link
-                href={`/posts/${post.id}`}
-                className="shrink-0 cursor-pointer text-xs font-medium text-accent hover:underline"
-              >
-                Abrir →
-              </Link>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-foreground">
+                {name}
+              </p>
+              <MetaLine post={post} showSpace={showSpace} pinned={pinned} />
             </div>
 
-            <h2 className="mt-3 font-[family-name:var(--font-outfit)] text-lg font-semibold leading-snug tracking-tight text-foreground">
-              {title}
-            </h2>
-            <div className="mt-3">
-              <MarkdownBody body={post.body} />
+            <div
+              onClick={(e) => {
+                const el = e.target as HTMLElement;
+                if (el.closest("a, button, video, input, textarea, label")) {
+                  e.stopPropagation();
+                }
+              }}
+            >
+              <h2 className="mt-3 font-[family-name:var(--font-outfit)] text-lg font-semibold leading-snug tracking-tight text-foreground">
+                {title}
+              </h2>
+              <div className="mt-3">
+                <MarkdownBody body={post.body} />
+              </div>
+              <PostMedia
+                imageUrl={post.imageUrl}
+                videoUrl={post.videoUrl}
+                linkUrl={post.linkUrl}
+              />
             </div>
-            <PostMedia
-              imageUrl={post.imageUrl}
-              videoUrl={post.videoUrl}
-              linkUrl={post.linkUrl}
-            />
 
             <div className="mt-2 flex flex-wrap gap-3 text-xs text-muted">
               <span>
@@ -145,21 +190,10 @@ export function PostCard({
                 {post.commentCount}{" "}
                 {post.commentCount === 1 ? "comentário" : "comentários"}
               </span>
+              <span className="ml-auto font-medium text-accent">Ler →</span>
             </div>
 
-            <PostActions
-              postId={post.id}
-              spaceSlug={post.space.slug}
-              liked={liked}
-              reactionCount={post.reactionCount}
-              isAdmin={isAdmin}
-              isAuthor={isAuthor}
-              pinned={pinned}
-              body={post.body}
-              imageUrl={post.imageUrl}
-              linkUrl={post.linkUrl}
-              videoUrl={post.videoUrl}
-            />
+            {actions}
           </div>
         </div>
       </article>
@@ -169,8 +203,8 @@ export function PostCard({
   return (
     <article className="post-card animate-[fadeIn_0.35s_ease-out] p-0">
       <Link
-        href={`/posts/${post.id}`}
-        className="block cursor-pointer p-5 transition-colors hover:bg-surface/40"
+        href={href}
+        className="block cursor-pointer p-5 pb-3 transition-colors hover:bg-surface/40"
       >
         <div className="flex gap-3">
           <Avatar name={name} url={avatarUrl} />
@@ -179,22 +213,7 @@ export function PostCard({
               <p className="truncate text-sm font-semibold text-foreground">
                 {name}
               </p>
-              <p className="mt-0.5 text-xs text-muted">
-                {showSpace ? (
-                  <>
-                    <span className="font-medium text-accent/90">
-                      {post.space.name}
-                    </span>
-                    {" · "}
-                  </>
-                ) : null}
-                {formatDate(post.createdAt)}
-                {pinned ? (
-                  <span className="ml-1 rounded-md bg-accent/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-accent">
-                    Fixado
-                  </span>
-                ) : null}
-              </p>
+              <MetaLine post={post} showSpace={showSpace} pinned={pinned} />
             </div>
 
             <h2 className="mt-3 font-[family-name:var(--font-outfit)] text-lg font-semibold leading-snug tracking-tight text-foreground">
@@ -239,6 +258,9 @@ export function PostCard({
           </div>
         </div>
       </Link>
+      {canManage ? (
+        <div className="border-t border-border/60 px-5 py-3">{actions}</div>
+      ) : null}
     </article>
   );
 }

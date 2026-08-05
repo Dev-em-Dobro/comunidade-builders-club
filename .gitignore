@@ -48,3 +48,4 @@ yarn-debug.log*
 .vscode/*
 !.vscode/extensions.json
 .idea/
+.env*
