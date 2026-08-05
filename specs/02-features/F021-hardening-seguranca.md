@@ -14,7 +14,7 @@ no login, URLs `javascript:` e demotion de admins.
 - [x] IDs Panda validados (sem host injection)
 - [x] `callbackUrl` só path relativo seguro (`/` interno)
 - [x] `imageUrl` / `linkUrl` / `videoUrl` / `avatarUrl` só `https:`
-- [x] Admin não demota outro admin nem altera o próprio papel
+- [x] Admin não altera o próprio papel (demotar outro admin: ver F032, com salvaguardas)
 - [x] Headers de segurança básicos no `next.config`
 
 ## Arquivos principais

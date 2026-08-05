@@ -57,7 +57,9 @@ export default async function AdminPage({ searchParams }: Props) {
       <section className="mt-8">
         <h2 className="text-lg font-semibold">Allowlist (acesso no login)</h2>
         <p className="mt-1 text-sm text-muted">
-          E-mails nesta lista entram já com membership ativo.
+          E-mails nesta lista entram já com membership ativo como{" "}
+          <strong>member</strong> (não admin). Use “Tornar admin” em Membros
+          quando precisar.
         </p>
         <form action={addAllowedEmailAction} className="mt-3 flex max-w-md gap-2">
           <input
@@ -175,12 +177,18 @@ export default async function AdminPage({ searchParams }: Props) {
                   <form
                     action={setMemberRoleAction.bind(null, m.userId, "admin")}
                   >
-                    <button type="submit" className="btn-ghost text-xs">
+                    <button type="submit" className="btn-ghost cursor-pointer text-xs">
                       Tornar admin
                     </button>
                   </form>
                 ) : (
-                  <span className="text-xs text-muted">Admin</span>
+                  <form
+                    action={setMemberRoleAction.bind(null, m.userId, "member")}
+                  >
+                    <button type="submit" className="btn-ghost cursor-pointer text-xs text-amber-700">
+                      Remover admin
+                    </button>
+                  </form>
                 )}
               </div>
             </li>

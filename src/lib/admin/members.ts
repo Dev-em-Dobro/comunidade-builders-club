@@ -67,15 +67,32 @@ export async function setMembershipRole(
     throw new Error("Você não pode alterar o próprio papel.");
   }
 
-  const target = await prisma.membership.findUnique({ where: { userId } });
+  const target = await prisma.membership.findUnique({
+    where: { userId },
+    include: { user: { select: { email: true } } },
+  });
   if (!target) {
     throw new Error("Membership não encontrada.");
   }
 
-  if (target.role === "admin" && role !== "admin") {
+  const bootstrap = process.env.BOOTSTRAP_ADMIN_EMAIL?.trim().toLowerCase();
+  if (
+    bootstrap &&
+    target.user.email.toLowerCase() === bootstrap &&
+    role !== "admin"
+  ) {
     throw new Error(
-      "Não é permitido demotar outro administrador. Use o banco/bootstrap se necessário.",
+      "Não é possível remover o admin do e-mail de bootstrap (BOOTSTRAP_ADMIN_EMAIL).",
     );
+  }
+
+  if (target.role === "admin" && role !== "admin") {
+    const adminCount = await prisma.membership.count({
+      where: { role: "admin", status: "active" },
+    });
+    if (adminCount <= 1) {
+      throw new Error("Não é possível remover o último administrador.");
+    }
   }
 
   return prisma.membership.update({
