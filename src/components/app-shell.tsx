@@ -1,6 +1,5 @@
 import { countUnread, listUnreadPreview, NOTIFICATION_LABELS } from "@/lib/notifications";
 import { listSpaces } from "@/lib/spaces";
-import { prisma } from "@/lib/db";
 import { AppShellClient } from "@/components/app-shell-client";
 
 export async function AppShell({
@@ -8,20 +7,18 @@ export async function AppShell({
   userId,
   isAdmin,
   displayName,
+  avatarUrl,
 }: {
   children: React.ReactNode;
   userId: string;
   isAdmin: boolean;
   displayName: string;
+  avatarUrl?: string | null;
 }) {
-  const [spaces, unread, preview, profile] = await Promise.all([
+  const [spaces, unread, preview] = await Promise.all([
     listSpaces(),
     countUnread(userId),
     listUnreadPreview(userId, 8),
-    prisma.profile.findUnique({
-      where: { userId },
-      select: { avatarUrl: true },
-    }),
   ]);
 
   return (
@@ -30,7 +27,7 @@ export async function AppShell({
       isAdmin={isAdmin}
       unread={unread}
       spaces={spaces.map((s) => ({ id: s.id, slug: s.slug, name: s.name }))}
-      avatarUrl={profile?.avatarUrl}
+      avatarUrl={avatarUrl}
       notifPreview={preview.map((n) => ({
         id: n.id,
         type: n.type,

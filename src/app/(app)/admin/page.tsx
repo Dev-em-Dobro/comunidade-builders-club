@@ -18,7 +18,6 @@ import {
   setMemberRoleAction,
   setMemberStatusAction,
 } from "@/actions/admin";
-import { AppShell } from "@/components/app-shell";
 import { AdminBulkAllowlist } from "@/components/admin-bulk-allowlist";
 import type { MembershipStatus } from "@prisma/client";
 
@@ -51,11 +50,7 @@ export default async function AdminPage({ searchParams }: Props) {
   ]);
 
   return (
-    <AppShell
-      userId={member.user.id}
-      isAdmin
-      displayName={member.profile.displayName}
-    >
+    <>
       <h1 className="page-title">Administração</h1>
 
       <section className="mt-8">
@@ -334,6 +329,6 @@ export default async function AdminPage({ searchParams }: Props) {
           </button>
         </form>
       </section>
-    </AppShell>
+    </>
   );
 }

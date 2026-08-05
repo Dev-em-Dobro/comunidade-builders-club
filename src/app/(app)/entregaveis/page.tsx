@@ -1,9 +1,6 @@
 import Link from "next/link";
 import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
 import { ENTREGAVEIS } from "@/lib/entregaveis";
-import { AppShell } from "@/components/app-shell";
-
-export const dynamic = "force-dynamic";
 
 function IconeDownload() {
   return (
@@ -30,11 +27,6 @@ export default async function EntregaveisPage() {
   const emBreve = ENTREGAVEIS.filter((e) => e.emBreve);
 
   return (
-    <AppShell
-      userId={member.user.id}
-      isAdmin={member.membership.role === "admin"}
-      displayName={member.profile.displayName}
-    >
       <div className="feed-wrap">
         <h1 className="page-title">Materiais</h1>
         <p className="mt-1.5 text-sm text-muted">
@@ -92,6 +84,5 @@ export default async function EntregaveisPage() {
           </section>
         ) : null}
       </div>
-    </AppShell>
   );
 }

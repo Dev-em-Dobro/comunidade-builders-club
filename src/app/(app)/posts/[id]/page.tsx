@@ -2,7 +2,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
 import { getPost, recordPostView } from "@/lib/posts";
-import { AppShell } from "@/components/app-shell";
 import { PostDetailContent } from "@/components/post-detail-content";
 import { previewFromBody } from "@/lib/posts/title";
 import type { PostDetailDto } from "@/actions/post-detail";
@@ -16,8 +15,7 @@ export default async function PostPage({ params }: Props) {
   const post = await getPost(id);
   if (!post) notFound();
 
-  const viewCount =
-    (await recordPostView(post.id, member.user.id)) ?? post.viewCount;
+  void recordPostView(post.id, member.user.id);
 
   const isAdmin = member.membership.role === "admin";
   const dto: PostDetailDto = {
@@ -28,7 +26,7 @@ export default async function PostPage({ params }: Props) {
     pinnedAt: post.pinnedAt?.toISOString() ?? null,
     commentCount: post.commentCount,
     reactionCount: post.reactionCount,
-    viewCount,
+    viewCount: post.viewCount,
     createdAt: post.createdAt.toISOString(),
     space: { slug: post.space.slug, name: post.space.name },
     authorName: post.author.profile?.displayName ?? "Membro",
@@ -54,23 +52,17 @@ export default async function PostPage({ params }: Props) {
     post.title?.trim() || previewFromBody(post.body, 90) || "Publicação";
 
   return (
-    <AppShell
-      userId={member.user.id}
-      isAdmin={isAdmin}
-      displayName={member.profile.displayName}
-    >
-      <div className="feed-wrap">
-        <Link
-          href={`/spaces/${post.space.slug}`}
-          className="text-sm font-medium text-accent hover:underline"
-        >
-          ← {post.space.name}
-        </Link>
-        <div className="mt-4">
-          <h1 className="sr-only">{title}</h1>
-          <PostDetailContent post={dto} isAdmin={isAdmin} />
-        </div>
+    <div className="feed-wrap">
+      <Link
+        href={`/spaces/${post.space.slug}`}
+        className="text-sm font-medium text-accent hover:underline"
+      >
+        ← {post.space.name}
+      </Link>
+      <div className="mt-4">
+        <h1 className="sr-only">{title}</h1>
+        <PostDetailContent post={dto} isAdmin={isAdmin} />
       </div>
-    </AppShell>
+    </div>
   );
 }

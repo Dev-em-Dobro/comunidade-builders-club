@@ -3,9 +3,6 @@ import { notFound } from "next/navigation";
 import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
 import { entregavelPorSlug } from "@/lib/entregaveis/catalogo";
 import { urlInternaEntregavel } from "@/lib/entregaveis/servir";
-import { AppShell } from "@/components/app-shell";
-
-export const dynamic = "force-dynamic";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -40,11 +37,6 @@ export default async function EntregavelPage({ params }: Props) {
   const src = urlInternaEntregavel(item.pasta);
 
   return (
-    <AppShell
-      userId={member.user.id}
-      isAdmin={member.membership.role === "admin"}
-      displayName={member.profile.displayName}
-    >
       <div className="-mx-4 -my-6 flex h-[calc(100dvh-3.5rem)] flex-col md:-mx-8 md:-my-10 md:h-[calc(100dvh)]">
         <header className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-2 border-b border-border bg-card/95 px-3 py-2.5 backdrop-blur sm:px-4 sm:py-3">
           <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
@@ -82,6 +74,5 @@ export default async function EntregavelPage({ params }: Props) {
           sandbox="allow-scripts allow-downloads allow-popups"
         />
       </div>
-    </AppShell>
   );
 }

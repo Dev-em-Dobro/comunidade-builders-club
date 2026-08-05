@@ -13,11 +13,15 @@ export const createPostSchema = z.object({
   videoUrl: optionalHttpsUrl,
 });
 
-const postInclude = {
+const postListIncludeBase = {
   author: {
     include: { profile: true },
   },
   space: true,
+} as const;
+
+const postInclude = {
+  ...postListIncludeBase,
   reactions: { select: { userId: true } },
 } as const;
 
@@ -25,6 +29,8 @@ export async function listPosts(opts: {
   spaceId?: string;
   /** Exclui spaces por slug (ex.: boas-vindas no Feed global). */
   excludeSpaceSlugs?: string[];
+  /** Se informado, carrega só a reação deste usuário (liked). */
+  viewerId?: string;
   cursor?: string;
   take?: number;
 }) {
@@ -36,7 +42,18 @@ export async function listPosts(opts: {
         ? { space: { slug: { notIn: opts.excludeSpaceSlugs } } }
         : {}),
     },
-    include: postInclude,
+    include: {
+      ...postListIncludeBase,
+      ...(opts.viewerId
+        ? {
+            reactions: {
+              where: { userId: opts.viewerId },
+              select: { userId: true },
+              take: 1,
+            },
+          }
+        : {}),
+    },
     orderBy: [{ pinnedAt: "desc" }, { createdAt: "desc" }],
     take: take + 1,
     ...(opts.cursor

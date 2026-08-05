@@ -1,4 +1,5 @@
 import type { Membership, Profile, Role } from "@prisma/client";
+import { cache } from "react";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import type { AuthUser } from "@/lib/auth";
@@ -12,16 +13,15 @@ export type ActiveMember = {
   membership: Membership;
 };
 
-export async function requireActiveMember(): Promise<ActiveMember> {
+/** Deduplica auth+membership no mesmo request (layout + page). */
+export const requireActiveMember = cache(async (): Promise<ActiveMember> => {
   const user = await requireUser();
   await ensureMemberBootstrap(user.id, user.name, user.image);
 
-  const membership = await prisma.membership.findUnique({
-    where: { userId: user.id },
-  });
-  const profile = await prisma.profile.findUnique({
-    where: { userId: user.id },
-  });
+  const [membership, profile] = await Promise.all([
+    prisma.membership.findUnique({ where: { userId: user.id } }),
+    prisma.profile.findUnique({ where: { userId: user.id } }),
+  ]);
 
   if (!membership || !profile) {
     throw new AuthError("Perfil incompleto. Tente entrar novamente.");
@@ -36,7 +36,7 @@ export async function requireActiveMember(): Promise<ActiveMember> {
   }
 
   return { user, profile, membership };
-}
+});
 
 export async function requireAdmin(): Promise<ActiveMember> {
   const member = await requireActiveMember();

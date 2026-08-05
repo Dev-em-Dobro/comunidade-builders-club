@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
 import { searchAll } from "@/lib/search";
-import { AppShell } from "@/components/app-shell";
 import { PostCard } from "@/components/post-card";
 
 type Props = { searchParams: Promise<{ q?: string }> };
@@ -13,11 +12,7 @@ export default async function BuscaPage({ searchParams }: Props) {
   const results = q.trim().length >= 2 ? await searchAll(q) : null;
 
   return (
-    <AppShell
-      userId={member.user.id}
-      isAdmin={member.membership.role === "admin"}
-      displayName={member.profile.displayName}
-    >
+    <>
       <h1 className="font-[family-name:var(--font-outfit)] text-2xl font-bold">
         Busca
       </h1>
@@ -79,6 +74,6 @@ export default async function BuscaPage({ searchParams }: Props) {
       ) : (
         <p className="mt-6 text-sm text-muted">Digite pelo menos 2 caracteres.</p>
       )}
-    </AppShell>
+    </>
   );
 }

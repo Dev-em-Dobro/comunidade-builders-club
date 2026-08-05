@@ -5,7 +5,6 @@ import {
   NOTIFICATION_LABELS,
 } from "@/lib/notifications";
 import { markAllReadAction, markReadAction } from "@/actions/notifications";
-import { AppShell } from "@/components/app-shell";
 import { EmptyState } from "@/components/empty-state";
 
 export default async function NotificacoesPage() {
@@ -14,11 +13,6 @@ export default async function NotificacoesPage() {
   const items = await listNotifications(member.user.id);
 
   return (
-    <AppShell
-      userId={member.user.id}
-      isAdmin={member.membership.role === "admin"}
-      displayName={member.profile.displayName}
-    >
       <div className="feed-wrap">
         <div className="flex items-center justify-between gap-4">
           <h1 className="page-title">Notificações</h1>
@@ -80,6 +74,5 @@ export default async function NotificacoesPage() {
           </ul>
         )}
       </div>
-    </AppShell>
   );
 }

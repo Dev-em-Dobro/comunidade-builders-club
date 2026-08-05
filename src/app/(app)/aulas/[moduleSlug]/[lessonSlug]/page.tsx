@@ -7,7 +7,6 @@ import {
   pandaEmbedUrl,
 } from "@/lib/aulas";
 import { markLessonCompletedAction } from "@/actions/aulas";
-import { AppShell } from "@/components/app-shell";
 
 type Props = {
   params: Promise<{ moduleSlug: string; lessonSlug: string }>;
@@ -32,11 +31,6 @@ export default async function LessonPage({ params }: Props) {
   }
 
   return (
-    <AppShell
-      userId={member.user.id}
-      isAdmin={member.membership.role === "admin"}
-      displayName={member.profile.displayName}
-    >
       <div className="mx-auto w-full max-w-3xl">
         <Link
           href="/aulas"
@@ -86,6 +80,5 @@ export default async function LessonPage({ params }: Props) {
           )}
         </div>
       </div>
-    </AppShell>
   );
 }

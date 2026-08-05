@@ -1,5 +1,4 @@
 import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
-import { AppShell } from "@/components/app-shell";
 import { updateProfileAction } from "@/actions/profile";
 
 export default async function PerfilPage() {
@@ -8,11 +7,7 @@ export default async function PerfilPage() {
   const { profile } = member;
 
   return (
-    <AppShell
-      userId={member.user.id}
-      isAdmin={member.membership.role === "admin"}
-      displayName={profile.displayName}
-    >
+    <>
       <h1 className="font-[family-name:var(--font-outfit)] text-2xl font-bold">
         Perfil
       </h1>
@@ -70,6 +65,6 @@ export default async function PerfilPage() {
           Salvar
         </button>
       </form>
-    </AppShell>
+    </>
   );
 }
