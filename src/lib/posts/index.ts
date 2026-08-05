@@ -3,14 +3,23 @@ import { prisma } from "@/lib/db";
 import { notifyMany } from "@/lib/notifications";
 import { resolveMentionedUserIds } from "@/lib/mentions";
 import { titleFromBody } from "@/lib/posts/title";
-import { optionalHttpsUrl } from "@/lib/security/urls";
+import { optionalHttpsUrl, optionalMediaUrl } from "@/lib/security/urls";
+import { WELCOME_SPACE_SLUG } from "@/lib/spaces/constants";
+import { ForbiddenError } from "@/lib/auth/errors";
 
 export const createPostSchema = z.object({
   spaceId: z.string().min(1),
   body: z.string().trim().min(1).max(10000),
-  imageUrl: optionalHttpsUrl,
+  imageUrl: optionalMediaUrl,
   linkUrl: optionalHttpsUrl,
-  videoUrl: optionalHttpsUrl,
+  videoUrl: optionalMediaUrl,
+});
+
+export const updatePostSchema = z.object({
+  body: z.string().trim().min(1).max(10000),
+  imageUrl: optionalMediaUrl,
+  linkUrl: optionalHttpsUrl,
+  videoUrl: optionalMediaUrl,
 });
 
 const postListIncludeBase = {
@@ -91,11 +100,24 @@ export async function getPost(id: string) {
   });
 }
 
+async function assertCanPostToSpace(spaceId: string, isAdmin: boolean) {
+  const space = await prisma.space.findUnique({ where: { id: spaceId } });
+  if (!space) throw new Error("Space não encontrado.");
+  if (space.slug === WELCOME_SPACE_SLUG && !isAdmin) {
+    throw new ForbiddenError(
+      "Apenas administradores podem publicar em Boas-vindas.",
+    );
+  }
+  return space;
+}
+
 export async function createPost(
   authorId: string,
   raw: z.infer<typeof createPostSchema>,
+  opts: { isAdmin: boolean },
 ) {
   const data = createPostSchema.parse(raw);
+  await assertCanPostToSpace(data.spaceId, opts.isAdmin);
   const title = titleFromBody(data.body);
   const post = await prisma.post.create({
     data: {
@@ -121,7 +143,42 @@ export async function createPost(
   return post;
 }
 
-export async function deletePost(id: string) {
+export async function updatePost(
+  id: string,
+  authorId: string,
+  isAdmin: boolean,
+  raw: z.infer<typeof updatePostSchema>,
+) {
+  const existing = await prisma.post.findUnique({ where: { id } });
+  if (!existing) throw new Error("Post não encontrado.");
+  if (!isAdmin && existing.authorId !== authorId) {
+    throw new ForbiddenError("Você só pode editar seus próprios posts.");
+  }
+  const data = updatePostSchema.parse(raw);
+  const title = titleFromBody(data.body);
+  return prisma.post.update({
+    where: { id },
+    data: {
+      title,
+      body: data.body,
+      imageUrl: data.imageUrl || null,
+      linkUrl: data.linkUrl || null,
+      videoUrl: data.videoUrl || null,
+    },
+    include: postInclude,
+  });
+}
+
+export async function deletePost(
+  id: string,
+  actorId: string,
+  isAdmin: boolean,
+) {
+  const existing = await prisma.post.findUnique({ where: { id } });
+  if (!existing) throw new Error("Post não encontrado.");
+  if (!isAdmin && existing.authorId !== actorId) {
+    throw new ForbiddenError("Você só pode remover seus próprios posts.");
+  }
   return prisma.post.delete({ where: { id } });
 }
 

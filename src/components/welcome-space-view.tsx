@@ -21,11 +21,13 @@ export function WelcomeSpaceView({
   spaceDescription,
   posts,
   isAdmin,
+  currentUserId,
 }: {
   spaceName: string;
   spaceDescription: string | null;
   posts: WelcomeCardPost[];
   isAdmin: boolean;
+  currentUserId: string;
 }) {
   const [openId, setOpenId] = useState<string | null>(null);
   const hero = posts[0];
@@ -114,6 +116,7 @@ export function WelcomeSpaceView({
       <PostModal
         postId={openId}
         isAdmin={isAdmin}
+        currentUserId={currentUserId}
         onClose={() => setOpenId(null)}
       />
     </div>

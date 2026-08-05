@@ -4,12 +4,16 @@ import Link from "next/link";
 import { previewFromBody } from "@/lib/posts/title";
 import { MarkdownBody } from "@/lib/markdown";
 import { PostActions } from "@/components/post-actions";
+import { PostMedia } from "@/components/post-media";
 
 export type PostCardData = {
   id: string;
   title: string;
   body: string;
   imageUrl: string | null;
+  linkUrl?: string | null;
+  videoUrl?: string | null;
+  authorId?: string;
   pinnedAt: Date | string | null;
   commentCount: number;
   reactionCount: number;
@@ -17,6 +21,7 @@ export type PostCardData = {
   createdAt: Date | string;
   space: { slug: string; name: string };
   author: {
+    id?: string;
     profile: { displayName: string; avatarUrl: string | null } | null;
   };
   reactions?: { userId: string }[];
@@ -80,6 +85,8 @@ export function PostCard({
   const liked = Boolean(
     currentUserId && post.reactions?.some((r) => r.userId === currentUserId),
   );
+  const authorId = post.authorId ?? post.author.id;
+  const isAuthor = Boolean(currentUserId && authorId === currentUserId);
 
   if (variant === "expanded") {
     return (
@@ -111,7 +118,7 @@ export function PostCard({
               </div>
               <Link
                 href={`/posts/${post.id}`}
-                className="shrink-0 text-xs font-medium text-accent hover:underline"
+                className="shrink-0 cursor-pointer text-xs font-medium text-accent hover:underline"
               >
                 Abrir →
               </Link>
@@ -123,15 +130,11 @@ export function PostCard({
             <div className="mt-3">
               <MarkdownBody body={post.body} />
             </div>
-            {post.imageUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={post.imageUrl}
-                alt=""
-                className="mt-3 max-h-80 w-full rounded-xl object-cover"
-                loading="lazy"
-              />
-            ) : null}
+            <PostMedia
+              imageUrl={post.imageUrl}
+              videoUrl={post.videoUrl}
+              linkUrl={post.linkUrl}
+            />
 
             <div className="mt-2 flex flex-wrap gap-3 text-xs text-muted">
               <span>
@@ -150,7 +153,12 @@ export function PostCard({
               liked={liked}
               reactionCount={post.reactionCount}
               isAdmin={isAdmin}
+              isAuthor={isAuthor}
               pinned={pinned}
+              body={post.body}
+              imageUrl={post.imageUrl}
+              linkUrl={post.linkUrl}
+              videoUrl={post.videoUrl}
             />
           </div>
         </div>
@@ -162,7 +170,7 @@ export function PostCard({
     <article className="post-card animate-[fadeIn_0.35s_ease-out] p-0">
       <Link
         href={`/posts/${post.id}`}
-        className="block p-5 transition-colors hover:bg-surface/40"
+        className="block cursor-pointer p-5 transition-colors hover:bg-surface/40"
       >
         <div className="flex gap-3">
           <Avatar name={name} url={avatarUrl} />
@@ -206,6 +214,11 @@ export function PostCard({
                 className="mt-3 max-h-40 w-full rounded-xl object-cover"
                 loading="lazy"
               />
+            ) : null}
+            {!post.imageUrl && post.linkUrl ? (
+              <p className="mt-2 truncate text-xs font-medium text-accent">
+                {post.linkUrl}
+              </p>
             ) : null}
 
             <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-border/70 pt-3 text-xs text-muted">

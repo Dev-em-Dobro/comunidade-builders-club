@@ -123,16 +123,25 @@ function SidebarFooter({
   );
 }
 
-function NovaPublicacaoFab() {
+function NovaPublicacaoFab({ isAdmin }: { isAdmin: boolean }) {
   const pathname = usePathname();
   if (pathname === "/nova" || pathname.startsWith("/entregaveis/")) {
     return null;
   }
+  // Membros comuns não publicam em Boas-vindas — esconde o FAB nesse space.
+  if (!isAdmin && pathname.startsWith("/spaces/boas-vindas")) {
+    return null;
+  }
+
+  const href =
+    pathname.startsWith("/spaces/") && !pathname.includes("boas-vindas")
+      ? `/nova?space=${pathname.split("/")[2] ?? ""}`
+      : "/nova";
 
   return (
     <Link
-      href="/nova"
-      className="fixed bottom-5 right-5 z-40 inline-flex h-14 items-center gap-2 rounded-full bg-accent px-5 text-sm font-semibold text-white shadow-lg shadow-accent/30 transition hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent md:bottom-8 md:right-8"
+      href={href}
+      className="fixed bottom-5 right-5 z-40 inline-flex h-14 cursor-pointer items-center gap-2 rounded-full bg-accent px-5 text-sm font-semibold text-white shadow-lg shadow-accent/30 transition hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent md:bottom-8 md:right-8"
       aria-label="Nova publicação"
     >
       {ICON_NOVA}
@@ -280,7 +289,7 @@ export function AppShellClient({
         <main className="flex-1 px-4 py-6 pb-24 md:px-8 md:py-10 md:pb-28">
           {children}
         </main>
-        <NovaPublicacaoFab />
+        <NovaPublicacaoFab isAdmin={isAdmin} />
       </div>
     </div>
   );

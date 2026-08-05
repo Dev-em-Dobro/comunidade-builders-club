@@ -56,7 +56,7 @@ export function FeedViewToggle({
     >
       <button
         type="button"
-        className={`rounded-md px-2.5 py-1.5 ${value === "compact" ? "bg-accent/10" : ""}`}
+        className={`cursor-pointer rounded-md px-2.5 py-1.5 ${value === "compact" ? "bg-accent/10" : ""}`}
         aria-pressed={value === "compact"}
         title="Visão reduzida"
         onClick={() => onChange("compact")}
@@ -66,7 +66,7 @@ export function FeedViewToggle({
       </button>
       <button
         type="button"
-        className={`rounded-md px-2.5 py-1.5 ${value === "expanded" ? "bg-accent/10" : ""}`}
+        className={`cursor-pointer rounded-md px-2.5 py-1.5 ${value === "expanded" ? "bg-accent/10" : ""}`}
         aria-pressed={value === "expanded"}
         title="Visão expandida"
         onClick={() => onChange("expanded")}

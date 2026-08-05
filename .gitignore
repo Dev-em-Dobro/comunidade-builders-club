@@ -19,6 +19,9 @@ next-env.d.ts
 *.pem
 Thumbs.db
 
+# uploads locais (ADR-008 fallback)
+/public/uploads/
+
 # debug
 npm-debug.log*
 yarn-debug.log*

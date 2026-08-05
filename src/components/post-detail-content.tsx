@@ -9,6 +9,7 @@ import {
 import { EmptyState } from "@/components/empty-state";
 import { MarkdownBody } from "@/lib/markdown";
 import { previewFromBody } from "@/lib/posts/title";
+import { PostMedia } from "@/components/post-media";
 import type { PostDetailDto } from "@/actions/post-detail";
 
 function CommentBlock({
@@ -16,11 +17,13 @@ function CommentBlock({
   postId,
   isAdmin,
   nested = false,
+  onCommentDone,
 }: {
   comment: PostDetailDto["comments"][number] | PostDetailDto["comments"][number]["replies"][number];
   postId: string;
   isAdmin: boolean;
   nested?: boolean;
+  onCommentDone?: () => void;
 }) {
   const replies = "replies" in comment ? comment.replies : undefined;
   return (
@@ -37,7 +40,13 @@ function CommentBlock({
           <p className="mt-2 text-xs text-muted">
             {new Date(comment.createdAt).toLocaleString("pt-BR")}
           </p>
-          {!nested ? <ReplyToggle postId={postId} parentId={comment.id} /> : null}
+          {!nested ? (
+            <ReplyToggle
+              postId={postId}
+              parentId={comment.id}
+              onDone={onCommentDone}
+            />
+          ) : null}
         </div>
         {isAdmin ? (
           <DeleteCommentButton commentId={comment.id} postId={postId} />
@@ -52,6 +61,7 @@ function CommentBlock({
               postId={postId}
               isAdmin={isAdmin}
               nested
+              onCommentDone={onCommentDone}
             />
           ))}
         </ul>
@@ -63,11 +73,15 @@ function CommentBlock({
 export function PostDetailContent({
   post,
   isAdmin,
+  isAuthor = false,
   compactHeader = false,
+  onCommentDone,
 }: {
   post: PostDetailDto;
   isAdmin: boolean;
+  isAuthor?: boolean;
   compactHeader?: boolean;
+  onCommentDone?: () => void;
 }) {
   const title =
     post.title?.trim() || previewFromBody(post.body, 90) || "Publicação";
@@ -108,21 +122,23 @@ export function PostDetailContent({
               <div className="mt-4">
                 <MarkdownBody body={post.body} />
               </div>
-              {post.imageUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={post.imageUrl}
-                  alt=""
-                  className="mt-3 max-h-96 w-full rounded-xl object-cover"
-                />
-              ) : null}
+              <PostMedia
+                imageUrl={post.imageUrl}
+                videoUrl={post.videoUrl}
+                linkUrl={post.linkUrl}
+              />
               <PostActions
                 postId={post.id}
                 spaceSlug={post.space.slug}
                 liked={post.liked}
                 reactionCount={post.reactionCount}
                 isAdmin={isAdmin}
+                isAuthor={isAuthor}
                 pinned={!!post.pinnedAt}
+                body={post.body}
+                imageUrl={post.imageUrl}
+                linkUrl={post.linkUrl}
+                videoUrl={post.videoUrl}
               />
             </div>
           </div>
@@ -133,7 +149,7 @@ export function PostDetailContent({
         <h3 className="font-[family-name:var(--font-outfit)] text-lg font-semibold">
           Comentários ({post.commentCount})
         </h3>
-        <CommentForm postId={post.id} />
+        <CommentForm postId={post.id} onDone={onCommentDone} />
         {post.comments.length === 0 ? (
           <div className="mt-4">
             <EmptyState
@@ -149,6 +165,7 @@ export function PostDetailContent({
                 comment={c}
                 postId={post.id}
                 isAdmin={isAdmin}
+                onCommentDone={onCommentDone}
               />
             ))}
           </ul>

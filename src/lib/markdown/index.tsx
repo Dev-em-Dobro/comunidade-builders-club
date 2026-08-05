@@ -4,13 +4,13 @@ import { isSafeHttpUrl } from "@/lib/markdown/text";
 export { escapeHtml, snippetFromBody, isSafeHttpUrl } from "@/lib/markdown/text";
 
 /**
- * Inline Markdown seguro + @menções.
+ * Inline Markdown seguro + @menções + autolink http(s).
  * Texto vai como children React (escape automático). Links só http(s).
  */
 export function renderInlineMarkdown(text: string): ReactNode[] {
   const nodes: ReactNode[] = [];
   const re =
-    /(`[^`]+`)|(\*\*[^*]+\*\*)|(\*[^*]+\*)|(\[[^\]]+\]\((https?:\/\/[^)\s]+)\))|(@[\p{L}\p{N}_.\-]{2,64})/gu;
+    /(`[^`]+`)|(\*\*[^*]+\*\*)|(\*[^*]+\*)|(\[[^\]]+\]\((https?:\/\/[^)\s]+)\))|(https?:\/\/[^\s<]+[^\s<.,;:!?'")\]])|(@[\p{L}\p{N}_.\-]{2,64})/gu;
 
   let last = 0;
   let key = 0;
@@ -19,7 +19,7 @@ export function renderInlineMarkdown(text: string): ReactNode[] {
     if (match.index > last) {
       nodes.push(text.slice(last, match.index));
     }
-    const [full, code, bold, italic, , linkUrl, mention] = match;
+    const [full, code, bold, italic, , mdLinkUrl, bareUrl, mention] = match;
     if (code) {
       nodes.push(
         <code
@@ -33,17 +33,29 @@ export function renderInlineMarkdown(text: string): ReactNode[] {
       nodes.push(<strong key={key++}>{bold.slice(2, -2)}</strong>);
     } else if (italic) {
       nodes.push(<em key={key++}>{italic.slice(1, -1)}</em>);
-    } else if (linkUrl && isSafeHttpUrl(linkUrl)) {
+    } else if (mdLinkUrl && isSafeHttpUrl(mdLinkUrl)) {
       const label = full.slice(1, full.indexOf("]"));
       nodes.push(
         <a
           key={key++}
-          href={linkUrl}
+          href={mdLinkUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="font-medium text-accent underline-offset-2 hover:underline"
+          className="cursor-pointer font-medium text-accent underline-offset-2 hover:underline"
         >
           {label}
+        </a>,
+      );
+    } else if (bareUrl && isSafeHttpUrl(bareUrl)) {
+      nodes.push(
+        <a
+          key={key++}
+          href={bareUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="cursor-pointer break-all font-medium text-accent underline-offset-2 hover:underline"
+        >
+          {bareUrl}
         </a>,
       );
     } else if (mention) {

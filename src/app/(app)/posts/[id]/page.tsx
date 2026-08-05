@@ -18,11 +18,15 @@ export default async function PostPage({ params }: Props) {
   void recordPostView(post.id, member.user.id);
 
   const isAdmin = member.membership.role === "admin";
+  const isAuthor = post.authorId === member.user.id;
   const dto: PostDetailDto = {
     id: post.id,
     title: post.title,
     body: post.body,
     imageUrl: post.imageUrl,
+    linkUrl: post.linkUrl,
+    videoUrl: post.videoUrl,
+    authorId: post.authorId,
     pinnedAt: post.pinnedAt?.toISOString() ?? null,
     commentCount: post.commentCount,
     reactionCount: post.reactionCount,
@@ -55,13 +59,13 @@ export default async function PostPage({ params }: Props) {
     <div className="feed-wrap">
       <Link
         href={`/spaces/${post.space.slug}`}
-        className="text-sm font-medium text-accent hover:underline"
+        className="cursor-pointer text-sm font-medium text-accent hover:underline"
       >
         ← {post.space.name}
       </Link>
       <div className="mt-4">
         <h1 className="sr-only">{title}</h1>
-        <PostDetailContent post={dto} isAdmin={isAdmin} />
+        <PostDetailContent post={dto} isAdmin={isAdmin} isAuthor={isAuthor} />
       </div>
     </div>
   );

@@ -40,6 +40,9 @@ export type PostDetailDto = {
   title: string;
   body: string;
   imageUrl: string | null;
+  linkUrl: string | null;
+  videoUrl: string | null;
+  authorId: string;
   pinnedAt: string | null;
   commentCount: number;
   reactionCount: number;
@@ -67,6 +70,9 @@ export async function getPostDetailAction(
     title: post.title,
     body: post.body,
     imageUrl: post.imageUrl,
+    linkUrl: post.linkUrl,
+    videoUrl: post.videoUrl,
+    authorId: post.authorId,
     pinnedAt: post.pinnedAt?.toISOString() ?? null,
     commentCount: post.commentCount,
     reactionCount: post.reactionCount,

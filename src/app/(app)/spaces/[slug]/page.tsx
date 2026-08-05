@@ -30,6 +30,7 @@ export default async function SpacePage({ params }: Props) {
         spaceName={space.name}
         spaceDescription={space.description}
         isAdmin={isAdmin}
+        currentUserId={member.user.id}
         posts={posts.map((p) => ({
           id: p.id,
           title: p.title,

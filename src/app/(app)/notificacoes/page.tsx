@@ -62,7 +62,10 @@ export default async function NotificacoesPage() {
                     </span>
                     {!n.readAt ? (
                       <form action={markReadAction.bind(null, n.id)}>
-                        <button type="submit" className="text-xs text-accent">
+                        <button
+                          type="submit"
+                          className="cursor-pointer text-xs font-medium text-accent hover:underline"
+                        >
                           Marcar lida
                         </button>
                       </form>

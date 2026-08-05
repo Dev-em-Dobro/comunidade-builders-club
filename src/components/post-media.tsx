@@ -1,0 +1,48 @@
+/** Bloco de mídia anexada ao post (imagem, vídeo, link). */
+
+export function PostMedia({
+  imageUrl,
+  videoUrl,
+  linkUrl,
+}: {
+  imageUrl?: string | null;
+  videoUrl?: string | null;
+  linkUrl?: string | null;
+}) {
+  if (!imageUrl && !videoUrl && !linkUrl) return null;
+
+  return (
+    <div className="mt-3 space-y-3">
+      {imageUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={imageUrl}
+          alt=""
+          className="max-h-96 w-full rounded-xl object-cover"
+          loading="lazy"
+        />
+      ) : null}
+      {videoUrl ? (
+        <video
+          src={videoUrl}
+          controls
+          preload="metadata"
+          className="max-h-96 w-full rounded-xl bg-foreground/5"
+        />
+      ) : null}
+      {linkUrl ? (
+        <a
+          href={linkUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex cursor-pointer items-center gap-2 rounded-xl border border-border bg-surface/50 px-3 py-2.5 text-sm font-medium text-accent transition-colors hover:bg-surface"
+        >
+          <span className="truncate" title={linkUrl}>
+            {linkUrl}
+          </span>
+          <span className="shrink-0 text-xs text-muted">↗</span>
+        </a>
+      ) : null}
+    </div>
+  );
+}

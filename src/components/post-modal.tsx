@@ -11,10 +11,12 @@ import { PostDetailContent } from "@/components/post-detail-content";
 export function PostModal({
   postId,
   isAdmin,
+  currentUserId,
   onClose,
 }: {
   postId: string | null;
   isAdmin: boolean;
+  currentUserId?: string;
   onClose: () => void;
 }) {
   const router = useRouter();
@@ -22,25 +24,21 @@ export function PostModal({
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
 
-  const load = useCallback(
-    (id: string) => {
-      setError(null);
-      setPost(null);
-      start(async () => {
-        try {
-          const data = await getPostDetailAction(id);
-          if (!data) {
-            setError("Post não encontrado.");
-            return;
-          }
-          setPost(data);
-        } catch {
-          setError("Não foi possível carregar o post.");
+  const load = useCallback((id: string) => {
+    setError(null);
+    start(async () => {
+      try {
+        const data = await getPostDetailAction(id);
+        if (!data) {
+          setError("Post não encontrado.");
+          return;
         }
-      });
-    },
-    [],
-  );
+        setPost(data);
+      } catch {
+        setError("Não foi possível carregar o post.");
+      }
+    });
+  }, []);
 
   useEffect(() => {
     if (!postId) {
@@ -48,6 +46,7 @@ export function PostModal({
       setError(null);
       return;
     }
+    setPost(null);
     load(postId);
   }, [postId, load]);
 
@@ -72,11 +71,15 @@ export function PostModal({
     (post ? post.body.slice(0, 60) : null) ||
     "Publicação";
 
+  const isAuthor = Boolean(
+    post && currentUserId && post.authorId === currentUserId,
+  );
+
   return (
     <div className="fixed inset-0 z-50 flex items-stretch justify-center md:items-center md:p-6">
       <button
         type="button"
-        className="absolute inset-0 bg-foreground/40 backdrop-blur-[2px]"
+        className="absolute inset-0 cursor-pointer bg-foreground/40 backdrop-blur-[2px]"
         aria-label="Fechar"
         onClick={onClose}
       />
@@ -92,7 +95,7 @@ export function PostModal({
           </h2>
           <button
             type="button"
-            className="btn-ghost text-xs"
+            className="btn-ghost cursor-pointer text-xs"
             disabled={!post}
             title="Abrir na área principal"
             onClick={() => {
@@ -104,7 +107,7 @@ export function PostModal({
           </button>
           <button
             type="button"
-            className="btn-ghost px-2 text-sm"
+            className="btn-ghost cursor-pointer px-2 text-sm"
             aria-label="Fechar"
             onClick={onClose}
           >
@@ -121,7 +124,13 @@ export function PostModal({
             <p className="text-sm text-muted">Carregando conteúdo…</p>
           ) : null}
           {post ? (
-            <PostDetailContent post={post} isAdmin={isAdmin} compactHeader />
+            <PostDetailContent
+              post={post}
+              isAdmin={isAdmin}
+              isAuthor={isAuthor}
+              compactHeader
+              onCommentDone={() => load(postId)}
+            />
           ) : null}
         </div>
       </div>

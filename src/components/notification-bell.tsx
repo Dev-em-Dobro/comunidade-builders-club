@@ -33,9 +33,48 @@ function BellIcon({ className }: { className?: string }) {
   );
 }
 
+const POLL_MS = 25_000;
+
+async function ensureBrowserPermission(): Promise<boolean> {
+  if (typeof window === "undefined" || !("Notification" in window)) {
+    return false;
+  }
+  if (Notification.permission === "granted") return true;
+  if (Notification.permission === "denied") return false;
+  try {
+    const result = await Notification.requestPermission();
+    return result === "granted";
+  } catch {
+    return false;
+  }
+}
+
+function showBrowserNotif(item: NotifPreview) {
+  if (typeof window === "undefined" || Notification.permission !== "granted") {
+    return;
+  }
+  try {
+    const n = new Notification(`${item.actorName} ${item.label}`, {
+      body: item.snippet ?? "Nova atividade na comunidade",
+      tag: item.id,
+    });
+    n.onclick = () => {
+      window.focus();
+      if (item.postId) {
+        window.location.href = `/posts/${item.postId}`;
+      } else {
+        window.location.href = "/notificacoes";
+      }
+      n.close();
+    };
+  } catch {
+    /* ignore */
+  }
+}
+
 export function NotificationBell({
-  unread,
-  items,
+  unread: initialUnread,
+  items: initialItems,
   compact = false,
 }: {
   unread: number;
@@ -43,9 +82,62 @@ export function NotificationBell({
   compact?: boolean;
 }) {
   const [open, setOpen] = useState(false);
+  const [unread, setUnread] = useState(initialUnread);
+  const [items, setItems] = useState(initialItems);
   const [pending, start] = useTransition();
   const rootRef = useRef<HTMLDivElement>(null);
+  const knownIdsRef = useRef<Set<string>>(new Set(initialItems.map((i) => i.id)));
   const router = useRouter();
+
+  useEffect(() => {
+    setUnread(initialUnread);
+    setItems(initialItems);
+    knownIdsRef.current = new Set(initialItems.map((i) => i.id));
+  }, [initialUnread, initialItems]);
+
+  useEffect(() => {
+    let cancelled = false;
+    void ensureBrowserPermission();
+
+    const tick = async () => {
+      try {
+        const res = await fetch("/api/notifications/poll", {
+          cache: "no-store",
+        });
+        if (!res.ok || cancelled) return;
+        const data = (await res.json()) as {
+          unread: number;
+          items: NotifPreview[];
+        };
+        if (cancelled) return;
+
+        const fresh = data.items.filter((i) => !knownIdsRef.current.has(i.id));
+        for (const item of fresh) {
+          showBrowserNotif(item);
+          knownIdsRef.current.add(item.id);
+        }
+        for (const item of data.items) {
+          knownIdsRef.current.add(item.id);
+        }
+
+        setUnread(data.unread);
+        setItems(data.items);
+      } catch {
+        /* ignore rede */
+      }
+    };
+
+    const id = window.setInterval(() => void tick(), POLL_MS);
+    const onVis = () => {
+      if (document.visibilityState === "visible") void tick();
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      cancelled = true;
+      window.clearInterval(id);
+      document.removeEventListener("visibilitychange", onVis);
+    };
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -69,10 +161,13 @@ export function NotificationBell({
         type="button"
         className={
           compact
-            ? "btn-ghost relative px-2"
-            : "btn-ghost w-full justify-start gap-2"
+            ? "btn-ghost relative cursor-pointer px-2"
+            : "btn-ghost w-full cursor-pointer justify-start gap-2"
         }
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => {
+          void ensureBrowserPermission();
+          setOpen((v) => !v);
+        }}
         aria-expanded={open}
         aria-haspopup="true"
         aria-label={
@@ -122,13 +217,17 @@ export function NotificationBell({
                 <li key={n.id}>
                   <button
                     type="button"
-                    className="w-full rounded-xl px-2 py-2 text-left text-sm transition-colors hover:bg-surface disabled:opacity-50"
+                    className="w-full cursor-pointer rounded-xl px-2 py-2 text-left text-sm transition-colors hover:bg-surface disabled:opacity-50"
                     disabled={pending}
                     onClick={() =>
                       start(async () => {
                         await markReadAction(n.id);
+                        setUnread((u) => Math.max(0, u - 1));
+                        setItems((list) => list.filter((x) => x.id !== n.id));
                         setOpen(false);
-                        router.push(n.postId ? `/posts/${n.postId}` : "/notificacoes");
+                        router.push(
+                          n.postId ? `/posts/${n.postId}` : "/notificacoes",
+                        );
                         router.refresh();
                       })
                     }
@@ -147,7 +246,7 @@ export function NotificationBell({
           )}
           <Link
             href="/notificacoes"
-            className="mt-1 block rounded-xl px-2 py-2 text-center text-xs font-medium text-accent hover:bg-surface"
+            className="mt-1 block cursor-pointer rounded-xl px-2 py-2 text-center text-xs font-medium text-accent hover:bg-surface"
             onClick={() => setOpen(false)}
           >
             Ver todas

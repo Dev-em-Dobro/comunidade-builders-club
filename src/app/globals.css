@@ -21,6 +21,18 @@
     color-scheme: light;
   }
 
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  a,
+  summary,
+  label[for],
+  select,
+  input[type="file"],
+  input[type="checkbox"],
+  input[type="radio"] {
+    cursor: pointer;
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
     background-image:
