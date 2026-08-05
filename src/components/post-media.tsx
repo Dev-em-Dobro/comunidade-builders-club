@@ -4,30 +4,39 @@ export function PostMedia({
   imageUrl,
   videoUrl,
   linkUrl,
+  /** No feed compacto pode cortar; no detalhe/expandido mostra inteira. */
+  cropImage = false,
 }: {
   imageUrl?: string | null;
   videoUrl?: string | null;
   linkUrl?: string | null;
+  cropImage?: boolean;
 }) {
   if (!imageUrl && !videoUrl && !linkUrl) return null;
 
   return (
     <div className="mt-3 space-y-3">
       {imageUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={imageUrl}
-          alt=""
-          className="max-h-96 w-full rounded-xl object-cover"
-          loading="lazy"
-        />
+        <div className="overflow-hidden rounded-xl bg-surface/60">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={imageUrl}
+            alt=""
+            className={
+              cropImage
+                ? "max-h-40 w-full object-cover"
+                : "mx-auto max-h-[min(70vh,36rem)] w-full object-contain"
+            }
+            loading="lazy"
+          />
+        </div>
       ) : null}
       {videoUrl ? (
         <video
           src={videoUrl}
           controls
           preload="metadata"
-          className="max-h-96 w-full rounded-xl bg-foreground/5"
+          className="max-h-[min(70vh,36rem)] w-full rounded-xl bg-foreground/5"
         />
       ) : null}
       {linkUrl ? (

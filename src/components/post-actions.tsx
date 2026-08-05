@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { toggleReactionAction, createCommentAction } from "@/actions/engagement";
 import {
   deletePostAction,
@@ -11,6 +11,24 @@ import {
 import { deleteCommentAction } from "@/actions/engagement";
 import { MentionTextarea } from "@/components/mention-textarea";
 import { ConfirmDialog } from "@/components/confirm-dialog";
+
+const MEDIA_ACCEPT =
+  "image/jpeg,image/png,image/gif,video/mp4,.jpg,.jpeg,.png,.gif,.mp4";
+
+async function uploadFile(file: File): Promise<{ url: string; kind: string }> {
+  const fd = new FormData();
+  fd.set("file", file);
+  const res = await fetch("/api/upload", { method: "POST", body: fd });
+  const data = (await res.json()) as {
+    url?: string;
+    kind?: string;
+    error?: string;
+  };
+  if (!res.ok || !data.url) {
+    throw new Error(data.error ?? "Falha no upload.");
+  }
+  return { url: data.url, kind: data.kind ?? "image" };
+}
 
 export function PostActions({
   postId,
@@ -41,12 +59,44 @@ export function PostActions({
   compact?: boolean;
 }) {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [pending, start] = useTransition();
   const [editing, setEditing] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
   const [editLink, setEditLink] = useState(linkUrl ?? "");
+  const [editImage, setEditImage] = useState(imageUrl ?? "");
+  const [editVideo, setEditVideo] = useState(videoUrl ?? "");
+  const [uploading, setUploading] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const canManage = Boolean(isAdmin || isAuthor);
+
+  function openEditor() {
+    setEditing((v) => !v);
+    setEditError(null);
+    setEditLink(linkUrl ?? "");
+    setEditImage(imageUrl ?? "");
+    setEditVideo(videoUrl ?? "");
+  }
+
+  async function onPickMedia(file: File | undefined) {
+    if (!file) return;
+    setEditError(null);
+    setUploading(true);
+    try {
+      const result = await uploadFile(file);
+      if (result.kind === "video") {
+        setEditVideo(result.url);
+        setEditImage("");
+      } else {
+        setEditImage(result.url);
+        setEditVideo("");
+      }
+    } catch (e) {
+      setEditError(e instanceof Error ? e.message : "Falha no upload.");
+    } finally {
+      setUploading(false);
+    }
+  }
 
   return (
     <div
@@ -88,11 +138,7 @@ export function PostActions({
               type="button"
               className="btn-ghost cursor-pointer text-xs"
               disabled={pending}
-              onClick={() => {
-                setEditing((v) => !v);
-                setEditError(null);
-                setEditLink(linkUrl ?? "");
-              }}
+              onClick={openEditor}
             >
               {editing ? "Cancelar" : "Editar"}
             </button>
@@ -110,15 +156,15 @@ export function PostActions({
 
       {editing && body !== undefined ? (
         <form
-          className="mt-3 space-y-2 rounded-xl border border-border bg-surface/40 p-3"
+          className="mt-3 space-y-3 rounded-xl border border-border bg-surface/40 p-3"
           action={(fd) => {
             setEditError(null);
             start(async () => {
               try {
                 fd.set("postId", postId);
-                fd.set("imageUrl", imageUrl ?? "");
+                fd.set("imageUrl", editImage);
                 fd.set("linkUrl", editLink.trim());
-                fd.set("videoUrl", videoUrl ?? "");
+                fd.set("videoUrl", editVideo);
                 await updatePostAction(fd);
                 setEditing(false);
                 router.refresh();
@@ -137,6 +183,63 @@ export function PostActions({
             required
             maxLength={10000}
           />
+          <div>
+            <p className="text-xs font-medium text-muted">
+              Mídia — jpg/png/gif (máx. 1 MB) ou mp4 (máx. 50 MB)
+            </p>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept={MEDIA_ACCEPT}
+              className="hidden"
+              disabled={uploading || pending}
+              onChange={(e) => {
+                void onPickMedia(e.target.files?.[0]);
+                e.target.value = "";
+              }}
+            />
+            <button
+              type="button"
+              className="btn-outline mt-2 cursor-pointer text-xs"
+              disabled={uploading || pending}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              {uploading
+                ? "Enviando…"
+                : editImage || editVideo
+                  ? "Trocar arquivo"
+                  : "Escolher arquivo"}
+            </button>
+            {editImage ? (
+              <div className="mt-2 flex items-center gap-2">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={editImage}
+                  alt=""
+                  className="h-16 w-16 rounded-lg object-cover"
+                />
+                <button
+                  type="button"
+                  className="cursor-pointer text-xs text-red-600 hover:underline"
+                  onClick={() => setEditImage("")}
+                >
+                  Remover imagem
+                </button>
+              </div>
+            ) : null}
+            {editVideo ? (
+              <div className="mt-2 flex items-center gap-2">
+                <span className="text-xs text-muted">Vídeo anexado</span>
+                <button
+                  type="button"
+                  className="cursor-pointer text-xs text-red-600 hover:underline"
+                  onClick={() => setEditVideo("")}
+                >
+                  Remover vídeo
+                </button>
+              </div>
+            ) : null}
+          </div>
           <label className="block text-xs font-medium text-muted">
             Link anexado (https://)
             <input
@@ -152,7 +255,11 @@ export function PostActions({
               {editError}
             </p>
           ) : null}
-          <button type="submit" className="btn-primary text-xs" disabled={pending}>
+          <button
+            type="submit"
+            className="btn-primary text-xs"
+            disabled={pending || uploading}
+          >
             {pending ? "Salvando…" : "Salvar"}
           </button>
         </form>
