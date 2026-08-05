@@ -7,11 +7,19 @@ const PANDA_ID_RE = /^[a-zA-Z0-9_-]+$/;
 export function pandaEmbedUrl(libraryId: string, externalId: string): string {
   const lib = libraryId
     .replace(/^player-vz-/, "")
+    .replace(/^vz-/, "")
     .replace(/\.tv\.pandavideo\.com\.br.*$/, "");
   if (!PANDA_ID_RE.test(lib) || !PANDA_ID_RE.test(externalId)) {
     throw new Error("IDs Panda inválidos");
   }
   return `https://player-vz-${lib}.tv.pandavideo.com.br/embed/?v=${encodeURIComponent(externalId)}`;
+}
+
+/** Extrai pullzone (sem prefixo vz-) da URL de thumbnail CDN Panda. */
+export function pullzoneFromThumbnail(thumb?: string | null): string | null {
+  if (!thumb) return null;
+  const m = thumb.match(/\/vz-([a-z0-9-]+)\//i);
+  return m?.[1] ?? null;
 }
 
 export const moduleSchema = z.object({
@@ -23,6 +31,7 @@ export const moduleSchema = z.object({
     .regex(/^[a-z0-9-]+$/),
   title: z.string().trim().min(2).max(200),
   description: z.string().trim().max(2000).optional().nullable(),
+  coverImageUrl: z.string().trim().max(2000).optional().nullable().or(z.literal("")),
   sortOrder: z.coerce.number().int().min(0).max(9999).default(0),
   published: z.boolean().default(false),
 });
@@ -49,6 +58,7 @@ export const lessonSchema = z.object({
     .min(1)
     .max(200)
     .regex(PANDA_ID_RE, "Library ID Panda inválido"),
+  thumbnailUrl: z.string().trim().max(2000).optional().nullable().or(z.literal("")),
   sortOrder: z.coerce.number().int().min(0).max(9999).default(0),
   published: z.boolean().default(false),
 });
@@ -88,7 +98,16 @@ export async function getLessonForMember(moduleSlug: string, lessonSlug: string)
 
 export async function createModule(raw: z.infer<typeof moduleSchema>) {
   const data = moduleSchema.parse(raw);
-  return prisma.module.create({ data });
+  return prisma.module.create({
+    data: {
+      slug: data.slug,
+      title: data.title,
+      description: data.description || null,
+      coverImageUrl: data.coverImageUrl || null,
+      sortOrder: data.sortOrder,
+      published: data.published,
+    },
+  });
 }
 
 export async function updateModule(
@@ -96,7 +115,17 @@ export async function updateModule(
   raw: z.infer<typeof moduleSchema>,
 ) {
   const data = moduleSchema.parse(raw);
-  return prisma.module.update({ where: { id }, data });
+  return prisma.module.update({
+    where: { id },
+    data: {
+      slug: data.slug,
+      title: data.title,
+      description: data.description || null,
+      coverImageUrl: data.coverImageUrl || null,
+      sortOrder: data.sortOrder,
+      published: data.published,
+    },
+  });
 }
 
 export async function deleteModule(id: string) {
@@ -105,7 +134,19 @@ export async function deleteModule(id: string) {
 
 export async function createLesson(raw: z.infer<typeof lessonSchema>) {
   const data = lessonSchema.parse(raw);
-  return prisma.lesson.create({ data });
+  return prisma.lesson.create({
+    data: {
+      moduleId: data.moduleId,
+      slug: data.slug,
+      title: data.title,
+      description: data.description || null,
+      pandaVideoExternalId: data.pandaVideoExternalId,
+      pandaLibraryId: data.pandaLibraryId.replace(/^vz-/, ""),
+      thumbnailUrl: data.thumbnailUrl || null,
+      sortOrder: data.sortOrder,
+      published: data.published,
+    },
+  });
 }
 
 export async function updateLesson(
@@ -113,7 +154,20 @@ export async function updateLesson(
   raw: z.infer<typeof lessonSchema>,
 ) {
   const data = lessonSchema.parse(raw);
-  return prisma.lesson.update({ where: { id }, data });
+  return prisma.lesson.update({
+    where: { id },
+    data: {
+      moduleId: data.moduleId,
+      slug: data.slug,
+      title: data.title,
+      description: data.description || null,
+      pandaVideoExternalId: data.pandaVideoExternalId,
+      pandaLibraryId: data.pandaLibraryId.replace(/^vz-/, ""),
+      thumbnailUrl: data.thumbnailUrl || null,
+      sortOrder: data.sortOrder,
+      published: data.published,
+    },
+  });
 }
 
 export async function deleteLesson(id: string) {

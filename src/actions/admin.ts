@@ -134,6 +134,7 @@ export async function createModuleAction(formData: FormData) {
     slug: String(formData.get("slug") ?? ""),
     title: String(formData.get("title") ?? ""),
     description: String(formData.get("description") ?? "") || null,
+    coverImageUrl: String(formData.get("coverImageUrl") ?? "") || null,
     sortOrder: Number(formData.get("sortOrder") ?? 0),
     published: formData.get("published") === "on",
   };
@@ -149,6 +150,7 @@ export async function updateModuleAction(id: string, formData: FormData) {
     slug: String(formData.get("slug") ?? ""),
     title: String(formData.get("title") ?? ""),
     description: String(formData.get("description") ?? "") || null,
+    coverImageUrl: String(formData.get("coverImageUrl") ?? "") || null,
     sortOrder: Number(formData.get("sortOrder") ?? 0),
     published: formData.get("published") === "on",
   };
@@ -174,6 +176,7 @@ export async function createLessonAction(formData: FormData) {
     description: String(formData.get("description") ?? "") || null,
     pandaVideoExternalId: String(formData.get("pandaVideoExternalId") ?? ""),
     pandaLibraryId: String(formData.get("pandaLibraryId") ?? ""),
+    thumbnailUrl: String(formData.get("thumbnailUrl") ?? "") || null,
     sortOrder: Number(formData.get("sortOrder") ?? 0),
     published: formData.get("published") === "on",
   };
@@ -192,6 +195,7 @@ export async function updateLessonAction(id: string, formData: FormData) {
     description: String(formData.get("description") ?? "") || null,
     pandaVideoExternalId: String(formData.get("pandaVideoExternalId") ?? ""),
     pandaLibraryId: String(formData.get("pandaLibraryId") ?? ""),
+    thumbnailUrl: String(formData.get("thumbnailUrl") ?? "") || null,
     sortOrder: Number(formData.get("sortOrder") ?? 0),
     published: formData.get("published") === "on",
   };

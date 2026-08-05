@@ -19,6 +19,7 @@ import {
   setMemberStatusAction,
 } from "@/actions/admin";
 import { AdminBulkAllowlist } from "@/components/admin-bulk-allowlist";
+import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import type { MembershipStatus } from "@prisma/client";
 
 type Props = {
@@ -203,6 +204,11 @@ export default async function AdminPage({ searchParams }: Props) {
           <input name="slug" className="input" placeholder="slug" required />
           <input name="description" className="input" placeholder="Descrição" />
           <input
+            name="coverImageUrl"
+            className="input"
+            placeholder="Capa URL ou /aulas/modulo-capa.png"
+          />
+          <input
             name="sortOrder"
             type="number"
             className="input"
@@ -219,20 +225,30 @@ export default async function AdminPage({ searchParams }: Props) {
         {modules.map((mod) => (
           <div key={mod.id} className="post-card mt-4 max-w-2xl space-y-3">
             <div className="flex flex-wrap items-start justify-between gap-2">
-              <div>
-                <p className="font-semibold">
-                  {mod.title}{" "}
-                  <span className="text-xs font-normal text-muted">
-                    /{mod.slug}
-                    {mod.published ? " · publicado" : " · rascunho"}
-                  </span>
-                </p>
+              <div className="flex min-w-0 items-start gap-3">
+                {mod.coverImageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={mod.coverImageUrl}
+                    alt=""
+                    className="h-14 w-10 shrink-0 rounded object-cover"
+                  />
+                ) : null}
+                <div>
+                  <p className="font-semibold">
+                    {mod.title}{" "}
+                    <span className="text-xs font-normal text-muted">
+                      /{mod.slug}
+                      {mod.published ? " · publicado" : " · rascunho"}
+                    </span>
+                  </p>
+                </div>
               </div>
-              <form action={deleteModuleAction.bind(null, mod.id)}>
-                <button type="submit" className="text-xs text-red-600">
-                  Remover módulo
-                </button>
-              </form>
+              <ConfirmDeleteButton
+                action={deleteModuleAction.bind(null, mod.id)}
+                label="Remover módulo"
+                message={`Remover o módulo "${mod.title}" e todas as aulas?`}
+              />
             </div>
 
             <ul className="space-y-2 text-sm">
@@ -241,18 +257,28 @@ export default async function AdminPage({ searchParams }: Props) {
                   key={l.id}
                   className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-surface/40 px-3 py-2"
                 >
-                  <span>
-                    {l.title}{" "}
-                    <span className="text-xs text-muted">
-                      /{l.slug}
-                      {l.published ? "" : " · rascunho"}
+                  <span className="flex min-w-0 items-center gap-2">
+                    {l.thumbnailUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={l.thumbnailUrl}
+                        alt=""
+                        className="h-8 w-14 shrink-0 rounded object-cover"
+                      />
+                    ) : null}
+                    <span>
+                      {l.title}{" "}
+                      <span className="text-xs text-muted">
+                        /{l.slug}
+                        {l.published ? "" : " · rascunho"}
+                      </span>
                     </span>
                   </span>
-                  <form action={deleteLessonAction.bind(null, l.id)}>
-                    <button type="submit" className="text-xs text-red-600">
-                      Remover
-                    </button>
-                  </form>
+                  <ConfirmDeleteButton
+                    action={deleteLessonAction.bind(null, l.id)}
+                    label="Remover"
+                    message={`Remover a aula "${l.title}"?`}
+                  />
                 </li>
               ))}
             </ul>
@@ -265,7 +291,7 @@ export default async function AdminPage({ searchParams }: Props) {
               <input
                 name="pandaLibraryId"
                 className="input"
-                placeholder="Library ID Panda (ex: xxxx)"
+                placeholder="Library/pullzone (ex: 77c52f03-dc6)"
                 required
               />
               <input
@@ -273,6 +299,11 @@ export default async function AdminPage({ searchParams }: Props) {
                 className="input"
                 placeholder="Video external ID"
                 required
+              />
+              <input
+                name="thumbnailUrl"
+                className="input"
+                placeholder="URL thumbnail (opcional)"
               />
               <input name="description" className="input" placeholder="Descrição" />
               <input
@@ -282,7 +313,7 @@ export default async function AdminPage({ searchParams }: Props) {
                 defaultValue={mod.lessons.length}
               />
               <label className="flex items-center gap-2 text-sm">
-                <input type="checkbox" name="published" /> Publicado
+                <input type="checkbox" name="published" defaultChecked /> Publicado
               </label>
               <button type="submit" className="btn-outline text-sm">
                 Adicionar aula
