@@ -24,9 +24,8 @@ import { AdminBulkAllowlist } from "@/components/admin-bulk-allowlist";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import {
   AdminTabs,
-  isAdminTab,
-  type AdminTabId,
 } from "@/components/admin-tabs";
+import { isAdminTab, type AdminTabId } from "@/lib/admin/tabs";
 import type { MembershipStatus } from "@prisma/client";
 
 type Props = {
