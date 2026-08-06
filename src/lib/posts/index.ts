@@ -63,11 +63,23 @@ export async function listPosts(opts: {
           }
         : {}),
     },
-    orderBy: [{ pinnedAt: "desc" }, { createdAt: "desc" }],
+    // Postgres: DESC coloca NULL primeiro — nulls:last mantém fixados no topo.
+    orderBy: [
+      { pinnedAt: { sort: "desc", nulls: "last" } },
+      { createdAt: "desc" },
+    ],
     take: take + 1,
     ...(opts.cursor
       ? { cursor: { id: opts.cursor }, skip: 1 }
       : {}),
+  });
+
+  // Entre fixados (e entre não-fixados), ordenar só por createdAt desc.
+  posts.sort((a, b) => {
+    const aPinned = a.pinnedAt ? 1 : 0;
+    const bPinned = b.pinnedAt ? 1 : 0;
+    if (aPinned !== bPinned) return bPinned - aPinned;
+    return b.createdAt.getTime() - a.createdAt.getTime();
   });
 
   let nextCursor: string | undefined;
