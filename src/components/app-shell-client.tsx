@@ -16,6 +16,7 @@ import {
   ICON_BUSCA,
   ICON_NOVA,
   ICON_PERFIL,
+  ICON_PROGRESSO,
   ICON_TODOS,
   iconForSpace,
 } from "@/components/nav-icons";
@@ -109,14 +110,30 @@ function SidebarFooter({
         Perfil
       </Link>
       {isAdmin ? (
-        <Link
-          href="/admin"
-          className={`btn-ghost justify-start gap-2 ${pathname.startsWith("/admin") ? "text-accent" : ""}`}
-          onClick={onNavigate}
-        >
-          {ICON_ADMIN}
-          Admin
-        </Link>
+        <>
+          <Link
+            href="/admin"
+            className={`btn-ghost justify-start gap-2 ${
+              pathname.startsWith("/admin") && !pathname.startsWith("/admin/progresso")
+                ? "text-accent"
+                : ""
+            }`}
+            onClick={onNavigate}
+          >
+            {ICON_ADMIN}
+            Admin
+          </Link>
+          <Link
+            href="/admin/progresso"
+            className={`btn-ghost justify-start gap-2 ${
+              pathname.startsWith("/admin/progresso") ? "text-accent" : ""
+            }`}
+            onClick={onNavigate}
+          >
+            {ICON_PROGRESSO}
+            Progresso
+          </Link>
+        </>
       ) : null}
       <LogoutButton />
     </div>

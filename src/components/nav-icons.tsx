@@ -107,6 +107,15 @@ export const ICON_ADMIN = (
   </NavIcon>
 );
 
+export const ICON_PROGRESSO = (
+  <NavIcon>
+    <path d="M3 3v18h18" />
+    <path d="M7 16v-5" />
+    <path d="M12 16V8" />
+    <path d="M17 16v-9" />
+  </NavIcon>
+);
+
 export const ICON_SAIR = (
   <NavIcon>
     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
