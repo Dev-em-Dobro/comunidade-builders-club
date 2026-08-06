@@ -17,7 +17,8 @@ export default async function AdminProgressoPage() {
       </Link>
       <h1 className="page-title mt-4">Progresso dos alunos</h1>
       <p className="mt-1.5 text-sm text-muted">
-        Acompanhe a conclusão das aulas publicadas do Builders Club.
+        Aulas concluídas e atividade na comunidade (posts, comentários e
+        reações).
       </p>
 
       <ProgressDashboard
@@ -31,6 +32,7 @@ export default async function AdminProgressoPage() {
           ...s,
           joinedAt: s.joinedAt.toISOString(),
           lastCompletedAt: s.lastCompletedAt?.toISOString() ?? null,
+          lastPostAt: s.lastPostAt?.toISOString() ?? null,
         }))}
       />
     </div>

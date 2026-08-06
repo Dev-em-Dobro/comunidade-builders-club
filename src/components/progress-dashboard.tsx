@@ -15,9 +15,10 @@ export function ProgressDashboard({
   summary,
 }: {
   students: Array<
-    Omit<StudentProgressRow, "joinedAt" | "lastCompletedAt"> & {
+    Omit<StudentProgressRow, "joinedAt" | "lastCompletedAt" | "lastPostAt"> & {
       joinedAt: string;
       lastCompletedAt: string | null;
+      lastPostAt: string | null;
     }
   >;
   lessons: LessonMeta[];
@@ -27,6 +28,8 @@ export function ProgressDashboard({
     averagePercent: number;
     completedAll: number;
     notStarted: number;
+    totalPosts: number;
+    membersWithPosts: number;
   };
 }) {
   const [q, setQ] = useState("");
@@ -44,16 +47,21 @@ export function ProgressDashboard({
 
   return (
     <div className="mt-6 space-y-6">
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         <StatCard label="Alunos ativos" value={String(summary.activeMembers)} />
         <StatCard label="Aulas publicadas" value={String(summary.totalLessons)} />
         <StatCard
-          label="Média de conclusão"
+          label="Média de aulas"
           value={`${summary.averagePercent}%`}
         />
         <StatCard
-          label="Concluíram tudo / não começaram"
+          label="Concluíram / zerados"
           value={`${summary.completedAll} / ${summary.notStarted}`}
+        />
+        <StatCard label="Posts na comunidade" value={String(summary.totalPosts)} />
+        <StatCard
+          label="Alunos que postaram"
+          value={String(summary.membersWithPosts)}
         />
       </div>
 
@@ -68,7 +76,7 @@ export function ProgressDashboard({
           />
         </label>
         <p className="text-xs text-muted">
-          Ordenado do menor para o maior progresso
+          Ordenado: menos aulas concluídas → menos posts
         </p>
       </div>
 
@@ -103,7 +111,12 @@ export function ProgressDashboard({
                         </span>
                       ) : null}
                     </p>
-                    <p className="truncate text-xs text-muted">{s.email}</p>
+                    <p className="truncate text-xs text-muted">
+                      {s.email} · {s.postsCount}{" "}
+                      {s.postsCount === 1 ? "post" : "posts"} ·{" "}
+                      {s.commentsCount}{" "}
+                      {s.commentsCount === 1 ? "comentário" : "comentários"}
+                    </p>
                   </div>
                   <div className="w-full sm:w-48">
                     <div className="mb-1 flex justify-between text-[11px] text-muted">
@@ -131,9 +144,23 @@ export function ProgressDashboard({
                       {s.lastCompletedAt
                         ? ` · Última aula: ${new Date(s.lastCompletedAt).toLocaleString("pt-BR")}`
                         : " · Ainda não concluiu nenhuma aula"}
+                      {s.lastPostAt
+                        ? ` · Último post: ${new Date(s.lastPostAt).toLocaleString("pt-BR")}`
+                        : " · Ainda não publicou"}
                     </p>
+                    <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                      <span className="rounded-lg bg-surface px-2.5 py-1.5">
+                        <strong>{s.postsCount}</strong> posts
+                      </span>
+                      <span className="rounded-lg bg-surface px-2.5 py-1.5">
+                        <strong>{s.commentsCount}</strong> comentários
+                      </span>
+                      <span className="rounded-lg bg-surface px-2.5 py-1.5">
+                        <strong>{s.reactionsCount}</strong> reações
+                      </span>
+                    </div>
                     {lessons.length === 0 ? (
-                      <p className="mt-2 text-sm text-muted">
+                      <p className="mt-3 text-sm text-muted">
                         Nenhuma aula publicada.
                       </p>
                     ) : (

@@ -145,14 +145,21 @@ function NovaPublicacaoFab({ isAdmin }: { isAdmin: boolean }) {
   if (pathname === "/nova" || pathname.startsWith("/entregaveis/")) {
     return null;
   }
-  // Membros comuns não publicam em Boas-vindas — esconde o FAB nesse space.
-  if (!isAdmin && pathname.startsWith("/spaces/boas-vindas")) {
+  // Membros comuns não publicam em Boas-vindas / Avisos.
+  if (
+    !isAdmin &&
+    (pathname.startsWith("/spaces/boas-vindas") ||
+      pathname.startsWith("/spaces/avisos"))
+  ) {
     return null;
   }
 
+  const spaceSlug = pathname.startsWith("/spaces/")
+    ? pathname.split("/")[2] ?? ""
+    : "";
   const href =
-    pathname.startsWith("/spaces/") && !pathname.includes("boas-vindas")
-      ? `/nova?space=${pathname.split("/")[2] ?? ""}`
+    spaceSlug && spaceSlug !== "boas-vindas" && spaceSlug !== "avisos"
+      ? `/nova?space=${spaceSlug}`
       : "/nova";
 
   return (

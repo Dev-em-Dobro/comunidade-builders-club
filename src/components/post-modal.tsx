@@ -29,10 +29,10 @@ export function PostModal({
     start(async () => {
       try {
         const data = await getPostDetailAction(id);
-        if (!data) {
-          setError("Post não encontrado.");
-          return;
-        }
+          if (!data) {
+            setError("Esta publicação foi removida ou não existe mais.");
+            return;
+          }
         setPost(data);
       } catch {
         setError("Não foi possível carregar o post.");

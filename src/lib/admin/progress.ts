@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { WELCOME_SPACE_SLUG } from "@/lib/spaces/constants";
 
 export type StudentProgressRow = {
   userId: string;
@@ -11,6 +12,10 @@ export type StudentProgressRow = {
   percent: number;
   completedLessonIds: string[];
   lastCompletedAt: Date | null;
+  postsCount: number;
+  commentsCount: number;
+  reactionsCount: number;
+  lastPostAt: Date | null;
 };
 
 export async function getPublishedLessonsCatalog() {
@@ -29,7 +34,7 @@ export async function getPublishedLessonsCatalog() {
   });
 }
 
-/** Progresso de aulas publicadas por membro active. */
+/** Progresso de aulas + atividade de posts por membro active. */
 export async function listStudentsLessonProgress(): Promise<{
   lessons: Awaited<ReturnType<typeof getPublishedLessonsCatalog>>;
   students: StudentProgressRow[];
@@ -39,6 +44,8 @@ export async function listStudentsLessonProgress(): Promise<{
     averagePercent: number;
     completedAll: number;
     notStarted: number;
+    totalPosts: number;
+    membersWithPosts: number;
   };
 }> {
   const lessons = await getPublishedLessonsCatalog();
@@ -55,11 +62,36 @@ export async function listStudentsLessonProgress(): Promise<{
             where: { completedAt: { not: null } },
             select: { lessonId: true, completedAt: true },
           },
+          _count: {
+            select: {
+              posts: true,
+              comments: true,
+              reactions: true,
+            },
+          },
+          posts: {
+            where: {
+              space: { slug: { not: WELCOME_SPACE_SLUG } },
+            },
+            orderBy: { createdAt: "desc" },
+            take: 1,
+            select: { createdAt: true },
+          },
         },
       },
     },
     orderBy: { createdAt: "asc" },
   });
+
+  // Contagem de posts excluindo boas-vindas (cards de orientação).
+  const postCounts = await prisma.post.groupBy({
+    by: ["authorId"],
+    where: { space: { slug: { not: WELCOME_SPACE_SLUG } } },
+    _count: { _all: true },
+  });
+  const postsByUser = new Map(
+    postCounts.map((row) => [row.authorId, row._count._all]),
+  );
 
   const students: StudentProgressRow[] = memberships.map((m) => {
     const completed = m.user.lessonProgress.filter((p) =>
@@ -90,11 +122,16 @@ export async function listStudentsLessonProgress(): Promise<{
       percent,
       completedLessonIds: completed.map((c) => c.lessonId),
       lastCompletedAt,
+      postsCount: postsByUser.get(m.userId) ?? 0,
+      commentsCount: m.user._count.comments,
+      reactionsCount: m.user._count.reactions,
+      lastPostAt: m.user.posts[0]?.createdAt ?? null,
     };
   });
 
   students.sort((a, b) => {
     if (a.percent !== b.percent) return a.percent - b.percent;
+    if (a.postsCount !== b.postsCount) return a.postsCount - b.postsCount;
     return a.displayName.localeCompare(b.displayName, "pt-BR");
   });
 
@@ -104,6 +141,8 @@ export async function listStudentsLessonProgress(): Promise<{
       : Math.round(
           students.reduce((sum, s) => sum + s.percent, 0) / students.length,
         );
+
+  const totalPosts = students.reduce((sum, s) => sum + s.postsCount, 0);
 
   return {
     lessons,
@@ -116,6 +155,8 @@ export async function listStudentsLessonProgress(): Promise<{
         (s) => totalLessons > 0 && s.completedCount === totalLessons,
       ).length,
       notStarted: students.filter((s) => s.completedCount === 0).length,
+      totalPosts,
+      membersWithPosts: students.filter((s) => s.postsCount > 0).length,
     },
   };
 }

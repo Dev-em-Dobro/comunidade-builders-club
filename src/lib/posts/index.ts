@@ -4,7 +4,7 @@ import { notifyMany } from "@/lib/notifications";
 import { resolveMentionedUserIds } from "@/lib/mentions";
 import { titleFromBody } from "@/lib/posts/title";
 import { optionalHttpsUrl, optionalMediaUrl } from "@/lib/security/urls";
-import { WELCOME_SPACE_SLUG } from "@/lib/spaces/constants";
+import { isAdminOnlyPublishSpace } from "@/lib/spaces/constants";
 import { ForbiddenError } from "@/lib/auth/errors";
 
 export const createPostSchema = z.object({
@@ -115,9 +115,9 @@ export async function getPost(id: string) {
 async function assertCanPostToSpace(spaceId: string, isAdmin: boolean) {
   const space = await prisma.space.findUnique({ where: { id: spaceId } });
   if (!space) throw new Error("Space não encontrado.");
-  if (space.slug === WELCOME_SPACE_SLUG && !isAdmin) {
+  if (isAdminOnlyPublishSpace(space.slug) && !isAdmin) {
     throw new ForbiddenError(
-      "Apenas administradores podem publicar em Boas-vindas.",
+      "Apenas administradores podem publicar neste space.",
     );
   }
   return space;
