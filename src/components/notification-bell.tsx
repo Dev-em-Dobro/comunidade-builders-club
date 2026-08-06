@@ -156,7 +156,7 @@ export function NotificationBell({
   }, [open]);
 
   return (
-    <div className="relative" ref={rootRef}>
+    <div className="relative z-[100]" ref={rootRef}>
       <button
         type="button"
         className={
@@ -199,7 +199,7 @@ export function NotificationBell({
 
       {open ? (
         <div
-          className={`absolute z-50 mt-2 w-[min(92vw,340px)] rounded-2xl border border-border bg-card p-2 shadow-lg ${
+          className={`absolute z-[100] mt-2 w-[min(92vw,340px)] rounded-2xl border border-border bg-card p-2 shadow-xl ${
             compact ? "right-0" : "left-0 bottom-full mb-2 mt-0"
           }`}
           role="menu"

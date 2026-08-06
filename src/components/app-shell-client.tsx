@@ -82,7 +82,7 @@ function SidebarFooter({
 }) {
   const pathname = usePathname();
   return (
-    <div className="mt-auto flex flex-col gap-0.5 border-t border-border pt-4">
+    <div className="mt-auto flex flex-col gap-0.5 border-t border-border pt-4 relative z-[100]">
       <Link
         href="/aulas"
         className={`btn-ghost justify-start gap-2 ${pathname.startsWith("/aulas") ? "text-accent" : ""}`}
@@ -187,7 +187,7 @@ export function AppShellClient({
 
   return (
     <div className="flex min-h-dvh w-full">
-      <aside className="sticky top-0 hidden h-dvh w-[260px] shrink-0 flex-col border-r border-border bg-sidebar/95 p-5 backdrop-blur-md md:flex">
+      <aside className="sticky top-0 z-40 hidden h-dvh w-[260px] shrink-0 flex-col border-r border-border bg-sidebar/95 p-5 backdrop-blur-md md:flex">
         <Link
           href="/"
           className="font-[family-name:var(--font-outfit)] text-xl font-bold tracking-tight text-foreground"
@@ -271,11 +271,23 @@ export function AppShellClient({
         <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-border/80 bg-background/85 px-4 py-3 backdrop-blur-md md:hidden">
           <button
             type="button"
-            className="btn-ghost -ml-1"
+            className="btn-ghost -ml-1 px-2"
             onClick={() => setDrawerOpen(true)}
             aria-label="Abrir menu"
           >
-            Menu
+            <svg
+              viewBox="0 0 24 24"
+              className="h-6 w-6"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              aria-hidden
+            >
+              <path d="M4 6h16" />
+              <path d="M4 12h16" />
+              <path d="M4 18h16" />
+            </svg>
           </button>
           <Link
             href="/"
