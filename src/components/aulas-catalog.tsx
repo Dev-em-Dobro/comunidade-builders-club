@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { pandaEmbedUrl } from "@/lib/aulas";
-import { markLessonCompletedAction } from "@/actions/aulas";
+import { MarkLessonCompleteButton } from "@/components/mark-lesson-complete-button";
 
 export type AulaLessonCard = {
   id: string;
@@ -28,9 +28,11 @@ export type AulaModuleCard = {
 function LessonModal({
   lesson,
   onClose,
+  onCompleted,
 }: {
   lesson: AulaLessonCard;
   onClose: () => void;
+  onCompleted: (lessonId: string) => void;
 }) {
   let embed: string | null = null;
   try {
@@ -67,7 +69,7 @@ function LessonModal({
         className="relative z-10 flex max-h-[100dvh] w-full max-w-3xl flex-col overflow-hidden bg-card shadow-2xl md:max-h-[90dvh] md:rounded-2xl md:border md:border-border"
       >
         <header className="flex shrink-0 items-center gap-2 border-b border-border px-4 py-3">
-          <h2 className="min-w-0 flex-1 truncate font-[family-name:var(--font-outfit)] text-base font-semibold">
+          <h2 className="min-w-0 flex-1 truncate font-[family-name:var(--font-outfit)] text-lg font-semibold">
             {lesson.title}
           </h2>
           <button
@@ -93,29 +95,28 @@ function LessonModal({
               </div>
             </div>
           ) : (
-            <p className="text-sm text-red-600">
+            <p className="text-[15px] text-red-600">
               Não foi possível montar o player. Confira os IDs Panda no admin.
             </p>
           )}
           {lesson.description ? (
-            <p className="mt-4 text-sm text-muted">{lesson.description}</p>
+            <p className="mt-4 text-[15px] text-muted md:text-base">
+              {lesson.description}
+            </p>
           ) : null}
           <div className="mt-5">
             {lesson.completed ? (
-              <p className="text-sm font-medium text-accent">Aula concluída</p>
+              <p className="inline-flex items-center gap-2 rounded-xl bg-accent/10 px-4 py-2.5 text-[15px] font-semibold text-accent">
+                <span aria-hidden>✓</span>
+                Aula concluída
+              </p>
             ) : (
-              <form
-                action={markLessonCompletedAction.bind(
-                  null,
-                  lesson.id,
-                  lesson.moduleSlug,
-                  lesson.slug,
-                )}
-              >
-                <button type="submit" className="btn-primary">
-                  Marcar como concluída
-                </button>
-              </form>
+              <MarkLessonCompleteButton
+                lessonId={lesson.id}
+                moduleSlug={lesson.moduleSlug}
+                lessonSlug={lesson.slug}
+                onCompleted={() => onCompleted(lesson.id)}
+              />
             )}
           </div>
         </div>
@@ -124,8 +125,31 @@ function LessonModal({
   );
 }
 
-export function AulasCatalog({ modules }: { modules: AulaModuleCard[] }) {
+export function AulasCatalog({
+  modules: initial,
+}: {
+  modules: AulaModuleCard[];
+}) {
+  const [modules, setModules] = useState(initial);
   const [open, setOpen] = useState<AulaLessonCard | null>(null);
+
+  useEffect(() => {
+    setModules(initial);
+  }, [initial]);
+
+  function markLocalCompleted(lessonId: string) {
+    setModules((prev) =>
+      prev.map((mod) => ({
+        ...mod,
+        lessons: mod.lessons.map((l) =>
+          l.id === lessonId ? { ...l, completed: true } : l,
+        ),
+      })),
+    );
+    setOpen((cur) =>
+      cur && cur.id === lessonId ? { ...cur, completed: true } : cur,
+    );
+  }
 
   if (modules.length === 0) {
     return null;
@@ -153,13 +177,15 @@ export function AulasCatalog({ modules }: { modules: AulaModuleCard[] }) {
                 </div>
               )}
               <div className="min-w-0 flex-1">
-                <h2 className="font-[family-name:var(--font-outfit)] text-lg font-semibold">
+                <h2 className="font-[family-name:var(--font-outfit)] text-lg font-semibold md:text-xl">
                   {mod.title}
                 </h2>
                 {mod.description ? (
-                  <p className="mt-0.5 text-sm text-muted">{mod.description}</p>
+                  <p className="mt-0.5 text-[15px] text-muted">
+                    {mod.description}
+                  </p>
                 ) : null}
-                <p className="mt-1 text-xs text-muted">
+                <p className="mt-1 text-sm text-muted">
                   {mod.lessons.length}{" "}
                   {mod.lessons.length === 1 ? "conteúdo" : "conteúdos"}
                 </p>
@@ -172,7 +198,7 @@ export function AulasCatalog({ modules }: { modules: AulaModuleCard[] }) {
                   <button
                     type="button"
                     onClick={() => setOpen(l)}
-                    className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-surface/60 sm:gap-4 sm:px-5"
+                    className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-surface/60 sm:gap-4 sm:px-5"
                   >
                     {l.thumbnailUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -187,17 +213,17 @@ export function AulasCatalog({ modules }: { modules: AulaModuleCard[] }) {
                       </div>
                     )}
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold text-foreground">
+                      <p className="truncate text-[15px] font-semibold text-foreground md:text-base">
                         {l.title}
                       </p>
-                      <p className="text-xs text-muted">Vídeo</p>
+                      <p className="text-sm text-muted">Vídeo</p>
                     </div>
                     {l.completed ? (
-                      <span className="shrink-0 text-[11px] font-semibold uppercase tracking-wide text-accent">
+                      <span className="shrink-0 text-xs font-semibold uppercase tracking-wide text-accent">
                         Concluída
                       </span>
                     ) : (
-                      <span className="shrink-0 text-xs font-medium text-accent">
+                      <span className="shrink-0 text-sm font-medium text-accent">
                         Assistir →
                       </span>
                     )}
@@ -206,7 +232,7 @@ export function AulasCatalog({ modules }: { modules: AulaModuleCard[] }) {
               ))}
             </ul>
 
-            <p className="border-t border-border px-4 py-2.5 text-xs text-muted sm:px-5">
+            <p className="border-t border-border px-4 py-2.5 text-sm text-muted sm:px-5">
               {mod.lessons.length} conteúdo(s)
             </p>
           </li>
@@ -214,7 +240,11 @@ export function AulasCatalog({ modules }: { modules: AulaModuleCard[] }) {
       </ul>
 
       {open ? (
-        <LessonModal lesson={open} onClose={() => setOpen(null)} />
+        <LessonModal
+          lesson={open}
+          onClose={() => setOpen(null)}
+          onCompleted={markLocalCompleted}
+        />
       ) : null}
     </>
   );

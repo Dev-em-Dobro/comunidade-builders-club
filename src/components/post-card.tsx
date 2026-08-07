@@ -49,12 +49,12 @@ function Avatar({
       <img
         src={url}
         alt=""
-        className="h-10 w-10 shrink-0 rounded-full object-cover ring-2 ring-surface"
+        className="h-11 w-11 shrink-0 rounded-full object-cover ring-2 ring-surface sm:h-12 sm:w-12"
       />
     );
   }
   return (
-    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent/15 text-sm font-bold text-accent">
+    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent/15 text-sm font-bold text-accent sm:h-12 sm:w-12 sm:text-base">
       {name.slice(0, 1).toUpperCase()}
     </div>
   );
@@ -80,7 +80,7 @@ function MetaLine({
   pinned: boolean;
 }) {
   return (
-    <p className="mt-0.5 text-xs text-muted">
+    <p className="mt-0.5 text-sm text-muted">
       {showSpace ? (
         <>
           <span className="font-medium text-accent/90">{post.space.name}</span>
@@ -154,7 +154,7 @@ export function PostCard({
           <Avatar name={name} url={avatarUrl} />
           <div className="min-w-0 flex-1">
             <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-foreground">
+              <p className="truncate text-[15px] font-semibold text-foreground md:text-base">
                 {name}
               </p>
               <MetaLine post={post} showSpace={showSpace} pinned={pinned} />
@@ -181,7 +181,7 @@ export function PostCard({
               />
             </div>
 
-            <div className="mt-2 flex flex-wrap gap-3 text-xs text-muted">
+            <div className="mt-2 flex flex-wrap gap-3 text-sm text-muted">
               <span>
                 {post.viewCount}{" "}
                 {post.viewCount === 1 ? "leitura" : "leituras"}
@@ -210,7 +210,7 @@ export function PostCard({
           <Avatar name={name} url={avatarUrl} />
           <div className="min-w-0 flex-1">
             <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-foreground">
+              <p className="truncate text-[15px] font-semibold text-foreground md:text-base">
                 {name}
               </p>
               <MetaLine post={post} showSpace={showSpace} pinned={pinned} />
@@ -220,7 +220,7 @@ export function PostCard({
               {title}
             </h2>
             {preview && preview !== title ? (
-              <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-muted">
+              <p className="mt-1.5 line-clamp-2 text-[15px] leading-relaxed text-muted md:text-base">
                 {preview}
               </p>
             ) : null}
@@ -240,7 +240,7 @@ export function PostCard({
               </p>
             ) : null}
 
-            <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-border/70 pt-3 text-xs text-muted">
+            <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-border/70 pt-3 text-sm text-muted">
               <span>
                 {post.viewCount}{" "}
                 {post.viewCount === 1 ? "leitura" : "leituras"}

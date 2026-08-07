@@ -129,7 +129,7 @@ export function MarkdownBody({
     <div
       className={
         className ??
-        "space-y-2 text-[15px] leading-relaxed text-foreground/90 [&_p]:my-0"
+        "space-y-2 text-base leading-relaxed text-foreground/90 [&_p]:my-0"
       }
     >
       {blocks.length > 0 ? blocks : <p>{renderInlineMarkdown(body)}</p>}
