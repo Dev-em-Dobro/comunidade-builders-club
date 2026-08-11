@@ -12,7 +12,7 @@ import { deleteCommentAction } from "@/actions/engagement";
 import { MentionTextarea } from "@/components/mention-textarea";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { useUpgradeOptional } from "@/components/upgrade-modal";
-import { UPGRADE_REQUIRED } from "@/lib/membership/require-member";
+import { UPGRADE_REQUIRED } from "@/lib/membership/errors";
 
 const MEDIA_ACCEPT =
   "image/jpeg,image/png,image/gif,video/mp4,.jpg,.jpeg,.png,.gif,.mp4";

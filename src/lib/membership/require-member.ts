@@ -7,6 +7,7 @@ import { requireUser } from "@/lib/auth/require-user";
 import { AuthError, ForbiddenError } from "@/lib/auth/errors";
 import { ensureMemberBootstrap } from "./bootstrap";
 import { isPaidMembership } from "./capabilities";
+import { UPGRADE_REQUIRED } from "./errors";
 
 export type ActiveMember = {
   user: AuthUser;
@@ -14,7 +15,7 @@ export type ActiveMember = {
   membership: Membership;
 };
 
-export const UPGRADE_REQUIRED = "UPGRADE_REQUIRED";
+export { UPGRADE_REQUIRED } from "./errors";
 
 /** Sessão + membership active (free ou paid). Deduplica no request. */
 export const requireActiveMember = cache(async (): Promise<ActiveMember> => {
