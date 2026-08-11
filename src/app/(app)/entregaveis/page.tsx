@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
+import { requirePaidMemberOrRedirect } from "@/lib/membership/require-member";
 import { ENTREGAVEIS } from "@/lib/entregaveis";
 
 function IconeDownload() {
@@ -22,7 +22,7 @@ function IconeDownload() {
 }
 
 export default async function EntregaveisPage() {
-  const member = await requireActiveMemberOrRedirect();
+  const member = await requirePaidMemberOrRedirect();
   const disponiveis = ENTREGAVEIS.filter((e) => !e.emBreve);
   const emBreve = ENTREGAVEIS.filter((e) => e.emBreve);
 

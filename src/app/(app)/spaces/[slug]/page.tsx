@@ -1,5 +1,9 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
+import {
+  isFreeSpaceSlug,
+  isPaidMembership,
+} from "@/lib/membership/capabilities";
 import { getSpaceBySlug } from "@/lib/spaces";
 import { listPosts } from "@/lib/posts";
 import { WELCOME_SPACE_SLUG } from "@/lib/spaces/constants";
@@ -17,6 +21,11 @@ export default async function SpacePage({ params }: Props) {
   ]);
   if (!space) notFound();
 
+  const isPaid = isPaidMembership(member.membership);
+  if (!isPaid && !isFreeSpaceSlug(slug)) {
+    redirect("/?upgrade=1");
+  }
+
   const { posts } = await listPosts({
     spaceId: space.id,
     viewerId: member.user.id,
@@ -30,6 +39,7 @@ export default async function SpacePage({ params }: Props) {
         spaceName={space.name}
         spaceDescription={space.description}
         isAdmin={isAdmin}
+        isPaid={isPaid}
         currentUserId={member.user.id}
         posts={posts.map((p) => ({
           id: p.id,
@@ -61,13 +71,18 @@ export default async function SpacePage({ params }: Props) {
         {posts.length === 0 ? (
           <EmptyState
             title="Nenhum post neste space"
-            description="Comece a conversa — use o botão Nova publicação."
+            description={
+              isPaid
+                ? "Comece a conversa — use o botão Nova publicação."
+                : "Ainda não há publicações aqui."
+            }
           />
         ) : (
           <FeedList
             posts={posts}
             showSpace={false}
             isAdmin={isAdmin}
+            isPaid={isPaid}
             currentUserId={member.user.id}
           />
         )}

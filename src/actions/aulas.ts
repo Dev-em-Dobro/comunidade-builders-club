@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireActiveMember } from "@/lib/membership/require-member";
+import { requirePaidMember } from "@/lib/membership/require-member";
 import { markLessonCompleted } from "@/lib/aulas";
 
 export async function markLessonCompletedAction(
@@ -9,7 +9,7 @@ export async function markLessonCompletedAction(
   moduleSlug: string,
   lessonSlug: string,
 ) {
-  const { user } = await requireActiveMember();
+  const { user } = await requirePaidMember();
   await markLessonCompleted(user.id, lessonId);
   revalidatePath("/aulas");
   revalidatePath(`/aulas/${moduleSlug}/${lessonSlug}`);

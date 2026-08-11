@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ENTREGAVEIS_MENU } from "@/lib/entregaveis/catalogo";
+import { useUpgradeOptional } from "@/components/upgrade-modal";
 
 function Icone({ d }: { d: React.ReactNode }) {
   return (
@@ -17,6 +18,22 @@ function Icone({ d }: { d: React.ReactNode }) {
       className="h-4 w-4 shrink-0"
     >
       {d}
+    </svg>
+  );
+}
+
+function LockIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      className="ml-auto h-3.5 w-3.5 shrink-0 opacity-70"
+      aria-hidden
+    >
+      <rect x="3" y="11" width="18" height="11" rx="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
     </svg>
   );
 }
@@ -75,18 +92,6 @@ const ICONES: Record<string, React.ReactNode> = {
       }
     />
   ),
-  "setup-orion": (
-    <Icone
-      d={
-        <>
-          <circle cx="8" cy="15" r="4" />
-          <path d="m10.5 10.5 6 6" />
-          <path d="m18 6-3-3" />
-          <path d="m15 9 3-3" />
-        </>
-      }
-    />
-  ),
   briefing: (
     <Icone
       d={
@@ -132,8 +137,15 @@ const ITENS = [
   })),
 ];
 
-export function MateriaisNav({ onNavigate }: { onNavigate?: () => void }) {
+export function MateriaisNav({
+  locked = false,
+  onNavigate,
+}: {
+  locked?: boolean;
+  onNavigate?: () => void;
+}) {
   const pathname = usePathname();
+  const upgrade = useUpgradeOptional();
 
   return (
     <nav className="flex flex-col gap-0.5">
@@ -145,6 +157,25 @@ export function MateriaisNav({ onNavigate }: { onNavigate?: () => void }) {
           item.href === "/entregaveis"
             ? pathname === "/entregaveis"
             : pathname === item.href || pathname.startsWith(`${item.href}/`);
+
+        if (locked) {
+          return (
+            <button
+              key={item.href}
+              type="button"
+              onClick={() => {
+                upgrade?.openUpgrade("materiais");
+                onNavigate?.();
+              }}
+              className="nav-space flex w-full cursor-pointer items-center gap-2 text-left opacity-80"
+            >
+              {item.icone}
+              <span className="truncate">{item.label}</span>
+              <LockIcon />
+            </button>
+          );
+        }
+
         return (
           <Link
             key={item.href}

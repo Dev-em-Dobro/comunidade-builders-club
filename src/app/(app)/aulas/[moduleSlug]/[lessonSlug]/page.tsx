@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
+import { requirePaidMemberOrRedirect } from "@/lib/membership/require-member";
 import {
   ensureLessonDiscussionPost,
   getLessonForMember,
@@ -23,7 +23,7 @@ type Props = {
 
 export default async function LessonPage({ params }: Props) {
   const { moduleSlug, lessonSlug } = await params;
-  const member = await requireActiveMemberOrRedirect();
+  const member = await requirePaidMemberOrRedirect();
 
   const lesson = await getLessonForMember(moduleSlug, lessonSlug);
   if (!lesson) notFound();

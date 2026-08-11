@@ -1,4 +1,4 @@
-// F014 — persistência Hubla → AllowedEmail + Membership.
+// F014 / F041 — persistência Hubla → AllowedEmail + Membership.tier.
 
 import { prisma } from "@/lib/db";
 import { addAllowedEmail, removeAllowedEmail } from "@/lib/membership/allowlist";
@@ -24,28 +24,44 @@ export async function registrarEntrega(
   });
 }
 
-async function ativarPendingSeExistir(email: string): Promise<void> {
+async function concederPaid(email: string): Promise<void> {
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) return;
   const m = await prisma.membership.findUnique({ where: { userId: user.id } });
-  if (m?.status === "pending") {
+  if (!m) {
+    await prisma.membership.create({
+      data: {
+        userId: user.id,
+        status: "active",
+        tier: "paid",
+        role: "member",
+      },
+    });
+    return;
+  }
+  if (m.role === "admin") {
     await prisma.membership.update({
       where: { userId: user.id },
-      data: { status: "active" },
+      data: { status: "active", tier: "paid" },
     });
+    return;
   }
+  await prisma.membership.update({
+    where: { userId: user.id },
+    data: { status: "active", tier: "paid" },
+  });
 }
 
-async function revogarSeExistir(email: string): Promise<void> {
+/** F041 — cancelamento Hubla desce para free (não revoga o login). */
+async function downgradeParaFree(email: string): Promise<void> {
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) return;
   const m = await prisma.membership.findUnique({ where: { userId: user.id } });
-  if (m && m.status !== "revoked" && m.role !== "admin") {
-    await prisma.membership.update({
-      where: { userId: user.id },
-      data: { status: "revoked" },
-    });
-  }
+  if (!m || m.role === "admin") return;
+  await prisma.membership.update({
+    where: { userId: user.id },
+    data: { status: "active", tier: "free" },
+  });
 }
 
 export async function aplicarAcaoAllowlist(acao: AcaoAllowlist): Promise<void> {
@@ -57,7 +73,7 @@ export async function aplicarAcaoAllowlist(acao: AcaoAllowlist): Promise<void> {
       source: "hubla",
       note: `product:${acao.productId}`,
     });
-    await ativarPendingSeExistir(acao.email);
+    await concederPaid(acao.email);
     return;
   }
 
@@ -66,7 +82,7 @@ export async function aplicarAcaoAllowlist(acao: AcaoAllowlist): Promise<void> {
   } catch {
     // já ausente — ok
   }
-  await revogarSeExistir(acao.email);
+  await downgradeParaFree(acao.email);
 }
 
 export async function processarWebhookHubla(

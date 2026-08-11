@@ -17,12 +17,14 @@ function CommentBlock({
   comment,
   postId,
   isAdmin,
+  isPaid = true,
   nested = false,
   onCommentDone,
 }: {
   comment: PostDetailDto["comments"][number] | PostDetailDto["comments"][number]["replies"][number];
   postId: string;
   isAdmin: boolean;
+  isPaid?: boolean;
   nested?: boolean;
   onCommentDone?: () => void;
 }) {
@@ -45,6 +47,7 @@ function CommentBlock({
             <ReplyToggle
               postId={postId}
               parentId={comment.id}
+              isPaid={isPaid}
               onDone={onCommentDone}
             />
           ) : null}
@@ -61,6 +64,7 @@ function CommentBlock({
               comment={r}
               postId={postId}
               isAdmin={isAdmin}
+              isPaid={isPaid}
               nested
               onCommentDone={onCommentDone}
             />
@@ -75,12 +79,14 @@ export function PostDetailContent({
   post,
   isAdmin,
   isAuthor = false,
+  isPaid = true,
   compactHeader = false,
   onCommentDone,
 }: {
   post: PostDetailDto;
   isAdmin: boolean;
   isAuthor?: boolean;
+  isPaid?: boolean;
   compactHeader?: boolean;
   onCommentDone?: () => void;
 }) {
@@ -141,6 +147,7 @@ export function PostDetailContent({
                 reactionCount={post.reactionCount}
                 isAdmin={isAdmin}
                 isAuthor={isAuthor}
+                isPaid={isPaid}
                 pinned={!!post.pinnedAt}
                 body={post.body}
                 imageUrl={post.imageUrl}
@@ -156,7 +163,7 @@ export function PostDetailContent({
         <h3 className="font-[family-name:var(--font-outfit)] text-lg font-semibold">
           Comentários ({post.commentCount})
         </h3>
-        <CommentForm postId={post.id} onDone={onCommentDone} />
+        <CommentForm postId={post.id} isPaid={isPaid} onDone={onCommentDone} />
         {post.comments.length === 0 ? (
           <div className="mt-4">
             <EmptyState
@@ -172,6 +179,7 @@ export function PostDetailContent({
                 comment={c}
                 postId={post.id}
                 isAdmin={isAdmin}
+                isPaid={isPaid}
                 onCommentDone={onCommentDone}
               />
             ))}

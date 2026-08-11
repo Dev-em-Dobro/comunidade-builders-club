@@ -11,11 +11,13 @@ import { PostDetailContent } from "@/components/post-detail-content";
 export function PostModal({
   postId,
   isAdmin,
+  isPaid = true,
   currentUserId,
   onClose,
 }: {
   postId: string | null;
   isAdmin: boolean;
+  isPaid?: boolean;
   currentUserId?: string;
   onClose: () => void;
 }) {
@@ -128,6 +130,7 @@ export function PostModal({
               post={post}
               isAdmin={isAdmin}
               isAuthor={isAuthor}
+              isPaid={isPaid}
               compactHeader
               onCommentDone={() => load(postId)}
             />

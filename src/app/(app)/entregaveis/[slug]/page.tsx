@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
+import { requirePaidMemberOrRedirect } from "@/lib/membership/require-member";
 import { entregavelPorSlug } from "@/lib/entregaveis/catalogo";
 import { urlInternaEntregavel } from "@/lib/entregaveis/servir";
 
@@ -26,7 +26,7 @@ function IconeDownload() {
 }
 
 export default async function EntregavelPage({ params }: Props) {
-  const member = await requireActiveMemberOrRedirect();
+  const member = await requirePaidMemberOrRedirect();
   const { slug } = await params;
   const item = entregavelPorSlug(slug);
 

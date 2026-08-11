@@ -1,4 +1,4 @@
-import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
+import { requirePaidMemberOrRedirect } from "@/lib/membership/require-member";
 import {
   listCompletedLessonIds,
   listPublishedModules,
@@ -7,7 +7,7 @@ import { EmptyState } from "@/components/empty-state";
 import { AulasCatalog } from "@/components/aulas-catalog";
 
 export default async function AulasPage() {
-  const member = await requireActiveMemberOrRedirect();
+  const member = await requirePaidMemberOrRedirect();
   const [modules, completed] = await Promise.all([
     listPublishedModules(),
     listCompletedLessonIds(member.user.id),

@@ -38,6 +38,8 @@ export async function listPosts(opts: {
   spaceId?: string;
   /** Exclui spaces por slug (ex.: boas-vindas no Feed global). */
   excludeSpaceSlugs?: string[];
+  /** Inclui só estes slugs (ex.: feed free). */
+  includeSpaceSlugs?: string[];
   /** Se informado, carrega só a reação deste usuário (liked). */
   viewerId?: string;
   cursor?: string;
@@ -49,6 +51,9 @@ export async function listPosts(opts: {
       ...(opts.spaceId ? { spaceId: opts.spaceId } : {}),
       ...(opts.excludeSpaceSlugs?.length
         ? { space: { slug: { notIn: opts.excludeSpaceSlugs } } }
+        : {}),
+      ...(opts.includeSpaceSlugs?.length
+        ? { space: { slug: { in: opts.includeSpaceSlugs } } }
         : {}),
     },
     include: {

@@ -2,10 +2,10 @@ import { prisma } from "@/lib/db";
 import { isEmailAllowed } from "./allowlist";
 
 /**
- * Garante Profile + Membership no login.
- * E-mail na allowlist (F012) ou BOOTSTRAP_ADMIN_EMAIL → active na hora.
- * Membership `revoked` não é reativado pela allowlist.
- * Fast-path: membro active com profile → quase zero trabalho.
+ * Garante Profile + Membership no login (F041 freemium).
+ * - Allowlist / Hubla / BOOTSTRAP_ADMIN → active + paid (+ admin se bootstrap)
+ * - Sem allowlist → active + free (entra na comunidade limitada)
+ * - Membership `revoked` não é reativado pela allowlist (só bootstrap admin)
  */
 export async function ensureMemberBootstrap(
   userId: string,
@@ -25,17 +25,6 @@ export async function ensureMemberBootstrap(
   const email = user.email.toLowerCase();
   const adminEmail = process.env.BOOTSTRAP_ADMIN_EMAIL?.trim().toLowerCase();
   const isBootstrapAdmin = !!adminEmail && email === adminEmail;
-
-  if (existing?.status === "active" && profileExists) {
-    if (isBootstrapAdmin && existing.role !== "admin") {
-      await prisma.membership.update({
-        where: { userId },
-        data: { status: "active", role: "admin" },
-      });
-    }
-    return;
-  }
-
   const allowed = isBootstrapAdmin || (await isEmailAllowed(email));
 
   if (!profileExists) {
@@ -50,11 +39,33 @@ export async function ensureMemberBootstrap(
     });
   }
 
+  // Fast-path: já active + profile; só sincroniza paid/admin se necessário.
+  if (existing?.status === "active" && profileExists) {
+    const needsAdmin =
+      isBootstrapAdmin && existing.role !== "admin";
+    const needsPaid =
+      (allowed || isBootstrapAdmin) && existing.tier !== "paid";
+    if (needsAdmin || needsPaid) {
+      await prisma.membership.update({
+        where: { userId },
+        data: {
+          status: "active",
+          tier: "paid",
+          ...(needsAdmin || isBootstrapAdmin
+            ? { role: "admin" as const }
+            : {}),
+        },
+      });
+    }
+    return;
+  }
+
   if (!existing) {
     await prisma.membership.create({
       data: {
         userId,
-        status: allowed ? "active" : "pending",
+        status: "active",
+        tier: allowed || isBootstrapAdmin ? "paid" : "free",
         role: isBootstrapAdmin ? "admin" : "member",
       },
     });
@@ -65,27 +76,21 @@ export async function ensureMemberBootstrap(
     if (isBootstrapAdmin) {
       await prisma.membership.update({
         where: { userId },
-        data: { status: "active", role: "admin" },
+        data: { status: "active", tier: "paid", role: "admin" },
       });
     }
     return;
   }
 
-  if (existing.status === "pending" && allowed) {
+  // pending legado → active free ou paid
+  if (existing.status === "pending") {
     await prisma.membership.update({
       where: { userId },
       data: {
         status: "active",
+        tier: allowed || isBootstrapAdmin ? "paid" : "free",
         ...(isBootstrapAdmin ? { role: "admin" as const } : {}),
       },
-    });
-    return;
-  }
-
-  if (isBootstrapAdmin && existing.role !== "admin") {
-    await prisma.membership.update({
-      where: { userId },
-      data: { status: "active", role: "admin" },
     });
   }
 }

@@ -95,6 +95,12 @@ enum MembershipStatus {
   revoked
 }
 
+/// F041 — freemium: free lê Feed/Boas-vindas/Geral/Avisos; paid libera o resto.
+enum MembershipTier {
+  free
+  paid
+}
+
 enum Role {
   member
   instructor
@@ -131,11 +137,14 @@ model Membership {
   userId    String           @unique
   user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   status    MembershipStatus @default(pending)
+  /// F041 — free (leitura limitada) | paid (comunidade completa).
+  tier      MembershipTier   @default(free)
   role      Role             @default(member)
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
 
   @@index([status])
+  @@index([tier])
   @@map("membership")
 }
 

@@ -21,12 +21,14 @@ export function WelcomeSpaceView({
   spaceDescription,
   posts,
   isAdmin,
+  isPaid = true,
   currentUserId,
 }: {
   spaceName: string;
   spaceDescription: string | null;
   posts: WelcomeCardPost[];
   isAdmin: boolean;
+  isPaid?: boolean;
   currentUserId: string;
 }) {
   const [openId, setOpenId] = useState<string | null>(null);
@@ -96,6 +98,7 @@ export function WelcomeSpaceView({
       <PostModal
         postId={openId}
         isAdmin={isAdmin}
+        isPaid={isPaid}
         currentUserId={currentUserId}
         onClose={() => setOpenId(null)}
       />

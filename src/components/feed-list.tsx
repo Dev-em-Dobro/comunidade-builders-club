@@ -82,11 +82,13 @@ export function FeedList({
   posts,
   showSpace = true,
   isAdmin,
+  isPaid = true,
   currentUserId,
 }: {
   posts: PostCardData[];
   showSpace?: boolean;
   isAdmin: boolean;
+  isPaid?: boolean;
   currentUserId: string;
 }) {
   const [view, setView] = useState<FeedViewMode>("compact");
@@ -124,6 +126,7 @@ export function FeedList({
             showSpace={showSpace}
             variant={view}
             isAdmin={isAdmin}
+            isPaid={isPaid}
             currentUserId={currentUserId}
           />
         ))}

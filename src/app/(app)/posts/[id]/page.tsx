@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
+import {
+  isFreeSpaceSlug,
+  isPaidMembership,
+} from "@/lib/membership/capabilities";
 import { getPost, recordPostView } from "@/lib/posts";
 import {
   getLessonPathById,
@@ -23,6 +27,11 @@ export default async function PostPage({ params }: Props) {
   if (lessonId) {
     const path = await getLessonPathById(lessonId);
     if (path) redirect(path);
+  }
+
+  const isPaid = isPaidMembership(member.membership);
+  if (!isPaid && !isFreeSpaceSlug(post.space.slug)) {
+    redirect("/?upgrade=1");
   }
 
   void recordPostView(post.id, member.user.id);
@@ -75,7 +84,7 @@ export default async function PostPage({ params }: Props) {
       </Link>
       <div className="mt-4">
         <h1 className="sr-only">{title}</h1>
-        <PostDetailContent post={dto} isAdmin={isAdmin} isAuthor={isAuthor} />
+        <PostDetailContent post={dto} isAdmin={isAdmin} isAuthor={isAuthor} isPaid={isPaid} />
       </div>
     </div>
   );

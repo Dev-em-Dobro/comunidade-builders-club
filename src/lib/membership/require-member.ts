@@ -6,6 +6,7 @@ import type { AuthUser } from "@/lib/auth";
 import { requireUser } from "@/lib/auth/require-user";
 import { AuthError, ForbiddenError } from "@/lib/auth/errors";
 import { ensureMemberBootstrap } from "./bootstrap";
+import { isPaidMembership } from "./capabilities";
 
 export type ActiveMember = {
   user: AuthUser;
@@ -13,7 +14,9 @@ export type ActiveMember = {
   membership: Membership;
 };
 
-/** Deduplica auth+membership no mesmo request (layout + page). */
+export const UPGRADE_REQUIRED = "UPGRADE_REQUIRED";
+
+/** Sessão + membership active (free ou paid). Deduplica no request. */
 export const requireActiveMember = cache(async (): Promise<ActiveMember> => {
   const user = await requireUser();
   await ensureMemberBootstrap(user.id, user.name, user.image);
@@ -38,6 +41,15 @@ export const requireActiveMember = cache(async (): Promise<ActiveMember> => {
   return { user, profile, membership };
 });
 
+/** Exige tier paid (ou staff). */
+export async function requirePaidMember(): Promise<ActiveMember> {
+  const member = await requireActiveMember();
+  if (!isPaidMembership(member.membership)) {
+    throw new ForbiddenError(UPGRADE_REQUIRED);
+  }
+  return member;
+}
+
 export async function requireAdmin(): Promise<ActiveMember> {
   const member = await requireActiveMember();
   if (member.membership.role !== "admin") {
@@ -55,6 +67,16 @@ export async function requireActiveMemberOrRedirect(): Promise<ActiveMember> {
     if (e instanceof ForbiddenError) redirect("/aguardando");
     throw e;
   }
+}
+
+export async function requirePaidMemberOrRedirect(
+  upgradePath = "/?upgrade=1",
+): Promise<ActiveMember> {
+  const member = await requireActiveMemberOrRedirect();
+  if (!isPaidMembership(member.membership)) {
+    redirect(upgradePath);
+  }
+  return member;
 }
 
 /** Sem sessão → /login. Sem papel admin → /. */

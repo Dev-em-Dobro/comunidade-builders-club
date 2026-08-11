@@ -34,6 +34,7 @@ type PostCardProps = {
   showSpace?: boolean;
   variant?: "compact" | "expanded";
   isAdmin?: boolean;
+  isPaid?: boolean;
   currentUserId?: string;
 };
 
@@ -103,6 +104,7 @@ export function PostCard({
   showSpace = true,
   variant = "compact",
   isAdmin = false,
+  isPaid = true,
   currentUserId,
 }: PostCardProps) {
   const router = useRouter();
@@ -128,6 +130,7 @@ export function PostCard({
       reactionCount={post.reactionCount}
       isAdmin={isAdmin}
       isAuthor={isAuthor}
+      isPaid={isPaid}
       pinned={pinned}
       body={post.body}
       imageUrl={post.imageUrl}

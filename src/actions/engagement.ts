@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireActiveMember, requireAdmin } from "@/lib/membership/require-member";
+import { requireActiveMember, requireAdmin, requirePaidMember } from "@/lib/membership/require-member";
 import {
   createComment,
   createCommentSchema,
@@ -10,7 +10,7 @@ import {
 } from "@/lib/engagement";
 
 export async function createCommentAction(formData: FormData) {
-  const { user } = await requireActiveMember();
+  const { user } = await requirePaidMember();
   const parentRaw = String(formData.get("parentId") ?? "").trim();
   const raw = {
     postId: String(formData.get("postId") ?? ""),
@@ -31,7 +31,7 @@ export async function deleteCommentAction(commentId: string, postId: string) {
 }
 
 export async function toggleReactionAction(postId: string) {
-  const { user } = await requireActiveMember();
+  const { user } = await requirePaidMember();
   const result = await togglePostReaction(user.id, postId);
   revalidatePath(`/posts/${postId}`);
   revalidatePath("/");

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { NOME_PRODUTO } from "@/lib/produto";
 import { LogoutButton } from "@/components/logout-button";
@@ -10,6 +10,8 @@ import {
   type NotifPreview,
 } from "@/components/notification-bell";
 import { MateriaisNav } from "@/components/materiais-nav";
+import { UpgradeProvider, useUpgrade } from "@/components/upgrade-modal";
+import { isFreeSpaceSlug } from "@/lib/membership/capabilities";
 import {
   ICON_ADMIN,
   ICON_AULAS,
@@ -22,6 +24,24 @@ import {
 } from "@/components/nav-icons";
 
 type SpaceLink = { id: string; slug: string; name: string };
+
+function LockIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className ?? "h-3.5 w-3.5 shrink-0 opacity-70"}
+      aria-hidden
+    >
+      <rect x="3" y="11" width="18" height="11" rx="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </svg>
+  );
+}
 
 function FeedLink({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
@@ -39,12 +59,15 @@ function FeedLink({ onNavigate }: { onNavigate?: () => void }) {
 
 function SpaceNav({
   spaces,
+  isPaid,
   onNavigate,
 }: {
   spaces: SpaceLink[];
+  isPaid: boolean;
   onNavigate?: () => void;
 }) {
   const pathname = usePathname();
+  const { openUpgrade } = useUpgrade();
 
   return (
     <nav className="flex flex-col gap-0.5">
@@ -54,6 +77,24 @@ function SpaceNav({
       {spaces.map((s) => {
         const href = `/spaces/${s.slug}`;
         const active = pathname === href;
+        const locked = !isPaid && !isFreeSpaceSlug(s.slug);
+        if (locked) {
+          return (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => {
+                openUpgrade("space");
+                onNavigate?.();
+              }}
+              className="nav-space flex w-full cursor-pointer items-center gap-2 text-left opacity-80"
+            >
+              {iconForSpace(s.slug)}
+              <span className="min-w-0 flex-1 truncate">{s.name}</span>
+              <LockIcon />
+            </button>
+          );
+        }
         return (
           <Link
             key={s.id}
@@ -73,33 +114,82 @@ function SpaceNav({
 function SidebarFooter({
   unread,
   isAdmin,
+  isPaid,
   notifPreview,
   onNavigate,
 }: {
   unread: number;
   isAdmin: boolean;
+  isPaid: boolean;
   notifPreview: NotifPreview[];
   onNavigate?: () => void;
 }) {
   const pathname = usePathname();
+  const { openUpgrade } = useUpgrade();
+
+  function LockedGhost({
+    label,
+    icon,
+    reason,
+    active,
+  }: {
+    label: string;
+    icon: React.ReactNode;
+    reason: "aulas" | "busca";
+    active: boolean;
+  }) {
+    return (
+      <button
+        type="button"
+        className={`btn-ghost w-full cursor-pointer justify-start gap-2 ${active ? "text-accent" : ""}`}
+        onClick={() => {
+          openUpgrade(reason);
+          onNavigate?.();
+        }}
+      >
+        {icon}
+        <span className="flex-1 text-left">{label}</span>
+        <LockIcon />
+      </button>
+    );
+  }
+
   return (
-    <div className="mt-auto flex flex-col gap-0.5 border-t border-border pt-4 relative z-[100]">
-      <Link
-        href="/aulas"
-        className={`btn-ghost justify-start gap-2 ${pathname.startsWith("/aulas") ? "text-accent" : ""}`}
-        onClick={onNavigate}
-      >
-        {ICON_AULAS}
-        Aulas
-      </Link>
-      <Link
-        href="/busca"
-        className={`btn-ghost justify-start gap-2 ${pathname.startsWith("/busca") ? "text-accent" : ""}`}
-        onClick={onNavigate}
-      >
-        {ICON_BUSCA}
-        Busca
-      </Link>
+    <div className="relative z-[100] mt-auto flex flex-col gap-0.5 border-t border-border pt-4">
+      {isPaid ? (
+        <Link
+          href="/aulas"
+          className={`btn-ghost justify-start gap-2 ${pathname.startsWith("/aulas") ? "text-accent" : ""}`}
+          onClick={onNavigate}
+        >
+          {ICON_AULAS}
+          Aulas
+        </Link>
+      ) : (
+        <LockedGhost
+          label="Aulas"
+          icon={ICON_AULAS}
+          reason="aulas"
+          active={pathname.startsWith("/aulas")}
+        />
+      )}
+      {isPaid ? (
+        <Link
+          href="/busca"
+          className={`btn-ghost justify-start gap-2 ${pathname.startsWith("/busca") ? "text-accent" : ""}`}
+          onClick={onNavigate}
+        >
+          {ICON_BUSCA}
+          Busca
+        </Link>
+      ) : (
+        <LockedGhost
+          label="Busca"
+          icon={ICON_BUSCA}
+          reason="busca"
+          active={pathname.startsWith("/busca")}
+        />
+      )}
       <NotificationBell unread={unread} items={notifPreview} />
       <Link
         href="/perfil"
@@ -114,7 +204,8 @@ function SidebarFooter({
           <Link
             href="/admin"
             className={`btn-ghost justify-start gap-2 ${
-              pathname.startsWith("/admin") && !pathname.startsWith("/admin/progresso")
+              pathname.startsWith("/admin") &&
+              !pathname.startsWith("/admin/progresso")
                 ? "text-accent"
                 : ""
             }`}
@@ -140,16 +231,18 @@ function SidebarFooter({
   );
 }
 
-function NovaPublicacaoFab({ isAdmin }: { isAdmin: boolean }) {
+function NovaPublicacaoFab({
+  isAdmin,
+  isPaid,
+}: {
+  isAdmin: boolean;
+  isPaid: boolean;
+}) {
   const pathname = usePathname();
-  // Só nas páginas de Spaces (não no Feed, Aulas, Materiais, etc.).
-  if (!pathname.startsWith("/spaces/")) {
-    return null;
-  }
-  if (pathname === "/nova" || pathname.startsWith("/entregaveis/")) {
-    return null;
-  }
-  // Membros comuns não publicam em Boas-vindas / Avisos.
+  const { openUpgrade } = useUpgrade();
+
+  if (!pathname.startsWith("/spaces/")) return null;
+  if (pathname === "/nova" || pathname.startsWith("/entregaveis/")) return null;
   if (
     !isAdmin &&
     (pathname.startsWith("/spaces/boas-vindas") ||
@@ -164,22 +257,37 @@ function NovaPublicacaoFab({ isAdmin }: { isAdmin: boolean }) {
       ? `/nova?space=${spaceSlug}`
       : "/nova";
 
+  const className =
+    "fixed bottom-5 right-5 z-40 inline-flex h-14 cursor-pointer items-center gap-2 rounded-full bg-accent px-5 text-sm font-semibold text-white shadow-lg shadow-accent/30 transition hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent md:bottom-8 md:right-8";
+
+  if (!isPaid) {
+    return (
+      <button
+        type="button"
+        className={className}
+        aria-label="Nova publicação (requer upgrade)"
+        onClick={() => openUpgrade("publicar")}
+      >
+        {ICON_NOVA}
+        <span className="pr-0.5">Nova publicação</span>
+        <LockIcon className="h-4 w-4 opacity-90" />
+      </button>
+    );
+  }
+
   return (
-    <Link
-      href={href}
-      className="fixed bottom-5 right-5 z-40 inline-flex h-14 cursor-pointer items-center gap-2 rounded-full bg-accent px-5 text-sm font-semibold text-white shadow-lg shadow-accent/30 transition hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent md:bottom-8 md:right-8"
-      aria-label="Nova publicação"
-    >
+    <Link href={href} className={className} aria-label="Nova publicação">
       {ICON_NOVA}
       <span className="pr-0.5">Nova publicação</span>
     </Link>
   );
 }
 
-export function AppShellClient({
+function ShellInner({
   children,
   displayName,
   isAdmin,
+  isPaid,
   unread,
   spaces,
   avatarUrl,
@@ -188,6 +296,7 @@ export function AppShellClient({
   children: React.ReactNode;
   displayName: string;
   isAdmin: boolean;
+  isPaid: boolean;
   unread: number;
   spaces: SpaceLink[];
   avatarUrl?: string | null;
@@ -233,20 +342,28 @@ export function AppShellClient({
               {initial}
             </div>
           )}
-          <p className="truncate text-sm font-medium text-foreground/90">
-            {displayName}
-          </p>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium text-foreground/90">
+              {displayName}
+            </p>
+            {!isPaid ? (
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-muted">
+                Plano gratuito
+              </p>
+            ) : null}
+          </div>
         </div>
         <div className="mt-8 flex min-h-0 flex-1 flex-col overflow-y-auto">
           <FeedLink />
           <div className="my-5 border-t border-border" />
-          <SpaceNav spaces={spaces} />
+          <SpaceNav spaces={spaces} isPaid={isPaid} />
           <div className="my-5 border-t border-border" />
-          <MateriaisNav />
+          <MateriaisNav locked={!isPaid} />
         </div>
         <SidebarFooter
           unread={unread}
           isAdmin={isAdmin}
+          isPaid={isPaid}
           notifPreview={notifPreview}
         />
       </aside>
@@ -279,13 +396,21 @@ export function AppShellClient({
             <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
               <FeedLink onNavigate={() => setDrawerOpen(false)} />
               <div className="my-5 border-t border-border" />
-              <SpaceNav spaces={spaces} onNavigate={() => setDrawerOpen(false)} />
+              <SpaceNav
+                spaces={spaces}
+                isPaid={isPaid}
+                onNavigate={() => setDrawerOpen(false)}
+              />
               <div className="my-5 border-t border-border" />
-              <MateriaisNav onNavigate={() => setDrawerOpen(false)} />
+              <MateriaisNav
+                locked={!isPaid}
+                onNavigate={() => setDrawerOpen(false)}
+              />
             </div>
             <SidebarFooter
               unread={unread}
               isAdmin={isAdmin}
+              isPaid={isPaid}
               notifPreview={notifPreview}
               onNavigate={() => setDrawerOpen(false)}
             />
@@ -327,8 +452,53 @@ export function AppShellClient({
         <main className="flex-1 px-4 py-6 pb-24 md:px-8 md:py-10 md:pb-28">
           {children}
         </main>
-        <NovaPublicacaoFab isAdmin={isAdmin} />
+        <NovaPublicacaoFab isAdmin={isAdmin} isPaid={isPaid} />
       </div>
     </div>
+  );
+}
+
+export function AppShellClient({
+  children,
+  displayName,
+  isAdmin,
+  isPaid,
+  checkoutUrl,
+  unread,
+  spaces,
+  avatarUrl,
+  notifPreview,
+}: {
+  children: React.ReactNode;
+  displayName: string;
+  isAdmin: boolean;
+  isPaid: boolean;
+  checkoutUrl: string;
+  unread: number;
+  spaces: SpaceLink[];
+  avatarUrl?: string | null;
+  notifPreview: NotifPreview[];
+}) {
+  const search = useSearchParams();
+  const autoOpen = search.get("upgrade") === "1";
+
+  return (
+    <UpgradeProvider
+      isPaid={isPaid}
+      checkoutUrl={checkoutUrl}
+      autoOpen={autoOpen}
+    >
+      <ShellInner
+        displayName={displayName}
+        isAdmin={isAdmin}
+        isPaid={isPaid}
+        unread={unread}
+        spaces={spaces}
+        avatarUrl={avatarUrl}
+        notifPreview={notifPreview}
+      >
+        {children}
+      </ShellInner>
+    </UpgradeProvider>
   );
 }

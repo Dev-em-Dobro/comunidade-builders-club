@@ -17,7 +17,7 @@ export async function addAllowedEmail(opts: {
   note?: string | null;
 }) {
   const email = normalizarEmail(opts.email);
-  return prisma.allowedEmail.upsert({
+  const row = await prisma.allowedEmail.upsert({
     where: { email },
     create: {
       email,
@@ -29,6 +29,25 @@ export async function addAllowedEmail(opts: {
       ...(opts.note !== undefined ? { note: opts.note } : {}),
     },
   });
+
+  // F041 — allowlist promove para paid se o user já existir.
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (user) {
+    const m = await prisma.membership.findUnique({ where: { userId: user.id } });
+    if (m && m.role !== "admin") {
+      await prisma.membership.update({
+        where: { userId: user.id },
+        data: { status: "active", tier: "paid" },
+      });
+    } else if (m?.role === "admin") {
+      await prisma.membership.update({
+        where: { userId: user.id },
+        data: { status: "active", tier: "paid" },
+      });
+    }
+  }
+
+  return row;
 }
 
 export async function listAllowedEmails() {

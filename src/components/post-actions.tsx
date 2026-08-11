@@ -11,6 +11,8 @@ import {
 import { deleteCommentAction } from "@/actions/engagement";
 import { MentionTextarea } from "@/components/mention-textarea";
 import { ConfirmDialog } from "@/components/confirm-dialog";
+import { useUpgradeOptional } from "@/components/upgrade-modal";
+import { UPGRADE_REQUIRED } from "@/lib/membership/require-member";
 
 const MEDIA_ACCEPT =
   "image/jpeg,image/png,image/gif,video/mp4,.jpg,.jpeg,.png,.gif,.mp4";
@@ -37,6 +39,7 @@ export function PostActions({
   reactionCount,
   isAdmin,
   isAuthor,
+  isPaid = true,
   pinned,
   body,
   imageUrl,
@@ -50,6 +53,7 @@ export function PostActions({
   reactionCount: number;
   isAdmin: boolean;
   isAuthor?: boolean;
+  isPaid?: boolean;
   pinned: boolean;
   body?: string;
   imageUrl?: string | null;
@@ -59,6 +63,7 @@ export function PostActions({
   compact?: boolean;
 }) {
   const router = useRouter();
+  const upgrade = useUpgradeOptional();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pending, start] = useTransition();
   const [editing, setEditing] = useState(false);
@@ -68,7 +73,7 @@ export function PostActions({
   const [editVideo, setEditVideo] = useState(videoUrl ?? "");
   const [uploading, setUploading] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const canManage = Boolean(isAdmin || isAuthor);
+  const canManage = Boolean(isPaid && (isAdmin || isAuthor));
 
   function openEditor() {
     setEditing((v) => !v);
@@ -110,12 +115,25 @@ export function PostActions({
             type="button"
             className="btn-outline cursor-pointer text-xs"
             disabled={pending}
-            onClick={() =>
+            onClick={() => {
+              if (!isPaid) {
+                upgrade?.openUpgrade("reagir");
+                return;
+              }
               start(async () => {
-                await toggleReactionAction(postId);
-                router.refresh();
-              })
-            }
+                try {
+                  await toggleReactionAction(postId);
+                  router.refresh();
+                } catch (e) {
+                  if (
+                    e instanceof Error &&
+                    e.message.includes(UPGRADE_REQUIRED)
+                  ) {
+                    upgrade?.openUpgrade("reagir");
+                  }
+                }
+              });
+            }}
           >
             {liked ? "Remover reação" : "Reagir"} ({reactionCount})
           </button>
@@ -290,17 +308,37 @@ export function CommentForm({
   parentId,
   placeholder,
   onDone,
+  isPaid = true,
 }: {
   postId: string;
   parentId?: string;
   placeholder?: string;
   onDone?: () => void;
+  isPaid?: boolean;
 }) {
   const router = useRouter();
+  const upgrade = useUpgradeOptional();
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [formKey, setFormKey] = useState(0);
   const formId = parentId ? `comment-form-${parentId}` : "comment-form";
+
+  if (!isPaid) {
+    return (
+      <div className="mt-3 rounded-xl border border-border bg-surface/40 p-4">
+        <p className="text-sm text-muted">
+          Comentários fazem parte do acesso completo.
+        </p>
+        <button
+          type="button"
+          className="btn-primary mt-3 cursor-pointer text-sm"
+          onClick={() => upgrade?.openUpgrade("comentar")}
+        >
+          Desbloquear para comentar
+        </button>
+      </div>
+    );
+  }
 
   return (
     <form
@@ -315,7 +353,13 @@ export function CommentForm({
             onDone?.();
             router.refresh();
           } catch (e) {
-            setError(e instanceof Error ? e.message : "Falha ao comentar.");
+            const msg =
+              e instanceof Error ? e.message : "Falha ao comentar.";
+            if (msg.includes(UPGRADE_REQUIRED)) {
+              upgrade?.openUpgrade("comentar");
+              return;
+            }
+            setError(msg);
           }
         });
       }}
@@ -348,25 +392,35 @@ export function ReplyToggle({
   postId,
   parentId,
   onDone,
+  isPaid = true,
 }: {
   postId: string;
   parentId: string;
   onDone?: () => void;
+  isPaid?: boolean;
 }) {
   const [open, setOpen] = useState(false);
+  const upgrade = useUpgradeOptional();
   return (
     <div className="mt-2">
       <button
         type="button"
         className="cursor-pointer text-xs font-medium text-accent hover:underline"
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => {
+          if (!isPaid) {
+            upgrade?.openUpgrade("comentar");
+            return;
+          }
+          setOpen((v) => !v);
+        }}
       >
         {open ? "Cancelar" : "Responder"}
       </button>
-      {open ? (
+      {open && isPaid ? (
         <CommentForm
           postId={postId}
           parentId={parentId}
+          isPaid={isPaid}
           placeholder="Responder… digite @ para mencionar"
           onDone={() => {
             setOpen(false);

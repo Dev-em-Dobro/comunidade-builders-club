@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
+import { requirePaidMemberOrRedirect } from "@/lib/membership/require-member";
 import { listSpaces } from "@/lib/spaces";
 import {
   isAdminOnlyPublishSpace,
@@ -10,7 +10,7 @@ type Props = { searchParams: Promise<{ space?: string }> };
 
 export default async function NovaPublicacaoPage({ searchParams }: Props) {
   const [member, allSpaces, sp] = await Promise.all([
-    requireActiveMemberOrRedirect(),
+    requirePaidMemberOrRedirect(),
     listSpaces(),
     searchParams,
   ]);
