@@ -2,11 +2,20 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
 import {
+  ensureLessonDiscussionPost,
   getLessonForMember,
   getLessonProgress,
   pandaEmbedUrl,
 } from "@/lib/aulas";
+import { getPost } from "@/lib/posts";
 import { MarkLessonCompleteButton } from "@/components/mark-lesson-complete-button";
+import {
+  CommentForm,
+  DeleteCommentButton,
+  ReplyToggle,
+} from "@/components/post-actions";
+import { EmptyState } from "@/components/empty-state";
+import { MarkdownBody } from "@/lib/markdown";
 
 type Props = {
   params: Promise<{ moduleSlug: string; lessonSlug: string }>;
@@ -29,6 +38,14 @@ export default async function LessonPage({ params }: Props) {
   } catch {
     notFound();
   }
+
+  const discussionMeta = await ensureLessonDiscussionPost({
+    id: lesson.id,
+    title: lesson.title,
+    authorFallbackId: member.user.id,
+  });
+  const discussion = await getPost(discussionMeta.id);
+  const isAdmin = member.membership.role === "admin";
 
   return (
     <div className="mx-auto w-full max-w-3xl">
@@ -74,6 +91,92 @@ export default async function LessonPage({ params }: Props) {
           />
         )}
       </div>
+
+      <section className="mt-10 border-t border-border pt-8">
+        <h2 className="font-[family-name:var(--font-outfit)] text-lg font-semibold">
+          Comentários
+          {discussion ? ` (${discussion.commentCount})` : ""}
+        </h2>
+        <p className="mt-1 text-sm text-muted">
+          Tire dúvidas e compartilhe aprendizados desta aula.
+        </p>
+        {discussion ? (
+          <>
+            <CommentForm postId={discussion.id} />
+            {discussion.comments.length === 0 ? (
+              <div className="mt-4">
+                <EmptyState
+                  title="Nenhum comentário"
+                  description="Seja o primeiro a comentar esta aula."
+                />
+              </div>
+            ) : (
+              <ul className="mt-4 space-y-3">
+                {discussion.comments.map((c) => (
+                  <li key={c.id} className="post-card !p-4">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium">
+                          {c.author.profile?.displayName ?? "Membro"}
+                        </p>
+                        <div className="mt-1.5 text-sm leading-relaxed">
+                          <MarkdownBody
+                            body={c.body}
+                            className="space-y-1 text-sm leading-relaxed [&_p]:my-0"
+                          />
+                        </div>
+                        <p className="mt-2 text-xs text-muted">
+                          {c.createdAt.toLocaleString("pt-BR")}
+                        </p>
+                        <ReplyToggle postId={discussion.id} parentId={c.id} />
+                      </div>
+                      {isAdmin ? (
+                        <DeleteCommentButton
+                          commentId={c.id}
+                          postId={discussion.id}
+                        />
+                      ) : null}
+                    </div>
+                    {c.replies.length > 0 ? (
+                      <ul className="mt-3 space-y-2">
+                        {c.replies.map((r) => (
+                          <li
+                            key={r.id}
+                            className="post-card ml-6 !bg-surface/40 !p-4"
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="min-w-0 flex-1">
+                                <p className="text-sm font-medium">
+                                  {r.author.profile?.displayName ?? "Membro"}
+                                </p>
+                                <div className="mt-1.5 text-sm leading-relaxed">
+                                  <MarkdownBody
+                                    body={r.body}
+                                    className="space-y-1 text-sm leading-relaxed [&_p]:my-0"
+                                  />
+                                </div>
+                                <p className="mt-2 text-xs text-muted">
+                                  {r.createdAt.toLocaleString("pt-BR")}
+                                </p>
+                              </div>
+                              {isAdmin ? (
+                                <DeleteCommentButton
+                                  commentId={r.id}
+                                  postId={discussion.id}
+                                />
+                              ) : null}
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </>
+        ) : null}
+      </section>
     </div>
   );
 }

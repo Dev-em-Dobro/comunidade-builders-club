@@ -76,4 +76,4 @@ Marque o que o cliente já tem pronto pra te enviar (economiza tempo de ida e vo
 
 ---
 
-*Arsenal Dev em Dobro · Consultoria Freela. Padrão de marca: fonte Ubuntu, copy sem travessão.*
+*Arsenal Builders Club · Builders Club. Padrão de marca: fonte Ubuntu, copy sem travessão.*

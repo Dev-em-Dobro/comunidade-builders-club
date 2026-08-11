@@ -37,25 +37,20 @@ export async function GET(_request: NextRequest, { params }: Params) {
 
   const corpo = sanitizarCorpoEntregavel(arquivo.body, arquivo.contentType);
   const ct = arquivo.contentType;
-  const headers: Record<string, string> = {
+  const headersOut: Record<string, string> = {
     "Content-Type": ct,
     "Cache-Control": "private, no-store",
     "X-Content-Type-Options": "nosniff",
   };
 
-  // Sem allow-same-origin: HTML/JS não herdam a origem autenticada do app.
-  if (ct.startsWith("text/html")) {
-    headers["Content-Security-Policy"] =
-      "sandbox allow-scripts allow-downloads allow-popups allow-modals; frame-ancestors 'self'";
-  } else if (ct.includes("svg")) {
-    headers["Content-Disposition"] = "attachment";
-    headers["Content-Security-Policy"] = "default-src 'none'; sandbox";
-  } else if (ct.includes("javascript")) {
-    headers["Content-Security-Policy"] = "default-src 'none'";
+  // Alinhado ao Orion: sem CSP sandbox opaca — assets/JS no iframe
+  // (allow-same-origin) precisam da sessão/cookie para fetch relativo.
+  if (ct.includes("svg")) {
+    headersOut["Content-Disposition"] = "attachment";
   }
 
   return new NextResponse(new Uint8Array(corpo), {
     status: 200,
-    headers,
+    headers: headersOut,
   });
 }

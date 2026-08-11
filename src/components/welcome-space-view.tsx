@@ -79,7 +79,7 @@ export function WelcomeSpaceView({
                 key={p.id}
                 type="button"
                 onClick={() => setOpenId(p.id)}
-                className="post-card flex min-h-[180px] flex-col p-5 text-left transition-colors hover:bg-surface/50"
+                className="post-card flex min-h-[160px] flex-col p-5 text-left transition-colors hover:bg-surface/50"
               >
                 <h3 className="font-[family-name:var(--font-outfit)] text-base font-semibold leading-snug">
                   {title}
@@ -87,26 +87,6 @@ export function WelcomeSpaceView({
                 <p className="mt-2 line-clamp-3 flex-1 text-sm text-muted">
                   {previewFromBody(p.body, 140)}
                 </p>
-                <div className="mt-4 flex items-center gap-2 border-t border-border/70 pt-3">
-                  {p.avatarUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={p.avatarUrl}
-                      alt=""
-                      className="h-7 w-7 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-accent/15 text-[10px] font-bold text-accent">
-                      {p.authorName.slice(0, 1).toUpperCase()}
-                    </div>
-                  )}
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-xs font-medium">{p.authorName}</p>
-                    <p className="text-[10px] text-muted">
-                      {p.reactionCount} reações · {p.commentCount} comentários
-                    </p>
-                  </div>
-                </div>
               </button>
             );
           })}

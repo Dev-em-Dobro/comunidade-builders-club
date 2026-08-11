@@ -75,4 +75,4 @@ Se você restringiu a chave, garanta que **Places API (New)** e **PageSpeed Insi
 
 ---
 
-*Arsenal Dev em Dobro · Consultoria Freela. Padrão de marca: fonte Ubuntu, copy sem travessão.*
+*Arsenal Builders Club · Builders Club. Padrão de marca: fonte Ubuntu, copy sem travessão.*

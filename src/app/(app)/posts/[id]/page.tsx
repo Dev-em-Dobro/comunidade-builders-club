@@ -1,7 +1,11 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
 import { getPost, recordPostView } from "@/lib/posts";
+import {
+  getLessonPathById,
+  parseLessonDiscussionMarker,
+} from "@/lib/aulas";
 import { PostDetailContent } from "@/components/post-detail-content";
 import { previewFromBody } from "@/lib/posts/title";
 import type { PostDetailDto } from "@/actions/post-detail";
@@ -14,6 +18,12 @@ export default async function PostPage({ params }: Props) {
 
   const post = await getPost(id);
   if (!post) notFound();
+
+  const lessonId = parseLessonDiscussionMarker(post.linkUrl);
+  if (lessonId) {
+    const path = await getLessonPathById(lessonId);
+    if (path) redirect(path);
+  }
 
   void recordPostView(post.id, member.user.id);
 

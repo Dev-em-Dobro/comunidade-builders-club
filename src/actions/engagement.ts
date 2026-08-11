@@ -21,6 +21,7 @@ export async function createCommentAction(formData: FormData) {
   await createComment(user.id, raw);
   revalidatePath(`/posts/${raw.postId}`);
   revalidatePath("/");
+  revalidatePath("/aulas", "layout");
 }
 
 export async function deleteCommentAction(commentId: string, postId: string) {

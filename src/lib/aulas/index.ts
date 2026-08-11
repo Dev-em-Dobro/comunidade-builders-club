@@ -201,3 +201,72 @@ export async function listCompletedLessonIds(userId: string) {
   });
   return new Set(rows.map((r) => r.lessonId));
 }
+
+/** Marcador estável do post de discussão da aula (não é URL pública). */
+export function lessonDiscussionMarker(lessonId: string) {
+  return `builders-club://aula/${lessonId}`;
+}
+
+export function parseLessonDiscussionMarker(
+  linkUrl: string | null | undefined,
+): string | null {
+  if (!linkUrl?.startsWith("builders-club://aula/")) return null;
+  const id = linkUrl.slice("builders-club://aula/".length).trim();
+  return id || null;
+}
+
+/**
+ * Garante um Post oculto (space aula-threads) para comentários da aula.
+ * Reusa o modelo Comment/notificações existentes.
+ */
+export async function ensureLessonDiscussionPost(lesson: {
+  id: string;
+  title: string;
+  authorFallbackId: string;
+}) {
+  const { AULA_THREADS_SPACE_SLUG } = await import("@/lib/spaces/constants");
+  const marker = lessonDiscussionMarker(lesson.id);
+
+  const existing = await prisma.post.findFirst({
+    where: { linkUrl: marker },
+  });
+  if (existing) return existing;
+
+  const space = await prisma.space.upsert({
+    where: { slug: AULA_THREADS_SPACE_SLUG },
+    create: {
+      slug: AULA_THREADS_SPACE_SLUG,
+      name: "Discussões de aulas",
+      description: "Threads internas das aulas (não aparece no menu)",
+      sortOrder: 999,
+    },
+    update: {},
+  });
+
+  const admin = await prisma.membership.findFirst({
+    where: { role: "admin", status: "active" },
+    select: { userId: true },
+  });
+
+  return prisma.post.create({
+    data: {
+      spaceId: space.id,
+      authorId: admin?.userId ?? lesson.authorFallbackId,
+      title: `Comentários: ${lesson.title}`,
+      body: `Discussão da aula **${lesson.title}**. Comente abaixo.`,
+      linkUrl: marker,
+    },
+  });
+}
+
+export async function getLessonPathById(lessonId: string) {
+  const lesson = await prisma.lesson.findUnique({
+    where: { id: lessonId },
+    select: {
+      slug: true,
+      module: { select: { slug: true } },
+    },
+  });
+  if (!lesson) return null;
+  return `/aulas/${lesson.module.slug}/${lesson.slug}`;
+}

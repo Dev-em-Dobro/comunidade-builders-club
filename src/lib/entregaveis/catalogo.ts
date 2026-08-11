@@ -60,7 +60,7 @@ export const ENTREGAVEIS: Entregavel[] = [
       "Contrato para projetos simples: sinal, garantia e escopo fora cobrado à parte.",
     pasta: "05-CONTRATO",
     kitZip: {
-      nomeArquivo: "contrato-freela-devemdobro.zip",
+      nomeArquivo: "contrato-freela-builders-club.zip",
       pastaInterna: "contrato-freela",
       arquivos: ["contrato-desenvolvimento.md", "_GUIA-como-usar.md"],
     },
@@ -72,17 +72,10 @@ export const ENTREGAVEIS: Entregavel[] = [
       "Do primeiro oi ao contrato: abertura, follow-up, objeção e fechamento.",
     pasta: "06-SCRIPTS-VENDA",
     kitZip: {
-      nomeArquivo: "scripts-de-venda-devemdobro.zip",
+      nomeArquivo: "scripts-de-venda-builders-club.zip",
       pastaInterna: "scripts-de-venda",
       arquivos: ["scripts-de-venda.md", "_GUIA-como-usar.md"],
     },
-  },
-  {
-    slug: "setup-orion",
-    titulo: "Setup do Orion",
-    descricao:
-      "Guia para destravar a chave Google (Places e PageSpeed) e resolver erros comuns.",
-    pasta: "07-SETUP-ORION",
   },
   {
     slug: "briefing",
@@ -97,6 +90,14 @@ export const ENTREGAVEIS: Entregavel[] = [
     descricao:
       "Faixas de referência para site, landing, bot e manutenção mensal.",
     pasta: "09-PRECIFICACAO",
+  },
+  {
+    slug: "setup-orion",
+    titulo: "Setup do Orion",
+    descricao:
+      "Guia para destravar a chave Google (Places e PageSpeed) e resolver erros comuns.",
+    pasta: "07-SETUP-ORION",
+    emBreve: true,
   },
   {
     slug: "crm",

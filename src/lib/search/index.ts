@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { AULA_THREADS_SPACE_SLUG } from "@/lib/spaces/constants";
 
 export async function searchAll(q: string) {
   const term = q.trim();
@@ -9,9 +10,14 @@ export async function searchAll(q: string) {
   const [posts, members, spaces] = await Promise.all([
     prisma.post.findMany({
       where: {
-        OR: [
-          { body: { contains: term, mode: "insensitive" } },
-          { title: { contains: term, mode: "insensitive" } },
+        AND: [
+          {
+            OR: [
+              { body: { contains: term, mode: "insensitive" } },
+              { title: { contains: term, mode: "insensitive" } },
+            ],
+          },
+          { space: { slug: { not: AULA_THREADS_SPACE_SLUG } } },
         ],
       },
       include: {
@@ -34,6 +40,7 @@ export async function searchAll(q: string) {
     }),
     prisma.space.findMany({
       where: {
+        slug: { not: AULA_THREADS_SPACE_SLUG },
         OR: [
           { name: { contains: term, mode: "insensitive" } },
           { slug: { contains: term, mode: "insensitive" } },

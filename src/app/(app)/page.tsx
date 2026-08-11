@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
 import { listPosts } from "@/lib/posts";
-import { WELCOME_SPACE_SLUG } from "@/lib/spaces/constants";
+import { WELCOME_SPACE_SLUG, AULA_THREADS_SPACE_SLUG } from "@/lib/spaces/constants";
 import { FeedList } from "@/components/feed-list";
 import { EmptyState } from "@/components/empty-state";
 
@@ -15,7 +15,7 @@ export default async function HomePage({ searchParams }: Props) {
   if (error) redirect("/");
 
   const { posts } = await listPosts({
-    excludeSpaceSlugs: [WELCOME_SPACE_SLUG],
+    excludeSpaceSlugs: [WELCOME_SPACE_SLUG, AULA_THREADS_SPACE_SLUG],
     viewerId: member.user.id,
     take: 30,
   });

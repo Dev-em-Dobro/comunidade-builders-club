@@ -26,9 +26,7 @@ const CARDS: Card[] = [
     marker: "builders-club://boas-vindas/hero-v1",
     sort: 0,
     title: "Bem-vindo ao Builders Club",
-    body: `Oi — seja bem-vindo ao **Builders Club**, a comunidade dos alunos Dev em Dobro.
-
-Aqui você troca ideia, tira dúvidas, celebra conquistas e acessa materiais e aulas. Este espaço é o ponto de partida: leia os cards abaixo e comece pelo que fizer mais sentido agora.
+    body: `Seja bem-vindo(a) ao **Builders Club**, a comunidade pra quem quer construir e vender soluções com IA. Este espaço é o ponto de partida: leia os cards abaixo e comece pelo que fizer mais sentido agora.
 
 **Dica:** o **Feed** (fora dos Spaces) mostra a timeline da comunidade. Os Spaces organizam as conversas por tema.`,
   },
@@ -43,7 +41,7 @@ Aqui você troca ideia, tira dúvidas, celebra conquistas e acessa materiais e a
 3. Explore **Materiais de apoio** no menu
 4. Publique sua primeira mensagem no space **Geral** ou **Dúvidas**
 
-Se algo não abrir, confira se seu e-mail está na allowlist (compra Hubla) ou fale com o suporte Dev em Dobro.`,
+Se algo não abrir, confira se seu e-mail está na allowlist ou fale com o suporte do Builders Club.`,
   },
   {
     marker: "builders-club://boas-vindas/como-usar-v1",
@@ -59,7 +57,7 @@ Se algo não abrir, confira se seu e-mail está na allowlist (compra Hubla) ou f
 
 ## Publicar
 
-Use o botão flutuante **Nova publicação**, escolha o space e escreva. Markdown básico funciona (\`**negrito**\`, listas, links).
+Use o botão flutuante **Nova publicação** (nas páginas de Spaces), escolha o space e escreva. Markdown básico funciona (\`**negrito**\`, listas, links).
 
 ## Visões do Feed
 
@@ -91,11 +89,11 @@ Prospecção de clientes e hunting de vagas fica no **Orion Lead Hunter** — n�
     marker: "builders-club://boas-vindas/materiais-aulas-v1",
     sort: 5,
     title: "Materiais e aulas",
-    body: `No menu **Materiais de apoio** você encontra kits e guias (arsenal, prompts, etc.).
+    body: `No menu **Materiais de apoio** você encontra kits e guias (arsenal, prompts, contrato, etc.).
 
 Em **Aulas**, quando houver módulos publicados, assista aos vídeos e marque como concluído.
 
-Qualquer problema de acesso a materiais, avise a equipe.`,
+Qualquer problema de acesso a materiais, avise a equipe do Builders Club.`,
   },
 ];
 

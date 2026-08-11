@@ -1,5 +1,5 @@
 /*
-  baixar-zip.js — download de kits do Arsenal como .zip (Consultoria Freela · Dev em Dobro)
+  baixar-zip.js — download de kits do Arsenal como .zip (Builders Club)
   Sem build, sem backend: usa o JSZip vendorado (_lib/jszip.min.js) e monta o zip no navegador,
   pegando os arquivos ao vivo (o que voce baixa e sempre igual ao que aparece na previa).
 
@@ -13,7 +13,7 @@
     </button>
 
   Requer que _lib/jszip.min.js seja carregado ANTES deste arquivo.
-  Observacao: o download funciona dentro do Orion com sessao ativa.
+  Observacao: o download funciona com sessao ativa no Builders Club.
 */
 (function () {
   'use strict';
@@ -96,7 +96,7 @@
         if (txtEl) txtEl.textContent = 'Tentar de novo';
         alert(
           'Não consegui montar o .zip aqui.\n\n' +
-          'Atualize a página no Orion e tente de novo.'
+          'Recarregue a página e tente de novo.'
         );
       })
       .then(function () {

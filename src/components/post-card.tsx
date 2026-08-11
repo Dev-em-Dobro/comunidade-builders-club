@@ -6,6 +6,7 @@ import { previewFromBody } from "@/lib/posts/title";
 import { MarkdownBody } from "@/lib/markdown";
 import { PostActions } from "@/components/post-actions";
 import { PostMedia } from "@/components/post-media";
+import { PostShareMenu } from "@/components/post-share-menu";
 
 export type PostCardData = {
   id: string;
@@ -153,11 +154,14 @@ export function PostCard({
         <div className="flex gap-3">
           <Avatar name={name} url={avatarUrl} />
           <div className="min-w-0 flex-1">
-            <div className="min-w-0">
-              <p className="truncate text-[15px] font-semibold text-foreground md:text-base">
-                {name}
-              </p>
-              <MetaLine post={post} showSpace={showSpace} pinned={pinned} />
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <p className="truncate text-[15px] font-semibold text-foreground md:text-base">
+                  {name}
+                </p>
+                <MetaLine post={post} showSpace={showSpace} pinned={pinned} />
+              </div>
+              <PostShareMenu postId={post.id} />
             </div>
 
             <div
@@ -201,10 +205,13 @@ export function PostCard({
   }
 
   return (
-    <article className="post-card animate-[fadeIn_0.35s_ease-out] p-0">
+    <article className="post-card relative animate-[fadeIn_0.35s_ease-out] p-0">
+      <div className="absolute right-3 top-3 z-10">
+        <PostShareMenu postId={post.id} />
+      </div>
       <Link
         href={href}
-        className="block cursor-pointer p-5 pb-3 transition-colors hover:bg-surface/40"
+        className="block cursor-pointer p-5 pb-3 pr-12 transition-colors hover:bg-surface/40"
       >
         <div className="flex gap-3">
           <Avatar name={name} url={avatarUrl} />
@@ -234,7 +241,9 @@ export function PostCard({
                 loading="lazy"
               />
             ) : null}
-            {!post.imageUrl && post.linkUrl ? (
+            {!post.imageUrl &&
+            post.linkUrl &&
+            !post.linkUrl.startsWith("builders-club://") ? (
               <p className="mt-2 truncate text-xs font-medium text-accent">
                 {post.linkUrl}
               </p>

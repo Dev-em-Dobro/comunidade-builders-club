@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { prisma } from "@/lib/db";
+import { HIDDEN_NAV_SPACE_SLUGS } from "@/lib/spaces/constants";
 
 export const spaceSchema = z.object({
   slug: z
@@ -14,7 +15,10 @@ export const spaceSchema = z.object({
 });
 
 export async function listSpaces() {
-  return prisma.space.findMany({ orderBy: { sortOrder: "asc" } });
+  return prisma.space.findMany({
+    where: { slug: { notIn: [...HIDDEN_NAV_SPACE_SLUGS] } },
+    orderBy: { sortOrder: "asc" },
+  });
 }
 
 export async function getSpaceBySlug(slug: string) {

@@ -56,4 +56,4 @@ A venda única paga o mês. A **recorrência paga o aluguel.** Sempre que der, t
 
 > Estas faixas são ponto de partida, não tabela oficial. Ajuste pra sua realidade e vá subindo o preço conforme monta portfólio e ganha confiança.
 
-*Arsenal Dev em Dobro · Consultoria Freela. Padrão de marca: fonte Ubuntu, copy sem travessão.*
+*Arsenal Builders Club · Builders Club. Padrão de marca: fonte Ubuntu, copy sem travessão.*

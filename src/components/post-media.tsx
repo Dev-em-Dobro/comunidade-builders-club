@@ -1,5 +1,9 @@
 /** Bloco de mídia anexada ao post (imagem, vídeo, link). */
 
+function isInternalMarker(url: string) {
+  return url.startsWith("builders-club://");
+}
+
 export function PostMedia({
   imageUrl,
   videoUrl,
@@ -12,7 +16,10 @@ export function PostMedia({
   linkUrl?: string | null;
   cropImage?: boolean;
 }) {
-  if (!imageUrl && !videoUrl && !linkUrl) return null;
+  const publicLink =
+    linkUrl && !isInternalMarker(linkUrl) ? linkUrl : null;
+
+  if (!imageUrl && !videoUrl && !publicLink) return null;
 
   return (
     <div className="mt-3 space-y-3">
@@ -39,15 +46,15 @@ export function PostMedia({
           className="max-h-[min(70vh,36rem)] w-full rounded-xl bg-foreground/5"
         />
       ) : null}
-      {linkUrl ? (
+      {publicLink ? (
         <a
-          href={linkUrl}
+          href={publicLink}
           target="_blank"
           rel="noopener noreferrer"
           className="flex cursor-pointer items-center gap-2 rounded-xl border border-border bg-surface/50 px-3 py-2.5 text-sm font-medium text-accent transition-colors hover:bg-surface"
         >
-          <span className="truncate" title={linkUrl}>
-            {linkUrl}
+          <span className="truncate" title={publicLink}>
+            {publicLink}
           </span>
           <span className="shrink-0 text-xs text-muted">↗</span>
         </a>

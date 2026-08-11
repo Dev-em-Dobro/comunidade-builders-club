@@ -1,8 +1,7 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
-import { pandaEmbedUrl } from "@/lib/aulas";
-import { MarkLessonCompleteButton } from "@/components/mark-lesson-complete-button";
 
 export type AulaLessonCard = {
   id: string;
@@ -25,227 +24,99 @@ export type AulaModuleCard = {
   lessons: AulaLessonCard[];
 };
 
-function LessonModal({
-  lesson,
-  onClose,
-  onCompleted,
-}: {
-  lesson: AulaLessonCard;
-  onClose: () => void;
-  onCompleted: (lessonId: string) => void;
-}) {
-  let embed: string | null = null;
-  try {
-    embed = pandaEmbedUrl(lesson.pandaLibraryId, lesson.pandaVideoExternalId);
-  } catch {
-    embed = null;
-  }
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prev;
-    };
-  }, [onClose]);
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-stretch justify-center md:items-center md:p-6">
-      <button
-        type="button"
-        className="absolute inset-0 bg-foreground/45 backdrop-blur-[2px]"
-        aria-label="Fechar"
-        onClick={onClose}
-      />
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label={lesson.title}
-        className="relative z-10 flex max-h-[100dvh] w-full max-w-3xl flex-col overflow-hidden bg-card shadow-2xl md:max-h-[90dvh] md:rounded-2xl md:border md:border-border"
-      >
-        <header className="flex shrink-0 items-center gap-2 border-b border-border px-4 py-3">
-          <h2 className="min-w-0 flex-1 truncate font-[family-name:var(--font-outfit)] text-lg font-semibold">
-            {lesson.title}
-          </h2>
-          <button
-            type="button"
-            className="btn-ghost px-2 text-sm"
-            aria-label="Fechar"
-            onClick={onClose}
-          >
-            ✕
-          </button>
-        </header>
-        <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-5">
-          {embed ? (
-            <div className="overflow-hidden rounded-xl border border-border bg-black">
-              <div className="relative aspect-video w-full">
-                <iframe
-                  src={embed}
-                  title={lesson.title}
-                  className="absolute inset-0 h-full w-full"
-                  allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
-                  allowFullScreen
-                />
-              </div>
-            </div>
-          ) : (
-            <p className="text-[15px] text-red-600">
-              Não foi possível montar o player. Confira os IDs Panda no admin.
-            </p>
-          )}
-          {lesson.description ? (
-            <p className="mt-4 text-[15px] text-muted md:text-base">
-              {lesson.description}
-            </p>
-          ) : null}
-          <div className="mt-5">
-            {lesson.completed ? (
-              <p className="inline-flex items-center gap-2 rounded-xl bg-accent/10 px-4 py-2.5 text-[15px] font-semibold text-accent">
-                <span aria-hidden>✓</span>
-                Aula concluída
-              </p>
-            ) : (
-              <MarkLessonCompleteButton
-                lessonId={lesson.id}
-                moduleSlug={lesson.moduleSlug}
-                lessonSlug={lesson.slug}
-                onCompleted={() => onCompleted(lesson.id)}
-              />
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export function AulasCatalog({
   modules: initial,
 }: {
   modules: AulaModuleCard[];
 }) {
   const [modules, setModules] = useState(initial);
-  const [open, setOpen] = useState<AulaLessonCard | null>(null);
 
   useEffect(() => {
     setModules(initial);
   }, [initial]);
-
-  function markLocalCompleted(lessonId: string) {
-    setModules((prev) =>
-      prev.map((mod) => ({
-        ...mod,
-        lessons: mod.lessons.map((l) =>
-          l.id === lessonId ? { ...l, completed: true } : l,
-        ),
-      })),
-    );
-    setOpen((cur) =>
-      cur && cur.id === lessonId ? { ...cur, completed: true } : cur,
-    );
-  }
 
   if (modules.length === 0) {
     return null;
   }
 
   return (
-    <>
-      <ul className="mt-8 space-y-6">
-        {modules.map((mod) => (
-          <li
-            key={mod.id}
-            className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm"
-          >
-            <div className="flex flex-wrap items-center gap-4 border-b border-border bg-surface/40 px-4 py-3 sm:px-5">
-              {mod.coverImageUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={mod.coverImageUrl}
-                  alt=""
-                  className="h-16 w-12 shrink-0 rounded-lg object-cover sm:h-20 sm:w-14"
-                />
-              ) : (
-                <div className="flex h-16 w-12 shrink-0 items-center justify-center rounded-lg bg-accent/15 text-xs font-bold text-accent sm:h-20 sm:w-14">
-                  Aula
-                </div>
-              )}
-              <div className="min-w-0 flex-1">
-                <h2 className="font-[family-name:var(--font-outfit)] text-lg font-semibold md:text-xl">
-                  {mod.title}
-                </h2>
-                {mod.description ? (
-                  <p className="mt-0.5 text-[15px] text-muted">
-                    {mod.description}
-                  </p>
-                ) : null}
-                <p className="mt-1 text-sm text-muted">
-                  {mod.lessons.length}{" "}
-                  {mod.lessons.length === 1 ? "conteúdo" : "conteúdos"}
-                </p>
+    <ul className="mt-8 space-y-6">
+      {modules.map((mod) => (
+        <li
+          key={mod.id}
+          className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm"
+        >
+          <div className="flex flex-wrap items-center gap-4 border-b border-border bg-surface/40 px-4 py-3 sm:px-5">
+            {mod.coverImageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={mod.coverImageUrl}
+                alt=""
+                className="h-16 w-12 shrink-0 rounded-lg object-cover sm:h-20 sm:w-14"
+              />
+            ) : (
+              <div className="flex h-16 w-12 shrink-0 items-center justify-center rounded-lg bg-accent/15 text-xs font-bold text-accent sm:h-20 sm:w-14">
+                Aula
               </div>
+            )}
+            <div className="min-w-0 flex-1">
+              <h2 className="font-[family-name:var(--font-outfit)] text-lg font-semibold md:text-xl">
+                {mod.title}
+              </h2>
+              {mod.description ? (
+                <p className="mt-0.5 text-[15px] text-muted">{mod.description}</p>
+              ) : null}
+              <p className="mt-1 text-sm text-muted">
+                {mod.lessons.length}{" "}
+                {mod.lessons.length === 1 ? "conteúdo" : "conteúdos"}
+              </p>
             </div>
+          </div>
 
-            <ul className="divide-y divide-border">
-              {mod.lessons.map((l) => (
-                <li key={l.id}>
-                  <button
-                    type="button"
-                    onClick={() => setOpen(l)}
-                    className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-surface/60 sm:gap-4 sm:px-5"
-                  >
-                    {l.thumbnailUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={l.thumbnailUrl}
-                        alt=""
-                        className="h-12 w-20 shrink-0 rounded-md object-cover sm:h-14 sm:w-24"
-                      />
-                    ) : (
-                      <div className="flex h-12 w-20 shrink-0 items-center justify-center rounded-md bg-surface text-[10px] font-semibold uppercase tracking-wide text-muted sm:h-14 sm:w-24">
-                        Vídeo
-                      </div>
-                    )}
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-[15px] font-semibold text-foreground md:text-base">
-                        {l.title}
-                      </p>
-                      <p className="text-sm text-muted">Vídeo</p>
+          <ul className="divide-y divide-border">
+            {mod.lessons.map((l) => (
+              <li key={l.id}>
+                <Link
+                  href={`/aulas/${l.moduleSlug}/${l.slug}`}
+                  className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-surface/60 sm:gap-4 sm:px-5"
+                >
+                  {l.thumbnailUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={l.thumbnailUrl}
+                      alt=""
+                      className="h-12 w-20 shrink-0 rounded-md object-cover sm:h-14 sm:w-24"
+                    />
+                  ) : (
+                    <div className="flex h-12 w-20 shrink-0 items-center justify-center rounded-md bg-surface text-[10px] font-semibold uppercase tracking-wide text-muted sm:h-14 sm:w-24">
+                      Vídeo
                     </div>
-                    {l.completed ? (
-                      <span className="shrink-0 text-xs font-semibold uppercase tracking-wide text-accent">
-                        Concluída
-                      </span>
-                    ) : (
-                      <span className="shrink-0 text-sm font-medium text-accent">
-                        Assistir →
-                      </span>
-                    )}
-                  </button>
-                </li>
-              ))}
-            </ul>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[15px] font-semibold text-foreground md:text-base">
+                      {l.title}
+                    </p>
+                    <p className="text-sm text-muted">Vídeo</p>
+                  </div>
+                  {l.completed ? (
+                    <span className="shrink-0 text-xs font-semibold uppercase tracking-wide text-accent">
+                      Concluída
+                    </span>
+                  ) : (
+                    <span className="shrink-0 text-sm font-medium text-accent">
+                      Assistir →
+                    </span>
+                  )}
+                </Link>
+              </li>
+            ))}
+          </ul>
 
-            <p className="border-t border-border px-4 py-2.5 text-sm text-muted sm:px-5">
-              {mod.lessons.length} conteúdo(s)
-            </p>
-          </li>
-        ))}
-      </ul>
-
-      {open ? (
-        <LessonModal
-          lesson={open}
-          onClose={() => setOpen(null)}
-          onCompleted={markLocalCompleted}
-        />
-      ) : null}
-    </>
+          <p className="border-t border-border px-4 py-2.5 text-sm text-muted sm:px-5">
+            {mod.lessons.length} conteúdo(s)
+          </p>
+        </li>
+      ))}
+    </ul>
   );
 }

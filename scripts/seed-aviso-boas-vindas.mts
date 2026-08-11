@@ -16,7 +16,7 @@ config({ path: resolve(root, ".env.local"), override: true });
 /** Marcador estável para idempotência (não é URL pública). */
 const MARKER = "builders-club://avisos/como-usar-v1";
 
-const BODY = `Bem-vindo ao **Builders Club** — a comunidade da Dev em Dobro.
+const BODY = `Bem-vindo ao **Builders Club** — a comunidade pra quem quer construir e vender soluções com IA.
 
 Aqui ficam conversas, dúvidas, conquistas e avisos oficiais. Use este post como guia rápido.
 
@@ -35,7 +35,7 @@ Escolha o space certo antes de publicar — facilita quem vai te ajudar.
 
 ## Como publicar
 
-1. No feed, use **Nova publicação**
+1. Nas páginas de **Spaces**, use **Nova publicação**
 2. Escolha o **space**
 3. Escreva o texto (Markdown básico funciona):
    - \`**negrito**\` · \`*itálico*\` · \`código\`
@@ -61,8 +61,8 @@ Clique para ir ao post e marcar como lida.
 
 ## Aulas
 
-Em breve (ou já disponível no menu **Aulas**): vídeos da comunidade.
-Assista e marque como concluída quando terminar.
+No menu **Aulas**: vídeos da comunidade.
+Assista e marque como concluída quando terminar. Dá para comentar em cada aula.
 
 ## Perfil
 
@@ -74,7 +74,7 @@ Em **Perfil**, ajuste nome de exibição, bio e foto. O \`@Nome\` das menções 
 - Evite spam e links duvidosos
 - Comunicados oficiais só em **Avisos** — o resto da conversa nos outros spaces
 
-Qualquer problema de acesso, fale com a equipe Dev em Dobro.
+Qualquer problema de acesso, fale com a equipe do Builders Club.
 
 Bora construir.`;
 

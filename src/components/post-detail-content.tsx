@@ -10,6 +10,7 @@ import { EmptyState } from "@/components/empty-state";
 import { MarkdownBody } from "@/lib/markdown";
 import { previewFromBody } from "@/lib/posts/title";
 import { PostMedia } from "@/components/post-media";
+import { PostShareMenu } from "@/components/post-share-menu";
 import type { PostDetailDto } from "@/actions/post-detail";
 
 function CommentBlock({
@@ -104,14 +105,20 @@ export function PostDetailContent({
               </div>
             )}
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold">{post.authorName}</p>
-              <p className="mt-0.5 text-xs text-muted">
-                {post.space.name} ·{" "}
-                {new Date(post.createdAt).toLocaleString("pt-BR")}
-                {post.pinnedAt ? " · Fixado" : ""}
-                {" · "}
-                {post.viewCount} {post.viewCount === 1 ? "leitura" : "leituras"}
-              </p>
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold">{post.authorName}</p>
+                  <p className="mt-0.5 text-xs text-muted">
+                    {post.space.name} ·{" "}
+                    {new Date(post.createdAt).toLocaleString("pt-BR")}
+                    {post.pinnedAt ? " · Fixado" : ""}
+                    {" · "}
+                    {post.viewCount}{" "}
+                    {post.viewCount === 1 ? "leitura" : "leituras"}
+                  </p>
+                </div>
+                <PostShareMenu postId={post.id} />
+              </div>
               <h2
                 className={`mt-4 font-[family-name:var(--font-outfit)] font-bold tracking-tight ${
                   compactHeader ? "text-xl" : "text-2xl"

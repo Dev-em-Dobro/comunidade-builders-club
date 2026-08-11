@@ -1,4 +1,4 @@
-# Scripts de venda · Consultoria Freela (Dev em Dobro)
+# Scripts de venda · Builders Club
 
 Do "oi, tudo bem?" ao contrato assinado. São 27 scripts prontos pra copiar, colar e adaptar, cobrindo cada etapa: abertura pra lista quente e fria, envio da amostra no ar, follow-up, diagnóstico, proposta, preço, objeções, contrato e pós-venda.
 
@@ -319,4 +319,4 @@ Tenho uma condição boa esse mês pra clientes que já são de casa. Quer ver?
 
 ---
 
-*Arsenal Dev em Dobro · Consultoria Freela. Estes scripts são ponto de partida: adapte pro seu jeito de falar e pro contexto de cada cliente. Padrão de marca: fonte Ubuntu, copy sem travessão.*
+*Arsenal Builders Club · Builders Club. Estes scripts são ponto de partida: adapte pro seu jeito de falar e pro contexto de cada cliente. Padrão de marca: fonte Ubuntu, copy sem travessão.*

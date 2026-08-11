@@ -142,6 +142,10 @@ function SidebarFooter({
 
 function NovaPublicacaoFab({ isAdmin }: { isAdmin: boolean }) {
   const pathname = usePathname();
+  // Só nas páginas de Spaces (não no Feed, Aulas, Materiais, etc.).
+  if (!pathname.startsWith("/spaces/")) {
+    return null;
+  }
   if (pathname === "/nova" || pathname.startsWith("/entregaveis/")) {
     return null;
   }
@@ -154,9 +158,7 @@ function NovaPublicacaoFab({ isAdmin }: { isAdmin: boolean }) {
     return null;
   }
 
-  const spaceSlug = pathname.startsWith("/spaces/")
-    ? pathname.split("/")[2] ?? ""
-    : "";
+  const spaceSlug = pathname.split("/")[2] ?? "";
   const href =
     spaceSlug && spaceSlug !== "boas-vindas" && spaceSlug !== "avisos"
       ? `/nova?space=${spaceSlug}`
