@@ -465,9 +465,10 @@ export function AppShellClient({
   isPaid,
   checkoutUrl,
   unread,
-  spaces,
+  spaces: initialSpaces,
   avatarUrl,
   notifPreview,
+  hydrateNav = false,
 }: {
   children: React.ReactNode;
   displayName: string;
@@ -478,9 +479,36 @@ export function AppShellClient({
   spaces: SpaceLink[];
   avatarUrl?: string | null;
   notifPreview: NotifPreview[];
+  /** Busca spaces em /api/nav após o paint (não bloqueia o feed no SSR). */
+  hydrateNav?: boolean;
 }) {
   const search = useSearchParams();
   const autoOpen = search.get("upgrade") === "1";
+  const [spaces, setSpaces] = useState(initialSpaces);
+
+  useEffect(() => {
+    setSpaces(initialSpaces);
+  }, [initialSpaces]);
+
+  useEffect(() => {
+    if (!hydrateNav) return;
+    let cancelled = false;
+    void (async () => {
+      try {
+        const res = await fetch("/api/nav", { cache: "no-store" });
+        if (!res.ok || cancelled) return;
+        const data = (await res.json()) as { spaces?: SpaceLink[] };
+        if (!cancelled && Array.isArray(data.spaces)) {
+          setSpaces(data.spaces);
+        }
+      } catch {
+        /* ignore */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [hydrateNav]);
 
   return (
     <UpgradeProvider

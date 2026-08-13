@@ -9,33 +9,34 @@ export type BootstrapResult = {
 
 /**
  * Garante Profile + Membership no login (F041 freemium).
- * - Allowlist / Hubla / BOOTSTRAP_ADMIN → active + paid (+ admin se bootstrap)
- * - Sem allowlist → active + free (entra na comunidade limitada)
- * - Membership `revoked` não é reativado pela allowlist (só bootstrap admin)
  *
- * Hot path: membro já active + profile → 1 query (sem allowlist).
+ * Hot path (membro active + profile): **1 query** no Postgres.
+ * Email vem da sessão quando possível (sem SELECT em user).
  */
 export async function ensureMemberBootstrap(
   userId: string,
   name: string,
   image: string | null | undefined,
+  emailFromSession?: string | null,
 ): Promise<BootstrapResult | null> {
-  const [user, existing, profile] = await Promise.all([
-    prisma.user.findUnique({
-      where: { id: userId },
-      select: { id: true, email: true },
-    }),
-    prisma.membership.findUnique({ where: { userId } }),
-    prisma.profile.findUnique({ where: { userId } }),
-  ]);
-  if (!user) return null;
+  const row = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      email: true,
+      membership: true,
+      profile: true,
+    },
+  });
+  if (!row) return null;
 
-  const email = user.email.toLowerCase();
+  const email = (emailFromSession || row.email).toLowerCase();
   const adminEmail = process.env.BOOTSTRAP_ADMIN_EMAIL?.trim().toLowerCase();
   const isBootstrapAdmin = !!adminEmail && email === adminEmail;
+  const existing = row.membership;
+  const profile = row.profile;
 
-  // Fast-path: já active + profile — não consulta allowlist a cada request.
-  // Paid/admin só sobe via Hubla, admin allowlist actions ou bootstrap admin.
+  // Fast-path: já active + profile — sem allowlist.
   if (existing?.status === "active" && profile) {
     if (isBootstrapAdmin && existing.role !== "admin") {
       const membership = await prisma.membership.update({
@@ -85,7 +86,6 @@ export async function ensureMemberBootstrap(
     return { membership: existing, profile: nextProfile };
   }
 
-  // pending legado → active free ou paid
   if (existing.status === "pending") {
     const membership = await prisma.membership.update({
       where: { userId },

@@ -17,6 +17,17 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
+  /**
+   * Evita hit no Postgres a cada navegação RSC.
+   * Sessão válida é lida do cookie assinado (~5 min); o poll / route handlers
+   * renovam o cookie (RSC sozinho não consegue Set-Cookie).
+   */
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60,
+    },
+  },
   socialProviders: env.google
     ? {
         google: {
@@ -38,7 +49,12 @@ export const auth = betterAuth({
     user: {
       create: {
         after: async (user) => {
-          await ensureMemberBootstrap(user.id, user.name, user.image);
+          await ensureMemberBootstrap(
+            user.id,
+            user.name,
+            user.image,
+            user.email,
+          );
         },
       },
     },

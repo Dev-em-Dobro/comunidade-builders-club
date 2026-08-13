@@ -15,6 +15,11 @@ const nextConfig: NextConfig = {
   outputFileTracingRoot: path.join(__dirname),
   experimental: {
     optimizePackageImports: ["better-auth"],
+    /** Client navigations reusam RSC por alguns segundos — menos “5s a cada clique”. */
+    staleTimes: {
+      dynamic: 30,
+      static: 180,
+    },
   },
   images: {
     formats: ["image/avif", "image/webp"],

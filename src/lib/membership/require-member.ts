@@ -19,7 +19,12 @@ export { UPGRADE_REQUIRED } from "./errors";
 /** Sessão + membership active (free ou paid). Deduplica no request. */
 export const requireActiveMember = cache(async (): Promise<ActiveMember> => {
   const user = await requireUser();
-  const boot = await ensureMemberBootstrap(user.id, user.name, user.image);
+  const boot = await ensureMemberBootstrap(
+    user.id,
+    user.name,
+    user.image,
+    user.email,
+  );
 
   if (!boot?.membership || !boot.profile) {
     throw new AuthError("Perfil incompleto. Tente entrar novamente.");
