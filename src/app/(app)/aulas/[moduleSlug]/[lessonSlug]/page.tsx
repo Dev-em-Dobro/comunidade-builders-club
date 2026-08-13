@@ -28,7 +28,6 @@ export default async function LessonPage({ params }: Props) {
   const lesson = await getLessonForMember(moduleSlug, lessonSlug);
   if (!lesson) notFound();
 
-  const progress = await getLessonProgress(member.user.id, lesson.id);
   let embed: string;
   try {
     embed = pandaEmbedUrl(
@@ -39,12 +38,17 @@ export default async function LessonPage({ params }: Props) {
     notFound();
   }
 
-  const discussionMeta = await ensureLessonDiscussionPost({
-    id: lesson.id,
-    title: lesson.title,
-    authorFallbackId: member.user.id,
+  const [progress, discussionMeta] = await Promise.all([
+    getLessonProgress(member.user.id, lesson.id),
+    ensureLessonDiscussionPost({
+      id: lesson.id,
+      title: lesson.title,
+      authorFallbackId: member.user.id,
+    }),
+  ]);
+  const discussion = await getPost(discussionMeta.id, {
+    viewerId: member.user.id,
   });
-  const discussion = await getPost(discussionMeta.id);
   const isAdmin = member.membership.role === "admin";
 
   return (

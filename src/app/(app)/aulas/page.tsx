@@ -24,8 +24,6 @@ export default async function AulasPage() {
       slug: l.slug,
       title: l.title,
       description: l.description,
-      pandaLibraryId: l.pandaLibraryId,
-      pandaVideoExternalId: l.pandaVideoExternalId,
       thumbnailUrl: l.thumbnailUrl,
       moduleSlug: mod.slug,
       completed: completed.has(l.id),

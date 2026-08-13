@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 
@@ -63,17 +64,38 @@ export const lessonSchema = z.object({
   published: z.boolean().default(false),
 });
 
-export async function listPublishedModules() {
-  return prisma.module.findMany({
-    where: { published: true },
-    include: {
-      lessons: {
-        where: { published: true },
-        orderBy: { sortOrder: "asc" },
+const listPublishedModulesCached = unstable_cache(
+  async () =>
+    prisma.module.findMany({
+      where: { published: true },
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        description: true,
+        coverImageUrl: true,
+        sortOrder: true,
+        lessons: {
+          where: { published: true },
+          orderBy: { sortOrder: "asc" },
+          select: {
+            id: true,
+            slug: true,
+            title: true,
+            description: true,
+            thumbnailUrl: true,
+            sortOrder: true,
+          },
+        },
       },
-    },
-    orderBy: { sortOrder: "asc" },
-  });
+      orderBy: { sortOrder: "asc" },
+    }),
+  ["published-modules"],
+  { revalidate: 120, tags: ["aulas"] },
+);
+
+export async function listPublishedModules() {
+  return listPublishedModulesCached();
 }
 
 export async function listAllModulesAdmin() {
@@ -229,6 +251,7 @@ export async function ensureLessonDiscussionPost(lesson: {
 
   const existing = await prisma.post.findFirst({
     where: { linkUrl: marker },
+    select: { id: true },
   });
   if (existing) return existing;
 

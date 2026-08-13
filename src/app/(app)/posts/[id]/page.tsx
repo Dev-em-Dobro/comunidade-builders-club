@@ -20,7 +20,7 @@ export default async function PostPage({ params }: Props) {
   const { id } = await params;
   const member = await requireActiveMemberOrRedirect();
 
-  const post = await getPost(id);
+  const post = await getPost(id, { viewerId: member.user.id });
   if (!post) notFound();
 
   const lessonId = parseLessonDiscussionMarker(post.linkUrl);

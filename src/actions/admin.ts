@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import type { MembershipStatus, Role } from "@prisma/client";
 import { requireAdmin } from "@/lib/membership/require-member";
 import {
@@ -30,6 +30,18 @@ import {
   updateModule,
 } from "@/lib/aulas";
 
+function bustSpacesCache() {
+  revalidateTag("spaces");
+  revalidatePath("/admin");
+  revalidatePath("/");
+}
+
+function bustAulasCache() {
+  revalidateTag("aulas");
+  revalidatePath("/admin");
+  revalidatePath("/aulas");
+}
+
 export async function createSpaceAction(formData: FormData) {
   await requireAdmin();
   const raw = {
@@ -40,8 +52,7 @@ export async function createSpaceAction(formData: FormData) {
   };
   spaceSchema.parse(raw);
   await createSpace(raw);
-  revalidatePath("/admin");
-  revalidatePath("/");
+  bustSpacesCache();
 }
 
 export async function updateSpaceAction(id: string, formData: FormData) {
@@ -54,15 +65,13 @@ export async function updateSpaceAction(id: string, formData: FormData) {
   };
   spaceSchema.parse(raw);
   await updateSpace(id, raw);
-  revalidatePath("/admin");
-  revalidatePath("/");
+  bustSpacesCache();
 }
 
 export async function deleteSpaceAction(id: string) {
   await requireAdmin();
   await deleteSpace(id);
-  revalidatePath("/admin");
-  revalidatePath("/");
+  bustSpacesCache();
 }
 
 export async function setMemberStatusAction(
@@ -140,8 +149,7 @@ export async function createModuleAction(formData: FormData) {
   };
   moduleSchema.parse(raw);
   await createModule(raw);
-  revalidatePath("/admin");
-  revalidatePath("/aulas");
+  bustAulasCache();
 }
 
 export async function updateModuleAction(id: string, formData: FormData) {
@@ -156,15 +164,13 @@ export async function updateModuleAction(id: string, formData: FormData) {
   };
   moduleSchema.parse(raw);
   await updateModule(id, raw);
-  revalidatePath("/admin");
-  revalidatePath("/aulas");
+  bustAulasCache();
 }
 
 export async function deleteModuleAction(id: string) {
   await requireAdmin();
   await deleteModule(id);
-  revalidatePath("/admin");
-  revalidatePath("/aulas");
+  bustAulasCache();
 }
 
 export async function createLessonAction(formData: FormData) {
@@ -182,8 +188,7 @@ export async function createLessonAction(formData: FormData) {
   };
   lessonSchema.parse(raw);
   await createLesson(raw);
-  revalidatePath("/admin");
-  revalidatePath("/aulas");
+  bustAulasCache();
 }
 
 export async function updateLessonAction(id: string, formData: FormData) {
@@ -201,13 +206,11 @@ export async function updateLessonAction(id: string, formData: FormData) {
   };
   lessonSchema.parse(raw);
   await updateLesson(id, raw);
-  revalidatePath("/admin");
-  revalidatePath("/aulas");
+  bustAulasCache();
 }
 
 export async function deleteLessonAction(id: string) {
   await requireAdmin();
   await deleteLesson(id);
-  revalidatePath("/admin");
-  revalidatePath("/aulas");
+  bustAulasCache();
 }

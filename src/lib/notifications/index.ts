@@ -50,8 +50,17 @@ export async function listNotifications(userId: string, take = 30) {
 export async function listUnreadPreview(userId: string, take = 8) {
   return prisma.notification.findMany({
     where: { recipientId: userId, readAt: null },
-    include: {
-      actor: { include: { profile: true } },
+    select: {
+      id: true,
+      type: true,
+      postId: true,
+      snippet: true,
+      createdAt: true,
+      actor: {
+        select: {
+          profile: { select: { displayName: true } },
+        },
+      },
     },
     orderBy: { createdAt: "desc" },
     take,

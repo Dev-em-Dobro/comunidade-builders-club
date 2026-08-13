@@ -100,6 +100,9 @@ export function NotificationBell({
     void ensureBrowserPermission();
 
     const tick = async () => {
+      if (typeof document !== "undefined" && document.visibilityState === "hidden") {
+        return;
+      }
       try {
         const res = await fetch("/api/notifications/poll", {
           cache: "no-store",
@@ -127,6 +130,7 @@ export function NotificationBell({
       }
     };
 
+    void tick();
     const id = window.setInterval(() => void tick(), POLL_MS);
     const onVis = () => {
       if (document.visibilityState === "visible") void tick();

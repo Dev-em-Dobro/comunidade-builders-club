@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { HIDDEN_NAV_SPACE_SLUGS } from "@/lib/spaces/constants";
@@ -14,11 +15,26 @@ export const spaceSchema = z.object({
   sortOrder: z.number().int().min(0).max(999).optional(),
 });
 
+const listSpacesCached = unstable_cache(
+  async () =>
+    prisma.space.findMany({
+      where: { slug: { notIn: [...HIDDEN_NAV_SPACE_SLUGS] } },
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+        description: true,
+        sortOrder: true,
+        createdAt: true,
+      },
+      orderBy: { sortOrder: "asc" },
+    }),
+  ["nav-spaces"],
+  { revalidate: 120, tags: ["spaces"] },
+);
+
 export async function listSpaces() {
-  return prisma.space.findMany({
-    where: { slug: { notIn: [...HIDDEN_NAV_SPACE_SLUGS] } },
-    orderBy: { sortOrder: "asc" },
-  });
+  return listSpacesCached();
 }
 
 export async function getSpaceBySlug(slug: string) {

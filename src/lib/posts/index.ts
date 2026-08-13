@@ -22,11 +22,46 @@ export const updatePostSchema = z.object({
   videoUrl: optionalMediaUrl,
 });
 
+const postListSelect = {
+  id: true,
+  spaceId: true,
+  authorId: true,
+  title: true,
+  body: true,
+  imageUrl: true,
+  linkUrl: true,
+  videoUrl: true,
+  pinnedAt: true,
+  commentCount: true,
+  reactionCount: true,
+  viewCount: true,
+  createdAt: true,
+  updatedAt: true,
+  author: {
+    select: {
+      id: true,
+      profile: {
+        select: { displayName: true, avatarUrl: true },
+      },
+    },
+  },
+  space: {
+    select: { id: true, slug: true, name: true },
+  },
+} as const;
+
 const postListIncludeBase = {
   author: {
-    include: { profile: true },
+    select: {
+      id: true,
+      profile: {
+        select: { displayName: true, avatarUrl: true },
+      },
+    },
   },
-  space: true,
+  space: {
+    select: { id: true, slug: true, name: true },
+  },
 } as const;
 
 const postInclude = {
@@ -56,8 +91,8 @@ export async function listPosts(opts: {
         ? { space: { slug: { in: opts.includeSpaceSlugs } } }
         : {}),
     },
-    include: {
-      ...postListIncludeBase,
+    select: {
+      ...postListSelect,
       ...(opts.viewerId
         ? {
             reactions: {
@@ -96,23 +131,55 @@ export async function listPosts(opts: {
   return { posts, nextCursor };
 }
 
-export async function getPost(id: string) {
+export async function getPost(id: string, opts?: { viewerId?: string }) {
   return prisma.post.findUnique({
     where: { id },
     include: {
-      ...postInclude,
+      author: {
+        select: {
+          id: true,
+          profile: {
+            select: { displayName: true, avatarUrl: true },
+          },
+        },
+      },
+      space: {
+        select: { id: true, slug: true, name: true },
+      },
       comments: {
         where: { parentId: null },
         include: {
-          author: { include: { profile: true } },
+          author: {
+            select: {
+              id: true,
+              profile: {
+                select: { displayName: true, avatarUrl: true },
+              },
+            },
+          },
           replies: {
-            include: { author: { include: { profile: true } } },
+            include: {
+              author: {
+                select: {
+                  id: true,
+                  profile: {
+                    select: { displayName: true, avatarUrl: true },
+                  },
+                },
+              },
+            },
             orderBy: { createdAt: "asc" },
           },
         },
         orderBy: { createdAt: "asc" },
       },
-      reactions: { select: { userId: true, type: true } },
+      reactions: opts?.viewerId
+        ? {
+            where: { userId: opts.viewerId },
+            select: { userId: true, type: true },
+            take: 1,
+          }
+        : { select: { userId: true, type: true } },
     },
   });
 }
@@ -216,24 +283,17 @@ export async function recordPostView(postId: string, userId: string) {
   if (post.authorId === userId) return post.viewCount;
 
   try {
-    await prisma.$transaction(async (tx) => {
-      await tx.postView.create({
-        data: { postId, userId },
-      });
-      await tx.post.update({
-        where: { id: postId },
-        data: { viewCount: { increment: 1 } },
-      });
+    await prisma.postView.create({ data: { postId, userId } });
+    const updated = await prisma.post.update({
+      where: { id: postId },
+      data: { viewCount: { increment: 1 } },
+      select: { viewCount: true },
     });
+    return updated.viewCount;
   } catch {
     // unique violation = já leu
+    return post.viewCount;
   }
-
-  const fresh = await prisma.post.findUnique({
-    where: { id: postId },
-    select: { viewCount: true },
-  });
-  return fresh?.viewCount ?? post.viewCount;
 }
 
 export async function backfillEmptyTitles() {

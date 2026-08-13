@@ -59,7 +59,7 @@ export async function getPostDetailAction(
   postId: string,
 ): Promise<PostDetailDto | null> {
   const member = await requireActiveMember();
-  const post = await getPost(postId);
+  const post = await getPost(postId, { viewerId: member.user.id });
   if (!post) return null;
 
   const viewCount =

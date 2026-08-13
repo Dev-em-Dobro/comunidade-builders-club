@@ -1,34 +1,57 @@
 import { prisma } from "@/lib/db";
+import type { Membership, Profile } from "@prisma/client";
 import { isEmailAllowed } from "./allowlist";
+
+export type BootstrapResult = {
+  membership: Membership;
+  profile: Profile;
+};
 
 /**
  * Garante Profile + Membership no login (F041 freemium).
  * - Allowlist / Hubla / BOOTSTRAP_ADMIN → active + paid (+ admin se bootstrap)
  * - Sem allowlist → active + free (entra na comunidade limitada)
  * - Membership `revoked` não é reativado pela allowlist (só bootstrap admin)
+ *
+ * Hot path: membro já active + profile → 1 query (sem allowlist).
  */
 export async function ensureMemberBootstrap(
   userId: string,
   name: string,
   image: string | null | undefined,
-): Promise<void> {
-  const [user, existing, profileExists] = await Promise.all([
-    prisma.user.findUnique({ where: { id: userId } }),
-    prisma.membership.findUnique({ where: { userId } }),
-    prisma.profile.findUnique({
-      where: { userId },
-      select: { userId: true },
+): Promise<BootstrapResult | null> {
+  const [user, existing, profile] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, email: true },
     }),
+    prisma.membership.findUnique({ where: { userId } }),
+    prisma.profile.findUnique({ where: { userId } }),
   ]);
-  if (!user) return;
+  if (!user) return null;
 
   const email = user.email.toLowerCase();
   const adminEmail = process.env.BOOTSTRAP_ADMIN_EMAIL?.trim().toLowerCase();
   const isBootstrapAdmin = !!adminEmail && email === adminEmail;
+
+  // Fast-path: já active + profile — não consulta allowlist a cada request.
+  // Paid/admin só sobe via Hubla, admin allowlist actions ou bootstrap admin.
+  if (existing?.status === "active" && profile) {
+    if (isBootstrapAdmin && existing.role !== "admin") {
+      const membership = await prisma.membership.update({
+        where: { userId },
+        data: { status: "active", tier: "paid", role: "admin" },
+      });
+      return { membership, profile };
+    }
+    return { membership: existing, profile };
+  }
+
   const allowed = isBootstrapAdmin || (await isEmailAllowed(email));
 
-  if (!profileExists) {
-    await prisma.profile.upsert({
+  let nextProfile = profile;
+  if (!nextProfile) {
+    nextProfile = await prisma.profile.upsert({
       where: { userId },
       create: {
         userId,
@@ -39,29 +62,8 @@ export async function ensureMemberBootstrap(
     });
   }
 
-  // Fast-path: já active + profile; só sincroniza paid/admin se necessário.
-  if (existing?.status === "active" && profileExists) {
-    const needsAdmin =
-      isBootstrapAdmin && existing.role !== "admin";
-    const needsPaid =
-      (allowed || isBootstrapAdmin) && existing.tier !== "paid";
-    if (needsAdmin || needsPaid) {
-      await prisma.membership.update({
-        where: { userId },
-        data: {
-          status: "active",
-          tier: "paid",
-          ...(needsAdmin || isBootstrapAdmin
-            ? { role: "admin" as const }
-            : {}),
-        },
-      });
-    }
-    return;
-  }
-
   if (!existing) {
-    await prisma.membership.create({
+    const membership = await prisma.membership.create({
       data: {
         userId,
         status: "active",
@@ -69,22 +71,23 @@ export async function ensureMemberBootstrap(
         role: isBootstrapAdmin ? "admin" : "member",
       },
     });
-    return;
+    return { membership, profile: nextProfile };
   }
 
   if (existing.status === "revoked") {
     if (isBootstrapAdmin) {
-      await prisma.membership.update({
+      const membership = await prisma.membership.update({
         where: { userId },
         data: { status: "active", tier: "paid", role: "admin" },
       });
+      return { membership, profile: nextProfile };
     }
-    return;
+    return { membership: existing, profile: nextProfile };
   }
 
   // pending legado → active free ou paid
   if (existing.status === "pending") {
-    await prisma.membership.update({
+    const membership = await prisma.membership.update({
       where: { userId },
       data: {
         status: "active",
@@ -92,5 +95,8 @@ export async function ensureMemberBootstrap(
         ...(isBootstrapAdmin ? { role: "admin" as const } : {}),
       },
     });
+    return { membership, profile: nextProfile };
   }
+
+  return { membership: existing, profile: nextProfile };
 }

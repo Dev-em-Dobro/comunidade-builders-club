@@ -1,8 +1,10 @@
+import { cache } from "react";
 import { headers } from "next/headers";
 import { auth, type AuthUser } from "./index";
 import { AuthError } from "./errors";
 
-export async function requireUser(): Promise<AuthUser> {
+/** Sessão Better Auth — deduplica no mesmo request RSC. */
+export const requireUser = cache(async (): Promise<AuthUser> => {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -12,11 +14,11 @@ export async function requireUser(): Promise<AuthUser> {
   }
 
   return session.user;
-}
+});
 
-export async function getOptionalUser(): Promise<AuthUser | null> {
+export const getOptionalUser = cache(async (): Promise<AuthUser | null> => {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
   return session?.user ?? null;
-}
+});

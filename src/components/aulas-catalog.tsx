@@ -1,15 +1,11 @@
-"use client";
-
+import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
 export type AulaLessonCard = {
   id: string;
   slug: string;
   title: string;
   description: string | null;
-  pandaLibraryId: string;
-  pandaVideoExternalId: string;
   thumbnailUrl: string | null;
   moduleSlug: string;
   completed: boolean;
@@ -24,17 +20,7 @@ export type AulaModuleCard = {
   lessons: AulaLessonCard[];
 };
 
-export function AulasCatalog({
-  modules: initial,
-}: {
-  modules: AulaModuleCard[];
-}) {
-  const [modules, setModules] = useState(initial);
-
-  useEffect(() => {
-    setModules(initial);
-  }, [initial]);
-
+export function AulasCatalog({ modules }: { modules: AulaModuleCard[] }) {
   if (modules.length === 0) {
     return null;
   }
@@ -48,11 +34,13 @@ export function AulasCatalog({
         >
           <div className="flex flex-wrap items-center gap-4 border-b border-border bg-surface/40 px-4 py-3 sm:px-5">
             {mod.coverImageUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <Image
                 src={mod.coverImageUrl}
                 alt=""
+                width={56}
+                height={80}
                 className="h-16 w-12 shrink-0 rounded-lg object-cover sm:h-20 sm:w-14"
+                sizes="56px"
               />
             ) : (
               <div className="flex h-16 w-12 shrink-0 items-center justify-center rounded-lg bg-accent/15 text-xs font-bold text-accent sm:h-20 sm:w-14">
@@ -81,11 +69,13 @@ export function AulasCatalog({
                   className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-surface/60 sm:gap-4 sm:px-5"
                 >
                   {l.thumbnailUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <Image
                       src={l.thumbnailUrl}
                       alt=""
+                      width={96}
+                      height={56}
                       className="h-12 w-20 shrink-0 rounded-md object-cover sm:h-14 sm:w-24"
+                      sizes="96px"
                     />
                   ) : (
                     <div className="flex h-12 w-20 shrink-0 items-center justify-center rounded-md bg-surface text-[10px] font-semibold uppercase tracking-wide text-muted sm:h-14 sm:w-24">

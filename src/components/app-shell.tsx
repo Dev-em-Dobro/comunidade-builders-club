@@ -1,9 +1,12 @@
-import { Suspense } from "react";
-import { countUnread, listUnreadPreview, NOTIFICATION_LABELS } from "@/lib/notifications";
+import { countUnread } from "@/lib/notifications";
 import { listSpaces } from "@/lib/spaces";
 import { checkoutUrlBuildersClub } from "@/lib/membership/checkout";
 import { AppShellClient } from "@/components/app-shell-client";
 
+/**
+ * Shell enxuto: spaces (cache) + contagem de não lidas.
+ * Preview de notificações fica no poll do client (1ª chamada imediata).
+ */
 export async function AppShell({
   children,
   userId,
@@ -19,34 +22,23 @@ export async function AppShell({
   displayName: string;
   avatarUrl?: string | null;
 }) {
-  const [spaces, unread, preview] = await Promise.all([
+  const [spaces, unread] = await Promise.all([
     listSpaces(),
     countUnread(userId),
-    listUnreadPreview(userId, 8),
   ]);
 
   return (
-    <Suspense fallback={<div className="min-h-dvh bg-background" />}>
-      <AppShellClient
-        displayName={displayName}
-        isAdmin={isAdmin}
-        isPaid={isPaid}
-        checkoutUrl={checkoutUrlBuildersClub()}
-        unread={unread}
-        spaces={spaces.map((s) => ({ id: s.id, slug: s.slug, name: s.name }))}
-        avatarUrl={avatarUrl}
-        notifPreview={preview.map((n) => ({
-          id: n.id,
-          type: n.type,
-          postId: n.postId,
-          snippet: n.snippet,
-          createdAt: n.createdAt.toISOString(),
-          actorName: n.actor?.profile?.displayName ?? "Alguém",
-          label: NOTIFICATION_LABELS[n.type] ?? n.type,
-        }))}
-      >
-        {children}
-      </AppShellClient>
-    </Suspense>
+    <AppShellClient
+      displayName={displayName}
+      isAdmin={isAdmin}
+      isPaid={isPaid}
+      checkoutUrl={checkoutUrlBuildersClub()}
+      unread={unread}
+      spaces={spaces.map((s) => ({ id: s.id, slug: s.slug, name: s.name }))}
+      avatarUrl={avatarUrl}
+      notifPreview={[]}
+    >
+      {children}
+    </AppShellClient>
   );
 }

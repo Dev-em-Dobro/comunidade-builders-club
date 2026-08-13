@@ -207,6 +207,7 @@ model Post {
 
   @@index([spaceId, pinnedAt, createdAt])
   @@index([authorId])
+  @@index([linkUrl])
   @@map("post")
 }
 

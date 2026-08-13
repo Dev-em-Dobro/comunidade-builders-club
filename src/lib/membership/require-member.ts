@@ -1,7 +1,6 @@
 import type { Membership, Profile, Role } from "@prisma/client";
 import { cache } from "react";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/db";
 import type { AuthUser } from "@/lib/auth";
 import { requireUser } from "@/lib/auth/require-user";
 import { AuthError, ForbiddenError } from "@/lib/auth/errors";
@@ -20,16 +19,13 @@ export { UPGRADE_REQUIRED } from "./errors";
 /** Sessão + membership active (free ou paid). Deduplica no request. */
 export const requireActiveMember = cache(async (): Promise<ActiveMember> => {
   const user = await requireUser();
-  await ensureMemberBootstrap(user.id, user.name, user.image);
+  const boot = await ensureMemberBootstrap(user.id, user.name, user.image);
 
-  const [membership, profile] = await Promise.all([
-    prisma.membership.findUnique({ where: { userId: user.id } }),
-    prisma.profile.findUnique({ where: { userId: user.id } }),
-  ]);
-
-  if (!membership || !profile) {
+  if (!boot?.membership || !boot.profile) {
     throw new AuthError("Perfil incompleto. Tente entrar novamente.");
   }
+
+  const { membership, profile } = boot;
 
   if (membership.status !== "active") {
     throw new ForbiddenError(
