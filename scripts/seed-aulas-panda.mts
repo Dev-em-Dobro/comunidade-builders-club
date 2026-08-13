@@ -19,6 +19,41 @@ const PANDA_FOLDER_ID = "d5fa2de0-ae46-4967-be9c-41466511e796";
 const MODULE_SLUG = "aulas";
 const COVER = "/aulas/modulo-capa.png";
 
+/**
+ * Títulos descritivos a partir do conteúdo dos vídeos (slides / abertura).
+ * Chave = panda video_external_id. Sem isso o seed cairia em "Aula N" pelo filename.
+ */
+const LESSON_META_BY_EXTERNAL_ID: Record<
+  string,
+  { title: string; description?: string }
+> = {
+  "3f725dbb-a62d-40d8-9501-1f754de461aa": {
+    title: "Renda extra com IA e Claude Code",
+    description:
+      "Consultoria 1 · Kickoff — o que vender, como achar cliente e as primeiras abordagens.",
+  },
+  "70f6d59c-b584-49ba-b8a5-a3f885992ee5": {
+    title: "Sites que vendem e o agente que atende sozinho",
+    description:
+      "Consultoria 2 — site e portfólio no ar + agente de IA que atende e marca consulta no WhatsApp.",
+  },
+  "c5c3b251-0600-449b-847f-604c504197f6": {
+    title: "Do nicho ao primeiro cliente",
+    description:
+      "Caminho pra fechar um cliente real e o que fazer quando ele disser sim.",
+  },
+  "ff16bb1e-23ae-48b9-a43c-c438b81aacdd": {
+    title: "Mentoria: destravando a prospecção",
+    description:
+      "Acompanhamento ao vivo com quem está travado ou ainda não começou a prospectar.",
+  },
+  "497c9745-4695-4881-9fd6-79ff4f4d9281": {
+    title: "Do “gostei” ao dinheiro na conta",
+    description:
+      "Precificação, entrega e fechamento — as maiores dúvidas da semana.",
+  },
+};
+
 type Target = "hml" | "prod" | "local";
 
 type PandaVideo = {
@@ -131,8 +166,13 @@ async function run(target: Target) {
         continue;
       }
 
-      const title = titleFromFile(v.title ?? `aula-${order + 1}`);
-      const slug = slugify(v.title ?? `aula-${order + 1}`) || `aula-${order + 1}`;
+      const meta = LESSON_META_BY_EXTERNAL_ID[externalId];
+      const title =
+        meta?.title ?? titleFromFile(v.title ?? `aula-${order + 1}`);
+      const description = meta?.description ?? null;
+      // Slug estável a partir do filename Panda (não muda com o título descritivo).
+      const slug =
+        slugify(v.title ?? `aula-${order + 1}`) || `aula-${order + 1}`;
 
       const existing = await prisma.lesson.findFirst({
         where: {
@@ -146,6 +186,7 @@ async function run(target: Target) {
           where: { id: existing.id },
           data: {
             title,
+            description,
             slug,
             pandaLibraryId: pullzone,
             thumbnailUrl: v.thumbnail ?? null,
@@ -159,6 +200,7 @@ async function run(target: Target) {
           data: {
             moduleId: mod.id,
             title,
+            description,
             slug,
             pandaVideoExternalId: externalId,
             pandaLibraryId: pullzone,
