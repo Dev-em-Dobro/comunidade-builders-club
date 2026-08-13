@@ -1,5 +1,7 @@
 /** Bloco de mídia anexada ao post (imagem, vídeo, link). */
 
+import { OptimizedMediaImage } from "@/components/optimized-media-image";
+
 function isInternalMarker(url: string) {
   return url.startsWith("builders-club://");
 }
@@ -10,11 +12,13 @@ export function PostMedia({
   linkUrl,
   /** No feed compacto pode cortar; no detalhe/expandido mostra inteira. */
   cropImage = false,
+  priority = false,
 }: {
   imageUrl?: string | null;
   videoUrl?: string | null;
   linkUrl?: string | null;
   cropImage?: boolean;
+  priority?: boolean;
 }) {
   const publicLink =
     linkUrl && !isInternalMarker(linkUrl) ? linkUrl : null;
@@ -25,16 +29,15 @@ export function PostMedia({
     <div className="mt-3 space-y-3">
       {imageUrl ? (
         <div className="overflow-hidden rounded-xl bg-surface/60">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <OptimizedMediaImage
             src={imageUrl}
-            alt=""
+            variant={cropImage ? "feed" : "detail"}
+            priority={priority}
             className={
               cropImage
                 ? "max-h-40 w-full object-cover"
                 : "mx-auto max-h-[min(70vh,36rem)] w-full object-contain"
             }
-            loading="lazy"
           />
         </div>
       ) : null}

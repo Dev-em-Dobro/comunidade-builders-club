@@ -113,13 +113,15 @@ export function FeedList({
     }
   }
 
+  const firstImageIndex = posts.findIndex((p) => p.imageUrl);
+
   return (
     <>
       <div className="mb-4 flex justify-end">
         <FeedViewToggle value={view} onChange={changeView} />
       </div>
       <div className={`space-y-3 ${ready ? "" : "opacity-90"}`}>
-        {posts.map((post) => (
+        {posts.map((post, index) => (
           <PostCard
             key={post.id}
             post={post}
@@ -128,6 +130,10 @@ export function FeedList({
             isAdmin={isAdmin}
             isPaid={isPaid}
             currentUserId={currentUserId}
+            priorityAvatar={index === 0}
+            priorityMedia={
+              firstImageIndex >= 0 ? index === firstImageIndex : false
+            }
           />
         ))}
       </div>
