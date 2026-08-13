@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { previewFromBody } from "@/lib/posts/title";
 import { MarkdownBody } from "@/lib/markdown";
+import { OptimizedMediaImage } from "@/components/optimized-media-image";
 import { PostActions } from "@/components/post-actions";
 import { PostMedia } from "@/components/post-media";
 import { PostShareMenu } from "@/components/post-share-menu";
@@ -36,21 +37,27 @@ type PostCardProps = {
   isAdmin?: boolean;
   isPaid?: boolean;
   currentUserId?: string;
+  /** Primeiro post com imagem no feed — evita lazy no LCP. */
+  priorityMedia?: boolean;
+  /** Primeiro card do feed — avatar acima da dobra. */
+  priorityAvatar?: boolean;
 };
 
 function Avatar({
   name,
   url,
+  priority = false,
 }: {
   name: string;
   url: string | null | undefined;
+  priority?: boolean;
 }) {
   if (url) {
     return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
+      <OptimizedMediaImage
         src={url}
-        alt=""
+        variant="avatar"
+        priority={priority}
         className="h-11 w-11 shrink-0 rounded-full object-cover ring-2 ring-surface sm:h-12 sm:w-12"
       />
     );
@@ -106,6 +113,8 @@ export function PostCard({
   isAdmin = false,
   isPaid = true,
   currentUserId,
+  priorityMedia = false,
+  priorityAvatar = false,
 }: PostCardProps) {
   const router = useRouter();
   const name = post.author.profile?.displayName ?? "Membro";
@@ -155,7 +164,7 @@ export function PostCard({
         }}
       >
         <div className="flex gap-3">
-          <Avatar name={name} url={avatarUrl} />
+          <Avatar name={name} url={avatarUrl} priority={priorityAvatar} />
           <div className="min-w-0 flex-1">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
@@ -185,6 +194,7 @@ export function PostCard({
                 imageUrl={post.imageUrl}
                 videoUrl={post.videoUrl}
                 linkUrl={post.linkUrl}
+                priority={priorityMedia}
               />
             </div>
 
@@ -217,7 +227,7 @@ export function PostCard({
         className="block cursor-pointer p-5 pb-3 pr-12 transition-colors hover:bg-surface/40"
       >
         <div className="flex gap-3">
-          <Avatar name={name} url={avatarUrl} />
+          <Avatar name={name} url={avatarUrl} priority={priorityAvatar} />
           <div className="min-w-0 flex-1">
             <div className="min-w-0">
               <p className="truncate text-[15px] font-semibold text-foreground md:text-base">
@@ -236,12 +246,11 @@ export function PostCard({
             ) : null}
 
             {post.imageUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <OptimizedMediaImage
                 src={post.imageUrl}
-                alt=""
+                variant="feed"
+                priority={priorityMedia}
                 className="mt-3 max-h-40 w-full rounded-xl object-cover"
-                loading="lazy"
               />
             ) : null}
             {!post.imageUrl &&

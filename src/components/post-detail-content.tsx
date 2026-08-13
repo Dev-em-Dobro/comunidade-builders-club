@@ -9,6 +9,7 @@ import {
 import { EmptyState } from "@/components/empty-state";
 import { MarkdownBody } from "@/lib/markdown";
 import { previewFromBody } from "@/lib/posts/title";
+import { OptimizedMediaImage } from "@/components/optimized-media-image";
 import { PostMedia } from "@/components/post-media";
 import { PostShareMenu } from "@/components/post-share-menu";
 import type { PostDetailDto } from "@/actions/post-detail";
@@ -99,10 +100,10 @@ export function PostDetailContent({
         <div className={compactHeader ? "" : "p-0"}>
           <div className="flex gap-3">
             {post.avatarUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <OptimizedMediaImage
                 src={post.avatarUrl}
-                alt=""
+                variant="avatar"
+                priority
                 className="h-10 w-10 shrink-0 rounded-full object-cover ring-2 ring-surface"
               />
             ) : (
@@ -139,6 +140,7 @@ export function PostDetailContent({
                 imageUrl={post.imageUrl}
                 videoUrl={post.videoUrl}
                 linkUrl={post.linkUrl}
+                priority
               />
               <PostActions
                 postId={post.id}
