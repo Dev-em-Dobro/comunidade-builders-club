@@ -19,6 +19,7 @@
     "db:import-allowed": "npx tsx scripts/import-allowed-emails.mts",
     "db:studio": "prisma studio",
     "mailpit": "docker compose up -d mailpit",
+    "perf:lighthouse": "npx tsx scripts/perf-lighthouse.mts",
     "postinstall": "prisma generate"
   },
   "dependencies": {

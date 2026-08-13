@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
 import { listPosts } from "@/lib/posts";
@@ -12,6 +13,74 @@ import { EmptyState } from "@/components/empty-state";
 
 type Props = { searchParams: Promise<{ error?: string; upgrade?: string }> };
 
+function FeedSkeleton() {
+  return (
+    <div className="space-y-4 animate-pulse" aria-busy="true" aria-label="Carregando feed">
+      {[0, 1].map((i) => (
+        <div
+          key={i}
+          className="rounded-2xl border border-border bg-card p-5 shadow-sm"
+        >
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-full bg-surface" />
+            <div className="h-3.5 w-32 rounded bg-surface" />
+          </div>
+          <div className="mt-4 space-y-2">
+            <div className="h-3.5 w-full rounded bg-surface/80" />
+            <div className="h-3.5 w-[70%] rounded bg-surface/70" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+async function HomeFeed({
+  userId,
+  isPaid,
+  isAdmin,
+}: {
+  userId: string;
+  isPaid: boolean;
+  isAdmin: boolean;
+}) {
+  const freeFeedSlugs = FREE_SPACE_SLUGS.filter((s) => s !== WELCOME_SPACE_SLUG);
+  const { posts } = await listPosts({
+    excludeSpaceSlugs: isPaid
+      ? [WELCOME_SPACE_SLUG, "aula-threads"]
+      : undefined,
+    includeSpaceSlugs: isPaid ? undefined : [...freeFeedSlugs],
+    viewerId: userId,
+    take: 30,
+  });
+
+  if (posts.length === 0) {
+    return (
+      <EmptyState
+        title="Nenhum post ainda"
+        description={
+          isPaid
+            ? "Seja o primeiro a compartilhar algo com a comunidade — use o botão Nova publicação."
+            : "Ainda não há publicações nos spaces liberados do plano gratuito."
+        }
+      />
+    );
+  }
+
+  return (
+    <FeedList
+      posts={posts}
+      isAdmin={isAdmin}
+      isPaid={isPaid}
+      currentUserId={userId}
+    />
+  );
+}
+
+/**
+ * LCP: o <h1>Feed</h1> é enviado assim que a auth resolve;
+ * posts ficam em Suspense (não atrasam o Largest Contentful Paint).
+ */
 export default async function HomePage({ searchParams }: Props) {
   const member = await requireActiveMemberOrRedirect();
 
@@ -19,17 +88,6 @@ export default async function HomePage({ searchParams }: Props) {
   if (error) redirect("/");
 
   const isPaid = isPaidMembership(member.membership);
-  // Free: feed só com Geral + Avisos (Boas-vindas fica no space próprio).
-  const freeFeedSlugs = FREE_SPACE_SLUGS.filter((s) => s !== WELCOME_SPACE_SLUG);
-
-  const { posts } = await listPosts({
-    excludeSpaceSlugs: isPaid
-      ? [WELCOME_SPACE_SLUG, "aula-threads"]
-      : undefined,
-    includeSpaceSlugs: isPaid ? undefined : [...freeFeedSlugs],
-    viewerId: member.user.id,
-    take: 30,
-  });
   const isAdmin = member.membership.role === "admin";
 
   return (
@@ -64,23 +122,13 @@ export default async function HomePage({ searchParams }: Props) {
       </div>
 
       <div className="mt-8">
-        {posts.length === 0 ? (
-          <EmptyState
-            title="Nenhum post ainda"
-            description={
-              isPaid
-                ? "Seja o primeiro a compartilhar algo com a comunidade — use o botão Nova publicação."
-                : "Ainda não há publicações nos spaces liberados do plano gratuito."
-            }
-          />
-        ) : (
-          <FeedList
-            posts={posts}
-            isAdmin={isAdmin}
+        <Suspense fallback={<FeedSkeleton />}>
+          <HomeFeed
+            userId={member.user.id}
             isPaid={isPaid}
-            currentUserId={member.user.id}
+            isAdmin={isAdmin}
           />
-        )}
+        </Suspense>
       </div>
     </div>
   );
