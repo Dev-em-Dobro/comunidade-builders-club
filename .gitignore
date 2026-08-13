@@ -49,3 +49,7 @@ yarn-debug.log*
 !.vscode/extensions.json
 .idea/
 .env*
+
+# perf local
+scripts/perf-reports/
+
