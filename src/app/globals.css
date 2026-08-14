@@ -1,27 +1,62 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
 
-  --color-background: #f3f6f5;
-  --color-foreground: #0f172a;
-  --color-card: #ffffff;
-  --color-border: #dde5e2;
-  --color-muted: #64748b;
-  --color-accent: #0d9488;
-  --color-accent-hover: #0f766e;
-  --color-accent-foreground: #ffffff;
-  --color-surface: #e7efed;
-  --color-sidebar: #fafcfb;
+  --color-background: var(--bc-background);
+  --color-foreground: var(--bc-foreground);
+  --color-card: var(--bc-card);
+  --color-border: var(--bc-border);
+  --color-muted: var(--bc-muted);
+  --color-accent: var(--bc-accent);
+  --color-accent-hover: var(--bc-accent-hover);
+  --color-accent-foreground: var(--bc-accent-foreground);
+  --color-surface: var(--bc-surface);
+  --color-sidebar: var(--bc-sidebar);
 }
 
 @layer base {
   :root {
     color-scheme: light;
-    /* Tipografia base um pouco maior; mobile permanece confortável. */
     --text-body: 15px;
     --text-body-md: 16px;
+    --bc-background: #f3f6f5;
+    --bc-foreground: #0f172a;
+    --bc-card: #ffffff;
+    --bc-border: #dde5e2;
+    --bc-muted: #64748b;
+    --bc-accent: #0d9488;
+    --bc-accent-hover: #0f766e;
+    --bc-accent-foreground: #ffffff;
+    --bc-surface: #e7efed;
+    --bc-sidebar: #fafcfb;
+    --bc-body-glow-a: rgba(13, 148, 136, 0.14);
+    --bc-body-glow-b: rgba(15, 118, 110, 0.09);
+    --bc-body-grad-start: #f7faf9;
+    --bc-body-grad-mid: #f3f6f5;
+    --bc-body-grad-end: #eef3f1;
+  }
+
+  html.dark {
+    color-scheme: dark;
+    --bc-background: #0b1211;
+    --bc-foreground: #e8eeec;
+    --bc-card: #141c1a;
+    --bc-border: #24302d;
+    --bc-muted: #8b9a96;
+    --bc-accent: #14b8a6;
+    --bc-accent-hover: #2dd4bf;
+    --bc-accent-foreground: #042f2e;
+    --bc-surface: #1a2422;
+    --bc-sidebar: #101816;
+    --bc-body-glow-a: rgba(20, 184, 166, 0.12);
+    --bc-body-glow-b: rgba(45, 212, 191, 0.06);
+    --bc-body-grad-start: #0d1514;
+    --bc-body-grad-mid: #0b1211;
+    --bc-body-grad-end: #0a1010;
   }
 
   button:not(:disabled),
@@ -51,9 +86,14 @@
     font-size: var(--text-body);
     line-height: 1.6;
     background-image:
-      radial-gradient(ellipse 90% 55% at 8% -15%, rgba(13, 148, 136, 0.14), transparent 55%),
-      radial-gradient(ellipse 70% 45% at 100% 0%, rgba(15, 118, 110, 0.09), transparent 50%),
-      linear-gradient(180deg, #f7faf9 0%, #f3f6f5 40%, #eef3f1 100%);
+      radial-gradient(ellipse 90% 55% at 8% -15%, var(--bc-body-glow-a), transparent 55%),
+      radial-gradient(ellipse 70% 45% at 100% 0%, var(--bc-body-glow-b), transparent 50%),
+      linear-gradient(
+        180deg,
+        var(--bc-body-grad-start) 0%,
+        var(--bc-body-grad-mid) 40%,
+        var(--bc-body-grad-end) 100%
+      );
     min-height: 100dvh;
   }
 
@@ -87,6 +127,14 @@
 
   .post-card {
     @apply rounded-2xl border border-border/80 bg-card p-5 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-all duration-200 hover:border-border hover:shadow-[0_8px_24px_rgba(15,23,42,0.06)];
+  }
+
+  html.dark .post-card {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  }
+
+  html.dark .post-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
   }
 
   .nav-space {

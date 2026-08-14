@@ -10,6 +10,7 @@ import {
   type NotifPreview,
 } from "@/components/notification-bell";
 import { MateriaisNav } from "@/components/materiais-nav";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { UpgradeProvider, useUpgrade } from "@/components/upgrade-modal";
 import { isFreeSpaceSlug } from "@/lib/membership/capabilities";
 import {
@@ -226,6 +227,7 @@ function SidebarFooter({
           </Link>
         </>
       ) : null}
+      <ThemeToggle />
       <LogoutButton />
     </div>
   );
@@ -446,7 +448,10 @@ function ShellInner({
           >
             {NOME_PRODUTO}
           </Link>
-          <NotificationBell unread={unread} items={notifPreview} compact />
+          <div className="flex items-center gap-0.5">
+            <ThemeToggle variant="icon" />
+            <NotificationBell unread={unread} items={notifPreview} compact />
+          </div>
         </header>
 
         <main className="flex-1 px-4 py-6 pb-24 md:px-8 md:py-10 md:pb-28">

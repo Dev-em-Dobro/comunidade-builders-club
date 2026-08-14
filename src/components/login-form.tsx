@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { authClient } from "@/lib/auth/client";
 import { NOME_PRODUTO } from "@/lib/produto";
 import { safeCallbackPath } from "@/lib/security/urls";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 function mensagemErroCallback(code: string | null): string | null {
   if (!code) return null;
@@ -71,6 +72,9 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
 
   return (
     <div className="relative flex min-h-dvh items-center justify-center px-4 py-12">
+      <div className="absolute right-4 top-4 z-10">
+        <ThemeToggle variant="icon" />
+      </div>
       <div
         className="pointer-events-none absolute inset-0 opacity-90"
         aria-hidden
@@ -137,7 +141,7 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
               </form>
 
               {error ? (
-                <p className="text-sm text-red-600" role="alert">
+                <p className="text-sm text-red-600 dark:text-red-400" role="alert">
                   {error}
                 </p>
               ) : null}

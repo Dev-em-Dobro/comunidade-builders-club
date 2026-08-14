@@ -18,12 +18,22 @@ F013 eleva o shell e o feed sem abandonar o teal.
 
 ## Tokens
 
-- Fundo: claro neutro `#f3f6f5`
-- Card: `#ffffff` com borda suave e sombra leve
-- Acento: teal `#0d9488` / hover `#0f766e`
-- Surface: `#e7efed`
+Tema **claro** (padrão) e **escuro** (F042). Acento teal nos dois.
+
+| Token | Claro | Escuro |
+|-------|--------|--------|
+| Fundo | `#f3f6f5` | `#0b1211` |
+| Card | `#ffffff` | `#141c1a` |
+| Acento | `#0d9488` / hover `#0f766e` | `#14b8a6` / hover `#2dd4bf` |
+| Surface | `#e7efed` | `#1a2422` |
+| Sidebar | `#fafcfb` | `#101816` |
+| Texto | `#0f172a` | `#e8eeec` |
+| Muted | `#64748b` | `#8b9a96` |
+| Borda | `#dde5e2` | `#24302d` |
+
 - Radius: 12–16px (não pill excessivo)
-- Sidebar: fundo card sólido, space ativo com surface + accent
+- Sidebar: fundo sólido, space ativo com surface + accent
+- Preferência de tema no dispositivo (`localStorage`); não segue o SO por padrão.
 
 ## Superfícies
 

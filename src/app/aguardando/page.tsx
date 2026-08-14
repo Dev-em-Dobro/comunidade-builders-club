@@ -6,6 +6,7 @@ import { prisma } from "@/lib/db";
 import { ensureMemberBootstrap } from "@/lib/membership/bootstrap";
 import { NOME_PRODUTO } from "@/lib/produto";
 import { LogoutButton } from "@/components/logout-button";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default async function AguardandoPage() {
   let user;
@@ -27,7 +28,10 @@ export default async function AguardandoPage() {
   }
 
   return (
-    <div className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-4">
+    <div className="relative mx-auto flex min-h-dvh max-w-md flex-col justify-center px-4">
+      <div className="absolute right-4 top-4">
+        <ThemeToggle variant="icon" />
+      </div>
       <div className="rounded-2xl border border-border bg-card p-8 shadow-sm">
         <p className="font-[family-name:var(--font-outfit)] text-2xl font-bold">
           {NOME_PRODUTO}
