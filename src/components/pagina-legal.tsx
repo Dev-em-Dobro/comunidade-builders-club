@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { ATUALIZADO_EM, OPERADOR_LEGAL } from "@/lib/legal";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export function PaginaLegal({
   titulo,
@@ -10,7 +11,10 @@ export function PaginaLegal({
   children: ReactNode;
 }) {
   return (
-    <main className="mx-auto max-w-2xl px-6 py-12">
+    <main className="relative mx-auto max-w-2xl px-6 py-12">
+      <div className="absolute right-4 top-4 sm:right-6 sm:top-6">
+        <ThemeToggle variant="icon" />
+      </div>
       <p className="text-sm text-muted">
         <Link href="/login" className="hover:text-accent">
           ← {OPERADOR_LEGAL.produto}
