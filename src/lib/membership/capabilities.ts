@@ -1,8 +1,9 @@
 // F041 — capabilities freemium.
 
 import type { Membership, MembershipTier, Role } from "@prisma/client";
+import { AULA_THREADS_SPACE_SLUG } from "@/lib/spaces/constants";
 
-/** Spaces liberados para leitura free. */
+/** Spaces cuja *página* é liberada para free (sidebar sem cadeado). */
 export const FREE_SPACE_SLUGS = [
   "boas-vindas",
   "geral",
@@ -13,6 +14,15 @@ export type FreeSpaceSlug = (typeof FREE_SPACE_SLUGS)[number];
 
 export function isFreeSpaceSlug(slug: string): boolean {
   return (FREE_SPACE_SLUGS as readonly string[]).includes(slug);
+}
+
+/**
+ * F041 — o feed é vitrine: free abre e lê qualquer post que apareça nele.
+ * Só as threads de aula ficam de fora (conteúdo pago, nunca vai ao feed).
+ * Interagir (comentar, reagir) continua sendo paid — gate é outro.
+ */
+export function canFreeReadPost(spaceSlug: string): boolean {
+  return spaceSlug !== AULA_THREADS_SPACE_SLUG;
 }
 
 export function isPaidMembership(

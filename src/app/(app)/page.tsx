@@ -3,11 +3,11 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
 import { listPosts } from "@/lib/posts";
+import { isPaidMembership } from "@/lib/membership/capabilities";
 import {
-  FREE_SPACE_SLUGS,
-  isPaidMembership,
-} from "@/lib/membership/capabilities";
-import { WELCOME_SPACE_SLUG } from "@/lib/spaces/constants";
+  AULA_THREADS_SPACE_SLUG,
+  WELCOME_SPACE_SLUG,
+} from "@/lib/spaces/constants";
 import { FeedList } from "@/components/feed-list";
 import { EmptyState } from "@/components/empty-state";
 
@@ -44,12 +44,10 @@ async function HomeFeed({
   isPaid: boolean;
   isAdmin: boolean;
 }) {
-  const freeFeedSlugs = FREE_SPACE_SLUGS.filter((s) => s !== WELCOME_SPACE_SLUG);
+  // F041: feed é vitrine — free vê a timeline inteira; o cadeado fica no card
+  // (space pago abre modal de upgrade em vez de navegar).
   const { posts } = await listPosts({
-    excludeSpaceSlugs: isPaid
-      ? [WELCOME_SPACE_SLUG, "aula-threads"]
-      : undefined,
-    includeSpaceSlugs: isPaid ? undefined : [...freeFeedSlugs],
+    excludeSpaceSlugs: [WELCOME_SPACE_SLUG, AULA_THREADS_SPACE_SLUG],
     viewerId: userId,
     take: 30,
   });
@@ -61,7 +59,7 @@ async function HomeFeed({
         description={
           isPaid
             ? "Seja o primeiro a compartilhar algo com a comunidade — use o botão Nova publicação."
-            : "Ainda não há publicações nos spaces liberados do plano gratuito."
+            : "Ainda não há publicações na comunidade."
         }
       />
     );
@@ -108,7 +106,8 @@ export default async function HomePage({ searchParams }: Props) {
               </>
             ) : (
               <>
-                Plano gratuito: você vê Geral e Avisos.{" "}
+                Plano gratuito: leitura do feed liberada. Comentar, reagir e os
+                spaces exclusivos são do acesso completo.{" "}
                 <Link
                   href="/?upgrade=1"
                   className="font-medium text-accent hover:underline"
