@@ -106,9 +106,8 @@ export default async function HomePage({ searchParams }: Props) {
               </>
             ) : (
               <>
-                Plano gratuito: leitura do feed liberada — posts marcados{" "}
-                <span className="font-medium text-accent/90">Membros</span> abrem
-                no acesso completo.{" "}
+                Plano gratuito: leitura do feed liberada. Comentar, reagir e os
+                spaces exclusivos são do acesso completo.{" "}
                 <Link
                   href="/?upgrade=1"
                   className="font-medium text-accent hover:underline"

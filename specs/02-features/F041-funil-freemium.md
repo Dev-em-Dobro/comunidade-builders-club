@@ -18,6 +18,8 @@ Conteúdo e interação completos ficam para **paid** (compra Hubla / allowlist)
 ## Free pode (leitura)
 - **Feed completo** — mesma timeline do paid (exclui só `boas-vindas` e
   `aula-threads`, que ficam fora do feed para todos os tiers)
+- **Abrir e ler qualquer post do feed**, inclusive de space pago — post
+  completo, mídia e comentários
 - Spaces: **Boas-vindas**, **Geral**, **Avisos**
 - **Notificações**
 - **Perfil**
@@ -25,24 +27,25 @@ Conteúdo e interação completos ficam para **paid** (compra Hubla / allowlist)
 ### Por que o feed é aberto
 O feed é a vitrine do produto: as vitórias e resultados dos alunos são postados
 em spaces pagos (ex.: **Conquistas**, **Projetos**). Esconder esses posts do free
-tira justamente a prova social que motiva o upgrade. O free **lê o card** no
-feed; o aprofundamento (post completo, comentários, space) exige upgrade.
+tira justamente a prova social que motiva o upgrade. Free **lê**; o que converte
+é **participar** — comentar, reagir, publicar, navegar os spaces.
 
 ## Free não pode (cadeado + popup upgrade)
-- Abrir o **detalhe** de post de space pago (card do feed → modal de upgrade)
-- Outros Spaces, **Materiais**, **Aulas**, **Busca**
+- Outros Spaces (a *página* do space), **Materiais**, **Aulas**, **Busca**
 - Publicar, comentar, reagir, fixar, editar (interações)
 - FAB Nova publicação
+- Threads de aula (`aula-threads`) — conteúdo pago, nunca aparece no feed
 
-## Feed do free — regra do card
-| Post em space | Card no feed | Clique no card |
-|---------------|--------------|----------------|
-| `geral`, `avisos` | normal | abre `/posts/[id]` |
-| demais spaces | normal + selo **Membros** | abre modal de upgrade (`reason: space`) |
+## Leitura de post — regra
+| Space do post | Free abre `/posts/[id]`? |
+|---------------|--------------------------|
+| qualquer space do feed (`geral`, `avisos`, `conquistas`, `projetos`, …) | sim |
+| `aula-threads` | não → `/?upgrade=1` |
 
-Gate de servidor continua valendo: `/posts/[id]` e `/spaces/[slug]` de space pago
-redirecionam free para `/?upgrade=1` (defesa em profundidade — o card só evita a
-navegação inútil).
+No detalhe do post, o link de volta aponta para o space quando free tem acesso a
+ele; caso contrário volta para o **Feed** (evita cair no redirect de upgrade).
+Gate de `/spaces/[slug]` continua igual: space pago redireciona free para
+`/?upgrade=1`.
 
 ## Hubla
 - `conceder` → `tier=paid` + `status=active` + allowlist
@@ -60,4 +63,5 @@ navegação inútil).
 - [x] Gates server + UI
 - [x] Preview only
 - [x] Feed do free lista posts de todos os spaces visíveis
-- [x] Card de space pago no feed do free tem selo e abre modal de upgrade
+- [x] Free abre o detalhe de qualquer post do feed (só `aula-threads` barrado)
+- [x] Interações no post seguem bloqueadas para free

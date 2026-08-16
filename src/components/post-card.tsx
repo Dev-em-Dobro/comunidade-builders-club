@@ -4,12 +4,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { previewFromBody } from "@/lib/posts/title";
 import { MarkdownBody } from "@/lib/markdown";
-import { isFreeSpaceSlug } from "@/lib/membership/capabilities";
 import { OptimizedMediaImage } from "@/components/optimized-media-image";
 import { PostActions } from "@/components/post-actions";
 import { PostMedia } from "@/components/post-media";
 import { PostShareMenu } from "@/components/post-share-menu";
-import { useUpgradeOptional } from "@/components/upgrade-modal";
 
 export type PostCardData = {
   id: string;
@@ -85,13 +83,10 @@ function MetaLine({
   post,
   showSpace,
   pinned,
-  locked = false,
 }: {
   post: PostCardData;
   showSpace: boolean;
   pinned: boolean;
-  /** F041 — post de space pago visto por free (vitrine). */
-  locked?: boolean;
 }) {
   return (
     <p className="mt-0.5 text-sm text-muted">
@@ -105,22 +100,6 @@ function MetaLine({
       {pinned ? (
         <span className="ml-1 rounded-md bg-accent/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-accent">
           Fixado
-        </span>
-      ) : null}
-      {locked ? (
-        <span className="ml-1 inline-flex items-center gap-1 rounded-md bg-surface px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted">
-          <svg
-            viewBox="0 0 24 24"
-            className="h-2.5 w-2.5"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            aria-hidden
-          >
-            <rect x="4" y="11" width="16" height="9" rx="2" />
-            <path d="M8 11V8a4 4 0 0 1 8 0v3" />
-          </svg>
-          Membros
         </span>
       ) : null}
     </p>
@@ -138,7 +117,6 @@ export function PostCard({
   priorityAvatar = false,
 }: PostCardProps) {
   const router = useRouter();
-  const upgrade = useUpgradeOptional();
   const name = post.author.profile?.displayName ?? "Membro";
   const avatarUrl = post.author.profile?.avatarUrl;
   const title =
@@ -152,17 +130,6 @@ export function PostCard({
   const isAuthor = Boolean(currentUserId && authorId === currentUserId);
   const canManage = isAdmin || isAuthor;
   const href = `/posts/${post.id}`;
-  // F041: free lê o card de qualquer space no feed, mas o detalhe é pago.
-  const locked = !isPaid && !isFreeSpaceSlug(post.space.slug);
-
-  /** Abre o post ou, se travado, o modal de upgrade. */
-  function openPost() {
-    if (locked) {
-      // Sem provider (fora do app shell) o /posts/[id] já redireciona pro upgrade.
-      if (upgrade) return upgrade.openUpgrade("space");
-    }
-    router.push(href);
-  }
 
   const actions = (
     <PostActions
@@ -188,11 +155,11 @@ export function PostCard({
         className="post-card animate-[fadeIn_0.35s_ease-out] cursor-pointer p-5 transition-colors hover:bg-surface/40"
         role="link"
         tabIndex={0}
-        onClick={openPost}
+        onClick={() => router.push(href)}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
-            openPost();
+            router.push(href);
           }
         }}
       >
@@ -204,12 +171,7 @@ export function PostCard({
                 <p className="truncate text-[15px] font-semibold text-foreground md:text-base">
                   {name}
                 </p>
-                <MetaLine
-                  post={post}
-                  showSpace={showSpace}
-                  pinned={pinned}
-                  locked={locked}
-                />
+                <MetaLine post={post} showSpace={showSpace} pinned={pinned} />
               </div>
               <PostShareMenu postId={post.id} />
             </div>
@@ -245,9 +207,7 @@ export function PostCard({
                 {post.commentCount}{" "}
                 {post.commentCount === 1 ? "comentário" : "comentários"}
               </span>
-              <span className="ml-auto font-medium text-accent">
-                {locked ? "Desbloquear →" : "Ler →"}
-              </span>
+              <span className="ml-auto font-medium text-accent">Ler →</span>
             </div>
 
             {actions}
@@ -257,95 +217,68 @@ export function PostCard({
     );
   }
 
-  const compactClass =
-    "block cursor-pointer p-5 pb-3 pr-12 transition-colors hover:bg-surface/40";
-
-  const compactBody = (
-    <div className="flex gap-3">
-      <Avatar name={name} url={avatarUrl} priority={priorityAvatar} />
-      <div className="min-w-0 flex-1">
-        <div className="min-w-0">
-          <p className="truncate text-[15px] font-semibold text-foreground md:text-base">
-            {name}
-          </p>
-          <MetaLine
-            post={post}
-            showSpace={showSpace}
-            pinned={pinned}
-            locked={locked}
-          />
-        </div>
-
-        <h2 className="mt-3 font-[family-name:var(--font-outfit)] text-lg font-semibold leading-snug tracking-tight text-foreground">
-          {title}
-        </h2>
-        {preview && preview !== title ? (
-          <p className="mt-1.5 line-clamp-2 text-[15px] leading-relaxed text-muted md:text-base">
-            {preview}
-          </p>
-        ) : null}
-
-        {post.imageUrl ? (
-          <OptimizedMediaImage
-            src={post.imageUrl}
-            variant="feed"
-            priority={priorityMedia}
-            className="mt-3 max-h-40 w-full rounded-xl object-cover"
-          />
-        ) : null}
-        {!post.imageUrl &&
-        post.linkUrl &&
-        !post.linkUrl.startsWith("builders-club://") ? (
-          <p className="mt-2 truncate text-xs font-medium text-accent">
-            {post.linkUrl}
-          </p>
-        ) : null}
-
-        <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-border/70 pt-3 text-sm text-muted">
-          <span>
-            {post.viewCount} {post.viewCount === 1 ? "leitura" : "leituras"}
-          </span>
-          <span>
-            {post.reactionCount}{" "}
-            {post.reactionCount === 1 ? "reação" : "reações"}
-          </span>
-          <span>
-            {post.commentCount}{" "}
-            {post.commentCount === 1 ? "comentário" : "comentários"}
-          </span>
-          <span className="ml-auto font-medium text-accent">
-            {locked ? "Desbloquear →" : "Ler →"}
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-
   return (
     <article className="post-card relative animate-[fadeIn_0.35s_ease-out] p-0">
       <div className="absolute right-3 top-3 z-10">
         <PostShareMenu postId={post.id} />
       </div>
-      {locked ? (
-        <div
-          role="link"
-          tabIndex={0}
-          className={compactClass}
-          onClick={openPost}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              openPost();
-            }
-          }}
-        >
-          {compactBody}
+      <Link
+        href={href}
+        className="block cursor-pointer p-5 pb-3 pr-12 transition-colors hover:bg-surface/40"
+      >
+        <div className="flex gap-3">
+          <Avatar name={name} url={avatarUrl} priority={priorityAvatar} />
+          <div className="min-w-0 flex-1">
+            <div className="min-w-0">
+              <p className="truncate text-[15px] font-semibold text-foreground md:text-base">
+                {name}
+              </p>
+              <MetaLine post={post} showSpace={showSpace} pinned={pinned} />
+            </div>
+
+            <h2 className="mt-3 font-[family-name:var(--font-outfit)] text-lg font-semibold leading-snug tracking-tight text-foreground">
+              {title}
+            </h2>
+            {preview && preview !== title ? (
+              <p className="mt-1.5 line-clamp-2 text-[15px] leading-relaxed text-muted md:text-base">
+                {preview}
+              </p>
+            ) : null}
+
+            {post.imageUrl ? (
+              <OptimizedMediaImage
+                src={post.imageUrl}
+                variant="feed"
+                priority={priorityMedia}
+                className="mt-3 max-h-40 w-full rounded-xl object-cover"
+              />
+            ) : null}
+            {!post.imageUrl &&
+            post.linkUrl &&
+            !post.linkUrl.startsWith("builders-club://") ? (
+              <p className="mt-2 truncate text-xs font-medium text-accent">
+                {post.linkUrl}
+              </p>
+            ) : null}
+
+            <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-border/70 pt-3 text-sm text-muted">
+              <span>
+                {post.viewCount}{" "}
+                {post.viewCount === 1 ? "leitura" : "leituras"}
+              </span>
+              <span>
+                {post.reactionCount}{" "}
+                {post.reactionCount === 1 ? "reação" : "reações"}
+              </span>
+              <span>
+                {post.commentCount}{" "}
+                {post.commentCount === 1 ? "comentário" : "comentários"}
+              </span>
+              <span className="ml-auto font-medium text-accent">Ler →</span>
+            </div>
+          </div>
         </div>
-      ) : (
-        <Link href={href} className={compactClass}>
-          {compactBody}
-        </Link>
-      )}
+      </Link>
       {canManage ? (
         <div className="border-t border-border/60 px-5 py-3">{actions}</div>
       ) : null}

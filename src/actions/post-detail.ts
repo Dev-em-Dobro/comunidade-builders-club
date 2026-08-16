@@ -1,6 +1,10 @@
 "use server";
 
 import { requireActiveMember } from "@/lib/membership/require-member";
+import {
+  canFreeReadPost,
+  isPaidMembership,
+} from "@/lib/membership/capabilities";
 import { getPost, recordPostView } from "@/lib/posts";
 
 function serializeComment(c: {
@@ -61,6 +65,11 @@ export async function getPostDetailAction(
   const member = await requireActiveMember();
   const post = await getPost(postId, { viewerId: member.user.id });
   if (!post) return null;
+
+  // F041: mesma política de leitura da página do post.
+  if (!isPaidMembership(member.membership) && !canFreeReadPost(post.space.slug)) {
+    return null;
+  }
 
   const viewCount =
     (await recordPostView(post.id, member.user.id)) ?? post.viewCount;
