@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
 import {
+  canFreeReadPost,
   isFreeSpaceSlug,
   isPaidMembership,
 } from "@/lib/membership/capabilities";
@@ -30,7 +31,8 @@ export default async function PostPage({ params }: Props) {
   }
 
   const isPaid = isPaidMembership(member.membership);
-  if (!isPaid && !isFreeSpaceSlug(post.space.slug)) {
+  // F041: free lê qualquer post da vitrine (feed). Interagir continua paid.
+  if (!isPaid && !canFreeReadPost(post.space.slug)) {
     redirect("/?upgrade=1");
   }
 
@@ -74,13 +76,16 @@ export default async function PostPage({ params }: Props) {
   const title =
     post.title?.trim() || previewFromBody(post.body, 90) || "Publicação";
 
+  // Free não entra no space pago: o "voltar" leva ao feed, de onde ele veio.
+  const canOpenSpace = isPaid || isFreeSpaceSlug(post.space.slug);
+
   return (
     <div className="feed-wrap">
       <Link
-        href={`/spaces/${post.space.slug}`}
+        href={canOpenSpace ? `/spaces/${post.space.slug}` : "/"}
         className="cursor-pointer text-sm font-medium text-accent hover:underline"
       >
-        ← {post.space.name}
+        ← {canOpenSpace ? post.space.name : "Feed"}
       </Link>
       <div className="mt-4">
         <h1 className="sr-only">{title}</h1>
