@@ -1,7 +1,8 @@
 # F041 — Funil freemium (free vs paid)
 
 ## Status
-Em Preview (homologação) — **não** mergear em `main` até validar.
+**Em produção** desde 16/08/2026 — homologado no Preview com conta free e
+mergeado em `main` (PR #2).
 
 ## Contexto
 Qualquer pessoa pode entrar no Builders Club como **free** (cadastro).
