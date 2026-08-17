@@ -7,8 +7,9 @@ Implementada — 2026-07-31
 Alunos cujo e-mail está na allowlist entram no primeiro login **já com
 membership `active`** — sem aprovação manual.
 
-Fonte da lista: export Orion (`HublaEntitlement` ativo / `purchaseVerifiedAt`)
-ou CSV de compradores Hubla.
+Fonte da lista: export Orion (`HublaEntitlement` ativo / `purchaseVerifiedAt`),
+CSV de compradores Hubla, ou seed DevQuest (`npm run db:seed:devquest`) —
+`source=devquest` e `note` com o `productId` Hubla (oferta distinta do Club).
 
 ## Modelo
 
