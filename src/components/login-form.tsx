@@ -13,6 +13,8 @@ function mensagemErroCallback(code: string | null): string | null {
     INVALID_TOKEN: "Link inválido ou já usado. Solicite um novo.",
     EXPIRED_TOKEN: "Link expirado. Solicite um novo pelo e-mail.",
     TOKEN_EXPIRED: "Link expirado. Solicite um novo pelo e-mail.",
+    INVALID_CALLBACK_URL:
+      "Link de retorno inválido. Abra /login e solicite um novo acesso.",
     oauth: "Não foi possível entrar com Google. Tente de novo.",
   };
   return (
@@ -23,6 +25,9 @@ function mensagemErroCallback(code: string | null): string | null {
 
 export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
   const searchParams = useSearchParams();
+  // Better Auth faz decodeURIComponent de novo no verify: NÃO aninhar
+  // callbackUrl dentro de errorCallbackURL (vira `/login?callbackUrl=/?utm…`
+  // com dois `?` → INVALID_CALLBACK_URL).
   const callbackUrl = safeCallbackPath(searchParams.get("callbackUrl"));
   const erroCallback = useMemo(
     () => mensagemErroCallback(searchParams.get("error")),
@@ -42,7 +47,7 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
       const { error: err } = await authClient.signIn.magicLink({
         email,
         callbackURL: callbackUrl,
-        errorCallbackURL: `/login?callbackUrl=${encodeURIComponent(callbackUrl)}`,
+        errorCallbackURL: "/login?error=magic_link",
       });
       if (err) {
         setError(err.message ?? "Falha ao enviar link.");
@@ -62,7 +67,7 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
     const { error: err } = await authClient.signIn.social({
       provider: "google",
       callbackURL: callbackUrl,
-      errorCallbackURL: `/login?error=oauth&callbackUrl=${encodeURIComponent(callbackUrl)}`,
+      errorCallbackURL: "/login?error=oauth",
     });
     if (err) {
       setError(err.message ?? "Falha ao iniciar login com Google.");
