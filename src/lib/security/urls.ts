@@ -2,6 +2,23 @@
 
 import { z } from "zod";
 
+/**
+ * Regex do Better Auth (`matchesOriginPattern` + allowRelativePaths).
+ * O verify do magic-link faz `decodeURIComponent` de novo: `%5B` passa aqui,
+ * vira `[` e o Better Auth responde INVALID_CALLBACK_URL.
+ */
+const BETTER_AUTH_CALLBACK_OK =
+  /^\/(?!\/|\\|%2f|%5c)[\w\-.\+/@]*(?:\?[\w\-.\+/=&%@]*)?$/i;
+
+function aceitoNoVerifyBetterAuth(url: string): boolean {
+  if (!BETTER_AUTH_CALLBACK_OK.test(url)) return false;
+  try {
+    return BETTER_AUTH_CALLBACK_OK.test(decodeURIComponent(url));
+  } catch {
+    return false;
+  }
+}
+
 /** Path relativo interno: `/foo`, nunca `//evil` ou absoluto. */
 export function safeCallbackPath(raw: string | null | undefined): string {
   if (!raw) return "/";
@@ -12,7 +29,10 @@ export function safeCallbackPath(raw: string | null | undefined): string {
   try {
     const u = new URL(trimmed, "https://callback.invalid");
     if (u.origin !== "https://callback.invalid") return "/";
-    return `${u.pathname}${u.search}${u.hash}` || "/";
+    const valor = `${u.pathname}${u.search}` || "/";
+    if (aceitoNoVerifyBetterAuth(valor)) return valor;
+    const soPath = u.pathname || "/";
+    return aceitoNoVerifyBetterAuth(soPath) ? soPath : "/";
   } catch {
     return "/";
   }

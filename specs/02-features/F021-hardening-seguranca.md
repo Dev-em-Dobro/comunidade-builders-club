@@ -12,7 +12,9 @@ no login, URLs `javascript:` e demotion de admins.
 - [x] Iframe de entregáveis sem `allow-same-origin` + CSP no serve HTML/SVG
 - [x] `HUBLA_PRODUCT_ID` obrigatório; token comparado com `timingSafeEqual`
 - [x] IDs Panda validados (sem host injection)
-- [x] `callbackUrl` só path relativo seguro (`/` interno)
+- [x] `callbackUrl` só path relativo seguro (`/` interno), aceito pelo
+      Better Auth após `decodeURIComponent` no verify (sem `?` aninhado e
+      sem colchetes/`%5B` de UTM)
 - [x] `imageUrl` / `linkUrl` / `videoUrl` / `avatarUrl` só `https:`
 - [x] Admin não altera o próprio papel (demotar outro admin: ver F032, com salvaguardas)
 - [x] Headers de segurança básicos no `next.config`
