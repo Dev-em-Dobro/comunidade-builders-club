@@ -101,6 +101,41 @@ const BUYERS: Array<{
     name: "Mateus Peres da Fonseca",
     email: "mateuspf11@gmail.com",
   },
+  {
+    productId: "5epPnsx4CawYQ1tzFERW",
+    name: "Douglas Gomes Moraes Brito",
+    email: "douglas.gm.brito@gmail.com",
+  },
+  {
+    productId: "8aH4cEEPOG7WyF00GrJ5",
+    name: "Henrique Fialho",
+    email: "ketafialho120@gmail.com",
+  },
+  {
+    productId: "5epPnsx4CawYQ1tzFERW",
+    name: "Tatiana Martins Toledo",
+    email: "tatianamtoledo@hotmail.com",
+  },
+  {
+    productId: "8aH4cEEPOG7WyF00GrJ5",
+    name: "Fabio Rodrigues Martines",
+    email: "f.rodrigues@live.com",
+  },
+  {
+    productId: "5epPnsx4CawYQ1tzFERW",
+    name: "Andrew Lodi",
+    email: "andrew.lodi@hotmail.com",
+  },
+  {
+    productId: "5epPnsx4CawYQ1tzFERW",
+    name: "Rafael Vicente Santrovitsch",
+    email: "rafaelvs1999@outlook.com",
+  },
+  {
+    productId: "5epPnsx4CawYQ1tzFERW",
+    name: "Thales Arduim",
+    email: "thalesarduim@gmail.com",
+  },
 ];
 
 function resolveUrl(target: Target): string {
