@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useRef, useState, useTransition } from "react";
+import { useRef, useState, useTransition, type ReactNode } from "react";
 import { toggleReactionAction, createCommentAction } from "@/actions/engagement";
 import {
   deletePostAction,
@@ -476,21 +476,22 @@ export function DeleteCommentButton({
   );
 }
 
-/** F045 — corpo do comentário com edição inline (autor ou admin). */
+/** F045 — corpo do comentário; edição controlada pelo pai (botão ao lado de Remover). */
 export function EditableCommentBody({
   commentId,
   postId,
   body,
-  canEdit,
+  editing,
+  onEditingChange,
 }: {
   commentId: string;
   postId: string;
   body: string;
-  canEdit: boolean;
+  editing: boolean;
+  onEditingChange: (editing: boolean) => void;
 }) {
   const router = useRouter();
   const [pending, start] = useTransition();
-  const [editing, setEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   if (editing) {
@@ -504,7 +505,7 @@ export function EditableCommentBody({
               fd.set("commentId", commentId);
               fd.set("postId", postId);
               await updateCommentAction(fd);
-              setEditing(false);
+              onEditingChange(false);
               router.refresh();
             } catch (e) {
               setError(e instanceof Error ? e.message : "Falha ao salvar.");
@@ -536,7 +537,10 @@ export function EditableCommentBody({
             type="button"
             className="btn-ghost cursor-pointer text-xs"
             disabled={pending}
-            onClick={() => setEditing(false)}
+            onClick={() => {
+              setError(null);
+              onEditingChange(false);
+            }}
           >
             Cancelar
           </button>
@@ -546,25 +550,83 @@ export function EditableCommentBody({
   }
 
   return (
-    <>
-      <div className="mt-1.5 text-sm leading-relaxed">
-        <MarkdownBody
-          body={body}
-          className="space-y-1 text-sm leading-relaxed [&_p]:my-0"
-        />
+    <div className="mt-1.5 text-sm leading-relaxed">
+      <MarkdownBody
+        body={body}
+        className="space-y-1 text-sm leading-relaxed [&_p]:my-0"
+      />
+    </div>
+  );
+}
+
+export function EditCommentButton({
+  onClick,
+}: {
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      className="cursor-pointer text-xs text-accent hover:underline"
+      onClick={onClick}
+    >
+      Editar
+    </button>
+  );
+}
+
+/** Card de comentário com Editar ao lado de Remover (posts e aulas). */
+export function CommentCard({
+  commentId,
+  postId,
+  authorName,
+  body,
+  createdAtLabel,
+  canEdit,
+  isAdmin,
+  nested = false,
+  replySlot,
+}: {
+  commentId: string;
+  postId: string;
+  authorName: string;
+  body: string;
+  createdAtLabel: string;
+  canEdit: boolean;
+  isAdmin: boolean;
+  nested?: boolean;
+  replySlot?: ReactNode;
+}) {
+  const [editing, setEditing] = useState(false);
+
+  return (
+    <div
+      className={`post-card !p-4 ${nested ? "ml-6 !bg-surface/40" : ""}`}
+    >
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium">{authorName}</p>
+          <EditableCommentBody
+            commentId={commentId}
+            postId={postId}
+            body={body}
+            editing={editing}
+            onEditingChange={setEditing}
+          />
+          <p className="mt-2 text-xs text-muted">{createdAtLabel}</p>
+          {replySlot}
+        </div>
+        {canEdit || isAdmin ? (
+          <div className="flex shrink-0 items-center gap-3">
+            {canEdit && !editing ? (
+              <EditCommentButton onClick={() => setEditing(true)} />
+            ) : null}
+            {isAdmin ? (
+              <DeleteCommentButton commentId={commentId} postId={postId} />
+            ) : null}
+          </div>
+        ) : null}
       </div>
-      {canEdit ? (
-        <button
-          type="button"
-          className="mt-2 cursor-pointer text-xs font-medium text-accent hover:underline"
-          onClick={() => {
-            setEditing(true);
-            setError(null);
-          }}
-        >
-          Editar
-        </button>
-      ) : null}
-    </>
+    </div>
   );
 }

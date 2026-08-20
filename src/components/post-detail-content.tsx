@@ -1,9 +1,8 @@
 "use client";
 
 import {
+  CommentCard,
   CommentForm,
-  DeleteCommentButton,
-  EditableCommentBody,
   PostActions,
   ReplyToggle,
 } from "@/components/post-actions";
@@ -40,32 +39,27 @@ function CommentBlock({
   );
 
   return (
-    <li className={`post-card !p-4 ${nested ? "ml-6 !bg-surface/40" : ""}`}>
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium">{comment.authorName}</p>
-          <EditableCommentBody
-            commentId={comment.id}
-            postId={postId}
-            body={comment.body}
-            canEdit={canEdit}
-          />
-          <p className="mt-2 text-xs text-muted">
-            {new Date(comment.createdAt).toLocaleString("pt-BR")}
-          </p>
-          {!nested ? (
+    <li>
+      <CommentCard
+        commentId={comment.id}
+        postId={postId}
+        authorName={comment.authorName}
+        body={comment.body}
+        createdAtLabel={new Date(comment.createdAt).toLocaleString("pt-BR")}
+        canEdit={canEdit}
+        isAdmin={isAdmin}
+        nested={nested}
+        replySlot={
+          !nested ? (
             <ReplyToggle
               postId={postId}
               parentId={comment.id}
               isPaid={isPaid}
               onDone={onCommentDone}
             />
-          ) : null}
-        </div>
-        {isAdmin ? (
-          <DeleteCommentButton commentId={comment.id} postId={postId} />
-        ) : null}
-      </div>
+          ) : null
+        }
+      />
       {replies && replies.length > 0 ? (
         <ul className="mt-3 space-y-2">
           {replies.map((r) => (
