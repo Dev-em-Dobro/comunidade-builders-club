@@ -1,12 +1,17 @@
 /**
  * F012 — Allowlist de compradores DevQuest (produto distinto do Builders Club).
  *
- *   npm run db:seed:devquest -- --target=hml
- *   npm run db:seed:devquest -- --target=prod --confirm
- *   npm run db:seed:devquest -- --target=hml,prod --confirm
+ * Adicionar compradores (sem alterar código / sem commit):
+ *
+ *   npm run db:seed:devquest -- --target=hml,prod --confirm \
+ *     --email=aluno@exemplo.com,outro@exemplo.com \
+ *     --product-id=0A91153455A
+ *
+ *   npm run db:seed:devquest -- --target=prod --confirm \
+ *     --email=aluno@exemplo.com --name="Nome Completo" --product-id=5epPnsx4CawYQ1tzFERW
  *
  * source = "devquest"
- * note   = "productId=<id Hubla>; name=<nome>"
+ * note   = "productId=<id Hubla/TMB>; name=<nome>"
  */
 import { config } from "dotenv";
 import { PrismaClient } from "@prisma/client";
@@ -20,139 +25,13 @@ config({ path: resolve(root, ".env.local"), override: true });
 type Target = "local" | "hml" | "prod";
 
 const SOURCE = "devquest";
+const DEFAULT_PRODUCT_ID = "5epPnsx4CawYQ1tzFERW";
 
-const BUYERS: Array<{
+type Buyer = {
   productId: string;
   name: string;
   email: string;
-}> = [
-  {
-    productId: "8aH4cEEPOG7WyF00GrJ5",
-    name: "Ygor Andrade Langendorf",
-    email: "frodnegnalrogy@gmail.com",
-  },
-  {
-    productId: "5epPnsx4CawYQ1tzFERW",
-    name: "Vinicius Henrique Gazzin Fernandes",
-    email: "viniciusgazzin@outlook.com",
-  },
-  {
-    productId: "5epPnsx4CawYQ1tzFERW",
-    name: "Pablo Da Silva Dutra",
-    email: "pablodutrad@gmail.com",
-  },
-  {
-    productId: "8aH4cEEPOG7WyF00GrJ5",
-    name: "Daniel Vilasboas Magalhães Santos",
-    email: "vmsdaniel@hotmail.com",
-  },
-  {
-    productId: "5epPnsx4CawYQ1tzFERW",
-    name: "Odlaor Arthur Augusto Almeida",
-    email: "odlaor.augusto@gmail.com",
-  },
-  {
-    productId: "5epPnsx4CawYQ1tzFERW",
-    name: "Augusto Cezar de Boni",
-    email: "gutoboni1@gmail.com",
-  },
-  {
-    productId: "5epPnsx4CawYQ1tzFERW",
-    name: "Pedro Henrique de Oliveira",
-    email: "pedro.henrique.d3v@gmail.com",
-  },
-  {
-    productId: "5epPnsx4CawYQ1tzFERW",
-    name: "Luciano José Rodrigues socolowski",
-    email: "luciano.1705@hotmail.com",
-  },
-  {
-    productId: "5epPnsx4CawYQ1tzFERW",
-    name: "Gyldson Rosa Fonseca",
-    email: "gyldson14@gmail.com",
-  },
-  {
-    productId: "5epPnsx4CawYQ1tzFERW",
-    name: "Carlos Alberto Tavares Sagrado",
-    email: "eldersagrado@gmail.com",
-  },
-  {
-    productId: "8aH4cEEPOG7WyF00GrJ5",
-    name: "Júlio Takeichi Carniello Murashima",
-    email: "juliotakeichi@outlook.com",
-  },
-  {
-    productId: "5epPnsx4CawYQ1tzFERW",
-    name: "Matheus Ruis Dias Milan de Souza",
-    email: "matheus.rdms@gmail.com",
-  },
-  {
-    productId: "5epPnsx4CawYQ1tzFERW",
-    name: "DANWESLEY DA SILVA KUKLA",
-    email: "danwesleykukla@gmail.com",
-  },
-  {
-    productId: "sgQzHMY32n6txMSFcVMg",
-    name: "FRANCYANE RODRIGUES DOS SANTOS",
-    email: "1993francy@gmail.com",
-  },
-  {
-    productId: "5epPnsx4CawYQ1tzFERW",
-    name: "Mateus Peres da Fonseca",
-    email: "mateuspf11@gmail.com",
-  },
-  {
-    productId: "5epPnsx4CawYQ1tzFERW",
-    name: "Douglas Gomes Moraes Brito",
-    email: "douglas.gm.brito@gmail.com",
-  },
-  {
-    productId: "8aH4cEEPOG7WyF00GrJ5",
-    name: "Henrique Fialho",
-    email: "ketafialho120@gmail.com",
-  },
-  {
-    productId: "5epPnsx4CawYQ1tzFERW",
-    name: "Tatiana Martins Toledo",
-    email: "tatianamtoledo@hotmail.com",
-  },
-  {
-    productId: "8aH4cEEPOG7WyF00GrJ5",
-    name: "Fabio Rodrigues Martines",
-    email: "f.rodrigues@live.com",
-  },
-  {
-    productId: "5epPnsx4CawYQ1tzFERW",
-    name: "Andrew Lodi",
-    email: "andrew.lodi@hotmail.com",
-  },
-  {
-    productId: "5epPnsx4CawYQ1tzFERW",
-    name: "Rafael Vicente Santrovitsch",
-    email: "rafaelvs1999@outlook.com",
-  },
-  {
-    productId: "5epPnsx4CawYQ1tzFERW",
-    name: "Thales Arduim",
-    email: "thalesarduim@gmail.com",
-  },
-  // TMB boleto parcelado (oferta 0A91153455A) — source continua devquest.
-  {
-    productId: "0A91153455A",
-    name: "Anderson Oliveira",
-    email: "anderson_oliveira2306@hotmail.com",
-  },
-  {
-    productId: "0A91153455A",
-    name: "Lucas",
-    email: "lcszero44@gmail.com",
-  },
-  {
-    productId: "0A91153455A",
-    name: "Lucas Jose",
-    email: "lucassjose28@gmail.com",
-  },
-];
+};
 
 function resolveUrl(target: Target): string {
   const map: Record<Target, string | undefined> = {
@@ -185,7 +64,56 @@ function parseTargets(argv: string[]): Target[] {
   return parts;
 }
 
-async function seedTarget(target: Target) {
+function parseArg(argv: string[], key: string): string | undefined {
+  const prefix = `${key}=`;
+  const hit = argv.find((a) => a.startsWith(prefix));
+  return hit?.slice(prefix.length).trim() || undefined;
+}
+
+function splitCsv(raw: string): string[] {
+  return raw
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
+function nameFromEmail(email: string): string {
+  const local = email.split("@")[0] ?? email;
+  return local
+    .replace(/[._+-]+/g, " ")
+    .replace(/\d+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .split(" ")
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+}
+
+function parseBuyers(argv: string[]): Buyer[] {
+  const emailsRaw = parseArg(argv, "--email");
+  if (!emailsRaw) {
+    throw new Error(
+      "Use --email=um@exemplo.com,outro@exemplo.com (lista separada por vírgula)",
+    );
+  }
+
+  const productId = parseArg(argv, "--product-id") ?? DEFAULT_PRODUCT_ID;
+  const names = splitCsv(parseArg(argv, "--name") ?? "");
+  const emails = splitCsv(emailsRaw);
+
+  if (emails.length === 0) {
+    throw new Error("--email não pode ser vazio");
+  }
+
+  return emails.map((email, index) => ({
+    productId,
+    email: email.toLowerCase(),
+    name: names[index]?.trim() || nameFromEmail(email),
+  }));
+}
+
+async function seedTarget(target: Target, buyers: Buyer[]) {
   const dbUrl = resolveUrl(target);
   console.log(`\n→ ${target}: ${maskUrl(dbUrl)}`);
 
@@ -196,7 +124,7 @@ async function seedTarget(target: Target) {
     let promoted = 0;
     let skippedRevoked = 0;
 
-    for (const buyer of BUYERS) {
+    for (const buyer of buyers) {
       const email = buyer.email.trim().toLowerCase();
       const note = `productId=${buyer.productId}; name=${buyer.name}`;
       const before = await prisma.allowedEmail.findUnique({ where: { email } });
@@ -233,7 +161,7 @@ async function seedTarget(target: Target) {
     }
 
     console.log(
-      `${target}: ${BUYERS.length} compradores · ${created} novos · ${updated} atualizados · ${promoted} memberships promovidos · ${skippedRevoked} revoked ignorados`,
+      `${target}: ${buyers.length} compradores · ${created} novos · ${updated} atualizados · ${promoted} memberships promovidos · ${skippedRevoked} revoked ignorados`,
     );
   } finally {
     await prisma.$disconnect();
@@ -243,11 +171,18 @@ async function seedTarget(target: Target) {
 async function main() {
   const argv = process.argv.slice(2);
   const targets = parseTargets(argv);
+  const buyers = parseBuyers(argv);
+
   if (targets.includes("prod") && !argv.includes("--confirm")) {
     throw new Error("Produção exige --confirm");
   }
+
+  for (const buyer of buyers) {
+    console.log(`· ${buyer.email} (${buyer.name}) · productId=${buyer.productId}`);
+  }
+
   for (const target of targets) {
-    await seedTarget(target);
+    await seedTarget(target, buyers);
   }
 }
 
