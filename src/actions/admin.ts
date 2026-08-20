@@ -28,6 +28,8 @@ import {
   moduleSchema,
   updateLesson,
   updateModule,
+  moveLesson,
+  moveModule,
 } from "@/lib/aulas";
 
 function bustSpacesCache() {
@@ -92,7 +94,7 @@ export async function setMemberRoleAction(userId: string, role: Role) {
 export async function addAllowedEmailAction(formData: FormData) {
   await requireAdmin();
   const email = String(formData.get("email") ?? "");
-  await addAllowedEmail({ email, source: "admin" });
+  await addAllowedEmail({ email, source: "manual" });
 
   const user = await prisma.user.findUnique({
     where: { email: email.trim().toLowerCase() },
@@ -212,5 +214,23 @@ export async function updateLessonAction(id: string, formData: FormData) {
 export async function deleteLessonAction(id: string) {
   await requireAdmin();
   await deleteLesson(id);
+  bustAulasCache();
+}
+
+export async function moveModuleAction(
+  id: string,
+  direction: "up" | "down",
+) {
+  await requireAdmin();
+  await moveModule(id, direction);
+  bustAulasCache();
+}
+
+export async function moveLessonAction(
+  id: string,
+  direction: "up" | "down",
+) {
+  await requireAdmin();
+  await moveLesson(id, direction);
   bustAulasCache();
 }

@@ -10,6 +10,7 @@ import { getPost, recordPostView } from "@/lib/posts";
 function serializeComment(c: {
   id: string;
   body: string;
+  authorId: string;
   createdAt: Date;
   author: {
     profile: { displayName: string; avatarUrl: string | null } | null;
@@ -17,6 +18,7 @@ function serializeComment(c: {
   replies?: Array<{
     id: string;
     body: string;
+    authorId: string;
     createdAt: Date;
     author: {
       profile: { displayName: string; avatarUrl: string | null } | null;
@@ -26,12 +28,14 @@ function serializeComment(c: {
   return {
     id: c.id,
     body: c.body,
+    authorId: c.authorId,
     createdAt: c.createdAt.toISOString(),
     authorName: c.author.profile?.displayName ?? "Membro",
     avatarUrl: c.author.profile?.avatarUrl ?? null,
     replies: (c.replies ?? []).map((r) => ({
       id: r.id,
       body: r.body,
+      authorId: r.authorId,
       createdAt: r.createdAt.toISOString(),
       authorName: r.author.profile?.displayName ?? "Membro",
       avatarUrl: r.author.profile?.avatarUrl ?? null,

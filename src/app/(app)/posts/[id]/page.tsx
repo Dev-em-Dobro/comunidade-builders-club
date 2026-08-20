@@ -60,12 +60,14 @@ export default async function PostPage({ params }: Props) {
     comments: post.comments.map((c) => ({
       id: c.id,
       body: c.body,
+      authorId: c.authorId,
       createdAt: c.createdAt.toISOString(),
       authorName: c.author.profile?.displayName ?? "Membro",
       avatarUrl: c.author.profile?.avatarUrl ?? null,
       replies: c.replies.map((r) => ({
         id: r.id,
         body: r.body,
+        authorId: r.authorId,
         createdAt: r.createdAt.toISOString(),
         authorName: r.author.profile?.displayName ?? "Membro",
         avatarUrl: r.author.profile?.avatarUrl ?? null,
@@ -89,7 +91,13 @@ export default async function PostPage({ params }: Props) {
       </Link>
       <div className="mt-4">
         <h1 className="sr-only">{title}</h1>
-        <PostDetailContent post={dto} isAdmin={isAdmin} isAuthor={isAuthor} isPaid={isPaid} />
+        <PostDetailContent
+          post={dto}
+          isAdmin={isAdmin}
+          isAuthor={isAuthor}
+          isPaid={isPaid}
+          currentUserId={member.user.id}
+        />
       </div>
     </div>
   );

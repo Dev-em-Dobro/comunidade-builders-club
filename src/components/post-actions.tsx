@@ -8,10 +8,14 @@ import {
   togglePinAction,
   updatePostAction,
 } from "@/actions/posts";
-import { deleteCommentAction } from "@/actions/engagement";
+import {
+  deleteCommentAction,
+  updateCommentAction,
+} from "@/actions/engagement";
 import { MentionTextarea } from "@/components/mention-textarea";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { useUpgradeOptional } from "@/components/upgrade-modal";
+import { MarkdownBody } from "@/lib/markdown";
 import { UPGRADE_REQUIRED } from "@/lib/membership/errors";
 
 const MEDIA_ACCEPT =
@@ -468,6 +472,99 @@ export function DeleteCommentButton({
           })
         }
       />
+    </>
+  );
+}
+
+/** F045 — corpo do comentário com edição inline (autor ou admin). */
+export function EditableCommentBody({
+  commentId,
+  postId,
+  body,
+  canEdit,
+}: {
+  commentId: string;
+  postId: string;
+  body: string;
+  canEdit: boolean;
+}) {
+  const router = useRouter();
+  const [pending, start] = useTransition();
+  const [editing, setEditing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  if (editing) {
+    return (
+      <form
+        className="mt-1.5 space-y-2"
+        action={(fd) => {
+          setError(null);
+          start(async () => {
+            try {
+              fd.set("commentId", commentId);
+              fd.set("postId", postId);
+              await updateCommentAction(fd);
+              setEditing(false);
+              router.refresh();
+            } catch (e) {
+              setError(e instanceof Error ? e.message : "Falha ao salvar.");
+            }
+          });
+        }}
+      >
+        <MentionTextarea
+          name="body"
+          className="input min-h-20"
+          defaultValue={body}
+          required
+          maxLength={5000}
+        />
+        {error ? (
+          <p className="text-sm text-red-600" role="alert">
+            {error}
+          </p>
+        ) : null}
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="submit"
+            className="btn-primary cursor-pointer text-xs"
+            disabled={pending}
+          >
+            {pending ? "Salvando…" : "Salvar"}
+          </button>
+          <button
+            type="button"
+            className="btn-ghost cursor-pointer text-xs"
+            disabled={pending}
+            onClick={() => setEditing(false)}
+          >
+            Cancelar
+          </button>
+        </div>
+      </form>
+    );
+  }
+
+  return (
+    <>
+      <div className="mt-1.5 text-sm leading-relaxed">
+        <MarkdownBody
+          body={body}
+          className="space-y-1 text-sm leading-relaxed [&_p]:my-0"
+        />
+      </div>
+      {canEdit ? (
+        <button
+          type="button"
+          className="mt-2 cursor-pointer text-xs font-medium text-accent hover:underline"
+          onClick={() => {
+            setEditing(true);
+            setError(null);
+          }}
+        >
+          Editar
+        </button>
+      ) : null}
     </>
   );
 }

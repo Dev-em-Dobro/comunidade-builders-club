@@ -1,12 +1,14 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireActiveMember, requireAdmin, requirePaidMember } from "@/lib/membership/require-member";
+import { requireAdmin, requirePaidMember } from "@/lib/membership/require-member";
 import {
   createComment,
   createCommentSchema,
   deleteComment,
   togglePostReaction,
+  updateComment,
+  updateCommentSchema,
 } from "@/lib/engagement";
 
 export async function createCommentAction(formData: FormData) {
@@ -21,6 +23,18 @@ export async function createCommentAction(formData: FormData) {
   await createComment(user.id, raw);
   revalidatePath(`/posts/${raw.postId}`);
   revalidatePath("/");
+  revalidatePath("/aulas", "layout");
+}
+
+export async function updateCommentAction(formData: FormData) {
+  const { user, membership } = await requirePaidMember();
+  const commentId = String(formData.get("commentId") ?? "");
+  const postId = String(formData.get("postId") ?? "");
+  const raw = { body: String(formData.get("body") ?? "") };
+  updateCommentSchema.parse(raw);
+  const isAdmin = membership.role === "admin";
+  await updateComment(commentId, user.id, isAdmin, raw);
+  revalidatePath(`/posts/${postId}`);
   revalidatePath("/aulas", "layout");
 }
 

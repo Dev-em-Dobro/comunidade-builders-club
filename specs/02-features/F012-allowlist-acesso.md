@@ -30,3 +30,4 @@ CSV de compradores Hubla, ou seed DevQuest (`npm run db:seed:devquest`) —
 - [x] `revoked` não é revertido pela allowlist
 - [x] Script importa CSV e/ou banco Orion (`ORION_DATABASE_URL`)
 - [x] Admin pode adicionar e-mail à allowlist
+- [x] Rótulo de `source` amigável na UI (F044) — não exibir `(admin)` cru
