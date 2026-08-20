@@ -6,6 +6,7 @@ import {
 } from "@/lib/membership/capabilities";
 import { getSpaceBySlug } from "@/lib/spaces";
 import { listPosts } from "@/lib/posts";
+import { markWelcomeSeen } from "@/lib/profile";
 import { WELCOME_SPACE_SLUG } from "@/lib/spaces/constants";
 import { FeedList } from "@/components/feed-list";
 import { WelcomeSpaceView } from "@/components/welcome-space-view";
@@ -24,6 +25,10 @@ export default async function SpacePage({ params }: Props) {
   const isPaid = isPaidMembership(member.membership);
   if (!isPaid && !isFreeSpaceSlug(slug)) {
     redirect("/?upgrade=1");
+  }
+
+  if (slug === WELCOME_SPACE_SLUG && !member.profile.welcomeSeenAt) {
+    await markWelcomeSeen(member.user.id);
   }
 
   const { posts } = await listPosts({
