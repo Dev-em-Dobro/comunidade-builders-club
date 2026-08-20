@@ -47,18 +47,31 @@ As chaves `DATABASE_URL_HML` / `DATABASE_URL_PROD` / `ORION_DATABASE_URL` são s
 | `BOOTSTRAP_ADMIN_EMAIL` | seu e-mail admin                       | mesmo ou de teste                              | seu e-mail              |
 | `HUBLA_WEBHOOK_TOKEN`   | token do webhook Hubla                 | mesmo ou dedicado de staging                   | obrigatório p/ webhook  |
 | `HUBLA_PRODUCT_ID`      | ID produto Builders Club (**obrigatório** no webhook) | mesmo                               | obrigatório p/ webhook  |
+| `TMB_WEBHOOK_TOKEN`     | Valor do webhook TMB (Mentoria)        | mesmo ou dedicado de staging                   | obrigatório p/ webhook TMB |
+| `TMB_WEBHOOK_HEADER`    | Chave do header (default `x-tmb-token`)| mesmo                                          | opcional                |
 
 
 ### Hubla (F014)
 
 Na Hubla, configure o webhook apontando para:
 
-- Prod: `https://builders-club.devemdobro.com/api/webhooks/hubla`
-- Staging: `https://staging.builders-club.devemdobro.com/api/webhooks/hubla`
+- Prod: `https://comunidade-builders-club.devemdobro.com/api/webhooks/hubla`
+- Staging: `https://staging.…/api/webhooks/hubla` (se existir)
 
 Header esperado: `x-hubla-token` = valor de `HUBLA_WEBHOOK_TOKEN`.
 
 Sem `HUBLA_PRODUCT_ID` o endpoint responde **503** (não processa eventos de outros produtos).
+
+### TMB Mentoria Freela (F047)
+
+Na TMB (Vendas → Webhook):
+
+- URL prod: `https://comunidade-builders-club.devemdobro.com/api/webhooks/tmb`
+- **Chave:** `x-tmb-token` (ou o valor de `TMB_WEBHOOK_HEADER`)
+- **Valor:** = `TMB_WEBHOOK_TOKEN` na Vercel
+
+Codes liberados por default: `1AS249898VN`, `3XB272209KV`, `9DW254247E5`.
+DevQuest continua via seed sazonal (não passa neste webhook).
 
 
 ### E-mail (Resend) — Production + Preview
