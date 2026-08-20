@@ -22,3 +22,11 @@ export async function updateProfile(
     },
   });
 }
+
+/** F048 — marca que o membro já passou por Boas-vindas. */
+export async function markWelcomeSeen(userId: string): Promise<void> {
+  await prisma.profile.updateMany({
+    where: { userId, welcomeSeenAt: null },
+    data: { welcomeSeenAt: new Date() },
+  });
+}

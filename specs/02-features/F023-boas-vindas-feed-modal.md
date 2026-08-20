@@ -17,6 +17,7 @@ com toggle entre visão reduzida (atual) e expandida.
 - [x] No modal: “Expandir” abre o post na área de conteúdo (rota `/posts/[id]`, ao lado do aside)
 - [x] Visão expandida do Feed mostra body (Markdown) + ações de reação no card
 - [x] Preferência de vista do Feed persistida em `localStorage`
+- [x] Primeiro acesso ao feed → Boas-vindas (F048)
 
 ## Fora de escopo
 - Dark theme estilo Circle

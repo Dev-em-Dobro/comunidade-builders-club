@@ -82,6 +82,11 @@ async function HomeFeed({
 export default async function HomePage({ searchParams }: Props) {
   const member = await requireActiveMemberOrRedirect();
 
+  // F048 — primeiro acesso: onboarding em Boas-vindas (não o feed).
+  if (!member.profile.welcomeSeenAt) {
+    redirect(`/spaces/${WELCOME_SPACE_SLUG}`);
+  }
+
   const { error } = await searchParams;
   if (error) redirect("/");
 

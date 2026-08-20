@@ -120,14 +120,16 @@ enum NotificationType {
 }
 
 model Profile {
-  id          String   @id @default(cuid())
-  userId      String   @unique
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  displayName String
-  bio         String?
-  avatarUrl   String?
-  joinedAt    DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id             String    @id @default(cuid())
+  userId         String    @unique
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  displayName    String
+  bio            String?
+  avatarUrl      String?
+  /// F048 — null = ainda não viu Boas-vindas (redirect no 1º acesso ao feed).
+  welcomeSeenAt  DateTime? @map("welcome_seen_at")
+  joinedAt       DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   @@map("profile")
 }
