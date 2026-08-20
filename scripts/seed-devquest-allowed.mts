@@ -136,6 +136,22 @@ const BUYERS: Array<{
     name: "Thales Arduim",
     email: "thalesarduim@gmail.com",
   },
+  // TMB boleto parcelado (oferta 0A91153455A) — source continua devquest.
+  {
+    productId: "0A91153455A",
+    name: "Anderson Oliveira",
+    email: "anderson_oliveira2306@hotmail.com",
+  },
+  {
+    productId: "0A91153455A",
+    name: "Lucas",
+    email: "lcszero44@gmail.com",
+  },
+  {
+    productId: "0A91153455A",
+    name: "Lucas Jose",
+    email: "lucassjose28@gmail.com",
+  },
 ];
 
 function resolveUrl(target: Target): string {
