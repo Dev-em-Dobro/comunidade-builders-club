@@ -157,6 +157,12 @@ export default async function LessonPage({ params }: Props) {
                                   canEdit={canEditReply}
                                   isAdmin={isAdmin}
                                   nested
+                                  replySlot={
+                                    <ReplyToggle
+                                      postId={discussion.id}
+                                      parentId={r.id}
+                                    />
+                                  }
                                 />
                               </li>
                             );

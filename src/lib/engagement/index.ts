@@ -28,7 +28,9 @@ export async function createComment(
     );
   }
 
-  let parentAuthorId: string | null = null;
+  let threadParentId: string | null = data.parentId || null;
+  let replyTargetAuthorId: string | null = null;
+
   if (data.parentId) {
     const parent = await prisma.comment.findUnique({
       where: { id: data.parentId },
@@ -36,10 +38,14 @@ export async function createComment(
     if (!parent || parent.postId !== data.postId) {
       throw new Error("Comentário pai inválido.");
     }
+    // F006 — UI 1 nível: responder a uma resposta entra no mesmo fio (raiz).
     if (parent.parentId) {
-      throw new Error("Só é permitido um nível de resposta.");
+      threadParentId = parent.parentId;
+      replyTargetAuthorId = parent.authorId;
+    } else {
+      threadParentId = parent.id;
+      replyTargetAuthorId = parent.authorId;
     }
-    parentAuthorId = parent.authorId;
   }
 
   const comment = await prisma.$transaction(async (tx) => {
@@ -48,7 +54,7 @@ export async function createComment(
         postId: data.postId,
         authorId,
         body: data.body,
-        parentId: data.parentId || null,
+        parentId: threadParentId,
       },
       include: { author: { include: { profile: true } } },
     });
@@ -59,9 +65,13 @@ export async function createComment(
     return c;
   });
 
-  if (data.parentId && parentAuthorId && parentAuthorId !== authorId) {
+  if (
+    threadParentId &&
+    replyTargetAuthorId &&
+    replyTargetAuthorId !== authorId
+  ) {
     await createNotification({
-      recipientId: parentAuthorId,
+      recipientId: replyTargetAuthorId,
       actorId: authorId,
       type: "reply_on_comment",
       postId: post.id,
@@ -81,7 +91,9 @@ export async function createComment(
 
   const mentioned = await resolveMentionedUserIds(data.body, authorId);
   const skip = new Set(
-    [authorId, post.authorId, parentAuthorId].filter(Boolean) as string[],
+    [authorId, post.authorId, replyTargetAuthorId].filter(
+      Boolean,
+    ) as string[],
   );
   await notifyMany(
     mentioned.filter((id) => !skip.has(id)),
