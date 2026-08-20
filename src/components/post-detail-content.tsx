@@ -51,14 +51,12 @@ function CommentBlock({
         isAdmin={isAdmin}
         nested={nested}
         replySlot={
-          !nested ? (
-            <ReplyToggle
-              postId={postId}
-              parentId={comment.id}
-              isPaid={isPaid}
-              onDone={onCommentDone}
-            />
-          ) : null
+          <ReplyToggle
+            postId={postId}
+            parentId={comment.id}
+            isPaid={isPaid}
+            onDone={onCommentDone}
+          />
         }
       />
       {replies && replies.length > 0 ? (
