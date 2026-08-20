@@ -10,9 +10,8 @@ import {
 import { getPost } from "@/lib/posts";
 import { MarkLessonCompleteButton } from "@/components/mark-lesson-complete-button";
 import {
+  CommentCard,
   CommentForm,
-  DeleteCommentButton,
-  EditableCommentBody,
   ReplyToggle,
 } from "@/components/post-actions";
 import { EmptyState } from "@/components/empty-state";
@@ -120,68 +119,51 @@ export default async function LessonPage({ params }: Props) {
                   const canEdit =
                     isAdmin || c.authorId === member.user.id;
                   return (
-                  <li key={c.id} className="post-card !p-4">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium">
-                          {c.author.profile?.displayName ?? "Membro"}
-                        </p>
-                        <EditableCommentBody
-                          commentId={c.id}
-                          postId={discussion.id}
-                          body={c.body}
-                          canEdit={canEdit}
-                        />
-                        <p className="mt-2 text-xs text-muted">
-                          {c.createdAt.toLocaleString("pt-BR")}
-                        </p>
-                        <ReplyToggle postId={discussion.id} parentId={c.id} />
-                      </div>
-                      {isAdmin ? (
-                        <DeleteCommentButton
-                          commentId={c.id}
-                          postId={discussion.id}
-                        />
-                      ) : null}
-                    </div>
-                    {c.replies.length > 0 ? (
-                      <ul className="mt-3 space-y-2">
-                        {c.replies.map((r) => {
-                          const canEditReply =
-                            isAdmin || r.authorId === member.user.id;
-                          return (
-                          <li
-                            key={r.id}
-                            className="post-card ml-6 !bg-surface/40 !p-4"
-                          >
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="min-w-0 flex-1">
-                                <p className="text-sm font-medium">
-                                  {r.author.profile?.displayName ?? "Membro"}
-                                </p>
-                                <EditableCommentBody
+                    <li key={c.id}>
+                      <CommentCard
+                        commentId={c.id}
+                        postId={discussion.id}
+                        authorName={
+                          c.author.profile?.displayName ?? "Membro"
+                        }
+                        body={c.body}
+                        createdAtLabel={c.createdAt.toLocaleString("pt-BR")}
+                        canEdit={canEdit}
+                        isAdmin={isAdmin}
+                        replySlot={
+                          <ReplyToggle
+                            postId={discussion.id}
+                            parentId={c.id}
+                          />
+                        }
+                      />
+                      {c.replies.length > 0 ? (
+                        <ul className="mt-3 space-y-2">
+                          {c.replies.map((r) => {
+                            const canEditReply =
+                              isAdmin || r.authorId === member.user.id;
+                            return (
+                              <li key={r.id}>
+                                <CommentCard
                                   commentId={r.id}
                                   postId={discussion.id}
+                                  authorName={
+                                    r.author.profile?.displayName ?? "Membro"
+                                  }
                                   body={r.body}
+                                  createdAtLabel={r.createdAt.toLocaleString(
+                                    "pt-BR",
+                                  )}
                                   canEdit={canEditReply}
+                                  isAdmin={isAdmin}
+                                  nested
                                 />
-                                <p className="mt-2 text-xs text-muted">
-                                  {r.createdAt.toLocaleString("pt-BR")}
-                                </p>
-                              </div>
-                              {isAdmin ? (
-                                <DeleteCommentButton
-                                  commentId={r.id}
-                                  postId={discussion.id}
-                                />
-                              ) : null}
-                            </div>
-                          </li>
-                          );
-                        })}
-                      </ul>
-                    ) : null}
-                  </li>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      ) : null}
+                    </li>
                   );
                 })}
               </ul>
