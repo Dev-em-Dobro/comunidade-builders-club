@@ -12,9 +12,16 @@ export const ADMIN_ONLY_PUBLISH_SLUGS = [
   AULA_THREADS_SPACE_SLUG,
 ] as const;
 
+/** Spaces sem comentários (orientação / não conversa). */
+export const COMMENTS_DISABLED_SPACE_SLUGS = [WELCOME_SPACE_SLUG] as const;
+
 /** Não listar no sidebar nem no Feed global. */
 export const HIDDEN_NAV_SPACE_SLUGS = [AULA_THREADS_SPACE_SLUG] as const;
 
 export function isAdminOnlyPublishSpace(slug: string): boolean {
   return (ADMIN_ONLY_PUBLISH_SLUGS as readonly string[]).includes(slug);
+}
+
+export function isCommentsDisabledSpace(slug: string): boolean {
+  return (COMMENTS_DISABLED_SPACE_SLUGS as readonly string[]).includes(slug);
 }
