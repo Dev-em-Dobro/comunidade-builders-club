@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { ForbiddenError } from "@/lib/auth/errors";
 import { createNotification, notifyMany } from "@/lib/notifications";
 import { resolveMentionedUserIds } from "@/lib/mentions";
+import { isCommentsDisabledSpace } from "@/lib/spaces/constants";
 
 export const createCommentSchema = z.object({
   postId: z.string().min(1),
@@ -16,8 +17,16 @@ export async function createComment(
 ) {
   const data = createCommentSchema.parse(raw);
 
-  const post = await prisma.post.findUnique({ where: { id: data.postId } });
+  const post = await prisma.post.findUnique({
+    where: { id: data.postId },
+    include: { space: { select: { slug: true } } },
+  });
   if (!post) throw new Error("Post não encontrado.");
+  if (isCommentsDisabledSpace(post.space.slug)) {
+    throw new ForbiddenError(
+      "Comentários estão desativados neste espaço.",
+    );
+  }
 
   let parentAuthorId: string | null = null;
   if (data.parentId) {

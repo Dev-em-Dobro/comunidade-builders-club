@@ -12,7 +12,8 @@ com toggle entre visão reduzida (atual) e expandida.
 - [x] Space `boas-vindas` no seed (topo da lista de Spaces)
 - [x] `/` = Feed com todos os posts **exceto** Boas-vindas; toggle compacto/expandido
 - [x] `/spaces/boas-vindas` = hero + grade de cards (posts do space)
-- [x] Clique no card abre modal com body, reações, comentários
+- [x] Clique no card abre modal com body, reações, expandir
+- [x] Comentários **desativados** em Boas-vindas (orientação, não conversa)
 - [x] No modal: “Expandir” abre o post na área de conteúdo (rota `/posts/[id]`, ao lado do aside)
 - [x] Visão expandida do Feed mostra body (Markdown) + ações de reação no card
 - [x] Preferência de vista do Feed persistida em `localStorage`

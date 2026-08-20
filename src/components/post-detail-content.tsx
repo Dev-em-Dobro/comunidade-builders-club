@@ -13,6 +13,7 @@ import { OptimizedMediaImage } from "@/components/optimized-media-image";
 import { PostMedia } from "@/components/post-media";
 import { PostShareMenu } from "@/components/post-share-menu";
 import type { PostDetailDto } from "@/actions/post-detail";
+import { isCommentsDisabledSpace } from "@/lib/spaces/constants";
 
 function CommentBlock({
   comment,
@@ -99,6 +100,7 @@ export function PostDetailContent({
 }) {
   const title =
     post.title?.trim() || previewFromBody(post.body, 90) || "Publicação";
+  const commentsDisabled = isCommentsDisabledSpace(post.space.slug);
 
   return (
     <div>
@@ -167,34 +169,36 @@ export function PostDetailContent({
         </div>
       </article>
 
-      <section className="mt-8">
-        <h3 className="font-[family-name:var(--font-outfit)] text-lg font-semibold">
-          Comentários ({post.commentCount})
-        </h3>
-        <CommentForm postId={post.id} isPaid={isPaid} onDone={onCommentDone} />
-        {post.comments.length === 0 ? (
-          <div className="mt-4">
-            <EmptyState
-              title="Nenhum comentário"
-              description="Seja o primeiro a responder este post."
-            />
-          </div>
-        ) : (
-          <ul className="mt-4 space-y-3">
-            {post.comments.map((c) => (
-              <CommentBlock
-                key={c.id}
-                comment={c}
-                postId={post.id}
-                isAdmin={isAdmin}
-                currentUserId={currentUserId}
-                isPaid={isPaid}
-                onCommentDone={onCommentDone}
+      {commentsDisabled ? null : (
+        <section className="mt-8">
+          <h3 className="font-[family-name:var(--font-outfit)] text-lg font-semibold">
+            Comentários ({post.commentCount})
+          </h3>
+          <CommentForm postId={post.id} isPaid={isPaid} onDone={onCommentDone} />
+          {post.comments.length === 0 ? (
+            <div className="mt-4">
+              <EmptyState
+                title="Nenhum comentário"
+                description="Seja o primeiro a responder este post."
               />
-            ))}
-          </ul>
-        )}
-      </section>
+            </div>
+          ) : (
+            <ul className="mt-4 space-y-3">
+              {post.comments.map((c) => (
+                <CommentBlock
+                  key={c.id}
+                  comment={c}
+                  postId={post.id}
+                  isAdmin={isAdmin}
+                  currentUserId={currentUserId}
+                  isPaid={isPaid}
+                  onCommentDone={onCommentDone}
+                />
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
     </div>
   );
 }
