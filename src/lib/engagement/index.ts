@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { prisma } from "@/lib/db";
+import { ForbiddenError } from "@/lib/auth/errors";
 import { createNotification, notifyMany } from "@/lib/notifications";
 import { resolveMentionedUserIds } from "@/lib/mentions";
 
@@ -102,6 +103,28 @@ export async function deleteComment(id: string) {
       where: { id: comment.postId },
       data: { commentCount: { decrement } },
     });
+  });
+}
+
+export const updateCommentSchema = z.object({
+  body: z.string().trim().min(1).max(5000),
+});
+
+export async function updateComment(
+  id: string,
+  actorId: string,
+  isAdmin: boolean,
+  raw: z.infer<typeof updateCommentSchema>,
+) {
+  const existing = await prisma.comment.findUnique({ where: { id } });
+  if (!existing) throw new Error("Comentário não encontrado.");
+  if (!isAdmin && existing.authorId !== actorId) {
+    throw new ForbiddenError("Você só pode editar seus próprios comentários.");
+  }
+  const data = updateCommentSchema.parse(raw);
+  return prisma.comment.update({
+    where: { id },
+    data: { body: data.body },
   });
 }
 

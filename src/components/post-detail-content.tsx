@@ -3,6 +3,7 @@
 import {
   CommentForm,
   DeleteCommentButton,
+  EditableCommentBody,
   PostActions,
   ReplyToggle,
 } from "@/components/post-actions";
@@ -18,29 +19,37 @@ function CommentBlock({
   comment,
   postId,
   isAdmin,
+  currentUserId,
   isPaid = true,
   nested = false,
   onCommentDone,
 }: {
-  comment: PostDetailDto["comments"][number] | PostDetailDto["comments"][number]["replies"][number];
+  comment:
+    | PostDetailDto["comments"][number]
+    | PostDetailDto["comments"][number]["replies"][number];
   postId: string;
   isAdmin: boolean;
+  currentUserId?: string;
   isPaid?: boolean;
   nested?: boolean;
   onCommentDone?: () => void;
 }) {
   const replies = "replies" in comment ? comment.replies : undefined;
+  const canEdit = Boolean(
+    isAdmin || (currentUserId && comment.authorId === currentUserId),
+  );
+
   return (
     <li className={`post-card !p-4 ${nested ? "ml-6 !bg-surface/40" : ""}`}>
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium">{comment.authorName}</p>
-          <div className="mt-1.5 text-sm leading-relaxed">
-            <MarkdownBody
-              body={comment.body}
-              className="space-y-1 text-sm leading-relaxed [&_p]:my-0"
-            />
-          </div>
+          <EditableCommentBody
+            commentId={comment.id}
+            postId={postId}
+            body={comment.body}
+            canEdit={canEdit}
+          />
           <p className="mt-2 text-xs text-muted">
             {new Date(comment.createdAt).toLocaleString("pt-BR")}
           </p>
@@ -65,6 +74,7 @@ function CommentBlock({
               comment={r}
               postId={postId}
               isAdmin={isAdmin}
+              currentUserId={currentUserId}
               isPaid={isPaid}
               nested
               onCommentDone={onCommentDone}
@@ -81,6 +91,7 @@ export function PostDetailContent({
   isAdmin,
   isAuthor = false,
   isPaid = true,
+  currentUserId,
   compactHeader = false,
   onCommentDone,
 }: {
@@ -88,6 +99,7 @@ export function PostDetailContent({
   isAdmin: boolean;
   isAuthor?: boolean;
   isPaid?: boolean;
+  currentUserId?: string;
   compactHeader?: boolean;
   onCommentDone?: () => void;
 }) {
@@ -181,6 +193,7 @@ export function PostDetailContent({
                 comment={c}
                 postId={post.id}
                 isAdmin={isAdmin}
+                currentUserId={currentUserId}
                 isPaid={isPaid}
                 onCommentDone={onCommentDone}
               />

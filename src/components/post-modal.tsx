@@ -131,6 +131,7 @@ export function PostModal({
               isAdmin={isAdmin}
               isAuthor={isAuthor}
               isPaid={isPaid}
+              currentUserId={currentUserId}
               compactHeader
               onCommentDone={() => load(postId)}
             />

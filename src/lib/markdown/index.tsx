@@ -106,7 +106,17 @@ export function MarkdownBody({
       continue;
     }
     if (line.trim() === "") {
-      i++;
+      // F043: linhas em branco do editor viram espaçamento visível.
+      let blanks = 0;
+      while (i < lines.length && lines[i]!.trim() === "") {
+        blanks += 1;
+        i += 1;
+      }
+      for (let b = 0; b < blanks; b++) {
+        blocks.push(
+          <div key={key++} className="h-3" aria-hidden="true" />,
+        );
+      }
       continue;
     }
     const para: string[] = [];
@@ -129,7 +139,7 @@ export function MarkdownBody({
     <div
       className={
         className ??
-        "space-y-2 text-base leading-relaxed text-foreground/90 [&_p]:my-0"
+        "space-y-1 text-base leading-relaxed text-foreground/90 [&_p]:my-0"
       }
     >
       {blocks.length > 0 ? blocks : <p>{renderInlineMarkdown(body)}</p>}

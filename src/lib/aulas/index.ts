@@ -196,6 +196,56 @@ export async function deleteLesson(id: string) {
   return prisma.lesson.delete({ where: { id } });
 }
 
+/** F046 — sobe/desce na lista e reindexa sortOrder (0..n). */
+export async function moveModule(id: string, direction: "up" | "down") {
+  const modules = await prisma.module.findMany({
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    select: { id: true },
+  });
+  const index = modules.findIndex((m) => m.id === id);
+  if (index < 0) throw new Error("Módulo não encontrado.");
+  const swapWith = direction === "up" ? index - 1 : index + 1;
+  if (swapWith < 0 || swapWith >= modules.length) return;
+
+  const ordered = [...modules];
+  const [item] = ordered.splice(index, 1);
+  ordered.splice(swapWith, 0, item!);
+
+  await prisma.$transaction(
+    ordered.map((m, i) =>
+      prisma.module.update({ where: { id: m.id }, data: { sortOrder: i } }),
+    ),
+  );
+}
+
+export async function moveLesson(id: string, direction: "up" | "down") {
+  const lesson = await prisma.lesson.findUnique({
+    where: { id },
+    select: { id: true, moduleId: true },
+  });
+  if (!lesson) throw new Error("Aula não encontrada.");
+
+  const lessons = await prisma.lesson.findMany({
+    where: { moduleId: lesson.moduleId },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    select: { id: true },
+  });
+  const index = lessons.findIndex((l) => l.id === id);
+  if (index < 0) return;
+  const swapWith = direction === "up" ? index - 1 : index + 1;
+  if (swapWith < 0 || swapWith >= lessons.length) return;
+
+  const ordered = [...lessons];
+  const [item] = ordered.splice(index, 1);
+  ordered.splice(swapWith, 0, item!);
+
+  await prisma.$transaction(
+    ordered.map((l, i) =>
+      prisma.lesson.update({ where: { id: l.id }, data: { sortOrder: i } }),
+    ),
+  );
+}
+
 export async function getLessonProgress(userId: string, lessonId: string) {
   return prisma.lessonProgress.findUnique({
     where: { userId_lessonId: { userId, lessonId } },

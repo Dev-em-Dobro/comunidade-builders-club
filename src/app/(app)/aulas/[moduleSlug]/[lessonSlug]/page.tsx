@@ -12,10 +12,10 @@ import { MarkLessonCompleteButton } from "@/components/mark-lesson-complete-butt
 import {
   CommentForm,
   DeleteCommentButton,
+  EditableCommentBody,
   ReplyToggle,
 } from "@/components/post-actions";
 import { EmptyState } from "@/components/empty-state";
-import { MarkdownBody } from "@/lib/markdown";
 
 type Props = {
   params: Promise<{ moduleSlug: string; lessonSlug: string }>;
@@ -116,19 +116,22 @@ export default async function LessonPage({ params }: Props) {
               </div>
             ) : (
               <ul className="mt-4 space-y-3">
-                {discussion.comments.map((c) => (
+                {discussion.comments.map((c) => {
+                  const canEdit =
+                    isAdmin || c.authorId === member.user.id;
+                  return (
                   <li key={c.id} className="post-card !p-4">
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-medium">
                           {c.author.profile?.displayName ?? "Membro"}
                         </p>
-                        <div className="mt-1.5 text-sm leading-relaxed">
-                          <MarkdownBody
-                            body={c.body}
-                            className="space-y-1 text-sm leading-relaxed [&_p]:my-0"
-                          />
-                        </div>
+                        <EditableCommentBody
+                          commentId={c.id}
+                          postId={discussion.id}
+                          body={c.body}
+                          canEdit={canEdit}
+                        />
                         <p className="mt-2 text-xs text-muted">
                           {c.createdAt.toLocaleString("pt-BR")}
                         </p>
@@ -143,7 +146,10 @@ export default async function LessonPage({ params }: Props) {
                     </div>
                     {c.replies.length > 0 ? (
                       <ul className="mt-3 space-y-2">
-                        {c.replies.map((r) => (
+                        {c.replies.map((r) => {
+                          const canEditReply =
+                            isAdmin || r.authorId === member.user.id;
+                          return (
                           <li
                             key={r.id}
                             className="post-card ml-6 !bg-surface/40 !p-4"
@@ -153,12 +159,12 @@ export default async function LessonPage({ params }: Props) {
                                 <p className="text-sm font-medium">
                                   {r.author.profile?.displayName ?? "Membro"}
                                 </p>
-                                <div className="mt-1.5 text-sm leading-relaxed">
-                                  <MarkdownBody
-                                    body={r.body}
-                                    className="space-y-1 text-sm leading-relaxed [&_p]:my-0"
-                                  />
-                                </div>
+                                <EditableCommentBody
+                                  commentId={r.id}
+                                  postId={discussion.id}
+                                  body={r.body}
+                                  canEdit={canEditReply}
+                                />
                                 <p className="mt-2 text-xs text-muted">
                                   {r.createdAt.toLocaleString("pt-BR")}
                                 </p>
@@ -171,11 +177,13 @@ export default async function LessonPage({ params }: Props) {
                               ) : null}
                             </div>
                           </li>
-                        ))}
+                          );
+                        })}
                       </ul>
                     ) : null}
                   </li>
-                ))}
+                  );
+                })}
               </ul>
             )}
           </>

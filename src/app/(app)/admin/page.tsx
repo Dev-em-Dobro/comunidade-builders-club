@@ -16,6 +16,8 @@ import {
   deleteLessonAction,
   deleteModuleAction,
   deleteSpaceAction,
+  moveLessonAction,
+  moveModuleAction,
   removeAllowedEmailAction,
   setMemberRoleAction,
   setMemberStatusAction,
@@ -26,6 +28,7 @@ import {
   AdminTabs,
 } from "@/components/admin-tabs";
 import { isAdminTab, type AdminTabId } from "@/lib/admin/tabs";
+import { labelAllowedEmailSource } from "@/lib/membership/allowlist-labels";
 import type { MembershipStatus } from "@prisma/client";
 
 type Props = {
@@ -115,7 +118,9 @@ export default async function AdminPage({ searchParams }: Props) {
               >
                 <span>
                   {a.email}{" "}
-                  <span className="text-xs text-muted">({a.source})</span>
+                  <span className="text-xs text-muted">
+                    ({labelAllowedEmailSource(a.source)})
+                  </span>
                 </span>
                 <form action={removeAllowedEmailAction.bind(null, a.email)}>
                   <button
@@ -291,7 +296,7 @@ export default async function AdminPage({ searchParams }: Props) {
             </button>
           </form>
 
-          {modules.map((mod) => (
+          {modules.map((mod, modIndex) => (
             <div key={mod.id} className="post-card mt-4 max-w-2xl space-y-3">
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div className="flex min-w-0 items-start gap-3">
@@ -309,19 +314,43 @@ export default async function AdminPage({ searchParams }: Props) {
                       <span className="text-xs font-normal text-muted">
                         /{mod.slug}
                         {mod.published ? " · publicado" : " · rascunho"}
+                        {" · ordem "}
+                        {mod.sortOrder}
                       </span>
                     </p>
                   </div>
                 </div>
-                <ConfirmDeleteButton
-                  action={deleteModuleAction.bind(null, mod.id)}
-                  label="Remover módulo"
-                  message={`Remover o módulo "${mod.title}" e todas as aulas?`}
-                />
+                <div className="flex flex-wrap items-center gap-2">
+                  <form action={moveModuleAction.bind(null, mod.id, "up")}>
+                    <button
+                      type="submit"
+                      className="btn-ghost cursor-pointer text-xs"
+                      disabled={modIndex === 0}
+                      title="Subir módulo"
+                    >
+                      ↑
+                    </button>
+                  </form>
+                  <form action={moveModuleAction.bind(null, mod.id, "down")}>
+                    <button
+                      type="submit"
+                      className="btn-ghost cursor-pointer text-xs"
+                      disabled={modIndex === modules.length - 1}
+                      title="Descer módulo"
+                    >
+                      ↓
+                    </button>
+                  </form>
+                  <ConfirmDeleteButton
+                    action={deleteModuleAction.bind(null, mod.id)}
+                    label="Remover módulo"
+                    message={`Remover o módulo "${mod.title}" e todas as aulas?`}
+                  />
+                </div>
               </div>
 
               <ul className="space-y-2 text-sm">
-                {mod.lessons.map((l) => (
+                {mod.lessons.map((l, lessonIndex) => (
                   <li
                     key={l.id}
                     className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-surface/40 px-3 py-2"
@@ -340,14 +369,38 @@ export default async function AdminPage({ searchParams }: Props) {
                         <span className="text-xs text-muted">
                           /{l.slug}
                           {l.published ? "" : " · rascunho"}
+                          {" · ordem "}
+                          {l.sortOrder}
                         </span>
                       </span>
                     </span>
-                    <ConfirmDeleteButton
-                      action={deleteLessonAction.bind(null, l.id)}
-                      label="Remover"
-                      message={`Remover a aula "${l.title}"?`}
-                    />
+                    <div className="flex flex-wrap items-center gap-2">
+                      <form action={moveLessonAction.bind(null, l.id, "up")}>
+                        <button
+                          type="submit"
+                          className="btn-ghost cursor-pointer text-xs"
+                          disabled={lessonIndex === 0}
+                          title="Subir aula"
+                        >
+                          ↑
+                        </button>
+                      </form>
+                      <form action={moveLessonAction.bind(null, l.id, "down")}>
+                        <button
+                          type="submit"
+                          className="btn-ghost cursor-pointer text-xs"
+                          disabled={lessonIndex === mod.lessons.length - 1}
+                          title="Descer aula"
+                        >
+                          ↓
+                        </button>
+                      </form>
+                      <ConfirmDeleteButton
+                        action={deleteLessonAction.bind(null, l.id)}
+                        label="Remover"
+                        message={`Remover a aula "${l.title}"?`}
+                      />
+                    </div>
                   </li>
                 ))}
               </ul>
