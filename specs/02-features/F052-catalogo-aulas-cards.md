@@ -21,8 +21,9 @@ acordeão). Sem trava por “nível”, sem favoritar/avaliar neste recorte.
   progresso, aula atual destacada). Se a formação tiver trilhas
   intermediárias (ex.: **IA Aplicada** e **Automações com n8n**), a
   sidebar agrupa os submódulos sob esses títulos, com um divisor entre
-  as trilhas. A coluna usa a altura da viewport e rola quando a lista
-  não cabe.
+  as trilhas. No desktop, a lista tem a mesma altura do bloco do
+  player (vídeo + aula anterior/próxima) e rola por dentro, para a
+  descrição da aula continuar visível abaixo.
 - Voltar do player vai para `/aulas` (grid).
 
 ## Critérios

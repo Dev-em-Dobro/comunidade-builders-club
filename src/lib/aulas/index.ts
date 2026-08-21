@@ -57,15 +57,19 @@ export const lessonSchema = z.object({
   pandaVideoExternalId: z
     .string()
     .trim()
-    .min(1)
     .max(200)
-    .regex(PANDA_ID_RE, "ID externo Panda inválido"),
+    .optional()
+    .nullable()
+    .transform((s) => (s && s.length > 0 ? s : null))
+    .refine((s) => s === null || PANDA_ID_RE.test(s), "ID externo Panda inválido"),
   pandaLibraryId: z
     .string()
     .trim()
-    .min(1)
     .max(200)
-    .regex(PANDA_ID_RE, "Library ID Panda inválido"),
+    .optional()
+    .nullable()
+    .transform((s) => (s && s.length > 0 ? s : null))
+    .refine((s) => s === null || PANDA_ID_RE.test(s), "Library ID Panda inválido"),
   thumbnailUrl: z.string().trim().max(2000).optional().nullable().or(z.literal("")),
   sortOrder: z.coerce.number().int().min(0).max(9999).default(0),
   published: z.boolean().default(false),
@@ -217,7 +221,9 @@ export async function createLesson(raw: z.infer<typeof lessonSchema>) {
       title: data.title,
       description: data.description || null,
       pandaVideoExternalId: data.pandaVideoExternalId,
-      pandaLibraryId: data.pandaLibraryId.replace(/^vz-/, ""),
+      pandaLibraryId: data.pandaLibraryId
+        ? data.pandaLibraryId.replace(/^vz-/, "")
+        : null,
       thumbnailUrl: data.thumbnailUrl || null,
       sortOrder: data.sortOrder,
       published: data.published,
@@ -238,7 +244,9 @@ export async function updateLesson(
       title: data.title,
       description: data.description || null,
       pandaVideoExternalId: data.pandaVideoExternalId,
-      pandaLibraryId: data.pandaLibraryId.replace(/^vz-/, ""),
+      pandaLibraryId: data.pandaLibraryId
+        ? data.pandaLibraryId.replace(/^vz-/, "")
+        : null,
       thumbnailUrl: data.thumbnailUrl || null,
       sortOrder: data.sortOrder,
       published: data.published,

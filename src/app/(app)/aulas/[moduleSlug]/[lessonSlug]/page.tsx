@@ -37,14 +37,19 @@ export default async function LessonPage({ params }: Props) {
   const lesson = await getLessonForMember(moduleSlug, lessonSlug);
   if (!lesson) notFound();
 
-  let embed: string;
-  try {
-    embed = pandaEmbedUrl(
-      lesson.pandaLibraryId,
-      lesson.pandaVideoExternalId,
-    );
-  } catch {
-    notFound();
+  const hasVideo = Boolean(
+    lesson.pandaLibraryId && lesson.pandaVideoExternalId,
+  );
+  let embed: string | null = null;
+  if (hasVideo) {
+    try {
+      embed = pandaEmbedUrl(
+        lesson.pandaLibraryId!,
+        lesson.pandaVideoExternalId!,
+      );
+    } catch {
+      notFound();
+    }
   }
 
   const [progress, discussionMeta, modules, completed] = await Promise.all([
@@ -80,17 +85,29 @@ export default async function LessonPage({ params }: Props) {
         ← Aulas
       </Link>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
+      <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div>
           <div className="overflow-hidden rounded-2xl border border-border bg-black shadow-sm">
             <div className="relative aspect-video w-full">
-              <iframe
-                src={embed}
-                title={lesson.title}
-                className="absolute inset-0 h-full w-full"
-                allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
-                allowFullScreen
-              />
+              {embed ? (
+                <iframe
+                  src={embed}
+                  title={lesson.title}
+                  className="absolute inset-0 h-full w-full"
+                  allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+                  allowFullScreen
+                />
+              ) : (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-card px-6 text-center">
+                  <p className="font-[family-name:var(--font-outfit)] text-lg font-semibold">
+                    Material de apoio
+                  </p>
+                  <p className="mt-2 max-w-sm text-sm text-muted">
+                    Esta aula não tem vídeo. Baixe os arquivos na descrição
+                    abaixo.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
           <div className="mt-3 flex items-center justify-between gap-3">
@@ -118,11 +135,13 @@ export default async function LessonPage({ params }: Props) {
         </div>
 
         {root ? (
-          <AulaCourseSidebar
-            root={root}
-            currentModuleSlug={moduleSlug}
-            currentLessonSlug={lessonSlug}
-          />
+          <div className="min-h-0 lg:h-0 lg:min-h-full">
+            <AulaCourseSidebar
+              root={root}
+              currentModuleSlug={moduleSlug}
+              currentLessonSlug={lessonSlug}
+            />
+          </div>
         ) : null}
       </div>
 

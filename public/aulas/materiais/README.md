@@ -1,5 +1,5 @@
-# Materiais das aulas (zip, md, docx, xlsx)
+# Materiais das aulas
 
-Coloque aqui os anexos. Na descrição da aula, o download usa:
+Os anexos ficam em `public/materiais/`. Na descrição:
 
-[Baixar arquivo](/aulas/materiais/nome-do-arquivo.zip)
+[Baixar arquivo](/materiais/nome-do-arquivo.zip)

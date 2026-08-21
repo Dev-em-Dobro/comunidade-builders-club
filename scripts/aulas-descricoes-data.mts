@@ -1,8 +1,8 @@
 /**
  * Descrições importadas de descricoes-aulas-builders.docx.
  * Chave: `${moduleSlug}/${lessonSlug}`.
- * Anexos zip/md/docx/xlsx ficam marcados como pendentes até o arquivo ir para
- * public/aulas/materiais/.
+ * Anexos zip/md/docx/xlsx ficam em public/materiais/ e entram como
+ * [Baixar arquivo](/materiais/nome.ext) na descrição.
  */
 export const AULA_DESCRICOES: Record<string, string> = {
   "fundamentos-do-builder-profissional/a-maneira-certeira-para-conseguir-os-primeiros-clientes": `Nessa aula mostramos as principais ferramentas para conseguir mais clientes, assim como as melhores maneiras para prospectar e fechar negócios no começo da carreira.
@@ -28,7 +28,7 @@ export const AULA_DESCRICOES: Record<string, string> = {
 Aqui vamos te dar uma fórmula pra calcular o valor do teu trabalho de uma forma bem fácil e direta.
 
 ## Materiais
-Anexo pendente (xlsx) — planilha para cálculo de horas. Vamos adicionar o arquivo em \`/aulas/materiais/\`.`,
+- [Baixar planilha de cálculo de horas](/materiais/calculo-horas-freelance.xlsx)`,
 
   "fundamentos-do-builder-profissional/como-hospedar-sites": `Trabalhando como freelancer você vai precisar hospedar os sites dos seus clientes. Nessa aula vamos te explicar como fazer isso de forma fácil usando o Netlify.
 
@@ -43,6 +43,13 @@ Anexo pendente (xlsx) — planilha para cálculo de horas. Vamos adicionar o arq
   "fundamentos-do-builder-profissional/preciso-de-cnpj": `Nessa aula vamos falar se precisa ou não abrir uma empresa para ser freelancer.
 
 E se o MEI é uma opção viável para quem quer abrir uma empresa.`,
+
+  "fundamentos-do-builder-profissional/lista-de-templates": `No anexo abaixo, estarão disponíveis mais de 10 templates de variadas áreas para você se inspirar e basear na construção do seu projeto.
+
+OBS: Eles estão em inglês. Alguns foram utilizados bootstrap, mas pode ser usado CSS puro normalmente.
+
+## Materiais
+- [Baixar templates](/materiais/templates.zip)`,
 
   "ia-aplicada-introducao/aula-1-introducao": `Nessa primeira aula, tu vai entender como funciona a Formação IA na Prática, qual é a jornada completa até o projeto final e por que esse curso é diferente da maioria. A gente apresenta os módulos, explica o Copiloto de Documentação que tu vai construir do zero e, principalmente, mostra o caminho das pedras pra tu realmente desenvolver aplicações usando IA do jeito mais eficiente e alinhado com o mercado.
 
@@ -105,7 +112,7 @@ Imagina que tu quer que a IA escreva código no padrão da tua empresa. Se tu s�
 - [Tailwind CSS — Customizing colors](https://tailwindcss.com/docs/customizing-colors)
 
 ## Materiais
-Anexo pendente (zip). Vamos adicionar o arquivo em \`/aulas/materiais/\`.`,
+- [Baixar few-shots e persona prompt](/materiais/few-shots-persona-prompt.zip)`,
 
   "ia-aplicada-rag/aula-13-o-que-e-rag": `Nessa aula vamos entender o problema fundamental que o RAG (Retrieval-Augmented Generation) resolve: fazer a IA responder perguntas sobre informações que ela não conhece. Tu vai ver as três grandes limitações da IA tradicional (knowledge cutoff, dados privados, falta de contexto) e como o RAG resolve cada uma delas. A aula explica de forma clara e prática o que é RAG, como funciona, e mostra casos de uso reais em atendimento ao cliente, documentação técnica, RH, e-commerce e suporte de TI. No final, tu vai saber exatamente quando usar RAG e por que é 100x mais prático que re-treinar a IA.
 
@@ -137,12 +144,12 @@ Anexo pendente (zip). Vamos adicionar o arquivo em \`/aulas/materiais/\`.`,
   "ia-aplicada-projeto-final/aula-27-projeto-doc-pilot": `Aprenda a construir um Copiloto de Documentação Interna para empresas, um sistema que responde perguntas sobre políticas, processos e códigos internos usando IA. Nesta aula, você verá como centralizar documentos espalhados em PDFs, Notion, Slack, GitHub e outros, processá-los com RAG e embeddings, e criar um chat inteligente que busca informações relevantes e cita as fontes. O projeto aplica conceitos de RAG, LLMs, embeddings e busca vetorial, usando Next.js 14, AstraDB, OpenAI e LangChain, resultando em uma ferramenta prática para reduzir dúvidas repetitivas e aumentar a produtividade da equipe.
 
 ## Materiais
-Anexo pendente (md). Vamos adicionar o arquivo em \`/aulas/materiais/\`.`,
+- [Baixar PRD do Doc Pilot](/materiais/PRD-DOCPILOT.md)`,
 
   "ia-aplicada-projeto-final/aula-28-projeto-doc-pilot-continuacao": `Nessa aula, vamos dar continuidade ao projeto criando nosso PRD.
 
 ## Materiais
-Anexo pendente (md). Vamos adicionar o arquivo em \`/aulas/materiais/\`.`,
+- [Baixar PRD do Doc Pilot](/materiais/PRD-DOCPILOT.md)`,
 
   "ia-aplicada-projeto-final/aula-29-design-e-configs-iniciais": `Nessa aula a gente vai integrar o layout à nossa aplicação e configurar o banco de dados no nosso projeto.
 
@@ -150,7 +157,7 @@ Anexo pendente (md). Vamos adicionar o arquivo em \`/aulas/materiais/\`.`,
 - [Google Stitch](https://stitch.withgoogle.com/)
 
 ## Materiais
-Anexo pendente (zip). Vamos adicionar o arquivo em \`/aulas/materiais/\`.`,
+- [Baixar configurações iniciais](/materiais/1-formacao-ia-aula-configuracoes-iniciais.zip)`,
 
   "ia-aplicada-projeto-final/aula-30-integrando-o-design": `Nessa aula a gente vai integrar o layout à nossa aplicação e configurar o banco de dados no nosso projeto.
 
@@ -159,7 +166,7 @@ Anexo pendente (zip). Vamos adicionar o arquivo em \`/aulas/materiais/\`.`,
 - [DataStax Astra](https://accounts.datastax.com/session-service/v1/login)
 
 ## Materiais
-Anexo pendente (zip). Vamos adicionar o arquivo em \`/aulas/materiais/\`.`,
+- [Baixar integração do design (env Astra/OpenAI)](/materiais/2-doc-pilot-aula-env-astra-openai.zip)`,
 
   "ia-aplicada-projeto-final/aula-31-configs-extra-openai": `Nessa aula nós vamos configurar o banco de dados do Astra e também realizar as configurações necessárias para a OpenAI.
 
@@ -172,17 +179,18 @@ Anexo pendente (zip). Vamos adicionar o arquivo em \`/aulas/materiais/\`.`,
   "ia-aplicada-projeto-final/aula-32-salvar-vetores-no-banco": `Nessa aula vamos criar os chunks com LangChain e salvar os vetores no banco.
 
 ## Materiais
-Anexo pendente (zip). Vamos adicionar o arquivo em \`/aulas/materiais/\`.`,
+- [Baixar aula de armazenar vetores](/materiais/3-aula-armazenar-veores-simples.zip)`,
 
   "ia-aplicada-projeto-final/aula-33-enviar-mensagem-pelo-chat": `Agora vamos mexer no nosso componente do chat pra enviar uma mensagem pra IA da OpenAI.
 
 ## Materiais
-Anexo pendente (zip). Vamos adicionar o arquivo em \`/aulas/materiais/\`.`,
+- [Baixar resposta da IA no chat](/materiais/4-doc-pilot-resposta-da-ia.zip)`,
 
   "ia-aplicada-projeto-final/aula-34-upload-de-arquivos": `Nessa aula vamos fazer um upload de arquivos para que qualquer pessoa possa subir um arquivo docx ou pdf.
 
 ## Materiais
-Anexos pendentes (zip e docx). Vamos adicionar os arquivos em \`/aulas/materiais/\`.`,
+- [Baixar upload de arquivos do Doc Pilot](/materiais/5-upload-de-arquivos-doc-pilot.zip)
+- [Baixar organograma NovaVision](/materiais/Organograma_NovaVision.docx)`,
 
   "automacoes-n8n-introducao/introducao-ao-n8n": `Nesta aula introdutória, você vai entender o que são automações e por que elas se tornaram essenciais no mercado atual. Vamos apresentar o conceito de iPaaS (Integration Platform as a Service) e como plataformas desse tipo permitem integrar diferentes sistemas, serviços e ferramentas, automatizando processos que antes eram manuais e repetitivos.
 

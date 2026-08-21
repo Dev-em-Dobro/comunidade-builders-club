@@ -22,7 +22,7 @@ export function isSafeHttpUrl(url: string): boolean {
   }
 }
 
-/** http(s) ou caminho interno de download (`/aulas/materiais/foo.zip`). */
+/** http(s) ou caminho interno de download (`/materiais/foo.zip`). */
 export function isSafeHref(href: string): boolean {
   const value = href.trim();
   if (isSafeHttpUrl(value)) return true;

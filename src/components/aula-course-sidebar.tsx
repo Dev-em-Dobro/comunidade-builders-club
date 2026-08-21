@@ -34,7 +34,7 @@ export function AulaCourseSidebar({
   return (
     <nav
       aria-label="Aulas do módulo"
-      className="flex flex-col gap-2 overscroll-contain lg:sticky lg:top-4 lg:max-h-[calc(100dvh-6rem)] lg:overflow-y-auto lg:pb-2"
+      className="flex h-full flex-col gap-2 overflow-y-auto overscroll-contain"
     >
       {groups.map((group, groupIndex) => (
         <div key={group.id} className="flex flex-col gap-2">

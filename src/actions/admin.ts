@@ -44,6 +44,7 @@ function bustAulasCache() {
   revalidatePath("/admin", "layout");
   revalidatePath("/aulas");
   revalidatePath("/aulas", "layout");
+  revalidatePath("/admin/progresso");
 }
 
 export async function createSpaceAction(formData: FormData) {
@@ -187,7 +188,9 @@ export async function createLessonAction(formData: FormData) {
     title: String(formData.get("title") ?? ""),
     description: String(formData.get("description") ?? "") || null,
     pandaVideoExternalId: String(formData.get("pandaVideoExternalId") ?? ""),
-    pandaLibraryId: String(formData.get("pandaLibraryId") ?? ""),
+    pandaLibraryId: String(formData.get("pandaVideoExternalId") ?? "").trim()
+      ? String(formData.get("pandaLibraryId") ?? "")
+      : "",
     thumbnailUrl: String(formData.get("thumbnailUrl") ?? "") || null,
     sortOrder: Number(formData.get("sortOrder") ?? 0),
     published: formData.get("published") === "on",
@@ -218,7 +221,9 @@ export async function updateLessonAction(id: string, formData: FormData) {
     title: String(formData.get("title") ?? ""),
     description: String(formData.get("description") ?? "") || null,
     pandaVideoExternalId: String(formData.get("pandaVideoExternalId") ?? ""),
-    pandaLibraryId: String(formData.get("pandaLibraryId") ?? ""),
+    pandaLibraryId: String(formData.get("pandaVideoExternalId") ?? "").trim()
+      ? String(formData.get("pandaLibraryId") ?? "")
+      : "",
     thumbnailUrl: String(formData.get("thumbnailUrl") ?? "") || null,
     sortOrder: Number(formData.get("sortOrder") ?? 0),
     published: formData.get("published") === "on",

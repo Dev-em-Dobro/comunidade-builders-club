@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { listPublishedModules } from "@/lib/aulas";
 import { WELCOME_SPACE_SLUG } from "@/lib/spaces/constants";
 
 export type StudentProgressRow = {
@@ -18,30 +19,43 @@ export type StudentProgressRow = {
   lastPostAt: Date | null;
 };
 
+type PublishedNode = {
+  title: string;
+  sortOrder: number;
+  lessons: Array<{ id: string; title: string; sortOrder: number }>;
+  children?: PublishedNode[];
+};
+
+/** Mesma árvore do catálogo do aluno, na ordem da jornada. */
 export async function getPublishedLessonsCatalog() {
-  return prisma.lesson.findMany({
-    where: {
-      published: true,
-      module: {
-        published: true,
-        OR: [
-          { parentId: null },
-          { parent: { published: true, parentId: null } },
-          { parent: { published: true, parent: { published: true } } },
-        ],
-      },
-    },
-    select: {
-      id: true,
-      title: true,
-      sortOrder: true,
-      module: { select: { title: true, sortOrder: true } },
-    },
-    orderBy: [
-      { module: { sortOrder: "asc" } },
-      { sortOrder: "asc" },
-    ],
-  });
+  const roots = await listPublishedModules();
+  const lessons: Array<{
+    id: string;
+    title: string;
+    sortOrder: number;
+    module: { title: string; sortOrder: number };
+  }> = [];
+
+  function walk(mod: PublishedNode, path: string[]) {
+    const titles = [...path, mod.title];
+    const moduleTitle = titles.join(" › ");
+    for (const lesson of mod.lessons) {
+      lessons.push({
+        id: lesson.id,
+        title: lesson.title,
+        sortOrder: lesson.sortOrder,
+        module: { title: moduleTitle, sortOrder: mod.sortOrder },
+      });
+    }
+    for (const child of mod.children ?? []) {
+      walk(child, titles);
+    }
+  }
+
+  for (const root of roots) {
+    walk(root, []);
+  }
+  return lessons;
 }
 
 /** Progresso de aulas + atividade de posts por membro active. */

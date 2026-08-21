@@ -25,7 +25,7 @@ type LessonSeed = {
   slug: string;
   title: string;
   description?: string;
-  pandaVideoExternalId: string;
+  pandaVideoExternalId?: string;
   sortOrder: number;
 };
 
@@ -763,6 +763,11 @@ const CATALOG: ModuleSeed[] = [
         pandaVideoExternalId: "96e49ff2-8901-4d58-8ef6-c4d1b269f5e8",
         sortOrder: 5,
       },
+      {
+        slug: "lista-de-templates",
+        title: "Lista de templates",
+        sortOrder: 6,
+      },
     ],
   },
 ];
@@ -828,18 +833,22 @@ async function upsertModule(
       });
 
   for (const lesson of seed.lessons) {
-    const byVideo = await prisma.lesson.findFirst({
-      where: { pandaVideoExternalId: lesson.pandaVideoExternalId },
-    });
+    const byVideo = lesson.pandaVideoExternalId
+      ? await prisma.lesson.findFirst({
+          where: { pandaVideoExternalId: lesson.pandaVideoExternalId },
+        })
+      : null;
     const bySlug = await prisma.lesson.findUnique({
       where: { moduleId_slug: { moduleId: module.id, slug: lesson.slug } },
     });
     const found = byVideo ?? bySlug;
     const lessonData = {
       title: lesson.title,
-      pandaVideoExternalId: lesson.pandaVideoExternalId,
-      pandaLibraryId: PANDA_LIBRARY,
-      thumbnailUrl: thumb(lesson.pandaVideoExternalId),
+      pandaVideoExternalId: lesson.pandaVideoExternalId ?? null,
+      pandaLibraryId: lesson.pandaVideoExternalId ? PANDA_LIBRARY : null,
+      thumbnailUrl: lesson.pandaVideoExternalId
+        ? thumb(lesson.pandaVideoExternalId)
+        : null,
       moduleId: module.id,
       slug: lesson.slug,
     };

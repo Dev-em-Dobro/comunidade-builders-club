@@ -35,7 +35,8 @@ numeração antiga (`Aula 15`, `Aula 04`, …).
 
 ## Regras de cadastro
 
-- Aula **a gravar** sem vídeo na Panda → não criar a aula.
+- Aula **a gravar** sem vídeo na Panda → não criar a aula — **exceto**
+  aula só de material (anexo em `/materiais/`), quando pedida.
 - No HML, **todos** os vídeos da pasta entram no submódulo correspondente,
   na ordem de chegada na Panda (`created_at`), com título amigável.
   Vídeos que ainda misturam assuntos ficam no catálogo de preview até a

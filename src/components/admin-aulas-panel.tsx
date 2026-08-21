@@ -394,15 +394,13 @@ function CreateLessonForm({ modules }: { modules: AdminModule[] }) {
       <input
         name="pandaLibraryId"
         className="input"
-        placeholder="Library/pullzone"
+        placeholder="Library/pullzone (vazio se for só material)"
         defaultValue="77c52f03-dc6"
-        required
       />
       <input
         name="pandaVideoExternalId"
         className="input"
-        placeholder="Video external ID"
-        required
+        placeholder="Video external ID (vazio se for só material)"
       />
       <input
         name="thumbnailUrl"
@@ -454,7 +452,7 @@ function EditLessonDescriptionForm({ modules }: { modules: AdminModule[] }) {
         key={lessonId}
         name="description"
         className="input min-h-28"
-        placeholder="Markdown: [texto](https://…) abre em nova guia. Downloads: [arquivo.zip](/aulas/materiais/…)"
+        placeholder="Markdown: [texto](https://…) abre em nova guia. Downloads: [arquivo.zip](/materiais/…)"
         defaultValue={selected?.description ?? ""}
         maxLength={12000}
       />
