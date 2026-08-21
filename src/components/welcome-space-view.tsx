@@ -56,17 +56,17 @@ export function WelcomeSpaceView({
         <button
           type="button"
           onClick={() => setOpenId(hero.id)}
-          className="post-card mt-6 w-full p-5 text-left transition-colors hover:bg-surface/50 sm:p-6"
+          className="post-card mt-4 w-full p-4 text-left transition-colors hover:bg-surface/50"
         >
-          <h2 className="font-[family-name:var(--font-outfit)] text-xl font-bold tracking-tight sm:text-2xl">
+          <h2 className="font-[family-name:var(--font-outfit)] text-lg font-semibold tracking-tight sm:text-xl">
             {hero.title?.trim() ||
               previewFromBody(hero.body, 80) ||
               "Bem-vindo ao Builders Club"}
           </h2>
-          <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted sm:text-base">
-            {previewFromBody(hero.body, 220)}
+          <p className="mt-1 line-clamp-1 text-sm text-muted">
+            {previewFromBody(hero.body, 140)}
           </p>
-          <p className="mt-3 text-xs font-medium text-accent">Abrir →</p>
+          <p className="mt-2 text-xs font-medium text-accent">Abrir →</p>
         </button>
       ) : null}
 
@@ -92,7 +92,7 @@ export function WelcomeSpaceView({
       ) : tutorialEmbedUrl || orientationCards.length > 0 ? (
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {tutorialEmbedUrl ? (
-            <div className="overflow-hidden rounded-2xl border border-border bg-black shadow-sm">
+            <div className="overflow-hidden rounded-2xl border border-border bg-black shadow-sm sm:col-span-2">
               <div className="relative aspect-video w-full">
                 <iframe
                   src={tutorialEmbedUrl}
