@@ -33,6 +33,8 @@ Formação IA e Automações          ← produto-base (rascunho)
 - `published = false` no módulo (e nas aulas) **não** aparece em `/aulas`
   nem na URL direta da aula. Toda a cadeia de ancestrais precisa estar
   publicada para o aluno ver a aula.
+- Títulos das aulas na UI são **amigáveis**, sem prefixo `Aula N —`
+  (a ordem fica no `sortOrder` e na sidebar).
 
 ## Catálogo Panda (pasta `085efceb-2ec6-44c7-b93b-d0eae6f19cd0`)
 
@@ -48,6 +50,7 @@ Produção só com `--target=prod --confirm`.
 - [x] Formulários de criação **não** se repetem: um “Novo módulo” e um
       “Nova aula” (destino via select), recolhidos acima da árvore
 - [x] Seed cria a formação + 2 módulos + 10 submódulos (5 de IA + 5 de n8n), todos `published: false`
+- [x] Títulos das aulas de IA/n8n sem numeração `Aula N —`
 
 ## Dependências
 

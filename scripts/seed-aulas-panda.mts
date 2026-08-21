@@ -6,7 +6,8 @@
  *
  * Idempotente por slug. Não altera `published` nem `sortOrder` se o
  * registro já existir (ordem do admin prevalece).
- * Títulos da jornada: documento oficial (sem Mxx-Lxx nem numeração antiga).
+ * Títulos da jornada e da formação IA/n8n: amigáveis (sem Mxx-Lxx
+ * nem prefixo `Aula N —`).
  */
 import { config } from "dotenv";
 import { PrismaClient } from "@prisma/client";
@@ -545,7 +546,7 @@ const CATALOG: ModuleSeed[] = [
         lessons: [
           {
             slug: "aula-1-introducao",
-            title: "Aula 1 — Introdução",
+            title: "Introdução",
             description:
               "Abertura da formação: o que você vai construir e por quê.",
             pandaVideoExternalId: "21b476aa-228f-4054-bc23-9b32c9a92ffa",
@@ -553,7 +554,7 @@ const CATALOG: ModuleSeed[] = [
           },
           {
             slug: "aula-2-formacao-e-surgimento-da-ia",
-            title: "Aula 2 — A formação e o surgimento da IA",
+            title: "A formação e o surgimento da IA",
             description:
               "Como a IA evoluiu e o recorte que usamos nesta formação.",
             pandaVideoExternalId: "41f76650-3775-4b69-98ee-ddb4e4c9d8dd",
@@ -561,7 +562,7 @@ const CATALOG: ModuleSeed[] = [
           },
           {
             slug: "aula-3-ia-pra-quem-nao-quer-ser-programador",
-            title: "Aula 3 — IA pra quem não quer ser programador",
+            title: "IA pra quem não quer ser programador",
             description:
               "Como usar IA no dia a dia mesmo sem viver só de código.",
             pandaVideoExternalId: "10746ecf-328c-45e8-af85-73f6211f59dd",
@@ -578,7 +579,7 @@ const CATALOG: ModuleSeed[] = [
         lessons: [
           {
             slug: "aula-4-como-as-llms-pensam",
-            title: "Aula 4 — Como as LLMs pensam",
+            title: "Como as LLMs pensam",
             description:
               "Intuição prática de como um modelo de linguagem gera respostas.",
             pandaVideoExternalId: "e8ea3434-2e9a-4547-84ba-da2490caa2fe",
@@ -586,7 +587,7 @@ const CATALOG: ModuleSeed[] = [
           },
           {
             slug: "aula-6-configuracoes",
-            title: "Aula 6 — Configurações",
+            title: "Configurações",
             description:
               "Parâmetros e configs que mudam o comportamento do modelo.",
             pandaVideoExternalId: "5b3283a3-60af-40ce-abb2-f7d256151e24",
@@ -603,7 +604,7 @@ const CATALOG: ModuleSeed[] = [
         lessons: [
           {
             slug: "aula-8-prompts",
-            title: "Aula 8 — Prompts",
+            title: "Prompts",
             description:
               "Estrutura de um bom prompt e padrões que se repetem no dia a dia.",
             pandaVideoExternalId: "cb34660e-776c-45b7-ac5c-4c98b3d6d8ae",
@@ -611,7 +612,7 @@ const CATALOG: ModuleSeed[] = [
           },
           {
             slug: "aula-10-few-shot",
-            title: "Aula 10 — Mão na massa: few-shot",
+            title: "Mão na massa: few-shot",
             description:
               "Ensinar o modelo com exemplos e iterar o prompt na prática.",
             pandaVideoExternalId: "95430708-f622-4025-876d-a02c16c14b13",
@@ -628,7 +629,7 @@ const CATALOG: ModuleSeed[] = [
         lessons: [
           {
             slug: "aula-13-o-que-e-rag",
-            title: "Aula 13 — O que é RAG",
+            title: "O que é RAG",
             description:
               "Retrieval-Augmented Generation: por que o modelo precisa da sua base.",
             pandaVideoExternalId: "25c49ffe-2f76-404d-b4d1-f8d88d21dad4",
@@ -636,7 +637,7 @@ const CATALOG: ModuleSeed[] = [
           },
           {
             slug: "aula-14-embeddings",
-            title: "Aula 14 — Embeddings",
+            title: "Embeddings",
             description:
               "Como transformar texto em vetores e buscar trechos relevantes.",
             pandaVideoExternalId: "69be19f9-40f1-4738-ba80-01aab4f95720",
@@ -653,7 +654,7 @@ const CATALOG: ModuleSeed[] = [
         lessons: [
           {
             slug: "aula-27-projeto-doc-pilot",
-            title: "Aula 27 — Projeto Doc Pilot",
+            title: "Projeto Doc Pilot",
             description:
               "Visão do produto final e o recorte que vamos construir.",
             pandaVideoExternalId: "abd536ee-6b16-43e7-94a0-59a945e84c14",
@@ -661,7 +662,7 @@ const CATALOG: ModuleSeed[] = [
           },
           {
             slug: "aula-28-projeto-doc-pilot-continuacao",
-            title: "Aula 28 — Projeto Doc Pilot (continuação)",
+            title: "Projeto Doc Pilot (continuação)",
             description:
               "Seguindo a construção do Doc Pilot passo a passo.",
             pandaVideoExternalId: "9bee1e55-6e05-408b-a8ba-4dda0eb97131",
@@ -669,7 +670,7 @@ const CATALOG: ModuleSeed[] = [
           },
           {
             slug: "aula-29-design-e-configs-iniciais",
-            title: "Aula 29 — Design e configs iniciais",
+            title: "Design e configs iniciais",
             description:
               "Base visual e configurações iniciais do produto.",
             pandaVideoExternalId: "97293066-3696-4d60-a9b1-783e0c059e54",
@@ -677,7 +678,7 @@ const CATALOG: ModuleSeed[] = [
           },
           {
             slug: "aula-30-integrando-o-design",
-            title: "Aula 30 — Integrando o design",
+            title: "Integrando o design",
             description:
               "Encaixar o layout no fluxo da aplicação.",
             pandaVideoExternalId: "723cea46-09b5-48ac-97ff-f7fa963086ee",
@@ -685,7 +686,7 @@ const CATALOG: ModuleSeed[] = [
           },
           {
             slug: "aula-31-configs-extra-openai",
-            title: "Aula 31 — Configs extra da OpenAI",
+            title: "Configs extra da OpenAI",
             description:
               "Ajustes extras da API da OpenAI no projeto.",
             pandaVideoExternalId: "70a5c758-2b14-45fb-8d9e-ee1ffddcc61f",
@@ -693,7 +694,7 @@ const CATALOG: ModuleSeed[] = [
           },
           {
             slug: "aula-32-salvar-vetores-no-banco",
-            title: "Aula 32 — Salvar vetores no banco",
+            title: "Salvar vetores no banco",
             description:
               "Persistir embeddings para busca no produto.",
             pandaVideoExternalId: "f9eed381-10ec-4272-9c24-2e57f32ad4f1",
@@ -701,7 +702,7 @@ const CATALOG: ModuleSeed[] = [
           },
           {
             slug: "aula-33-enviar-mensagem-pelo-chat",
-            title: "Aula 33 — Enviar mensagem pelo chat",
+            title: "Enviar mensagem pelo chat",
             description:
               "O fluxo de envio e resposta no chat do Doc Pilot.",
             pandaVideoExternalId: "028d05a1-01b8-4b45-8539-2bbe7d023226",
@@ -709,7 +710,7 @@ const CATALOG: ModuleSeed[] = [
           },
           {
             slug: "aula-34-upload-de-arquivos",
-            title: "Aula 34 — Upload de arquivos",
+            title: "Upload de arquivos",
             description:
               "Enviar arquivos, indexar e usar no chat.",
             pandaVideoExternalId: "36b8eb27-985c-4c91-a4e0-4c22ef6c70fe",
