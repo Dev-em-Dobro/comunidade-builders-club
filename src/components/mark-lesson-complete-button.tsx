@@ -9,11 +9,15 @@ export function MarkLessonCompleteButton({
   moduleSlug,
   lessonSlug,
   onCompleted,
+  label = "Marcar como concluída",
+  className = "btn-primary min-w-[12rem]",
 }: {
   lessonId: string;
   moduleSlug: string;
   lessonSlug: string;
   onCompleted?: () => void;
+  label?: string;
+  className?: string;
 }) {
   const router = useRouter();
   const [pending, start] = useTransition();
@@ -36,7 +40,7 @@ export function MarkLessonCompleteButton({
     <div>
       <button
         type="button"
-        className="btn-primary min-w-[12rem]"
+        className={className}
         disabled={pending}
         aria-busy={pending}
         onClick={() => {
@@ -62,7 +66,7 @@ export function MarkLessonCompleteButton({
           });
         }}
       >
-        {pending ? "Marcando…" : "Marcar como concluída"}
+        {pending ? "Marcando…" : label}
       </button>
       {error ? (
         <p className="mt-2 text-sm text-red-600" role="alert">

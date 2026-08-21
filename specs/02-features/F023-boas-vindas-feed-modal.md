@@ -11,7 +11,11 @@ com toggle entre visão reduzida (atual) e expandida.
 ## Critérios
 - [x] Space `boas-vindas` no seed (topo da lista de Spaces)
 - [x] `/` = Feed com todos os posts **exceto** Boas-vindas; toggle compacto/expandido
-- [x] `/spaces/boas-vindas` = hero + grade de cards (posts do space)
+- [x] `/spaces/boas-vindas` = hero + tutorial Panda em largura total +
+  grade compacta de cards abaixo (posts do space)
+- [x] Abaixo do hero: player Panda do tutorial da comunidade
+  (`tutorial-intro-comunidade`). Cards de orientação ficam abaixo do
+  vídeo, compactos, para continuarem visíveis na tela.
 - [x] Clique no card abre modal com body, reações, expandir
 - [x] Comentários **desativados** em Boas-vindas (orientação, não conversa)
 - [x] No modal: “Expandir” abre o post na área de conteúdo (rota `/posts/[id]`, ao lado do aside)
@@ -26,4 +30,4 @@ com toggle entre visão reduzida (atual) e expandida.
 ## Arquivos
 - `src/components/welcome-space-view.tsx`, `post-modal.tsx`, `feed-list.tsx`, `post-detail-content.tsx`
 - `src/actions/post-detail.ts`
-- `prisma/seed.ts`, `src/lib/spaces/constants.ts`
+- `prisma/seed.ts`, `src/lib/spaces/constants.ts` (tutorial Panda)

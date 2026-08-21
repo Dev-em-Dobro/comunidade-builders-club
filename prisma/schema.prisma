@@ -298,10 +298,15 @@ model Module {
   coverImageUrl String?
   sortOrder     Int      @default(0)
   published     Boolean  @default(false)
+  /// F050 — módulo interno (subpasta). Null = primeiro nível do catálogo.
+  parentId      String?
+  parent        Module?  @relation("ModuleTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children      Module[] @relation("ModuleTree")
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   lessons       Lesson[]
 
+  @@index([parentId, sortOrder])
   @@map("module")
 }
 
@@ -312,8 +317,8 @@ model Lesson {
   slug                 String
   title                String
   description          String?
-  pandaVideoExternalId String
-  pandaLibraryId       String
+  pandaVideoExternalId String?
+  pandaLibraryId       String?
   thumbnailUrl         String?
   sortOrder            Int              @default(0)
   published            Boolean          @default(false)

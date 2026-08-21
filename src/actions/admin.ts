@@ -41,7 +41,10 @@ function bustSpacesCache() {
 function bustAulasCache() {
   revalidateTag("aulas");
   revalidatePath("/admin");
+  revalidatePath("/admin", "layout");
   revalidatePath("/aulas");
+  revalidatePath("/aulas", "layout");
+  revalidatePath("/admin/progresso");
 }
 
 export async function createSpaceAction(formData: FormData) {
@@ -148,6 +151,7 @@ export async function createModuleAction(formData: FormData) {
     coverImageUrl: String(formData.get("coverImageUrl") ?? "") || null,
     sortOrder: Number(formData.get("sortOrder") ?? 0),
     published: formData.get("published") === "on",
+    parentId: String(formData.get("parentId") ?? "") || null,
   };
   moduleSchema.parse(raw);
   await createModule(raw);
@@ -163,6 +167,7 @@ export async function updateModuleAction(id: string, formData: FormData) {
     coverImageUrl: String(formData.get("coverImageUrl") ?? "") || null,
     sortOrder: Number(formData.get("sortOrder") ?? 0),
     published: formData.get("published") === "on",
+    parentId: String(formData.get("parentId") ?? "") || null,
   };
   moduleSchema.parse(raw);
   await updateModule(id, raw);
@@ -183,13 +188,28 @@ export async function createLessonAction(formData: FormData) {
     title: String(formData.get("title") ?? ""),
     description: String(formData.get("description") ?? "") || null,
     pandaVideoExternalId: String(formData.get("pandaVideoExternalId") ?? ""),
-    pandaLibraryId: String(formData.get("pandaLibraryId") ?? ""),
+    pandaLibraryId: String(formData.get("pandaVideoExternalId") ?? "").trim()
+      ? String(formData.get("pandaLibraryId") ?? "")
+      : "",
     thumbnailUrl: String(formData.get("thumbnailUrl") ?? "") || null,
     sortOrder: Number(formData.get("sortOrder") ?? 0),
     published: formData.get("published") === "on",
   };
   lessonSchema.parse(raw);
   await createLesson(raw);
+  bustAulasCache();
+}
+
+export async function updateLessonDescriptionAction(formData: FormData) {
+  await requireAdmin();
+  const id = String(formData.get("lessonId") ?? "");
+  const description = String(formData.get("description") ?? "").trim();
+  if (!id) throw new Error("Aula inválida.");
+  if (description.length > 12000) throw new Error("Descrição muito longa.");
+  await prisma.lesson.update({
+    where: { id },
+    data: { description: description || null },
+  });
   bustAulasCache();
 }
 
@@ -201,7 +221,9 @@ export async function updateLessonAction(id: string, formData: FormData) {
     title: String(formData.get("title") ?? ""),
     description: String(formData.get("description") ?? "") || null,
     pandaVideoExternalId: String(formData.get("pandaVideoExternalId") ?? ""),
-    pandaLibraryId: String(formData.get("pandaLibraryId") ?? ""),
+    pandaLibraryId: String(formData.get("pandaVideoExternalId") ?? "").trim()
+      ? String(formData.get("pandaLibraryId") ?? "")
+      : "",
     thumbnailUrl: String(formData.get("thumbnailUrl") ?? "") || null,
     sortOrder: Number(formData.get("sortOrder") ?? 0),
     published: formData.get("published") === "on",
@@ -217,20 +239,20 @@ export async function deleteLessonAction(id: string) {
   bustAulasCache();
 }
 
-export async function moveModuleAction(
-  id: string,
-  direction: "up" | "down",
-) {
+export async function moveModuleAction(formData: FormData) {
   await requireAdmin();
+  const id = String(formData.get("id") ?? "").trim();
+  const direction = formData.get("direction") === "up" ? "up" : "down";
+  if (!id) throw new Error("Módulo não encontrado.");
   await moveModule(id, direction);
   bustAulasCache();
 }
 
-export async function moveLessonAction(
-  id: string,
-  direction: "up" | "down",
-) {
+export async function moveLessonAction(formData: FormData) {
   await requireAdmin();
+  const id = String(formData.get("id") ?? "").trim();
+  const direction = formData.get("direction") === "up" ? "up" : "down";
+  if (!id) throw new Error("Aula não encontrada.");
   await moveLesson(id, direction);
   bustAulasCache();
 }

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { snippetFromBody } from "@/lib/markdown/text";
 
 export type AulaLessonCard = {
   id: string;
@@ -18,95 +19,316 @@ export type AulaModuleCard = {
   description: string | null;
   coverImageUrl: string | null;
   lessons: AulaLessonCard[];
+  children?: AulaModuleCard[];
 };
 
-export function AulasCatalog({ modules }: { modules: AulaModuleCard[] }) {
-  if (modules.length === 0) {
-    return null;
-  }
+type ModuleNode = {
+  id: string;
+  slug: string;
+  title: string;
+  description: string | null;
+  coverImageUrl: string | null;
+  lessons: Array<{
+    id: string;
+    slug: string;
+    title: string;
+    description: string | null;
+    thumbnailUrl: string | null;
+  }>;
+  children?: ModuleNode[];
+};
 
+export function mapModule(mod: ModuleNode, completed: Set<string>): AulaModuleCard {
+  return {
+    id: mod.id,
+    slug: mod.slug,
+    title: mod.title,
+    description: mod.description,
+    coverImageUrl: mod.coverImageUrl,
+    lessons: mod.lessons.map((l) => ({
+      id: l.id,
+      slug: l.slug,
+      title: l.title,
+      description: l.description,
+      thumbnailUrl: l.thumbnailUrl,
+      moduleSlug: mod.slug,
+      completed: completed.has(l.id),
+    })),
+    children: (mod.children ?? []).map((child) => mapModule(child, completed)),
+  };
+}
+
+export function contentCount(mod: AulaModuleCard): number {
   return (
-    <ul className="mt-8 space-y-6">
-      {modules.map((mod) => (
-        <li
-          key={mod.id}
-          className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm"
-        >
-          <div className="flex flex-wrap items-center gap-4 border-b border-border bg-surface/40 px-4 py-3 sm:px-5">
-            {mod.coverImageUrl ? (
+    mod.lessons.length +
+    (mod.children ?? []).reduce((n, child) => n + contentCount(child), 0)
+  );
+}
+
+export function completedCount(mod: AulaModuleCard): number {
+  return (
+    mod.lessons.filter((l) => l.completed).length +
+    (mod.children ?? []).reduce((n, child) => n + completedCount(child), 0)
+  );
+}
+
+export function coverOf(mod: AulaModuleCard): string | null {
+  if (mod.coverImageUrl) return mod.coverImageUrl;
+  const own = mod.lessons.find((l) => l.thumbnailUrl)?.thumbnailUrl;
+  if (own) return own;
+  for (const child of mod.children ?? []) {
+    const nested = coverOf(child);
+    if (nested) return nested;
+  }
+  return null;
+}
+
+export function findModuleBySlug(
+  modules: AulaModuleCard[],
+  slug: string,
+): AulaModuleCard | null {
+  for (const mod of modules) {
+    if (mod.slug === slug) return mod;
+    const nested = findModuleBySlug(mod.children ?? [], slug);
+    if (nested) return nested;
+  }
+  return null;
+}
+
+export function findRootContaining(
+  roots: AulaModuleCard[],
+  slug: string,
+): AulaModuleCard | null {
+  for (const root of roots) {
+    if (findModuleBySlug([root], slug)) return root;
+  }
+  return null;
+}
+
+export function leafModules(mod: AulaModuleCard): AulaModuleCard[] {
+  const kids = mod.children ?? [];
+  const nested = kids.flatMap(leafModules);
+  if (mod.lessons.length > 0) return [mod, ...nested];
+  return nested;
+}
+
+/** Agrupa submódulos pelas trilhas intermediárias (ex.: IA Aplicada | n8n). */
+export type SidebarGroup = {
+  id: string;
+  title: string | null;
+  sections: AulaModuleCard[];
+};
+
+export function sidebarGroups(root: AulaModuleCard): SidebarGroup[] {
+  const kids = root.children ?? [];
+  const tracks = kids.filter((k) => (k.children ?? []).length > 0);
+  if (tracks.length >= 2) {
+    return tracks
+      .map((track) => ({
+        id: track.id,
+        title: track.title,
+        sections: leafModules(track),
+      }))
+      .filter((g) => g.sections.length > 0);
+  }
+  return [{ id: root.id, title: null, sections: leafModules(root) }];
+}
+
+export function flattenLessons(mod: AulaModuleCard): AulaLessonCard[] {
+  return [
+    ...mod.lessons,
+    ...(mod.children ?? []).flatMap(flattenLessons),
+  ];
+}
+
+export function progressPct(mod: AulaModuleCard): number {
+  const total = contentCount(mod);
+  if (total === 0) return 0;
+  return Math.round((completedCount(mod) / total) * 100);
+}
+
+function LessonRows({ lessons }: { lessons: AulaLessonCard[] }) {
+  if (lessons.length === 0) return null;
+  return (
+    <ul className="divide-y divide-border">
+      {lessons.map((l) => (
+        <li key={l.id}>
+          <Link
+            href={`/aulas/${l.moduleSlug}/${l.slug}`}
+            className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-surface/60 sm:gap-4 sm:px-5"
+          >
+            {l.thumbnailUrl ? (
               <Image
-                src={mod.coverImageUrl}
+                src={l.thumbnailUrl}
                 alt=""
-                width={56}
-                height={80}
-                className="h-16 w-12 shrink-0 rounded-lg object-cover sm:h-20 sm:w-14"
-                sizes="56px"
+                width={96}
+                height={56}
+                className="h-12 w-20 shrink-0 rounded-md object-cover sm:h-14 sm:w-24"
+                sizes="96px"
               />
             ) : (
-              <div className="flex h-16 w-12 shrink-0 items-center justify-center rounded-lg bg-accent/15 text-xs font-bold text-accent sm:h-20 sm:w-14">
-                Aula
+              <div className="flex h-12 w-20 shrink-0 items-center justify-center rounded-md bg-surface text-[10px] font-semibold uppercase tracking-wide text-muted sm:h-14 sm:w-24">
+                Vídeo
               </div>
             )}
             <div className="min-w-0 flex-1">
-              <h2 className="font-[family-name:var(--font-outfit)] text-lg font-semibold md:text-xl">
-                {mod.title}
-              </h2>
-              {mod.description ? (
-                <p className="mt-0.5 text-[15px] text-muted">{mod.description}</p>
-              ) : null}
-              <p className="mt-1 text-sm text-muted">
-                {mod.lessons.length}{" "}
-                {mod.lessons.length === 1 ? "conteúdo" : "conteúdos"}
+              <p className="truncate text-[15px] font-semibold text-foreground md:text-base">
+                {l.title}
               </p>
+              <p className="text-sm text-muted">Vídeo</p>
             </div>
-          </div>
-
-          <ul className="divide-y divide-border">
-            {mod.lessons.map((l) => (
-              <li key={l.id}>
-                <Link
-                  href={`/aulas/${l.moduleSlug}/${l.slug}`}
-                  className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-surface/60 sm:gap-4 sm:px-5"
-                >
-                  {l.thumbnailUrl ? (
-                    <Image
-                      src={l.thumbnailUrl}
-                      alt=""
-                      width={96}
-                      height={56}
-                      className="h-12 w-20 shrink-0 rounded-md object-cover sm:h-14 sm:w-24"
-                      sizes="96px"
-                    />
-                  ) : (
-                    <div className="flex h-12 w-20 shrink-0 items-center justify-center rounded-md bg-surface text-[10px] font-semibold uppercase tracking-wide text-muted sm:h-14 sm:w-24">
-                      Vídeo
-                    </div>
-                  )}
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-[15px] font-semibold text-foreground md:text-base">
-                      {l.title}
-                    </p>
-                    <p className="text-sm text-muted">Vídeo</p>
-                  </div>
-                  {l.completed ? (
-                    <span className="shrink-0 text-xs font-semibold uppercase tracking-wide text-accent">
-                      Concluída
-                    </span>
-                  ) : (
-                    <span className="shrink-0 text-sm font-medium text-accent">
-                      Assistir →
-                    </span>
-                  )}
-                </Link>
-              </li>
-            ))}
-          </ul>
-
-          <p className="border-t border-border px-4 py-2.5 text-sm text-muted sm:px-5">
-            {mod.lessons.length} conteúdo(s)
-          </p>
+            {l.completed ? (
+              <span className="shrink-0 text-xs font-semibold uppercase tracking-wide text-accent">
+                Concluída
+              </span>
+            ) : (
+              <span className="shrink-0 text-sm font-medium text-accent">
+                Assistir →
+              </span>
+            )}
+          </Link>
         </li>
       ))}
     </ul>
+  );
+}
+
+function ModuleBranch({
+  mod,
+  depth,
+}: {
+  mod: AulaModuleCard;
+  depth: number;
+}) {
+  const children = mod.children ?? [];
+  const headingClass =
+    depth <= 1
+      ? "font-[family-name:var(--font-outfit)] text-base font-semibold md:text-lg"
+      : "text-[15px] font-semibold";
+
+  return (
+    <div className="border-t border-border">
+      <div
+        className={
+          depth <= 1
+            ? "flex flex-wrap items-center gap-3 bg-surface/30 px-4 py-3 sm:px-5"
+            : "px-4 py-3 sm:px-5 sm:pl-8"
+        }
+      >
+        {mod.coverImageUrl && depth < 2 ? (
+          <Image
+            src={mod.coverImageUrl}
+            alt=""
+            width={36}
+            height={48}
+            className="h-12 w-9 shrink-0 rounded-lg object-cover"
+            sizes="36px"
+          />
+        ) : null}
+        <div className="min-w-0 flex-1">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">
+            {depth >= 2 ? "Submódulo" : "Módulo"}
+          </p>
+          <h3 className={headingClass}>{mod.title}</h3>
+          {mod.description ? (
+            <p className="mt-0.5 whitespace-pre-line text-sm text-muted sm:text-[15px]">
+              {mod.description}
+            </p>
+          ) : null}
+        </div>
+      </div>
+      <LessonRows lessons={mod.lessons} />
+      {children.map((child) => (
+        <ModuleBranch key={child.id} mod={child} depth={depth + 1} />
+      ))}
+    </div>
+  );
+}
+
+function Cover({ src, title }: { src: string | null; title: string }) {
+  if (src) {
+    return (
+      <Image
+        src={src}
+        alt=""
+        fill
+        className="h-full w-full object-fill"
+        sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
+      />
+    );
+  }
+  return (
+    <div className="flex h-full w-full items-end bg-gradient-to-br from-accent/80 to-accent-hover p-4">
+      <span className="font-[family-name:var(--font-outfit)] text-lg font-semibold text-accent-foreground">
+        {title}
+      </span>
+    </div>
+  );
+}
+
+export function AulasCatalog({ modules }: { modules: AulaModuleCard[] }) {
+  if (modules.length === 0) return null;
+
+  return (
+    <ul className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+      {modules.map((mod) => {
+        const total = contentCount(mod);
+        const pct = progressPct(mod);
+        const summary = mod.description
+          ? snippetFromBody(mod.description, 140)
+          : null;
+        return (
+          <li key={mod.id}>
+            <Link
+              href={`/aulas/${mod.slug}`}
+              className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-colors hover:border-accent/40 hover:shadow-md"
+            >
+              <div className="relative aspect-video w-full overflow-hidden bg-surface">
+                <Cover src={coverOf(mod)} title={mod.title} />
+              </div>
+              <div className="flex flex-1 flex-col p-4 sm:p-5">
+                <h2 className="font-[family-name:var(--font-outfit)] text-lg font-semibold leading-snug">
+                  {mod.title}
+                </h2>
+                {summary ? (
+                  <p className="mt-1.5 line-clamp-2 text-sm text-muted">
+                    {summary}
+                  </p>
+                ) : null}
+                <div className="mt-auto pt-4">
+                  <div className="h-1.5 overflow-hidden rounded-full bg-surface">
+                    <div
+                      className="h-full rounded-full bg-accent"
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                  <p className="mt-1.5 text-xs font-medium text-muted">
+                    {pct}%
+                    {total > 0
+                      ? ` · ${total} ${total === 1 ? "aula" : "aulas"}`
+                      : " · em breve"}
+                  </p>
+                </div>
+              </div>
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+export function AulasModuleOutline({ mod }: { mod: AulaModuleCard }) {
+  const children = mod.children ?? [];
+  if (mod.lessons.length === 0 && children.length === 0) {
+    return null;
+  }
+  return (
+    <div className="mt-8 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+      <LessonRows lessons={mod.lessons} />
+      {children.map((child) => (
+        <ModuleBranch key={child.id} mod={child} depth={1} />
+      ))}
+    </div>
   );
 }

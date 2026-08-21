@@ -7,12 +7,18 @@ import {
 import { getSpaceBySlug } from "@/lib/spaces";
 import { listPosts } from "@/lib/posts";
 import { markWelcomeSeen } from "@/lib/profile";
-import { WELCOME_SPACE_SLUG } from "@/lib/spaces/constants";
+import {
+  WELCOME_SPACE_SLUG,
+  WELCOME_TUTORIAL_VIDEO,
+} from "@/lib/spaces/constants";
+import { pandaEmbedUrl } from "@/lib/aulas";
 import { FeedList } from "@/components/feed-list";
 import { WelcomeSpaceView } from "@/components/welcome-space-view";
 import { EmptyState } from "@/components/empty-state";
 
 type Props = { params: Promise<{ slug: string }> };
+
+export const dynamic = "force-dynamic";
 
 export default async function SpacePage({ params }: Props) {
   const { slug } = await params;
@@ -39,6 +45,16 @@ export default async function SpacePage({ params }: Props) {
   const isAdmin = member.membership.role === "admin";
 
   if (slug === WELCOME_SPACE_SLUG) {
+    let tutorialEmbedUrl: string | null = null;
+    try {
+      tutorialEmbedUrl = pandaEmbedUrl(
+        WELCOME_TUTORIAL_VIDEO.pandaLibraryId,
+        WELCOME_TUTORIAL_VIDEO.pandaVideoExternalId,
+      );
+    } catch {
+      tutorialEmbedUrl = null;
+    }
+
     return (
       <WelcomeSpaceView
         spaceName={space.name}
@@ -46,6 +62,8 @@ export default async function SpacePage({ params }: Props) {
         isAdmin={isAdmin}
         isPaid={isPaid}
         currentUserId={member.user.id}
+        tutorialEmbedUrl={tutorialEmbedUrl}
+        tutorialTitle={WELCOME_TUTORIAL_VIDEO.title}
         posts={posts.map((p) => ({
           id: p.id,
           title: p.title,

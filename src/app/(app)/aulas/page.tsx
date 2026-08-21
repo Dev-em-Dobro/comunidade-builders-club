@@ -4,7 +4,7 @@ import {
   listPublishedModules,
 } from "@/lib/aulas";
 import { EmptyState } from "@/components/empty-state";
-import { AulasCatalog } from "@/components/aulas-catalog";
+import { AulasCatalog, mapModule } from "@/components/aulas-catalog";
 
 export default async function AulasPage() {
   const member = await requirePaidMemberOrRedirect();
@@ -13,28 +13,13 @@ export default async function AulasPage() {
     listCompletedLessonIds(member.user.id),
   ]);
 
-  const catalog = modules.map((mod) => ({
-    id: mod.id,
-    slug: mod.slug,
-    title: mod.title,
-    description: mod.description,
-    coverImageUrl: mod.coverImageUrl,
-    lessons: mod.lessons.map((l) => ({
-      id: l.id,
-      slug: l.slug,
-      title: l.title,
-      description: l.description,
-      thumbnailUrl: l.thumbnailUrl,
-      moduleSlug: mod.slug,
-      completed: completed.has(l.id),
-    })),
-  }));
+  const catalog = modules.map((mod) => mapModule(mod, completed));
 
   return (
     <div className="feed-wrap-wide">
       <h1 className="page-title">Aulas</h1>
       <p className="mt-2 text-sm text-muted">
-        Conteúdo em vídeo da comunidade. Clique para assistir.
+        Escolha um módulo para ver as aulas.
       </p>
 
       {catalog.length === 0 ? (

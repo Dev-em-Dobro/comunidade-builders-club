@@ -10,6 +10,9 @@ Admin move módulos e aulas na ordem do catálogo (setas ↑/↓), usando
 ## Comportamento
 - Na tab Admin → Aulas: botões subir/descer por módulo e por aula.
 - Troca `sortOrder` com o vizinho imediato (mesmo módulo, para aulas).
+- Persistência: form envia `id` + `direction` (não usa `.bind` de dois
+  argumentos no client, que descartava a direção). Refresh após mover.
+- Seed não sobrescreve `sortOrder` de aula/módulo já existente.
 - Itens nas pontas não sobem/descem além do limite.
 - Cache de aulas invalidado após mover.
 

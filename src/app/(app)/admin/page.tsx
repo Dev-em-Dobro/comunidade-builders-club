@@ -10,19 +10,14 @@ import { listAllowedEmails } from "@/lib/membership/allowlist";
 import { listAllModulesAdmin } from "@/lib/aulas";
 import {
   addAllowedEmailAction,
-  createLessonAction,
-  createModuleAction,
   createSpaceAction,
-  deleteLessonAction,
-  deleteModuleAction,
   deleteSpaceAction,
-  moveLessonAction,
-  moveModuleAction,
   removeAllowedEmailAction,
   setMemberRoleAction,
   setMemberStatusAction,
 } from "@/actions/admin";
 import { AdminBulkAllowlist } from "@/components/admin-bulk-allowlist";
+import { AdminAulasPanel } from "@/components/admin-aulas-panel";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import {
   AdminTabs,
@@ -34,6 +29,8 @@ import type { MembershipStatus } from "@prisma/client";
 type Props = {
   searchParams: Promise<{ status?: string; q?: string; tab?: string }>;
 };
+
+export const dynamic = "force-dynamic";
 
 const STATUSES: Array<MembershipStatus | "all"> = [
   "all",
@@ -265,204 +262,11 @@ export default async function AdminPage({ searchParams }: Props) {
         <section className="mt-8">
           <h2 className="text-lg font-semibold">Aulas (Panda Video)</h2>
           <p className="mt-1 text-sm text-muted">
-            Cadastre módulos e aulas com IDs do Panda. Só itens publicados
-            aparecem para membros.
+            Árvore da formação, módulos e submódulos. Criação fica nos
+            formulários acima da lista — não se repete em cada item. Só
+            publicados aparecem para membros.
           </p>
-
-          <form
-            action={createModuleAction}
-            className="post-card mt-4 max-w-lg space-y-2"
-          >
-            <p className="text-sm font-medium">Novo módulo</p>
-            <input name="title" className="input" placeholder="Título" required />
-            <input name="slug" className="input" placeholder="slug" required />
-            <input name="description" className="input" placeholder="Descrição" />
-            <input
-              name="coverImageUrl"
-              className="input"
-              placeholder="Capa URL ou /aulas/modulo-capa.png"
-            />
-            <input
-              name="sortOrder"
-              type="number"
-              className="input"
-              defaultValue={0}
-            />
-            <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" name="published" /> Publicado
-            </label>
-            <button type="submit" className="btn-primary">
-              Criar módulo
-            </button>
-          </form>
-
-          {modules.map((mod, modIndex) => (
-            <div key={mod.id} className="post-card mt-4 max-w-2xl space-y-3">
-              <div className="flex flex-wrap items-start justify-between gap-2">
-                <div className="flex min-w-0 items-start gap-3">
-                  {mod.coverImageUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={mod.coverImageUrl}
-                      alt=""
-                      className="h-14 w-10 shrink-0 rounded object-cover"
-                    />
-                  ) : null}
-                  <div>
-                    <p className="font-semibold">
-                      {mod.title}{" "}
-                      <span className="text-xs font-normal text-muted">
-                        /{mod.slug}
-                        {mod.published ? " · publicado" : " · rascunho"}
-                        {" · ordem "}
-                        {mod.sortOrder}
-                      </span>
-                    </p>
-                  </div>
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <form action={moveModuleAction.bind(null, mod.id, "up")}>
-                    <button
-                      type="submit"
-                      className="btn-ghost cursor-pointer text-xs"
-                      disabled={modIndex === 0}
-                      title="Subir módulo"
-                    >
-                      ↑
-                    </button>
-                  </form>
-                  <form action={moveModuleAction.bind(null, mod.id, "down")}>
-                    <button
-                      type="submit"
-                      className="btn-ghost cursor-pointer text-xs"
-                      disabled={modIndex === modules.length - 1}
-                      title="Descer módulo"
-                    >
-                      ↓
-                    </button>
-                  </form>
-                  <ConfirmDeleteButton
-                    action={deleteModuleAction.bind(null, mod.id)}
-                    label="Remover módulo"
-                    message={`Remover o módulo "${mod.title}" e todas as aulas?`}
-                  />
-                </div>
-              </div>
-
-              <ul className="space-y-2 text-sm">
-                {mod.lessons.map((l, lessonIndex) => (
-                  <li
-                    key={l.id}
-                    className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-surface/40 px-3 py-2"
-                  >
-                    <span className="flex min-w-0 items-center gap-2">
-                      {l.thumbnailUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={l.thumbnailUrl}
-                          alt=""
-                          className="h-8 w-14 shrink-0 rounded object-cover"
-                        />
-                      ) : null}
-                      <span>
-                        {l.title}{" "}
-                        <span className="text-xs text-muted">
-                          /{l.slug}
-                          {l.published ? "" : " · rascunho"}
-                          {" · ordem "}
-                          {l.sortOrder}
-                        </span>
-                      </span>
-                    </span>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <form action={moveLessonAction.bind(null, l.id, "up")}>
-                        <button
-                          type="submit"
-                          className="btn-ghost cursor-pointer text-xs"
-                          disabled={lessonIndex === 0}
-                          title="Subir aula"
-                        >
-                          ↑
-                        </button>
-                      </form>
-                      <form action={moveLessonAction.bind(null, l.id, "down")}>
-                        <button
-                          type="submit"
-                          className="btn-ghost cursor-pointer text-xs"
-                          disabled={lessonIndex === mod.lessons.length - 1}
-                          title="Descer aula"
-                        >
-                          ↓
-                        </button>
-                      </form>
-                      <ConfirmDeleteButton
-                        action={deleteLessonAction.bind(null, l.id)}
-                        label="Remover"
-                        message={`Remover a aula "${l.title}"?`}
-                      />
-                    </div>
-                  </li>
-                ))}
-              </ul>
-
-              <form
-                action={createLessonAction}
-                className="space-y-2 border-t border-border pt-3"
-              >
-                <p className="text-xs font-medium text-muted">
-                  Nova aula neste módulo
-                </p>
-                <input type="hidden" name="moduleId" value={mod.id} />
-                <input
-                  name="title"
-                  className="input"
-                  placeholder="Título da aula"
-                  required
-                />
-                <input
-                  name="slug"
-                  className="input"
-                  placeholder="slug-da-aula"
-                  required
-                />
-                <input
-                  name="pandaLibraryId"
-                  className="input"
-                  placeholder="Library/pullzone (ex: 77c52f03-dc6)"
-                  required
-                />
-                <input
-                  name="pandaVideoExternalId"
-                  className="input"
-                  placeholder="Video external ID"
-                  required
-                />
-                <input
-                  name="thumbnailUrl"
-                  className="input"
-                  placeholder="URL thumbnail (opcional)"
-                />
-                <input
-                  name="description"
-                  className="input"
-                  placeholder="Descrição"
-                />
-                <input
-                  name="sortOrder"
-                  type="number"
-                  className="input"
-                  defaultValue={mod.lessons.length}
-                />
-                <label className="flex items-center gap-2 text-sm">
-                  <input type="checkbox" name="published" defaultChecked />{" "}
-                  Publicado
-                </label>
-                <button type="submit" className="btn-outline text-sm">
-                  Adicionar aula
-                </button>
-              </form>
-            </div>
-          ))}
+          <AdminAulasPanel modules={modules} />
         </section>
       ) : null}
 
