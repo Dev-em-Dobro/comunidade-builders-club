@@ -50,6 +50,7 @@ const CATALOG: ModuleSeed[] = [
     title: "FASE 1 — Do zero ao primeiro sim",
     description:
       "Jornada até o primeiro cliente fechado: nicho, abordagem, amostra e o lado empresa.",
+    coverImageUrl: "/1-renda-extra.png",
     sortOrder: 0,
     lessons: [],
     children: [
@@ -233,6 +234,7 @@ const CATALOG: ModuleSeed[] = [
     title: "FASE 2 — Entregar e ligar a recorrência",
     description:
       "Entregar o site, o agente e transformar a entrega em mensalidade. Marco: cliente entregue + receita recorrente.",
+    coverImageUrl: "/2-entregar-recorrencia.png",
     sortOrder: 1,
     lessons: [],
     children: [
@@ -325,6 +327,7 @@ const CATALOG: ModuleSeed[] = [
     title: "Formação IA e Automações",
     description:
       "Produto-base da comunidade: criação de software com IA aplicada e automações com n8n.",
+    coverImageUrl: "/3-ia-automacoes.png",
     sortOrder: 10,
     lessons: [],
     children: [
@@ -726,6 +729,7 @@ const CATALOG: ModuleSeed[] = [
     slug: "fundamentos-do-builder-profissional",
     title: "Fundamentos do Builder Profissional",
     description: "",
+    coverImageUrl: "/4-fundamentos-builder.png",
     sortOrder: 11,
     lessons: [
       {

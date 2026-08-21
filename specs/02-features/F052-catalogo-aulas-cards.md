@@ -14,8 +14,10 @@ acordeão). Sem trava por “nível”, sem favoritar/avaliar neste recorte.
 ## Comportamento
 
 - `/aulas` — grid de módulos **publicados** na raiz (`parentId` null).
-- Card: capa (`coverImageUrl` ou thumb da primeira aula), título,
-  resumo curto da descrição, % concluído e quantidade de aulas na árvore.
+- Card: capa do módulo raiz (`coverImageUrl` em `/public`, série
+  `1-renda-extra.png` … `4-fundamentos-builder.png`). Sem capa, cai
+  para a thumb da primeira aula. Título, resumo da descrição, %
+  concluído e quantidade de aulas na árvore.
 - Clique no card → primeira aula da árvore (`/aulas/[moduleSlug]/[lessonSlug]`).
 - Player: vídeo à esquerda; à direita, módulos com aulas (acordeão,
   progresso, aula atual destacada). Se a formação tiver trilhas
@@ -35,6 +37,8 @@ acordeão). Sem trava por “nível”, sem favoritar/avaliar neste recorte.
 - [x] Formação com trilhas internas (IA / n8n) aparece agrupada, não
   como uma lista plana
 - [x] Detalhes e comentários ficam abaixo do vídeo, em abas
+- [x] Cards raiz usam capas de workspace no mesmo estilo (não frames
+  aleatórios de vídeo)
 
 ## Dependências
 
