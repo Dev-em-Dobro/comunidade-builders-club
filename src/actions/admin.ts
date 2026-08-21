@@ -148,6 +148,7 @@ export async function createModuleAction(formData: FormData) {
     coverImageUrl: String(formData.get("coverImageUrl") ?? "") || null,
     sortOrder: Number(formData.get("sortOrder") ?? 0),
     published: formData.get("published") === "on",
+    parentId: String(formData.get("parentId") ?? "") || null,
   };
   moduleSchema.parse(raw);
   await createModule(raw);
@@ -163,6 +164,7 @@ export async function updateModuleAction(id: string, formData: FormData) {
     coverImageUrl: String(formData.get("coverImageUrl") ?? "") || null,
     sortOrder: Number(formData.get("sortOrder") ?? 0),
     published: formData.get("published") === "on",
+    parentId: String(formData.get("parentId") ?? "") || null,
   };
   moduleSchema.parse(raw);
   await updateModule(id, raw);

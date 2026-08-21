@@ -35,6 +35,13 @@ export const moduleSchema = z.object({
   coverImageUrl: z.string().trim().max(2000).optional().nullable().or(z.literal("")),
   sortOrder: z.coerce.number().int().min(0).max(9999).default(0),
   published: z.boolean().default(false),
+  parentId: z
+    .string()
+    .trim()
+    .min(1)
+    .optional()
+    .nullable()
+    .or(z.literal("")),
 });
 
 export const lessonSchema = z.object({
@@ -64,27 +71,45 @@ export const lessonSchema = z.object({
   published: z.boolean().default(false),
 });
 
+const publishedLessonSelect = {
+  id: true,
+  slug: true,
+  title: true,
+  description: true,
+  thumbnailUrl: true,
+  sortOrder: true,
+} as const;
+
+const publishedModuleFields = {
+  id: true,
+  slug: true,
+  title: true,
+  description: true,
+  coverImageUrl: true,
+  sortOrder: true,
+  lessons: {
+    where: { published: true },
+    orderBy: { sortOrder: "asc" as const },
+    select: publishedLessonSelect,
+  },
+};
+
 const listPublishedModulesCached = unstable_cache(
   async () =>
     prisma.module.findMany({
-      where: { published: true },
+      where: { published: true, parentId: null },
       select: {
-        id: true,
-        slug: true,
-        title: true,
-        description: true,
-        coverImageUrl: true,
-        sortOrder: true,
-        lessons: {
+        ...publishedModuleFields,
+        children: {
           where: { published: true },
           orderBy: { sortOrder: "asc" },
           select: {
-            id: true,
-            slug: true,
-            title: true,
-            description: true,
-            thumbnailUrl: true,
-            sortOrder: true,
+            ...publishedModuleFields,
+            children: {
+              where: { published: true },
+              orderBy: { sortOrder: "asc" },
+              select: publishedModuleFields,
+            },
           },
         },
       },
@@ -100,22 +125,49 @@ export async function listPublishedModules() {
 
 export async function listAllModulesAdmin() {
   return prisma.module.findMany({
+    where: { parentId: null },
     include: {
       lessons: { orderBy: { sortOrder: "asc" } },
+      children: {
+        orderBy: { sortOrder: "asc" },
+        include: {
+          lessons: { orderBy: { sortOrder: "asc" } },
+          children: {
+            orderBy: { sortOrder: "asc" },
+            include: { lessons: { orderBy: { sortOrder: "asc" } } },
+          },
+        },
+      },
     },
     orderBy: { sortOrder: "asc" },
   });
 }
 
 export async function getLessonForMember(moduleSlug: string, lessonSlug: string) {
-  return prisma.lesson.findFirst({
+  const lesson = await prisma.lesson.findFirst({
     where: {
       slug: lessonSlug,
       published: true,
       module: { slug: moduleSlug, published: true },
     },
-    include: { module: true },
+    include: {
+      module: {
+        include: { parent: { include: { parent: true } } },
+      },
+    },
   });
+  if (!lesson) return null;
+  type Ancestor = { published: boolean; parent?: Ancestor | null } | null;
+  let ancestor: Ancestor = lesson.module.parent;
+  while (ancestor) {
+    if (!ancestor.published) return null;
+    ancestor = ancestor.parent ?? null;
+  }
+  return lesson;
+}
+
+function parentIdFrom(data: z.infer<typeof moduleSchema>): string | null {
+  return data.parentId && data.parentId.length > 0 ? data.parentId : null;
 }
 
 export async function createModule(raw: z.infer<typeof moduleSchema>) {
@@ -128,6 +180,7 @@ export async function createModule(raw: z.infer<typeof moduleSchema>) {
       coverImageUrl: data.coverImageUrl || null,
       sortOrder: data.sortOrder,
       published: data.published,
+      parentId: parentIdFrom(data),
     },
   });
 }
@@ -146,6 +199,7 @@ export async function updateModule(
       coverImageUrl: data.coverImageUrl || null,
       sortOrder: data.sortOrder,
       published: data.published,
+      parentId: parentIdFrom(data),
     },
   });
 }
@@ -198,7 +252,14 @@ export async function deleteLesson(id: string) {
 
 /** F046 — sobe/desce na lista e reindexa sortOrder (0..n). */
 export async function moveModule(id: string, direction: "up" | "down") {
+  const target = await prisma.module.findUnique({
+    where: { id },
+    select: { id: true, parentId: true },
+  });
+  if (!target) throw new Error("Módulo não encontrado.");
+
   const modules = await prisma.module.findMany({
+    where: { parentId: target.parentId },
     orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
     select: { id: true },
   });

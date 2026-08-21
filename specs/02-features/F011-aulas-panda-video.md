@@ -8,9 +8,13 @@ Catálogo de módulos/aulas com playback via Panda Video (ADR-005).
 
 ## Modelo
 
-- `Module` — título, slug, descrição, ordem, publicado
+- `Module` — título, slug, descrição, ordem, publicado; `parentId` opcional
+  (formação → módulo → submódulo · F050)
 - `Lesson` — título, descrição, `pandaVideoExternalId`, `pandaLibraryId`, ordem, `moduleId`, publicado
 - `LessonProgress` — userId, lessonId, seconds, completedAt (opcional no MVP)
+
+Somente módulo **publicado** na raiz entra no catálogo do aluno. Rascunho
+(e qualquer descendente) fica só no admin.
 
 ## Critérios
 

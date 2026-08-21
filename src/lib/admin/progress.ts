@@ -20,7 +20,17 @@ export type StudentProgressRow = {
 
 export async function getPublishedLessonsCatalog() {
   return prisma.lesson.findMany({
-    where: { published: true },
+    where: {
+      published: true,
+      module: {
+        published: true,
+        OR: [
+          { parentId: null },
+          { parent: { published: true, parentId: null } },
+          { parent: { published: true, parent: { published: true } } },
+        ],
+      },
+    },
     select: {
       id: true,
       title: true,
