@@ -252,7 +252,7 @@ function Cover({ src, title }: { src: string | null; title: string }) {
         src={src}
         alt=""
         fill
-        className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+        className="h-full w-full object-fill"
         sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
       />
     );
@@ -283,7 +283,7 @@ export function AulasCatalog({ modules }: { modules: AulaModuleCard[] }) {
               href={`/aulas/${mod.slug}`}
               className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-colors hover:border-accent/40 hover:shadow-md"
             >
-              <div className="relative aspect-[16/10] overflow-hidden bg-surface">
+              <div className="relative aspect-video w-full overflow-hidden bg-surface">
                 <Cover src={coverOf(mod)} title={mod.title} />
               </div>
               <div className="flex flex-1 flex-col p-4 sm:p-5">

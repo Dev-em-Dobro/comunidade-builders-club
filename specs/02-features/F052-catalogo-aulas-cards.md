@@ -15,7 +15,8 @@ acordeão). Sem trava por “nível”, sem favoritar/avaliar neste recorte.
 
 - `/aulas` — grid de módulos **publicados** na raiz (`parentId` null).
 - Card: capa do módulo raiz (`coverImageUrl` em `/public`, série
-  `1-renda-extra.png` … `4-fundamentos-builder.png`). Sem capa, cai
+  `1-renda-extra.png` … `4-fundamentos-builder.png`). A capa preenche
+  a área 16:9 do card (largura × altura), sem recorte. Sem capa, cai
   para a thumb da primeira aula. Título, resumo da descrição, %
   concluído e quantidade de aulas na árvore.
 - Clique no card → primeira aula da árvore (`/aulas/[moduleSlug]/[lessonSlug]`).
@@ -39,6 +40,7 @@ acordeão). Sem trava por “nível”, sem favoritar/avaliar neste recorte.
 - [x] Detalhes e comentários ficam abaixo do vídeo, em abas
 - [x] Cards raiz usam capas de workspace no mesmo estilo (não frames
   aleatórios de vídeo)
+- [x] Capa ocupa a área inteira do card, sem corte
 
 ## Dependências
 
