@@ -55,16 +55,32 @@ const CATALOG: ModuleSeed[] = [
         slug: "fase-1-m01-comece-por-aqui",
         title: "Comece por aqui",
         description:
-          "Boas-vindas, mapa da formação e o que você vai construir e vender com IA.\n\nEntregável: apresentar-se no grupo e definir um nicho inicial.",
+          "Introdução ao clube, tutorial da comunidade, mapa da formação e o que você vai construir e vender com IA.\n\nEntregável: apresentar-se no grupo e definir um nicho inicial.",
         sortOrder: 0,
         lessons: [
+          {
+            slug: "aula-introducao-builders-club",
+            title: "Introdução ao Builders Club",
+            description:
+              "Aula de abertura: o que é o Builders Club, para quem é e como você entra na jornada.",
+            pandaVideoExternalId: "19fad82c-70df-4dd1-ab5d-a6b44b18a58f",
+            sortOrder: 0,
+          },
+          {
+            slug: "tutorial-intro-comunidade",
+            title: "Como usar a comunidade",
+            description:
+              "Tutorial da plataforma: Feed, Spaces, Aulas e como circular na comunidade. O mesmo vídeo aparece na tela de Boas-vindas.",
+            pandaVideoExternalId: "38608c40-7b9a-4b30-a33e-287bf5072af3",
+            sortOrder: 1,
+          },
           {
             slug: "bem-vindo-e-mapa-da-jornada",
             title: "Bem-vindo e mapa da jornada",
             description:
               "Boas-vindas, como funciona a formação, mapa das fases, como usar a plataforma, regras e a primeira ação.",
             pandaVideoExternalId: "e413fe2b-8f93-408b-bb03-3fa6684c8f33",
-            sortOrder: 0,
+            sortOrder: 2,
           },
           {
             slug: "o-que-voce-vai-construir",
@@ -72,7 +88,7 @@ const CATALOG: ModuleSeed[] = [
             description:
               "Nivelamento: o que é a formação, o que não é, e o objetivo de construir e vender soluções com IA.",
             pandaVideoExternalId: "9986fcaa-be0f-479b-8e51-8015baa04fde",
-            sortOrder: 1,
+            sortOrder: 3,
           },
         ],
       },

@@ -1,7 +1,8 @@
 /**
- * Publica a jornada Fase 1 e Fase 2 só no HML (preview da aba Aulas).
+ * Publica uma árvore de módulos (raiz + filhos + aulas) no HML.
  *
  *   npx tsx scripts/publish-jornada-hml.mts
+ *   npx tsx scripts/publish-jornada-hml.mts --slugs=formacao-ia-e-automacoes,fundamentos-do-builder-profissional
  *   npx tsx scripts/publish-jornada-hml.mts --target=prod --confirm
  */
 import { config } from "dotenv";
@@ -13,6 +14,11 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 config({ path: resolve(root, ".env"), override: true });
 
 type Target = "local" | "hml" | "prod";
+
+const DEFAULT_SLUGS = [
+  "fase-1-do-zero-ao-primeiro-sim",
+  "fase-2-entregar-e-ligar-a-recorrencia",
+];
 
 function resolveUrl(target: Target): string {
   const map: Record<Target, string | undefined> = {
@@ -39,6 +45,14 @@ if (target === "prod" && !argv.includes("--confirm")) {
   throw new Error("Produção exige --confirm");
 }
 
+const slugs = (
+  argv.find((a) => a.startsWith("--slugs="))?.slice("--slugs=".length) ??
+  DEFAULT_SLUGS.join(",")
+)
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
+
 const prisma = new PrismaClient({
   datasources: { db: { url: resolveUrl(target) } },
 });
@@ -46,12 +60,12 @@ const prisma = new PrismaClient({
 const roots = await prisma.module.findMany({
   where: {
     parentId: null,
-    slug: { in: ["fase-1-do-zero-ao-primeiro-sim", "fase-2-entregar-e-ligar-a-recorrencia"] },
+    slug: { in: slugs },
   },
   select: { id: true, slug: true },
 });
 if (roots.length === 0) {
-  throw new Error("Jornada não encontrada");
+  throw new Error(`Nenhum módulo raiz: ${slugs.join(", ")}`);
 }
 
 const ids = new Set(roots.map((r) => r.id));
@@ -83,5 +97,5 @@ const les = await prisma.lesson.updateMany({
 
 await prisma.$disconnect();
 console.log(
-  `[${target}] publicados ${mod.count} módulos e ${les.count} aulas da jornada`,
+  `[${target}] ${roots.map((r) => r.slug).join(", ")}: ${mod.count} módulos e ${les.count} aulas publicados`,
 );

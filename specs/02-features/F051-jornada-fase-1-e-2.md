@@ -15,6 +15,10 @@ confirmação.
 ```
 FASE 1 — Do zero ao primeiro sim     ← raiz (rascunho)
 ├── Comece por aqui                  ← M01
+│   ├── Introdução ao Builders Club
+│   ├── Como usar a comunidade       ← mesmo vídeo da tela Boas-vindas
+│   ├── Bem-vindo e mapa da jornada
+│   └── O que você vai construir…
 ├── Escolha o nicho e o que vender   ← M02
 ├── Ache seus clientes               ← M03
 ├── Aborde e mande a amostra         ← M04
@@ -40,7 +44,11 @@ numeração antiga (`Aula 15`, `Aula 04`, …).
 - **HML:** jornada publicada para preview em `/aulas`. **Produção:** rascunho
   até o usuário confirmar.
 
-## Catálogo Panda (pasta `ce8de2e5-0047-493a-a9ba-a19dcbc31eb6`)
+## Catálogo Panda
+
+- Jornada (Fase 1–2): pasta `ce8de2e5-0047-493a-a9ba-a19dcbc31eb6`
+- M01 Comece por aqui: pasta `4bdf67e4-2ede-4495-a2dc-ff3e6fe68b20`
+  (introdução + tutorial da comunidade + nivelamento)
 
 Seed via `npm run db:seed:aulas-panda` (idempotente por slug). Padrão: HML.
 Usar `video_external_id`, não o ID da URL do dashboard.
