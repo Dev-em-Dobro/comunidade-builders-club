@@ -14,6 +14,7 @@ import {
   CommentForm,
   ReplyToggle,
 } from "@/components/post-actions";
+import { MarkdownBody } from "@/lib/markdown";
 import { EmptyState } from "@/components/empty-state";
 
 type Props = {
@@ -53,19 +54,28 @@ export default async function LessonPage({ params }: Props) {
   return (
     <div className="mx-auto w-full max-w-3xl">
       <Link
-        href="/aulas"
+        href={
+          lesson.module.parent?.parent
+            ? `/aulas/${lesson.module.parent.parent.slug}`
+            : lesson.module.parent
+              ? `/aulas/${lesson.module.parent.slug}`
+              : `/aulas/${moduleSlug}`
+        }
         className="text-[15px] font-medium text-accent hover:underline"
       >
-        ← Voltar às aulas
+        ← Voltar ao módulo
       </Link>
       <p className="mt-4 text-xs font-medium uppercase tracking-wide text-muted md:text-sm">
         {lesson.module.title}
       </p>
       <h1 className="page-title mt-1">{lesson.title}</h1>
       {lesson.description ? (
-        <p className="mt-2 text-[15px] text-muted md:text-base">
-          {lesson.description}
-        </p>
+        <div className="mt-3">
+          <MarkdownBody
+            body={lesson.description}
+            className="space-y-2 text-[15px] leading-relaxed text-muted md:text-base [&_a]:text-accent [&_h2]:text-foreground [&_pre]:text-foreground"
+          />
+        </div>
       ) : null}
 
       <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-black shadow-sm">

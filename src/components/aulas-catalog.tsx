@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { snippetFromBody } from "@/lib/markdown/text";
 
 export type AulaLessonCard = {
   id: string;
@@ -21,11 +22,83 @@ export type AulaModuleCard = {
   children?: AulaModuleCard[];
 };
 
-function contentCount(mod: AulaModuleCard): number {
+type ModuleNode = {
+  id: string;
+  slug: string;
+  title: string;
+  description: string | null;
+  coverImageUrl: string | null;
+  lessons: Array<{
+    id: string;
+    slug: string;
+    title: string;
+    description: string | null;
+    thumbnailUrl: string | null;
+  }>;
+  children?: ModuleNode[];
+};
+
+export function mapModule(mod: ModuleNode, completed: Set<string>): AulaModuleCard {
+  return {
+    id: mod.id,
+    slug: mod.slug,
+    title: mod.title,
+    description: mod.description,
+    coverImageUrl: mod.coverImageUrl,
+    lessons: mod.lessons.map((l) => ({
+      id: l.id,
+      slug: l.slug,
+      title: l.title,
+      description: l.description,
+      thumbnailUrl: l.thumbnailUrl,
+      moduleSlug: mod.slug,
+      completed: completed.has(l.id),
+    })),
+    children: (mod.children ?? []).map((child) => mapModule(child, completed)),
+  };
+}
+
+export function contentCount(mod: AulaModuleCard): number {
   return (
     mod.lessons.length +
     (mod.children ?? []).reduce((n, child) => n + contentCount(child), 0)
   );
+}
+
+export function completedCount(mod: AulaModuleCard): number {
+  return (
+    mod.lessons.filter((l) => l.completed).length +
+    (mod.children ?? []).reduce((n, child) => n + completedCount(child), 0)
+  );
+}
+
+export function coverOf(mod: AulaModuleCard): string | null {
+  if (mod.coverImageUrl) return mod.coverImageUrl;
+  const own = mod.lessons.find((l) => l.thumbnailUrl)?.thumbnailUrl;
+  if (own) return own;
+  for (const child of mod.children ?? []) {
+    const nested = coverOf(child);
+    if (nested) return nested;
+  }
+  return null;
+}
+
+export function findModuleBySlug(
+  modules: AulaModuleCard[],
+  slug: string,
+): AulaModuleCard | null {
+  for (const mod of modules) {
+    if (mod.slug === slug) return mod;
+    const nested = findModuleBySlug(mod.children ?? [], slug);
+    if (nested) return nested;
+  }
+  return null;
+}
+
+function progressPct(mod: AulaModuleCard): number {
+  const total = contentCount(mod);
+  if (total === 0) return 0;
+  return Math.round((completedCount(mod) / total) * 100);
 }
 
 function LessonRows({ lessons }: { lessons: AulaLessonCard[] }) {
@@ -83,55 +156,36 @@ function ModuleBranch({
 }) {
   const children = mod.children ?? [];
   const headingClass =
-    depth === 0
-      ? "font-[family-name:var(--font-outfit)] text-lg font-semibold md:text-xl"
-      : depth === 1
-        ? "font-[family-name:var(--font-outfit)] text-base font-semibold md:text-lg"
-        : "text-[15px] font-semibold";
+    depth <= 1
+      ? "font-[family-name:var(--font-outfit)] text-base font-semibold md:text-lg"
+      : "text-[15px] font-semibold";
 
   return (
-    <div className={depth === 0 ? "" : "border-t border-border"}>
+    <div className="border-t border-border">
       <div
         className={
-          depth === 0
-            ? "flex flex-wrap items-center gap-4 border-b border-border bg-surface/40 px-4 py-3 sm:px-5"
-            : depth === 1
-              ? "flex flex-wrap items-center gap-3 bg-surface/30 px-4 py-3 sm:px-5"
-              : "px-4 py-3 sm:px-5 sm:pl-8"
+          depth <= 1
+            ? "flex flex-wrap items-center gap-3 bg-surface/30 px-4 py-3 sm:px-5"
+            : "px-4 py-3 sm:px-5 sm:pl-8"
         }
       >
         {mod.coverImageUrl && depth < 2 ? (
           <Image
             src={mod.coverImageUrl}
             alt=""
-            width={56}
-            height={80}
-            className={
-              depth === 0
-                ? "h-16 w-12 shrink-0 rounded-lg object-cover sm:h-20 sm:w-14"
-                : "h-12 w-9 shrink-0 rounded-lg object-cover"
-            }
-            sizes="56px"
+            width={36}
+            height={48}
+            className="h-12 w-9 shrink-0 rounded-lg object-cover"
+            sizes="36px"
           />
         ) : null}
         <div className="min-w-0 flex-1">
-          {depth === 1 ? (
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">
-              Módulo
-            </p>
-          ) : null}
-          {depth >= 2 ? (
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">
-              Submódulo
-            </p>
-          ) : null}
-          {depth === 0 ? (
-            <h2 className={headingClass}>{mod.title}</h2>
-          ) : (
-            <h3 className={headingClass}>{mod.title}</h3>
-          )}
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">
+            {depth >= 2 ? "Submódulo" : "Módulo"}
+          </p>
+          <h3 className={headingClass}>{mod.title}</h3>
           {mod.description ? (
-            <p className="mt-0.5 text-sm text-muted sm:text-[15px]">
+            <p className="mt-0.5 whitespace-pre-line text-sm text-muted sm:text-[15px]">
               {mod.description}
             </p>
           ) : null}
@@ -145,27 +199,90 @@ function ModuleBranch({
   );
 }
 
-export function AulasCatalog({ modules }: { modules: AulaModuleCard[] }) {
-  if (modules.length === 0) {
-    return null;
+function Cover({ src, title }: { src: string | null; title: string }) {
+  if (src) {
+    return (
+      <Image
+        src={src}
+        alt=""
+        fill
+        className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+        sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
+      />
+    );
   }
+  return (
+    <div className="flex h-full w-full items-end bg-gradient-to-br from-accent/80 to-accent-hover p-4">
+      <span className="font-[family-name:var(--font-outfit)] text-lg font-semibold text-accent-foreground">
+        {title}
+      </span>
+    </div>
+  );
+}
+
+export function AulasCatalog({ modules }: { modules: AulaModuleCard[] }) {
+  if (modules.length === 0) return null;
 
   return (
-    <ul className="mt-8 space-y-6">
+    <ul className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
       {modules.map((mod) => {
         const total = contentCount(mod);
+        const pct = progressPct(mod);
+        const summary = mod.description
+          ? snippetFromBody(mod.description, 140)
+          : null;
         return (
-          <li
-            key={mod.id}
-            className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm"
-          >
-            <ModuleBranch mod={mod} depth={0} />
-            <p className="border-t border-border px-4 py-2.5 text-sm text-muted sm:px-5">
-              {total} {total === 1 ? "conteúdo" : "conteúdos"}
-            </p>
+          <li key={mod.id}>
+            <Link
+              href={`/aulas/${mod.slug}`}
+              className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-colors hover:border-accent/40 hover:shadow-md"
+            >
+              <div className="relative aspect-[16/10] overflow-hidden bg-surface">
+                <Cover src={coverOf(mod)} title={mod.title} />
+              </div>
+              <div className="flex flex-1 flex-col p-4 sm:p-5">
+                <h2 className="font-[family-name:var(--font-outfit)] text-lg font-semibold leading-snug">
+                  {mod.title}
+                </h2>
+                {summary ? (
+                  <p className="mt-1.5 line-clamp-2 text-sm text-muted">
+                    {summary}
+                  </p>
+                ) : null}
+                <div className="mt-auto pt-4">
+                  <div className="h-1.5 overflow-hidden rounded-full bg-surface">
+                    <div
+                      className="h-full rounded-full bg-accent"
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                  <p className="mt-1.5 text-xs font-medium text-muted">
+                    {pct}%
+                    {total > 0
+                      ? ` · ${total} ${total === 1 ? "aula" : "aulas"}`
+                      : " · em breve"}
+                  </p>
+                </div>
+              </div>
+            </Link>
           </li>
         );
       })}
     </ul>
+  );
+}
+
+export function AulasModuleOutline({ mod }: { mod: AulaModuleCard }) {
+  const children = mod.children ?? [];
+  if (mod.lessons.length === 0 && children.length === 0) {
+    return null;
+  }
+  return (
+    <div className="mt-8 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+      <LessonRows lessons={mod.lessons} />
+      {children.map((child) => (
+        <ModuleBranch key={child.id} mod={child} depth={1} />
+      ))}
+    </div>
   );
 }

@@ -42,6 +42,7 @@ function bustAulasCache() {
   revalidateTag("aulas");
   revalidatePath("/admin");
   revalidatePath("/aulas");
+  revalidatePath("/aulas", "layout");
 }
 
 export async function createSpaceAction(formData: FormData) {
@@ -192,6 +193,19 @@ export async function createLessonAction(formData: FormData) {
   };
   lessonSchema.parse(raw);
   await createLesson(raw);
+  bustAulasCache();
+}
+
+export async function updateLessonDescriptionAction(formData: FormData) {
+  await requireAdmin();
+  const id = String(formData.get("lessonId") ?? "");
+  const description = String(formData.get("description") ?? "").trim();
+  if (!id) throw new Error("Aula inválida.");
+  if (description.length > 12000) throw new Error("Descrição muito longa.");
+  await prisma.lesson.update({
+    where: { id },
+    data: { description: description || null },
+  });
   bustAulasCache();
 }
 

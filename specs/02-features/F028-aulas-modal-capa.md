@@ -10,6 +10,6 @@ modal, sync da pasta Panda e remoção com confirmação no admin.
 ## Critérios
 - [x] `coverImageUrl` no Module + `thumbnailUrl` na Lesson
 - [x] Capa em `/public/aulas/modulo-capa.png`
-- [x] Catálogo `/aulas` com lista clicável → modal de playback
+- [x] Catálogo `/aulas` (F028: lista; **F052:** cards → lista do módulo)
 - [x] Seed/sync da pasta Panda `d5fa2de0-ae46-4967-be9c-41466511e796`
 - [x] Admin remove módulo/aula com confirmação

@@ -21,3 +21,12 @@ export function isSafeHttpUrl(url: string): boolean {
     return false;
   }
 }
+
+/** http(s) ou caminho interno de download (`/aulas/materiais/foo.zip`). */
+export function isSafeHref(href: string): boolean {
+  const value = href.trim();
+  if (isSafeHttpUrl(value)) return true;
+  if (!value.startsWith("/") || value.startsWith("//")) return false;
+  if (value.includes("\\") || value.includes(":")) return false;
+  return true;
+}

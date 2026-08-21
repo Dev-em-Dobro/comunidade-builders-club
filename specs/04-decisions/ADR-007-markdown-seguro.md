@@ -10,9 +10,11 @@ extra no MVP.
 
 ## Decisão
 Renderizar Markdown **seguro** em `src/lib/markdown/` com parser próprio:
-escape HTML + regras limitadas (`**`, `*`, `` ` ``, links http(s), listas,
-quebras). Menções `@DisplayName` viram links/spans após escape.
+escape HTML + regras limitadas (`**`, `*`, `` ` ``, `##`, bloco ` ``` `,
+links http(s), caminhos internos `/…` para download, listas, quebras).
+Menções `@DisplayName` viram links/spans após escape.
 Linhas em branco do editor viram espaçamento visual (F043).
+Links abrem em nova guia (`target=_blank` + `rel=noopener noreferrer`).
 
 Não usar `dangerouslySetInnerHTML` com markdown bruto de libs sem sanitização.
 

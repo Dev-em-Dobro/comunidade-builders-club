@@ -18,7 +18,12 @@ Formação IA e Automações          ← produto-base (rascunho)
 │   ├── Engenharia de Prompt
 │   ├── RAG
 │   └── Projeto final
-└── Automações com n8n            ← módulo (aulas na raiz da pasta)
+└── Automações com n8n            ← módulo
+    ├── Introdução ao n8n         ← submódulo
+    ├── Banco de integrações n8n
+    ├── Fundamentos n8n
+    ├── Criação de agentes
+    └── Criando automações com IA
 ```
 
 ## Modelo (extensão de F011)
@@ -42,7 +47,7 @@ Produção só com `--target=prod --confirm`.
 - [x] Admin mostra árvore compacta (formação → módulo → submódulo → aulas)
 - [x] Formulários de criação **não** se repetem: um “Novo módulo” e um
       “Nova aula” (destino via select), recolhidos acima da árvore
-- [x] Seed cria a formação + 2 módulos + 5 submódulos, todos `published: false`
+- [x] Seed cria a formação + 2 módulos + 10 submódulos (5 de IA + 5 de n8n), todos `published: false`
 
 ## Dependências
 

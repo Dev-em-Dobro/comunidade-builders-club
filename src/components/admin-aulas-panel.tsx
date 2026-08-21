@@ -8,6 +8,7 @@ import {
   deleteModuleAction,
   moveLessonAction,
   moveModuleAction,
+  updateLessonDescriptionAction,
 } from "@/actions/admin";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 
@@ -15,6 +16,7 @@ type AdminLesson = {
   id: string;
   slug: string;
   title: string;
+  description?: string | null;
   published: boolean;
   sortOrder: number;
   thumbnailUrl: string | null;
@@ -55,6 +57,27 @@ function flattenModules(
     out.push({ id: mod.id, label, lessonCount: mod.lessons.length });
     if (mod.children?.length) {
       out.push(...flattenModules(mod.children, label));
+    }
+  }
+  return out;
+}
+
+function flattenLessons(
+  modules: AdminModule[],
+  prefix = "",
+): { id: string; label: string; description: string }[] {
+  const out: { id: string; label: string; description: string }[] = [];
+  for (const mod of modules) {
+    const label = prefix ? `${prefix} › ${mod.title}` : mod.title;
+    for (const lesson of mod.lessons) {
+      out.push({
+        id: lesson.id,
+        label: `${label} › ${lesson.title}`,
+        description: lesson.description ?? "",
+      });
+    }
+    if (mod.children?.length) {
+      out.push(...flattenLessons(mod.children, label));
     }
   }
   return out;
@@ -391,6 +414,45 @@ function CreateLessonForm({ modules }: { modules: AdminModule[] }) {
   );
 }
 
+function EditLessonDescriptionForm({ modules }: { modules: AdminModule[] }) {
+  const options = useMemo(() => flattenLessons(modules), [modules]);
+  const [lessonId, setLessonId] = useState(options[0]?.id ?? "");
+  const selected = options.find((o) => o.id === lessonId);
+
+  return (
+    <form action={updateLessonDescriptionAction} className="space-y-2">
+      <select
+        name="lessonId"
+        className="input"
+        required
+        value={lessonId}
+        onChange={(e) => setLessonId(e.target.value)}
+      >
+        {options.length === 0 ? (
+          <option value="">Nenhuma aula ainda</option>
+        ) : (
+          options.map((opt) => (
+            <option key={opt.id} value={opt.id}>
+              {opt.label}
+            </option>
+          ))
+        )}
+      </select>
+      <textarea
+        key={lessonId}
+        name="description"
+        className="input min-h-28"
+        placeholder="Markdown: [texto](https://…) abre em nova guia. Downloads: [arquivo.zip](/aulas/materiais/…)"
+        defaultValue={selected?.description ?? ""}
+        maxLength={12000}
+      />
+      <button type="submit" className="btn-primary" disabled={!lessonId}>
+        Salvar descrição
+      </button>
+    </form>
+  );
+}
+
 export function AdminAulasPanel({ modules }: { modules: AdminModule[] }) {
   return (
     <div className="mt-4 max-w-3xl space-y-4">
@@ -413,6 +475,17 @@ export function AdminAulasPanel({ modules }: { modules: AdminModule[] }) {
           </p>
           <div className="mt-3">
             <CreateLessonForm modules={modules} />
+          </div>
+        </details>
+        <details className="post-card !p-4 sm:col-span-2">
+          <summary className="cursor-pointer text-sm font-medium">
+            Editar descrição da aula
+          </summary>
+          <p className="mt-1 text-xs text-muted">
+            Texto simples. Anexos na descrição ainda não são suportados.
+          </p>
+          <div className="mt-3">
+            <EditLessonDescriptionForm modules={modules} />
           </div>
         </details>
       </div>

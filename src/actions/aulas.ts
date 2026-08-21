@@ -12,5 +12,6 @@ export async function markLessonCompletedAction(
   const { user } = await requirePaidMember();
   await markLessonCompleted(user.id, lessonId);
   revalidatePath("/aulas");
+  revalidatePath(`/aulas/${moduleSlug}`);
   revalidatePath(`/aulas/${moduleSlug}/${lessonSlug}`);
 }

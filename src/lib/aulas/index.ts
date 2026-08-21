@@ -53,7 +53,7 @@ export const lessonSchema = z.object({
     .max(80)
     .regex(/^[a-z0-9-]+$/),
   title: z.string().trim().min(2).max(200),
-  description: z.string().trim().max(5000).optional().nullable(),
+  description: z.string().trim().max(12000).optional().nullable(),
   pandaVideoExternalId: z
     .string()
     .trim()
