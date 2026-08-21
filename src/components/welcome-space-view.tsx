@@ -16,6 +16,31 @@ export type WelcomeCardPost = {
   createdAt: string;
 };
 
+function OrientationCard({
+  p,
+  onOpen,
+}: {
+  p: WelcomeCardPost;
+  onOpen: (id: string) => void;
+}) {
+  const title =
+    p.title?.trim() || previewFromBody(p.body, 70) || "Orientação";
+  return (
+    <button
+      type="button"
+      onClick={() => onOpen(p.id)}
+      className="post-card flex flex-col p-4 text-left transition-colors hover:bg-surface/50"
+    >
+      <h3 className="font-[family-name:var(--font-outfit)] text-sm font-semibold leading-snug sm:text-base">
+        {title}
+      </h3>
+      <p className="mt-1.5 line-clamp-2 text-sm text-muted">
+        {previewFromBody(p.body, 110)}
+      </p>
+    </button>
+  );
+}
+
 export function WelcomeSpaceView({
   spaceName,
   spaceDescription,
@@ -38,6 +63,12 @@ export function WelcomeSpaceView({
   const [openId, setOpenId] = useState<string | null>(null);
   const hero = posts[0];
   const orientationCards = posts.slice(hero ? 1 : 0);
+  const sideCards = tutorialEmbedUrl
+    ? orientationCards.slice(0, 3)
+    : [];
+  const restCards = tutorialEmbedUrl
+    ? orientationCards.slice(3)
+    : orientationCards;
 
   return (
     <div className="feed-wrap-wide">
@@ -90,7 +121,7 @@ export function WelcomeSpaceView({
           rodar o seed de welcome cards.
         </p>
       ) : tutorialEmbedUrl || orientationCards.length > 0 ? (
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-4 grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {tutorialEmbedUrl ? (
             <div className="overflow-hidden rounded-2xl border border-border bg-black shadow-sm sm:col-span-2">
               <div className="relative aspect-video w-full">
@@ -105,25 +136,16 @@ export function WelcomeSpaceView({
               </div>
             </div>
           ) : null}
-          {orientationCards.map((p) => {
-            const title =
-              p.title?.trim() || previewFromBody(p.body, 70) || "Orientação";
-            return (
-              <button
-                key={p.id}
-                type="button"
-                onClick={() => setOpenId(p.id)}
-                className="post-card flex min-h-11 flex-col p-4 text-left transition-colors hover:bg-surface/50"
-              >
-                <h3 className="font-[family-name:var(--font-outfit)] text-sm font-semibold leading-snug sm:text-base">
-                  {title}
-                </h3>
-                <p className="mt-1.5 line-clamp-2 flex-1 text-sm text-muted">
-                  {previewFromBody(p.body, 110)}
-                </p>
-              </button>
-            );
-          })}
+          {sideCards.length > 0 ? (
+            <div className="contents lg:col-span-1 lg:flex lg:flex-col lg:gap-3">
+              {sideCards.map((p) => (
+                <OrientationCard key={p.id} p={p} onOpen={setOpenId} />
+              ))}
+            </div>
+          ) : null}
+          {restCards.map((p) => (
+            <OrientationCard key={p.id} p={p} onOpen={setOpenId} />
+          ))}
         </div>
       ) : null}
 

@@ -14,8 +14,9 @@ com toggle entre visão reduzida (atual) e expandida.
 - [x] `/spaces/boas-vindas` = hero compacto + tutorial Panda em destaque
   (2 colunas no grid) + cards de orientação ao lado/abaixo
 - [x] Abaixo do hero: player Panda do tutorial da comunidade
-  (`tutorial-intro-comunidade`) com mais peso visual que os cards
-  (`sm:col-span-2` / `lg:col-span-2`). Cards compactos no restante da grade.
+  (`tutorial-intro-comunidade`) em 2 colunas. Ao lado, **pilha** de
+  cards (não um card esticado na altura do vídeo). O restante da
+  grade fica abaixo.
 - [x] Clique no card abre modal com body, reações, expandir
 - [x] Comentários **desativados** em Boas-vindas (orientação, não conversa)
 - [x] No modal: “Expandir” abre o post na área de conteúdo (rota `/posts/[id]`, ao lado do aside)
