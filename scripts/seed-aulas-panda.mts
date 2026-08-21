@@ -728,7 +728,8 @@ const CATALOG: ModuleSeed[] = [
   {
     slug: "fundamentos-do-builder-profissional",
     title: "Fundamentos do Builder Profissional",
-    description: "",
+    description:
+      "A base para operar como profissional: CNPJ, precificação, contrato, hospedagem, domínio e os primeiros clientes.",
     coverImageUrl: "/4-fundamentos-builder.png",
     sortOrder: 11,
     lessons: [
