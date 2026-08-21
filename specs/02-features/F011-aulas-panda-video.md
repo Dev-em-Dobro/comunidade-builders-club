@@ -25,8 +25,8 @@ pode marcar o material como pendente.
 ## Critérios
 
 - [x] Membro active lista módulos/aulas publicados
-- [x] `/aulas` mostra cards dos módulos raiz; clique abre a lista
-  (`/aulas/[moduleSlug]` · F052)
+- [x] `/aulas` mostra cards dos módulos raiz; clique abre o player
+  (`/aulas/[moduleSlug]/[lessonSlug]` · F052)
 - [x] Player iframe Panda (`https://player-vz-{libraryId}.tv.pandavideo.com.br/embed/?v={externalId}`) + allowfullscreen
 - [x] Admin CRUD módulos e aulas com IDs Panda
 - [x] Admin reordena módulos/aulas (↑/↓ · F046)

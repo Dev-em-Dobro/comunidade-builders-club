@@ -5,28 +5,30 @@ Em implementação
 
 ## Objetivo
 A aba `/aulas` mostra **cards dos módulos de primeiro nível**. O aluno
-clica no card e vai para a **lista de aulas** daquele módulo
-(`/aulas/[moduleSlug]`). A aula em si continua em
-`/aulas/[moduleSlug]/[lessonSlug]`.
+clica no card e entra no **player da jornada**: vídeo + lista de módulos
+ao lado + detalhes da aula abaixo.
 
-Referência visual: classroom tipo Skool (capa, título, resumo, barra de
-progresso). Sem trava por “nível” neste recorte.
+Referência visual: classroom (capa nos cards; player com sidebar em
+acordeão). Sem trava por “nível”, sem favoritar/avaliar neste recorte.
 
 ## Comportamento
 
 - `/aulas` — grid de módulos **publicados** na raiz (`parentId` null).
 - Card: capa (`coverImageUrl` ou thumb da primeira aula), título,
   resumo curto da descrição, % concluído e quantidade de aulas na árvore.
-- Clique → `/aulas/[slug]` com a lista (submódulos + aulas), o mesmo
-  recorte que o catálogo antigo mostrava *dentro* de um módulo raiz.
-- Voltar da aula abre a lista do módulo raiz da jornada (não o grid).
+- Clique no card → primeira aula da árvore (`/aulas/[moduleSlug]/[lessonSlug]`).
+- Player: vídeo à esquerda; à direita, módulos com aulas (acordeão,
+  progresso, aula atual destacada). Abaixo: título, concluir, abas
+  Informações / Comentários.
+- Voltar do player vai para `/aulas` (grid).
 
 ## Critérios
 
 - [x] `/aulas` é um grid de cards, não a árvore inteira na mesma página
-- [x] Clique no card abre a lista de aulas daquele módulo
-- [x] Barra de progresso reflete aulas concluídas na árvore
-- [x] Player e URL da aula não mudam
+- [x] Clique no card abre o player da primeira aula daquele módulo
+- [x] Barra de progresso do card reflete aulas concluídas na árvore
+- [x] Sidebar lista os módulos da jornada sem sair do player
+- [x] Detalhes e comentários ficam abaixo do vídeo, em abas
 
 ## Dependências
 

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { requirePaidMemberOrRedirect } from "@/lib/membership/require-member";
 import {
   listCompletedLessonIds,
@@ -7,9 +7,8 @@ import {
 } from "@/lib/aulas";
 import { EmptyState } from "@/components/empty-state";
 import {
-  AulasModuleOutline,
-  contentCount,
   findModuleBySlug,
+  flattenLessons,
   mapModule,
 } from "@/components/aulas-catalog";
 
@@ -29,7 +28,10 @@ export default async function AulasModulePage({ params }: Props) {
   const mod = findModuleBySlug(catalog, moduleSlug);
   if (!mod) notFound();
 
-  const total = contentCount(mod);
+  const first = flattenLessons(mod)[0];
+  if (first) {
+    redirect(`/aulas/${first.moduleSlug}/${first.slug}`);
+  }
 
   return (
     <div className="feed-wrap-wide">
@@ -40,21 +42,12 @@ export default async function AulasModulePage({ params }: Props) {
         ← Aulas
       </Link>
       <h1 className="page-title mt-4">{mod.title}</h1>
-      {mod.description ? (
-        <p className="mt-2 whitespace-pre-line text-sm text-muted sm:text-[15px]">
-          {mod.description}
-        </p>
-      ) : null}
-      {total === 0 ? (
-        <div className="mt-8">
-          <EmptyState
-            title="Nenhuma aula neste módulo"
-            description="O conteúdo ainda está sendo preparado."
-          />
-        </div>
-      ) : (
-        <AulasModuleOutline mod={mod} />
-      )}
+      <div className="mt-8">
+        <EmptyState
+          title="Nenhuma aula neste módulo"
+          description="O conteúdo ainda está sendo preparado."
+        />
+      </div>
     </div>
   );
 }

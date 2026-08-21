@@ -95,7 +95,31 @@ export function findModuleBySlug(
   return null;
 }
 
-function progressPct(mod: AulaModuleCard): number {
+export function findRootContaining(
+  roots: AulaModuleCard[],
+  slug: string,
+): AulaModuleCard | null {
+  for (const root of roots) {
+    if (findModuleBySlug([root], slug)) return root;
+  }
+  return null;
+}
+
+export function leafModules(mod: AulaModuleCard): AulaModuleCard[] {
+  const kids = mod.children ?? [];
+  const nested = kids.flatMap(leafModules);
+  if (mod.lessons.length > 0) return [mod, ...nested];
+  return nested;
+}
+
+export function flattenLessons(mod: AulaModuleCard): AulaLessonCard[] {
+  return [
+    ...mod.lessons,
+    ...(mod.children ?? []).flatMap(flattenLessons),
+  ];
+}
+
+export function progressPct(mod: AulaModuleCard): number {
   const total = contentCount(mod);
   if (total === 0) return 0;
   return Math.round((completedCount(mod) / total) * 100);
