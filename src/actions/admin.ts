@@ -41,6 +41,7 @@ function bustSpacesCache() {
 function bustAulasCache() {
   revalidateTag("aulas");
   revalidatePath("/admin");
+  revalidatePath("/admin", "layout");
   revalidatePath("/aulas");
   revalidatePath("/aulas", "layout");
 }
@@ -233,20 +234,20 @@ export async function deleteLessonAction(id: string) {
   bustAulasCache();
 }
 
-export async function moveModuleAction(
-  id: string,
-  direction: "up" | "down",
-) {
+export async function moveModuleAction(formData: FormData) {
   await requireAdmin();
+  const id = String(formData.get("id") ?? "").trim();
+  const direction = formData.get("direction") === "up" ? "up" : "down";
+  if (!id) throw new Error("Módulo não encontrado.");
   await moveModule(id, direction);
   bustAulasCache();
 }
 
-export async function moveLessonAction(
-  id: string,
-  direction: "up" | "down",
-) {
+export async function moveLessonAction(formData: FormData) {
   await requireAdmin();
+  const id = String(formData.get("id") ?? "").trim();
+  const direction = formData.get("direction") === "up" ? "up" : "down";
+  if (!id) throw new Error("Aula não encontrada.");
   await moveLesson(id, direction);
   bustAulasCache();
 }

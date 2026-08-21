@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   createLessonAction,
   createModuleAction,
@@ -124,25 +125,34 @@ function StatusDot({ published }: { published: boolean }) {
 }
 
 function MoveDelete({
-  up,
-  down,
+  itemId,
+  moveAction,
   upDisabled,
   downDisabled,
   removeAction,
   removeLabel,
   removeMessage,
 }: {
-  up: (formData: FormData) => void | Promise<void>;
-  down: (formData: FormData) => void | Promise<void>;
+  itemId: string;
+  moveAction: (formData: FormData) => void | Promise<void>;
   upDisabled: boolean;
   downDisabled: boolean;
   removeAction: (formData: FormData) => void | Promise<void>;
   removeLabel: string;
   removeMessage: string;
 }) {
+  const router = useRouter();
+
+  async function submit(formData: FormData) {
+    await moveAction(formData);
+    router.refresh();
+  }
+
   return (
     <div className="flex shrink-0 items-center gap-1">
-      <form action={up}>
+      <form action={submit}>
+        <input type="hidden" name="id" value={itemId} />
+        <input type="hidden" name="direction" value="up" />
         <button
           type="submit"
           className="btn-ghost cursor-pointer px-1.5 py-0.5 text-xs"
@@ -152,7 +162,9 @@ function MoveDelete({
           ↑
         </button>
       </form>
-      <form action={down}>
+      <form action={submit}>
+        <input type="hidden" name="id" value={itemId} />
+        <input type="hidden" name="direction" value="down" />
         <button
           type="submit"
           className="btn-ghost cursor-pointer px-1.5 py-0.5 text-xs"
@@ -236,8 +248,8 @@ function ModuleTree({
                     <StatusDot published={l.published} />
                   </span>
                   <MoveDelete
-                    up={moveLessonAction.bind(null, l.id, "up")}
-                    down={moveLessonAction.bind(null, l.id, "down")}
+                    itemId={l.id}
+                    moveAction={moveLessonAction}
                     upDisabled={lessonIndex === 0}
                     downDisabled={lessonIndex === mod.lessons.length - 1}
                     removeAction={deleteLessonAction.bind(null, l.id)}
@@ -260,8 +272,8 @@ function ModuleTree({
           ))}
         </details>
         <MoveDelete
-          up={moveModuleAction.bind(null, mod.id, "up")}
-          down={moveModuleAction.bind(null, mod.id, "down")}
+          itemId={mod.id}
+          moveAction={moveModuleAction}
           upDisabled={index === 0}
           downDisabled={index === siblingCount - 1}
           removeAction={deleteModuleAction.bind(null, mod.id)}

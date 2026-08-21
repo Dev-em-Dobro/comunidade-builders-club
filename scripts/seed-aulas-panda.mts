@@ -4,7 +4,8 @@
  *   npm run db:seed:aulas-panda -- --target=hml
  *   npm run db:seed:aulas-panda -- --target=prod --confirm
  *
- * Idempotente por slug. Não altera `published` se o registro já existir.
+ * Idempotente por slug. Não altera `published` nem `sortOrder` se o
+ * registro já existir (ordem do admin prevalece).
  * Títulos da jornada: documento oficial (sem Mxx-Lxx nem numeração antiga).
  */
 import { config } from "dotenv";
@@ -811,7 +812,6 @@ async function upsertModule(
           title: seed.title,
           ...(seed.description ? { description: seed.description } : {}),
           coverImageUrl: seed.coverImageUrl ?? undefined,
-          sortOrder: seed.sortOrder,
           parentId,
         },
       })
@@ -840,7 +840,6 @@ async function upsertModule(
       pandaVideoExternalId: lesson.pandaVideoExternalId,
       pandaLibraryId: PANDA_LIBRARY,
       thumbnailUrl: thumb(lesson.pandaVideoExternalId),
-      sortOrder: lesson.sortOrder,
       moduleId: module.id,
       slug: lesson.slug,
     };
@@ -853,6 +852,7 @@ async function upsertModule(
       await prisma.lesson.create({
         data: {
           ...lessonData,
+          sortOrder: lesson.sortOrder,
           description: lesson.description || null,
           published: false,
         },

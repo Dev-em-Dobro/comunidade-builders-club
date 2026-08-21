@@ -30,6 +30,8 @@ type Props = {
   searchParams: Promise<{ status?: string; q?: string; tab?: string }>;
 };
 
+export const dynamic = "force-dynamic";
+
 const STATUSES: Array<MembershipStatus | "all"> = [
   "all",
   "pending",
