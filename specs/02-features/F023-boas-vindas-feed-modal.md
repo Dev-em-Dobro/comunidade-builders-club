@@ -11,10 +11,11 @@ com toggle entre visão reduzida (atual) e expandida.
 ## Critérios
 - [x] Space `boas-vindas` no seed (topo da lista de Spaces)
 - [x] `/` = Feed com todos os posts **exceto** Boas-vindas; toggle compacto/expandido
-- [x] `/spaces/boas-vindas` = hero + grade de cards (posts do space)
+- [x] `/spaces/boas-vindas` = hero + tutorial Panda em largura total +
+  grade compacta de cards abaixo (posts do space)
 - [x] Abaixo do hero: player Panda do tutorial da comunidade
-  (`tutorial-intro-comunidade`). No desktop, os cards de orientação
-  ficam ao lado do vídeo para permanecerem visíveis; no mobile, abaixo.
+  (`tutorial-intro-comunidade`). Cards de orientação ficam abaixo do
+  vídeo, compactos, para continuarem visíveis na tela.
 - [x] Clique no card abre modal com body, reações, expandir
 - [x] Comentários **desativados** em Boas-vindas (orientação, não conversa)
 - [x] No modal: “Expandir” abre o post na área de conteúdo (rota `/posts/[id]`, ao lado do aside)
