@@ -71,7 +71,7 @@ export function WelcomeSpaceView({
       ) : null}
 
       {tutorialEmbedUrl ? (
-        <section className="mt-5" aria-labelledby="welcome-tutorial-title">
+        <div className="mt-5">
           <h2
             id="welcome-tutorial-title"
             className="font-[family-name:var(--font-outfit)] text-base font-semibold tracking-tight"
@@ -79,21 +79,9 @@ export function WelcomeSpaceView({
             {tutorialTitle ?? "Como usar a comunidade"}
           </h2>
           <p className="mt-1 text-sm text-muted">
-            Tutorial da plataforma. Os cards abaixo são os primeiros passos.
+            Tutorial da plataforma. Os cards ao lado são os primeiros passos.
           </p>
-          <div className="mt-3 overflow-hidden rounded-2xl border border-border bg-black shadow-sm">
-            <div className="relative aspect-video w-full min-h-[12rem]">
-              <iframe
-                src={tutorialEmbedUrl}
-                title={tutorialTitle ?? "Tutorial da comunidade"}
-                className="absolute inset-0 h-full w-full"
-                allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
-                allowFullScreen
-                referrerPolicy="origin"
-              />
-            </div>
-          </div>
-        </section>
+        </div>
       ) : null}
 
       {posts.length === 0 && !tutorialEmbedUrl ? (
@@ -101,8 +89,22 @@ export function WelcomeSpaceView({
           Em breve: cards de orientação. Admins podem publicar neste space ou
           rodar o seed de welcome cards.
         </p>
-      ) : orientationCards.length > 0 ? (
+      ) : tutorialEmbedUrl || orientationCards.length > 0 ? (
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {tutorialEmbedUrl ? (
+            <div className="overflow-hidden rounded-2xl border border-border bg-black shadow-sm">
+              <div className="relative aspect-video w-full">
+                <iframe
+                  src={tutorialEmbedUrl}
+                  title={tutorialTitle ?? "Tutorial da comunidade"}
+                  className="absolute inset-0 h-full w-full"
+                  allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+                  allowFullScreen
+                  referrerPolicy="origin"
+                />
+              </div>
+            </div>
+          ) : null}
           {orientationCards.map((p) => {
             const title =
               p.title?.trim() || previewFromBody(p.body, 70) || "Orientação";

@@ -41,6 +41,8 @@ acordeão). Sem trava por “nível”, sem favoritar/avaliar neste recorte.
 - [x] Cards raiz usam capas de workspace no mesmo estilo (não frames
   aleatórios de vídeo)
 - [x] Capa ocupa a área inteira do card, sem corte
+- [x] Bolinha da aula alinhada ao centro da primeira linha do título
+  (sem offset extra que deixa o anel torto)
 
 ## Dependências
 

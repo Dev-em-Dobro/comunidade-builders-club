@@ -487,12 +487,15 @@ export function AppShellClient({
   /** Busca spaces em /api/nav após o paint (não bloqueia o feed no SSR). */
   hydrateNav?: boolean;
 }) {
+  const pathname = usePathname();
   const search = useSearchParams();
   const autoOpen = search.get("upgrade") === "1";
   const [spaces, setSpaces] = useState(initialSpaces);
 
   useEffect(() => {
-    setSpaces(initialSpaces);
+    if (initialSpaces.length > 0) {
+      setSpaces(initialSpaces);
+    }
   }, [initialSpaces]);
 
   useEffect(() => {
@@ -503,7 +506,11 @@ export function AppShellClient({
         const res = await fetch("/api/nav", { cache: "no-store" });
         if (!res.ok || cancelled) return;
         const data = (await res.json()) as { spaces?: SpaceLink[] };
-        if (!cancelled && Array.isArray(data.spaces)) {
+        if (
+          !cancelled &&
+          Array.isArray(data.spaces) &&
+          data.spaces.length > 0
+        ) {
           setSpaces(data.spaces);
         }
       } catch {
@@ -513,7 +520,7 @@ export function AppShellClient({
     return () => {
       cancelled = true;
     };
-  }, [hydrateNav]);
+  }, [hydrateNav, pathname]);
 
   return (
     <UpgradeProvider

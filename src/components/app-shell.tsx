@@ -1,6 +1,8 @@
 import { checkoutUrlBuildersClub } from "@/lib/membership/checkout";
 import { AppShellClient } from "@/components/app-shell-client";
 
+const EMPTY_SPACES: { id: string; slug: string; name: string }[] = [];
+
 /**
  * Shell **não** espera spaces/unread no SSR — isso atrasava o feed ~centenas de ms–segundos.
  * Spaces vêm de /api/nav; unread/preview do poll (já imediato no bell).
@@ -26,7 +28,7 @@ export function AppShell({
       isPaid={isPaid}
       checkoutUrl={checkoutUrlBuildersClub()}
       unread={0}
-      spaces={[]}
+      spaces={EMPTY_SPACES}
       avatarUrl={avatarUrl}
       notifPreview={[]}
       hydrateNav
