@@ -112,6 +112,28 @@ export function leafModules(mod: AulaModuleCard): AulaModuleCard[] {
   return nested;
 }
 
+/** Agrupa submódulos pelas trilhas intermediárias (ex.: IA Aplicada | n8n). */
+export type SidebarGroup = {
+  id: string;
+  title: string | null;
+  sections: AulaModuleCard[];
+};
+
+export function sidebarGroups(root: AulaModuleCard): SidebarGroup[] {
+  const kids = root.children ?? [];
+  const tracks = kids.filter((k) => (k.children ?? []).length > 0);
+  if (tracks.length >= 2) {
+    return tracks
+      .map((track) => ({
+        id: track.id,
+        title: track.title,
+        sections: leafModules(track),
+      }))
+      .filter((g) => g.sections.length > 0);
+  }
+  return [{ id: root.id, title: null, sections: leafModules(root) }];
+}
+
 export function flattenLessons(mod: AulaModuleCard): AulaLessonCard[] {
   return [
     ...mod.lessons,

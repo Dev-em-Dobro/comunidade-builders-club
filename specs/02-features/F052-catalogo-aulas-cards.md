@@ -18,8 +18,11 @@ acordeão). Sem trava por “nível”, sem favoritar/avaliar neste recorte.
   resumo curto da descrição, % concluído e quantidade de aulas na árvore.
 - Clique no card → primeira aula da árvore (`/aulas/[moduleSlug]/[lessonSlug]`).
 - Player: vídeo à esquerda; à direita, módulos com aulas (acordeão,
-  progresso, aula atual destacada). Abaixo: título, concluir, abas
-  Informações / Comentários.
+  progresso, aula atual destacada). Se a formação tiver trilhas
+  intermediárias (ex.: **IA Aplicada** e **Automações com n8n**), a
+  sidebar agrupa os submódulos sob esses títulos, com um divisor entre
+  as trilhas. A coluna usa a altura da viewport e rola quando a lista
+  não cabe.
 - Voltar do player vai para `/aulas` (grid).
 
 ## Critérios
@@ -28,6 +31,8 @@ acordeão). Sem trava por “nível”, sem favoritar/avaliar neste recorte.
 - [x] Clique no card abre o player da primeira aula daquele módulo
 - [x] Barra de progresso do card reflete aulas concluídas na árvore
 - [x] Sidebar lista os módulos da jornada sem sair do player
+- [x] Formação com trilhas internas (IA / n8n) aparece agrupada, não
+  como uma lista plana
 - [x] Detalhes e comentários ficam abaixo do vídeo, em abas
 
 ## Dependências
