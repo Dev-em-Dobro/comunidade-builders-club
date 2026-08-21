@@ -15,10 +15,11 @@ acordeão). Sem trava por “nível”, sem favoritar/avaliar neste recorte.
 
 - `/aulas` — grid de módulos **publicados** na raiz (`parentId` null).
 - Card: capa do módulo raiz (`coverImageUrl` em `/public`, série
-  `1-renda-extra.png` … `4-fundamentos-builder.png`). A capa preenche
-  a área 16:9 do card (largura × altura), sem recorte. Sem capa, cai
-  para a thumb da primeira aula. Título, resumo da descrição, %
-  concluído e quantidade de aulas na árvore.
+  `1-renda-extra.png` … `4-fundamentos-builder.png`). A área da capa é
+  16:9; a imagem preenche com `object-cover` (pode recortar, não
+  distorce). `1-renda-extra.png` é quadrada — `object-fill` a achatava.
+  Sem capa, cai para a thumb da primeira aula. Título, resumo da
+  descrição, % concluído e quantidade de aulas na árvore.
 - Clique no card → primeira aula da árvore (`/aulas/[moduleSlug]/[lessonSlug]`).
 - Player: vídeo à esquerda; à direita, módulos com aulas (acordeão,
   progresso, aula atual destacada). Se a formação tiver trilhas
@@ -40,7 +41,7 @@ acordeão). Sem trava por “nível”, sem favoritar/avaliar neste recorte.
 - [x] Detalhes e comentários ficam abaixo do vídeo, em abas
 - [x] Cards raiz usam capas de workspace no mesmo estilo (não frames
   aleatórios de vídeo)
-- [x] Capa ocupa a área inteira do card, sem corte
+- [x] Capa ocupa a área 16:9 do card sem distorcer (`object-cover`)
 - [x] Bolinha da aula alinhada ao centro da primeira linha do título
   (sem offset extra que deixa o anel torto)
 

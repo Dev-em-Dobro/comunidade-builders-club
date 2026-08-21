@@ -252,7 +252,7 @@ function Cover({ src, title }: { src: string | null; title: string }) {
         src={src}
         alt=""
         fill
-        className="h-full w-full object-fill"
+        className="h-full w-full object-cover"
         sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
       />
     );
