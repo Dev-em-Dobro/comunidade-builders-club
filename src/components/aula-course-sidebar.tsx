@@ -66,23 +66,27 @@ export function AulaCourseSidebar({
                     <li key={l.id}>
                       <Link
                         href={`/aulas/${l.moduleSlug}/${l.slug}`}
-                        className={`flex items-start gap-2 rounded-lg px-2 py-2 text-sm leading-snug ${
+                        className={`grid grid-cols-[1rem_minmax(0,1fr)] items-start gap-x-2 rounded-lg px-2 py-2 text-sm leading-snug ${
                           active
                             ? "font-semibold text-accent"
                             : "text-foreground hover:bg-surface/70"
                         }`}
                       >
                         <span
-                          className={`mt-0.5 h-2 w-2 shrink-0 rounded-full ${
-                            l.completed
-                              ? "bg-accent"
-                              : active
-                                ? "ring-2 ring-accent"
-                                : "border border-muted"
-                          }`}
+                          className="mt-[0.35rem] flex h-4 w-4 shrink-0 items-center justify-center"
                           aria-hidden
-                        />
-                        <span>{l.title}</span>
+                        >
+                          <span
+                            className={`box-border h-2 w-2 rounded-full ${
+                              l.completed
+                                ? "border-2 border-accent bg-accent"
+                                : active
+                                  ? "border-2 border-accent bg-transparent"
+                                  : "border border-muted bg-transparent"
+                            }`}
+                          />
+                        </span>
+                        <span className="min-w-0">{l.title}</span>
                       </Link>
                     </li>
                   );
