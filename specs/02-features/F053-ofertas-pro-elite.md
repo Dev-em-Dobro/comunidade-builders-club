@@ -52,12 +52,12 @@ Libera no Club:
 
 Cartão/Pix (Hubla): [https://pay.hub.la/v1SsMcVXNip7Mn5A2pNH](https://pay.hub.la/v1SsMcVXNip7Mn5A2pNH)
 
-Boleto (TMB, R$ 1.297) — as duas ofertas liberam Elite:
+Boleto (TMB, R$ 1.297):
 
-| Code | Checkout |
-|------|----------|
-| `9DW254247E5` | [pay.tmb.com.br/DevemDobro/9DW254247E5](https://pay.tmb.com.br/DevemDobro/9DW254247E5) |
-| `3XB272209KV` | [pay.tmb.com.br/DevemDobro/3XB272209KV](https://pay.tmb.com.br/DevemDobro/3XB272209KV) |
+| Code | Papel |
+|------|--------|
+| `9DW254247E5` | Checkout de boleto na página `/planos` — [pay.tmb.com.br/DevemDobro/9DW254247E5](https://pay.tmb.com.br/DevemDobro/9DW254247E5) |
+| `3XB272209KV` | Continua válido no webhook (concede Elite); não aparece como CTA |
 
 - Tudo do PRO
 - Acesso ao **Orion** (link na sidebar; `ORION_APP_URL`)
@@ -95,10 +95,13 @@ concedem **pro**.
 Página **`/planos`** (liberada para free e PRO):
 
 - Título “Ver planos”
+- Subtítulo profissional (formação, comunidade, 1º cliente em 90 dias)
 - Dois cards lado a lado (empilhados no mobile): PRO vs Elite
+- Cards com destaque, hover (elevação/sombra) e lista de entregas em título + detalhe
 - Elite em destaque (recomendado)
 - CTA principal: checkout Hubla (cartão/Pix)
-- Elite: dois CTAs extras de boleto TMB (R$ 1.297)
+- Elite: **um** CTA de boleto TMB (`9DW254247E5`, R$ 1.297)
+- Sem rodapé de meios de pagamento
 - Query `?motivo=` contextualiza o bloqueio (busca, aulas, space, …)
 - Query `?destaque=elite` para quem já é PRO (upgrade Orion)
 - Sem texto “oferta em definição”

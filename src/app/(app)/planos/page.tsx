@@ -59,10 +59,6 @@ export default async function PlanosPage({ searchParams }: Props) {
         <PlanCards offers={offers} currentPlan={currentPlan} />
       </div>
 
-      <p className="mt-6 text-center text-xs text-muted">
-        Cartão e Pix na Hubla · Boleto Elite na TMB (R$ 1.297)
-      </p>
-
       <p className="mt-4 text-center text-sm">
         <Link href="/" className="font-medium text-accent hover:underline">
           Voltar ao feed

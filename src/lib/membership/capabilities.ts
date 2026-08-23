@@ -109,7 +109,7 @@ export const UPGRADE_REASON_COPY: Record<
   },
   aulas: {
     title: "Aulas para membros",
-    body: "Assista às aulas gravadas e marque progresso com o PRO ou o Elite.",
+    body: "A formação gravada e o acompanhamento de progresso entram no PRO e no Elite.",
   },
   busca: {
     title: "Busca para membros",
@@ -133,7 +133,7 @@ export const UPGRADE_REASON_COPY: Record<
   },
   geral: {
     title: "Desbloqueie o Builders Club",
-    body: "Você está no plano gratuito. Compare o PRO e o Elite e escolha como vai fechar o 1º cliente em 90 dias.",
+    body: "Dois planos, o mesmo objetivo: fechar o primeiro cliente em 90 dias. Escolha o nível de acesso da formação e da comunidade.",
   },
 };
 

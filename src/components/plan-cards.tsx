@@ -7,7 +7,7 @@ function CheckIcon() {
       fill="none"
       stroke="currentColor"
       strokeWidth="2.2"
-      className="mt-0.5 h-4 w-4 shrink-0 text-accent"
+      className="h-3.5 w-3.5 text-accent"
       aria-hidden
     >
       <path d="M20 6 9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
@@ -28,10 +28,10 @@ function OfferCard({
 }) {
   return (
     <article
-      className={`flex flex-col rounded-2xl border p-5 sm:p-6 ${
+      className={`flex h-full flex-col rounded-2xl border p-5 transition duration-200 sm:p-6 motion-safe:hover:-translate-y-1 ${
         featured
-          ? "border-accent bg-accent/5 shadow-md"
-          : "border-border bg-card"
+          ? "border-accent bg-accent/5 shadow-md hover:shadow-xl hover:border-accent"
+          : "border-border bg-card shadow-sm hover:border-accent/40 hover:shadow-lg"
       }`}
     >
       <div className="flex items-center justify-between gap-2">
@@ -56,23 +56,34 @@ function OfferCard({
       {offer.extraPriceNote ? (
         <p className="mt-0.5 text-xs text-muted">{offer.extraPriceNote}</p>
       ) : null}
-      <ul className="mt-4 flex flex-1 flex-col gap-2">
+      <ul className="mt-5 flex flex-col gap-3">
         {offer.highlights.map((item) => (
-          <li key={item} className="flex items-start gap-2 text-sm leading-snug">
-            <CheckIcon />
-            <span>{item}</span>
+          <li key={item.title} className="flex items-start gap-3">
+            <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent/15">
+              <CheckIcon />
+            </span>
+            <span>
+              <span className="block text-sm font-semibold leading-snug text-foreground">
+                {item.title}
+              </span>
+              <span className="mt-0.5 block text-[13px] leading-snug text-muted">
+                {item.detail}
+              </span>
+            </span>
           </li>
         ))}
       </ul>
-      <p className="mt-4 text-sm font-medium text-foreground">
+      <p className="mt-5 text-sm font-medium text-foreground">
         Promessa: {offer.promise}
       </p>
       {current ? (
-        <p className="btn-outline mt-5 w-full cursor-default opacity-70">
-          Plano atual
-        </p>
+        <div className="mt-auto pt-5">
+          <p className="btn-outline w-full cursor-default opacity-70">
+            Plano atual
+          </p>
+        </div>
       ) : (
-        <div className="mt-5 flex flex-col gap-2">
+        <div className="mt-auto flex flex-col gap-2 pt-5">
           <a
             href={offer.checkoutUrl}
             target="_blank"
@@ -81,12 +92,11 @@ function OfferCard({
           >
             {cta}
           </a>
-          {offer.boletoCheckouts && offer.boletoCheckouts.length > 0 ? (
-            <>
-              <p className="pt-1 text-center text-xs text-muted">
-                Ou boleto em R$ 1.297
-              </p>
-              {offer.boletoCheckouts.map((boleto) => (
+          {offer.paymentHint ? (
+            <p className="text-center text-xs text-muted">{offer.paymentHint}</p>
+          ) : null}
+          {offer.boletoCheckouts && offer.boletoCheckouts.length > 0
+            ? offer.boletoCheckouts.map((boleto) => (
                 <a
                   key={boleto.url}
                   href={boleto.url}
@@ -96,9 +106,8 @@ function OfferCard({
                 >
                   {boleto.label}
                 </a>
-              ))}
-            </>
-          ) : null}
+              ))
+            : null}
         </div>
       )}
     </article>
@@ -113,7 +122,7 @@ export function PlanCards({
   currentPlan: "none" | "pro" | "elite";
 }) {
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
+    <div className="grid items-stretch gap-4 sm:grid-cols-2 sm:gap-5">
       <OfferCard
         offer={offers.pro}
         cta="Quero o PRO"
