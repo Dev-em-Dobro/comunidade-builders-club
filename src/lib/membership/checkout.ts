@@ -62,7 +62,7 @@ export function ofertaPro(): ClubOffer {
       "Skills",
       "Templates",
       "Ingresso pro evento",
-      "Comunidade (spaces, posts e interações)",
+      "Comunidade",
     ],
     checkoutUrl: checkoutUrlPro(),
   };
@@ -86,13 +86,13 @@ export function ofertaElite(): ClubOffer {
     checkoutUrl: checkoutUrlElite(),
     boletoCheckouts: [
       {
-        label: "Boleto — oferta 1",
+        label: "Boleto R$ 1.297 — opção 1",
         url:
           envUrl("TMB_CHECKOUT_ELITE_BOLETO_1") ||
           CHECKOUT_ELITE_BOLETO_URLS[0],
       },
       {
-        label: "Boleto — oferta 2",
+        label: "Boleto R$ 1.297 — opção 2",
         url:
           envUrl("TMB_CHECKOUT_ELITE_BOLETO_2") ||
           CHECKOUT_ELITE_BOLETO_URLS[1],

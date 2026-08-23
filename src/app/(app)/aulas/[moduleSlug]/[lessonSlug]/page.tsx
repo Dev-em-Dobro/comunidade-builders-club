@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requirePaidMemberOrRedirect } from "@/lib/membership/require-member";
+import { hrefPlanos } from "@/lib/membership/capabilities";
 import {
   ensureLessonDiscussionPost,
   getLessonForMember,
@@ -32,7 +33,7 @@ type Props = {
 
 export default async function LessonPage({ params }: Props) {
   const { moduleSlug, lessonSlug } = await params;
-  const member = await requirePaidMemberOrRedirect();
+  const member = await requirePaidMemberOrRedirect(hrefPlanos({ motivo: "aulas" }));
 
   const lesson = await getLessonForMember(moduleSlug, lessonSlug);
   if (!lesson) notFound();

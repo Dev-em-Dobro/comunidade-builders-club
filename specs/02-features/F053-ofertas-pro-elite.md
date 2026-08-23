@@ -32,7 +32,7 @@ tem acesso completo, inclusive Orion.
   do space nem interage
 - **Avisos** deixa de ser free (era F041) — agora é comunidade (PRO+)
 - Perfil e notificações seguem liberados (conta, não produto)
-- Clique em menu/ação bloqueada → modal comparando PRO e Elite
+- Clique em menu/ação bloqueada → modal com CTA **Ver planos** → `/planos`
 
 ## PRO — R$ 297
 
@@ -67,8 +67,7 @@ Boleto (TMB, R$ 1.297) — as duas ofertas liberam Elite:
 
 **Promessa:** feche o 1º cliente em **90 dias**.
 
-Membro **PRO** que clica em Orion vê o modal só com upgrade para Elite
-(não revende o PRO).
+Membro **PRO** que clica em Orion vai a `/planos?destaque=elite` (não revende o PRO).
 
 ## Hubla
 
@@ -93,14 +92,25 @@ concedem **pro**.
 
 ## UI
 
-Modal “Desbloqueie o Builders Club”:
+Página **`/planos`** (liberada para free e PRO):
 
-- Copy do motivo (space, aulas, materiais, interações, Orion, …)
+- Título “Ver planos”
 - Dois cards lado a lado (empilhados no mobile): PRO vs Elite
 - Elite em destaque (recomendado)
 - CTA principal: checkout Hubla (cartão/Pix)
-- Elite: dois CTAs extras de boleto (TMB)
+- Elite: dois CTAs extras de boleto TMB (R$ 1.297)
+- Query `?motivo=` contextualiza o bloqueio (busca, aulas, space, …)
+- Query `?destaque=elite` para quem já é PRO (upgrade Orion)
 - Sem texto “oferta em definição”
+
+Modal de bloqueio (clique em busca, aulas, space, publicar, …):
+
+- Copy do motivo
+- “Agora não” fecha
+- CTA principal **Ver planos** → `/planos` (não checkout direto, não “Comprar Builders Club”)
+
+Ações gated no servidor (aulas, busca, space pago, post de aula, …)
+redirecionam para `/planos`. Links antigos `/?upgrade=1` também caem em `/planos`.
 
 ## Critérios
 
@@ -108,7 +118,8 @@ Modal “Desbloqueie o Builders Club”:
 - [x] Enum `pro` / `elite`; `paid` legado = PRO
 - [x] Free: só Feed, Boas-vindas, Geral (+ perfil/notificações)
 - [x] Avisos e demais spaces exigem PRO
-- [x] Modal compara as duas ofertas com os links oficiais
-- [x] PRO não vê Orion liberado; clique abre upgrade Elite
+- [x] Página `/planos` compara as duas ofertas com os links oficiais
+- [x] Modal de bloqueio leva a `/planos` (CTA Ver planos)
+- [x] PRO não vê Orion liberado; clique vai a `/planos?destaque=elite`
 - [x] Webhook mapeia product id → pro ou elite
 - [ ] Preview only (migrate HML; prod só após merge + confirmação)

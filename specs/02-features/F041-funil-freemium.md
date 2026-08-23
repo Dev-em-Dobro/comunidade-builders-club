@@ -44,12 +44,12 @@ tira justamente a prova social que motiva o upgrade. Free **lê**; o que convert
 | Space do post | Free abre `/posts/[id]`? |
 |---------------|--------------------------|
 | qualquer space do feed (`geral`, `avisos`, `conquistas`, `projetos`, …) | sim |
-| `aula-threads` | não → `/?upgrade=1` |
+| `aula-threads` | não → `/planos` |
 
 No detalhe do post, o link de volta aponta para o space quando free tem acesso a
 ele; caso contrário volta para o **Feed** (evita cair no redirect de upgrade).
 Gate de `/spaces/[slug]` continua igual: space pago redireciona free para
-`/?upgrade=1`.
+`/planos`. Links antigos `/?upgrade=1` redirecionam para `/planos`.
 
 ## Hubla
 - `conceder` → `tier=paid` + `status=active` + allowlist
@@ -57,9 +57,9 @@ Gate de `/spaces/[slug]` continua igual: space pago redireciona free para
 
 ## UI
 - Menus pagos com ícone de cadeado
-- Clique em menu/ação bloqueada → modal “Comprar Builders Club”
-- Checkout: duas ofertas oficiais — ver F053 (`HUBLA_CHECKOUT_URL_PRO` /
-  `HUBLA_CHECKOUT_URL_ELITE`)
+- Clique em menu/ação bloqueada → modal com CTA **Ver planos** → `/planos`
+- Checkout das duas ofertas oficiais na página `/planos` — ver F053
+  (`HUBLA_CHECKOUT_URL_PRO` / `HUBLA_CHECKOUT_URL_ELITE`)
 
 ## Critérios
 - [x] Schema `Membership.tier`

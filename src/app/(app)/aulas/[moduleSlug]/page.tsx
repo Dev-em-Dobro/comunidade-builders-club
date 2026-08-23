@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { requirePaidMemberOrRedirect } from "@/lib/membership/require-member";
+import { hrefPlanos } from "@/lib/membership/capabilities";
 import {
   listCompletedLessonIds,
   listPublishedModules,
@@ -18,7 +19,7 @@ type Props = {
 
 export default async function AulasModulePage({ params }: Props) {
   const { moduleSlug } = await params;
-  const member = await requirePaidMemberOrRedirect();
+  const member = await requirePaidMemberOrRedirect(hrefPlanos({ motivo: "aulas" }));
   const [modules, completed] = await Promise.all([
     listPublishedModules(),
     listCompletedLessonIds(member.user.id),

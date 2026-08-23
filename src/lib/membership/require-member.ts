@@ -5,7 +5,7 @@ import type { AuthUser } from "@/lib/auth";
 import { requireUser } from "@/lib/auth/require-user";
 import { AuthError, ForbiddenError } from "@/lib/auth/errors";
 import { ensureMemberBootstrap } from "./bootstrap";
-import { isPaidMembership } from "./capabilities";
+import { hrefPlanos, isPaidMembership } from "./capabilities";
 import { UPGRADE_REQUIRED } from "./errors";
 
 export type ActiveMember = {
@@ -72,7 +72,7 @@ export async function requireActiveMemberOrRedirect(): Promise<ActiveMember> {
 }
 
 export async function requirePaidMemberOrRedirect(
-  upgradePath = "/?upgrade=1",
+  upgradePath = hrefPlanos(),
 ): Promise<ActiveMember> {
   const member = await requireActiveMemberOrRedirect();
   if (!isPaidMembership(member.membership)) {

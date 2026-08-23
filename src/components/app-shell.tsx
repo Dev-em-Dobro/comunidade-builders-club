@@ -1,4 +1,4 @@
-import { ofertasBuildersClub, urlOrionApp } from "@/lib/membership/checkout";
+import { urlOrionApp } from "@/lib/membership/checkout";
 import { AppShellClient } from "@/components/app-shell-client";
 
 const EMPTY_SPACES: { id: string; slug: string; name: string }[] = [];
@@ -29,7 +29,6 @@ export function AppShell({
       isAdmin={isAdmin}
       isPaid={isPaid}
       isElite={isElite}
-      offers={ofertasBuildersClub()}
       orionUrl={urlOrionApp()}
       unread={0}
       spaces={EMPTY_SPACES}

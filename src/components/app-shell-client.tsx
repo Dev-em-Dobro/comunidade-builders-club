@@ -13,12 +13,12 @@ import { MateriaisNav } from "@/components/materiais-nav";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { UpgradeProvider, useUpgrade } from "@/components/upgrade-modal";
 import { isFreeSpaceSlug } from "@/lib/membership/capabilities";
-import type { ClubOffer } from "@/lib/membership/checkout";
 import {
   ICON_ADMIN,
   ICON_AULAS,
   ICON_BUSCA,
   ICON_NOVA,
+  ICON_PLANOS,
   ICON_PERFIL,
   ICON_PROGRESSO,
   ICON_TODOS,
@@ -187,6 +187,16 @@ function SidebarFooter({
 
   return (
     <div className="relative z-[100] mt-auto flex flex-col gap-0.5 border-t border-border pt-4">
+      {!isElite ? (
+        <Link
+          href="/planos"
+          className={`btn-ghost justify-start gap-2 ${pathname.startsWith("/planos") ? "text-accent" : ""}`}
+          onClick={onNavigate}
+        >
+          {ICON_PLANOS}
+          Planos
+        </Link>
+      ) : null}
       {isPaid ? (
         <Link
           href="/aulas"
@@ -530,7 +540,6 @@ export function AppShellClient({
   isAdmin,
   isPaid,
   isElite,
-  offers,
   orionUrl,
   unread,
   spaces: initialSpaces,
@@ -543,7 +552,6 @@ export function AppShellClient({
   isAdmin: boolean;
   isPaid: boolean;
   isElite: boolean;
-  offers: { pro: ClubOffer; elite: ClubOffer };
   orionUrl: string;
   unread: number;
   spaces: SpaceLink[];
@@ -591,7 +599,6 @@ export function AppShellClient({
     <UpgradeProvider
       isPaid={isPaid}
       isElite={isElite}
-      offers={offers}
       autoOpen={autoOpen}
     >
       <ShellInner

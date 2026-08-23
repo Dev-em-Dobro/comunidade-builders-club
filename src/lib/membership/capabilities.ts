@@ -50,6 +50,7 @@ export function isFreeAppPath(pathname: string): boolean {
   if (pathname === "/" || pathname === "") return true;
   if (pathname.startsWith("/notificacoes")) return true;
   if (pathname.startsWith("/perfil")) return true;
+  if (pathname.startsWith("/planos")) return true;
   if (pathname.startsWith("/posts/")) return true; // detalhe: gate por space do post
   if (pathname.startsWith("/spaces/")) {
     const slug = pathname.split("/")[2] ?? "";
@@ -74,3 +75,75 @@ export type UpgradeReason =
   | "reagir"
   | "orion"
   | "geral";
+
+const UPGRADE_REASONS: readonly UpgradeReason[] = [
+  "space",
+  "materiais",
+  "aulas",
+  "busca",
+  "publicar",
+  "comentar",
+  "reagir",
+  "orion",
+  "geral",
+];
+
+export function parseUpgradeReason(value: string | undefined): UpgradeReason | undefined {
+  if (!value) return undefined;
+  return (UPGRADE_REASONS as readonly string[]).includes(value)
+    ? (value as UpgradeReason)
+    : undefined;
+}
+
+export const UPGRADE_REASON_COPY: Record<
+  UpgradeReason,
+  { title: string; body: string }
+> = {
+  space: {
+    title: "Space exclusivo para membros",
+    body: "Entre no PRO ou no Elite para abrir este space e participar das conversas da comunidade.",
+  },
+  materiais: {
+    title: "Skills e templates para membros",
+    body: "Arsenal, prompts, contratos e kits ficam liberados no PRO. O Elite ainda soma mais material.",
+  },
+  aulas: {
+    title: "Aulas para membros",
+    body: "Assista às aulas gravadas e marque progresso com o PRO ou o Elite.",
+  },
+  busca: {
+    title: "Busca para membros",
+    body: "Pesquisar posts e membros faz parte do acesso PRO e Elite.",
+  },
+  publicar: {
+    title: "Publicar é para membros",
+    body: "Para criar publicações e participar de verdade, escolha o PRO ou o Elite.",
+  },
+  comentar: {
+    title: "Comentar é para membros",
+    body: "Comentários e respostas ficam liberados no PRO e no Elite.",
+  },
+  reagir: {
+    title: "Reagir é para membros",
+    body: "Reações fazem parte do acesso PRO e Elite.",
+  },
+  orion: {
+    title: "Orion é do plano Elite",
+    body: "O acesso ao Orion entra no Elite, junto com a reunião semanal em grupo.",
+  },
+  geral: {
+    title: "Desbloqueie o Builders Club",
+    body: "Você está no plano gratuito. Compare o PRO e o Elite e escolha como vai fechar o 1º cliente em 90 dias.",
+  },
+};
+
+export function hrefPlanos(opts?: {
+  motivo?: UpgradeReason;
+  destaque?: "elite";
+}): string {
+  const p = new URLSearchParams();
+  if (opts?.motivo && opts.motivo !== "geral") p.set("motivo", opts.motivo);
+  if (opts?.destaque === "elite") p.set("destaque", "elite");
+  const q = p.toString();
+  return q ? `/planos?${q}` : "/planos";
+}

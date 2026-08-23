@@ -3,6 +3,7 @@ import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
 import {
   isFreeSpaceSlug,
   isPaidMembership,
+  hrefPlanos,
 } from "@/lib/membership/capabilities";
 import { getSpaceBySlug } from "@/lib/spaces";
 import { listPosts } from "@/lib/posts";
@@ -30,7 +31,7 @@ export default async function SpacePage({ params }: Props) {
 
   const isPaid = isPaidMembership(member.membership);
   if (!isPaid && !isFreeSpaceSlug(slug)) {
-    redirect("/?upgrade=1");
+    redirect(hrefPlanos({ motivo: "space" }));
   }
 
   if (slug === WELCOME_SPACE_SLUG && !member.profile.welcomeSeenAt) {
