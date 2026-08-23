@@ -1,5 +1,8 @@
 import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
-import { isPaidMembership } from "@/lib/membership/capabilities";
+import {
+  isEliteMembership,
+  isPaidMembership,
+} from "@/lib/membership/capabilities";
 import { AppShell } from "@/components/app-shell";
 
 export default async function AppSegmentLayout({
@@ -9,12 +12,14 @@ export default async function AppSegmentLayout({
 }) {
   const member = await requireActiveMemberOrRedirect();
   const isPaid = isPaidMembership(member.membership);
+  const isElite = isEliteMembership(member.membership);
 
   return (
     <AppShell
       userId={member.user.id}
       isAdmin={member.membership.role === "admin"}
       isPaid={isPaid}
+      isElite={isElite}
       displayName={member.profile.displayName}
       avatarUrl={member.profile.avatarUrl}
     >

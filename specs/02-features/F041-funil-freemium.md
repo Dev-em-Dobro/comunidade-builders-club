@@ -4,6 +4,9 @@
 **Em produção** desde 16/08/2026 — homologado no Preview com conta free e
 mergeado em `main` (PR #2).
 
+Planos pagos PRO/Elite e checkout oficial: [F053](F053-ofertas-pro-elite.md)
+(2026-08-23). `paid` legado = PRO. **Avisos** deixou de ser space free.
+
 ## Contexto
 Qualquer pessoa pode entrar no Builders Club como **free** (cadastro).
 Conteúdo e interação completos ficam para **paid** (compra Hubla / allowlist).
@@ -21,7 +24,7 @@ Conteúdo e interação completos ficam para **paid** (compra Hubla / allowlist)
   `aula-threads`, que ficam fora do feed para todos os tiers)
 - **Abrir e ler qualquer post do feed**, inclusive de space pago — post
   completo, mídia e comentários
-- Spaces: **Boas-vindas**, **Geral**, **Avisos**
+- Spaces: **Boas-vindas**, **Geral** (Avisos é PRO+ desde F053)
 - **Notificações**
 - **Perfil**
 
@@ -55,7 +58,8 @@ Gate de `/spaces/[slug]` continua igual: space pago redireciona free para
 ## UI
 - Menus pagos com ícone de cadeado
 - Clique em menu/ação bloqueada → modal “Comprar Builders Club”
-- Checkout: `HUBLA_CHECKOUT_URL` (oferta Raphael — placeholder até existir)
+- Checkout: duas ofertas oficiais — ver F053 (`HUBLA_CHECKOUT_URL_PRO` /
+  `HUBLA_CHECKOUT_URL_ELITE`)
 
 ## Critérios
 - [x] Schema `Membership.tier`

@@ -13,6 +13,7 @@ import { MateriaisNav } from "@/components/materiais-nav";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { UpgradeProvider, useUpgrade } from "@/components/upgrade-modal";
 import { isFreeSpaceSlug } from "@/lib/membership/capabilities";
+import type { ClubOffer } from "@/lib/membership/checkout";
 import {
   ICON_ADMIN,
   ICON_AULAS,
@@ -23,6 +24,31 @@ import {
   ICON_TODOS,
   iconForSpace,
 } from "@/components/nav-icons";
+
+function OrionIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-4 w-4 shrink-0"
+      aria-hidden
+    >
+      <circle cx="12" cy="12" r="3" />
+      <path d="M12 3v2" />
+      <path d="M12 19v2" />
+      <path d="m5.6 5.6 1.4 1.4" />
+      <path d="m17 17 1.4 1.4" />
+      <path d="M3 12h2" />
+      <path d="M19 12h2" />
+      <path d="m5.6 18.4 1.4-1.4" />
+      <path d="m17 7 1.4-1.4" />
+    </svg>
+  );
+}
 
 type SpaceLink = { id: string; slug: string; name: string };
 
@@ -116,12 +142,16 @@ function SidebarFooter({
   unread,
   isAdmin,
   isPaid,
+  isElite,
+  orionUrl,
   notifPreview,
   onNavigate,
 }: {
   unread: number;
   isAdmin: boolean;
   isPaid: boolean;
+  isElite: boolean;
+  orionUrl: string;
   notifPreview: NotifPreview[];
   onNavigate?: () => void;
 }) {
@@ -190,6 +220,31 @@ function SidebarFooter({
           reason="busca"
           active={pathname.startsWith("/busca")}
         />
+      )}
+      {isElite ? (
+        <a
+          href={orionUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn-ghost justify-start gap-2"
+          onClick={onNavigate}
+        >
+          <OrionIcon />
+          Orion
+        </a>
+      ) : (
+        <button
+          type="button"
+          className="btn-ghost w-full cursor-pointer justify-start gap-2"
+          onClick={() => {
+            openUpgrade("orion");
+            onNavigate?.();
+          }}
+        >
+          <OrionIcon />
+          <span className="flex-1 text-left">Orion</span>
+          <LockIcon />
+        </button>
       )}
       <NotificationBell unread={unread} items={notifPreview} />
       <Link
@@ -290,6 +345,8 @@ function ShellInner({
   displayName,
   isAdmin,
   isPaid,
+  isElite,
+  orionUrl,
   unread,
   spaces,
   avatarUrl,
@@ -299,6 +356,8 @@ function ShellInner({
   displayName: string;
   isAdmin: boolean;
   isPaid: boolean;
+  isElite: boolean;
+  orionUrl: string;
   unread: number;
   spaces: SpaceLink[];
   avatarUrl?: string | null;
@@ -348,11 +407,9 @@ function ShellInner({
             <p className="truncate text-sm font-medium text-foreground/90">
               {displayName}
             </p>
-            {!isPaid ? (
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-muted">
-                Plano gratuito
-              </p>
-            ) : null}
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-muted">
+              {isElite ? "Plano Elite" : isPaid ? "Plano PRO" : "Plano gratuito"}
+            </p>
           </div>
         </div>
         <div className="mt-8 flex min-h-0 flex-1 flex-col overflow-y-auto">
@@ -366,6 +423,8 @@ function ShellInner({
           unread={unread}
           isAdmin={isAdmin}
           isPaid={isPaid}
+          isElite={isElite}
+          orionUrl={orionUrl}
           notifPreview={notifPreview}
         />
       </aside>
@@ -413,6 +472,8 @@ function ShellInner({
               unread={unread}
               isAdmin={isAdmin}
               isPaid={isPaid}
+              isElite={isElite}
+              orionUrl={orionUrl}
               notifPreview={notifPreview}
               onNavigate={() => setDrawerOpen(false)}
             />
@@ -468,7 +529,9 @@ export function AppShellClient({
   displayName,
   isAdmin,
   isPaid,
-  checkoutUrl,
+  isElite,
+  offers,
+  orionUrl,
   unread,
   spaces: initialSpaces,
   avatarUrl,
@@ -479,7 +542,9 @@ export function AppShellClient({
   displayName: string;
   isAdmin: boolean;
   isPaid: boolean;
-  checkoutUrl: string;
+  isElite: boolean;
+  offers: { pro: ClubOffer; elite: ClubOffer };
+  orionUrl: string;
   unread: number;
   spaces: SpaceLink[];
   avatarUrl?: string | null;
@@ -525,13 +590,16 @@ export function AppShellClient({
   return (
     <UpgradeProvider
       isPaid={isPaid}
-      checkoutUrl={checkoutUrl}
+      isElite={isElite}
+      offers={offers}
       autoOpen={autoOpen}
     >
       <ShellInner
         displayName={displayName}
         isAdmin={isAdmin}
         isPaid={isPaid}
+        isElite={isElite}
+        orionUrl={orionUrl}
         unread={unread}
         spaces={spaces}
         avatarUrl={avatarUrl}

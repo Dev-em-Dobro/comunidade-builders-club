@@ -95,10 +95,13 @@ enum MembershipStatus {
   revoked
 }
 
-/// F041 — freemium: free lê Feed/Boas-vindas/Geral/Avisos; paid libera o resto.
+/// F041 / F053 — free lê Feed/Boas-vindas/Geral; pro/elite liberam o resto.
+/// `paid` é legado F041 (tratado como pro).
 enum MembershipTier {
   free
   paid
+  pro
+  elite
 }
 
 enum Role {
@@ -139,7 +142,7 @@ model Membership {
   userId    String           @unique
   user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   status    MembershipStatus @default(pending)
-  /// F041 — free (leitura limitada) | paid (comunidade completa).
+  /// F041/F053 — free | pro | elite (`paid` legado = pro).
   tier      MembershipTier   @default(free)
   role      Role             @default(member)
   createdAt DateTime         @default(now())

@@ -1,4 +1,4 @@
-import { checkoutUrlBuildersClub } from "@/lib/membership/checkout";
+import { ofertasBuildersClub, urlOrionApp } from "@/lib/membership/checkout";
 import { AppShellClient } from "@/components/app-shell-client";
 
 const EMPTY_SPACES: { id: string; slug: string; name: string }[] = [];
@@ -11,6 +11,7 @@ export function AppShell({
   children,
   isAdmin,
   isPaid,
+  isElite,
   displayName,
   avatarUrl,
 }: {
@@ -18,6 +19,7 @@ export function AppShell({
   userId: string;
   isAdmin: boolean;
   isPaid: boolean;
+  isElite: boolean;
   displayName: string;
   avatarUrl?: string | null;
 }) {
@@ -26,7 +28,9 @@ export function AppShell({
       displayName={displayName}
       isAdmin={isAdmin}
       isPaid={isPaid}
-      checkoutUrl={checkoutUrlBuildersClub()}
+      isElite={isElite}
+      offers={ofertasBuildersClub()}
+      orionUrl={urlOrionApp()}
       unread={0}
       spaces={EMPTY_SPACES}
       avatarUrl={avatarUrl}

@@ -17,7 +17,9 @@ Padrão espelhado do Orion F019, adaptado ao Club (sem SSO).
 | `customer.member_removed` | Remove allowlist; se membership `active` → `revoked` |
 | `invoice.refunded` | Idem revogar |
 
-Filtro opcional `HUBLA_PRODUCT_ID`. Idempotência: `x-hubla-idempotency` → `HublaWebhookDelivery`.
+Filtro por mapa de produtos (F053): `HUBLA_PRODUCT_ID` (legado=PRO),
+`HUBLA_PRODUCT_ID_PRO`, `HUBLA_PRODUCT_ID_ELITE`. Sem nenhum ID → 503.
+Idempotência: `x-hubla-idempotency` → `HublaWebhookDelivery`.
 
 ## Critérios
 - [x] Token inválido / ausente → 401

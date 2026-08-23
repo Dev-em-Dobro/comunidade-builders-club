@@ -46,7 +46,12 @@ As chaves `DATABASE_URL_HML` / `DATABASE_URL_PROD` / `ORION_DATABASE_URL` são s
 | `EMAIL_PROVIDER`        | `resend`                               | `resend` (ou mailpit só local)                 | `mailpit`               |
 | `BOOTSTRAP_ADMIN_EMAIL` | seu e-mail admin                       | mesmo ou de teste                              | seu e-mail              |
 | `HUBLA_WEBHOOK_TOKEN`   | token do webhook Hubla                 | mesmo ou dedicado de staging                   | obrigatório p/ webhook  |
-| `HUBLA_PRODUCT_ID`      | ID produto Builders Club (**obrigatório** no webhook) | mesmo                               | obrigatório p/ webhook  |
+| `HUBLA_PRODUCT_ID`      | ID legado (mapeia **PRO**) | mesmo                               | obrigatório p/ webhook se os dois abaixo vazios |
+| `HUBLA_PRODUCT_ID_PRO`  | ID produto PRO (R$ 297) | mesmo                               | recomendado |
+| `HUBLA_PRODUCT_ID_ELITE`| ID produto Elite (R$ 997) | mesmo                               | recomendado |
+| `HUBLA_CHECKOUT_URL_PRO` | Override checkout PRO | mesmo | opcional (default `pay.hub.la/XaY8…`) |
+| `HUBLA_CHECKOUT_URL_ELITE` | Override checkout Elite | mesmo | opcional (default `pay.hub.la/v1Ss…`) |
+| `ORION_APP_URL`         | URL do Orion (sidebar Elite) | mesmo | opcional |
 | `TMB_WEBHOOK_TOKEN`     | Valor do webhook TMB (Mentoria)        | mesmo ou dedicado de staging                   | obrigatório p/ webhook TMB |
 | `TMB_WEBHOOK_HEADER`    | Chave do header (default `x-tmb-token`)| mesmo                                          | opcional                |
 
@@ -60,7 +65,7 @@ Na Hubla, configure o webhook apontando para:
 
 Header esperado: `x-hubla-token` = valor de `HUBLA_WEBHOOK_TOKEN`.
 
-Sem `HUBLA_PRODUCT_ID` o endpoint responde **503** (não processa eventos de outros produtos).
+Sem nenhum de `HUBLA_PRODUCT_ID` / `HUBLA_PRODUCT_ID_PRO` / `HUBLA_PRODUCT_ID_ELITE` o endpoint responde **503**. Cada ID mapeia o grant para PRO ou Elite (F053).
 
 ### TMB Mentoria Freela (F047)
 
@@ -70,7 +75,8 @@ Na TMB (Vendas → Webhook):
 - **Chave:** `x-tmb-token` (ou o valor de `TMB_WEBHOOK_HEADER`)
 - **Valor:** = `TMB_WEBHOOK_TOKEN` na Vercel
 
-Codes liberados por default: `1AS249898VN`, `3XB272209KV`, `9DW254247E5`.
+Codes liberados por default: `1AS249898VN` (PRO / Mentoria), `3XB272209KV` e
+`9DW254247E5` (Elite boleto). Override Elite: `TMB_ELITE_CODES`.
 DevQuest continua via seed sazonal (não passa neste webhook).
 
 

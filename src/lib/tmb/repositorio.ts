@@ -6,7 +6,14 @@ import {
   idempotencyKeyTmb,
   interpretarVendaTmb,
 } from "./interpretar";
-import type { AcaoTmb } from "./tipos";
+import type { AcaoTmb, PlanoTmb } from "./tipos";
+import type { MembershipTier } from "@prisma/client";
+
+function rankPago(tier: MembershipTier | PlanoTmb): number {
+  if (tier === "elite") return 3;
+  if (tier === "pro" || tier === "paid") return 2;
+  return 1;
+}
 
 async function jaProcessouIdempotency(key: string): Promise<boolean> {
   const row = await prisma.hublaWebhookDelivery.findUnique({
@@ -27,7 +34,7 @@ async function registrarEntrega(
   });
 }
 
-async function concederPaid(email: string): Promise<void> {
+async function concederPago(email: string, plan: PlanoTmb): Promise<void> {
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) return;
   const m = await prisma.membership.findUnique({ where: { userId: user.id } });
@@ -36,15 +43,16 @@ async function concederPaid(email: string): Promise<void> {
       data: {
         userId: user.id,
         status: "active",
-        tier: "paid",
+        tier: plan,
         role: "member",
       },
     });
     return;
   }
+  const nextTier = rankPago(plan) >= rankPago(m.tier) ? plan : m.tier;
   await prisma.membership.update({
     where: { userId: user.id },
-    data: { status: "active", tier: "paid" },
+    data: { status: "active", tier: nextTier },
   });
 }
 
@@ -68,13 +76,14 @@ async function aplicarAcao(acao: AcaoTmb): Promise<void> {
       acao.lancamentoId ? `lancamento_id=${acao.lancamentoId}` : null,
       acao.nome ? `name=${acao.nome}` : null,
       `pedido=${acao.pedido}`,
+      `plan=${acao.plan}`,
     ].filter(Boolean);
     await addAllowedEmail({
       email: acao.email,
       source: "tmb",
       note: noteParts.join("; "),
     });
-    await concederPaid(acao.email);
+    await concederPago(acao.email, acao.plan);
     return;
   }
 

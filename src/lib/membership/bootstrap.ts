@@ -41,7 +41,7 @@ export async function ensureMemberBootstrap(
     if (isBootstrapAdmin && existing.role !== "admin") {
       const membership = await prisma.membership.update({
         where: { userId },
-        data: { status: "active", tier: "paid", role: "admin" },
+        data: { status: "active", tier: "elite", role: "admin" },
       });
       return { membership, profile };
     }
@@ -68,7 +68,7 @@ export async function ensureMemberBootstrap(
       data: {
         userId,
         status: "active",
-        tier: allowed || isBootstrapAdmin ? "paid" : "free",
+        tier: isBootstrapAdmin ? "elite" : allowed ? "pro" : "free",
         role: isBootstrapAdmin ? "admin" : "member",
       },
     });
@@ -79,7 +79,7 @@ export async function ensureMemberBootstrap(
     if (isBootstrapAdmin) {
       const membership = await prisma.membership.update({
         where: { userId },
-        data: { status: "active", tier: "paid", role: "admin" },
+        data: { status: "active", tier: "elite", role: "admin" },
       });
       return { membership, profile: nextProfile };
     }
@@ -91,7 +91,7 @@ export async function ensureMemberBootstrap(
       where: { userId },
       data: {
         status: "active",
-        tier: allowed || isBootstrapAdmin ? "paid" : "free",
+        tier: isBootstrapAdmin ? "elite" : allowed ? "pro" : "free",
         ...(isBootstrapAdmin ? { role: "admin" as const } : {}),
       },
     });

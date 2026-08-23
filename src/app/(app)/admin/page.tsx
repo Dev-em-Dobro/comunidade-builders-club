@@ -25,6 +25,7 @@ import {
 import { isAdminTab, type AdminTabId } from "@/lib/admin/tabs";
 import { labelAllowedEmailSource } from "@/lib/membership/allowlist-labels";
 import type { MembershipStatus } from "@prisma/client";
+import { tierLabel } from "@/lib/membership/capabilities";
 
 type Props = {
   searchParams: Promise<{ status?: string; q?: string; tab?: string }>;
@@ -186,7 +187,7 @@ export default async function AdminPage({ searchParams }: Props) {
                     {m.user.profile?.displayName ?? m.user.email}
                   </p>
                   <p className="text-xs text-muted">
-                    {m.user.email} · {m.status} · {m.role}
+                    {m.user.email} · {m.status} · {m.role} · {tierLabel(m.tier)}
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-1">

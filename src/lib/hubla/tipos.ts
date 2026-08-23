@@ -1,5 +1,7 @@
 // Tipos do webhook Hubla v2 (F014 / ADR-006).
 
+import type { PlanoPagoHubla } from "./produtos";
+
 export type HublaWebhookPayload = {
   type?: string;
   version?: string;
@@ -32,6 +34,7 @@ export type AcaoAllowlist =
       acao: "conceder";
       email: string;
       productId: string;
+      plan: PlanoPagoHubla;
       hublaUserId?: string;
       subscriptionId?: string;
     }

@@ -112,12 +112,12 @@ export default async function HomePage({ searchParams }: Props) {
             ) : (
               <>
                 Plano gratuito: leitura do feed liberada. Comentar, reagir e os
-                spaces exclusivos são do acesso completo.{" "}
+                spaces da comunidade são do PRO e do Elite.{" "}
                 <Link
                   href="/?upgrade=1"
                   className="font-medium text-accent hover:underline"
                 >
-                  Desbloquear tudo
+                  Ver planos
                 </Link>
               </>
             )}

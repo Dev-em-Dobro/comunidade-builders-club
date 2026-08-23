@@ -1,14 +1,10 @@
-// F041 — capabilities freemium.
+// F041 / F053 — capabilities freemium (free | pro | elite).
 
-import type { Membership, MembershipTier, Role } from "@prisma/client";
+import type { Membership, MembershipTier } from "@prisma/client";
 import { AULA_THREADS_SPACE_SLUG } from "@/lib/spaces/constants";
 
 /** Spaces cuja *página* é liberada para free (sidebar sem cadeado). */
-export const FREE_SPACE_SLUGS = [
-  "boas-vindas",
-  "geral",
-  "avisos",
-] as const;
+export const FREE_SPACE_SLUGS = ["boas-vindas", "geral"] as const;
 
 export type FreeSpaceSlug = (typeof FREE_SPACE_SLUGS)[number];
 
@@ -19,18 +15,28 @@ export function isFreeSpaceSlug(slug: string): boolean {
 /**
  * F041 — o feed é vitrine: free abre e lê qualquer post que apareça nele.
  * Só as threads de aula ficam de fora (conteúdo pago, nunca vai ao feed).
- * Interagir (comentar, reagir) continua sendo paid — gate é outro.
+ * Interagir (comentar, reagir) continua sendo PRO+ — gate é outro.
  */
 export function canFreeReadPost(spaceSlug: string): boolean {
   return spaceSlug !== AULA_THREADS_SPACE_SLUG;
 }
+
+const PAID_TIERS = new Set<MembershipTier>(["paid", "pro", "elite"]);
 
 export function isPaidMembership(
   m: Pick<Membership, "tier" | "role" | "status">,
 ): boolean {
   if (m.status !== "active") return false;
   if (m.role === "admin" || m.role === "instructor") return true;
-  return m.tier === "paid";
+  return PAID_TIERS.has(m.tier);
+}
+
+export function isEliteMembership(
+  m: Pick<Membership, "tier" | "role" | "status">,
+): boolean {
+  if (m.status !== "active") return false;
+  if (m.role === "admin" || m.role === "instructor") return true;
+  return m.tier === "elite";
 }
 
 export function isFreeMembership(
@@ -53,7 +59,9 @@ export function isFreeAppPath(pathname: string): boolean {
 }
 
 export function tierLabel(tier: MembershipTier): string {
-  return tier === "paid" ? "Pago" : "Gratuito";
+  if (tier === "elite") return "Elite";
+  if (tier === "pro" || tier === "paid") return "PRO";
+  return "Gratuito";
 }
 
 export type UpgradeReason =
@@ -64,4 +72,5 @@ export type UpgradeReason =
   | "publicar"
   | "comentar"
   | "reagir"
+  | "orion"
   | "geral";

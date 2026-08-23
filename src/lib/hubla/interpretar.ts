@@ -1,4 +1,5 @@
 import { emailDoEvento, productIdDoEvento } from "./normalizar";
+import type { PlanoPagoHubla } from "./produtos";
 import {
   EVENTOS_CONCEDER,
   EVENTOS_REVOGAR,
@@ -8,7 +9,7 @@ import {
 
 export function interpretarEventoHubla(
   payload: HublaWebhookPayload,
-  productIdFiltro?: string | null,
+  productPlanMap?: Map<string, PlanoPagoHubla> | null,
 ): AcaoAllowlist {
   const tipo = payload.type?.trim();
   if (!tipo) {
@@ -25,7 +26,8 @@ export function interpretarEventoHubla(
     return { acao: "ignorar", motivo: "product_id ausente" };
   }
 
-  if (productIdFiltro && productId !== productIdFiltro) {
+  const plan = productPlanMap?.get(productId) ?? null;
+  if (productPlanMap && productPlanMap.size > 0 && !plan) {
     return { acao: "ignorar", motivo: "produto não filtrado" };
   }
 
@@ -43,6 +45,7 @@ export function interpretarEventoHubla(
       acao: "conceder",
       email,
       productId,
+      plan: plan ?? "pro",
       hublaUserId: event.user?.id,
       subscriptionId: event.subscription?.id,
     };

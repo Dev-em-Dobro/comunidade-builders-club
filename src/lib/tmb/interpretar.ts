@@ -3,8 +3,10 @@ import {
   STATUS_FINANCEIRO_REVOKE,
   STATUS_PEDIDO_GRANT,
   STATUS_PEDIDO_REVOKE,
+  TMB_ELITE_CODES_DEFAULT,
   TMB_MENTORIA_CODES_DEFAULT,
   type AcaoTmb,
+  type PlanoTmb,
   type TmbVendaPayload,
 } from "./tipos";
 
@@ -43,6 +45,18 @@ export function codesPermitidos(): Set<string> {
     ? raw.split(",").map((c) => c.trim()).filter(Boolean)
     : [...TMB_MENTORIA_CODES_DEFAULT];
   return new Set(list.map((c) => c.toUpperCase()));
+}
+
+export function codesElite(): Set<string> {
+  const raw = process.env.TMB_ELITE_CODES?.trim();
+  const list = raw
+    ? raw.split(",").map((c) => c.trim()).filter(Boolean)
+    : [...TMB_ELITE_CODES_DEFAULT];
+  return new Set(list.map((c) => c.toUpperCase()));
+}
+
+export function planoDoCodeTmb(code: string): PlanoTmb {
+  return codesElite().has(code.toUpperCase()) ? "elite" : "pro";
 }
 
 export function lancamentoIdFiltro(): string | null {
@@ -111,6 +125,7 @@ export function interpretarVendaTmb(payload: unknown): AcaoTmb {
       acao: "conceder",
       email,
       productId,
+      plan: planoDoCodeTmb(productId),
       pedido,
       nome,
       lancamentoId,
