@@ -128,7 +128,7 @@ export function ofertaElite(): ClubOffer {
     checkoutUrl: checkoutUrlElite(),
     boletoCheckouts: [
       {
-        label: "Pagar com boleto — R$ 1.297",
+        label: "Opção para boleto",
         url: envUrl("TMB_CHECKOUT_ELITE_BOLETO_1") || CHECKOUT_ELITE_BOLETO_URL,
       },
     ],

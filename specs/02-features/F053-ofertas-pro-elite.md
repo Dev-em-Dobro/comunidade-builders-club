@@ -34,6 +34,11 @@ tem acesso completo, inclusive Orion.
 - Perfil e notificações seguem liberados (conta, não produto)
 - Clique em menu/ação bloqueada → modal com CTA **Ver planos** → `/planos`
 
+Identidade (sidebar e `/perfil`):
+
+- Free: texto “Plano gratuito”, sem destaque
+- PRO / Elite: badge (bandeirinha) com o nome do plano — Elite mais forte que PRO
+
 ## PRO — R$ 297
 
 Checkout: [https://pay.hub.la/XaY8QNfZlOO1XBgjzMfY](https://pay.hub.la/XaY8QNfZlOO1XBgjzMfY)
@@ -100,7 +105,7 @@ Página **`/planos`** (liberada para free e PRO):
 - Cards com destaque, hover (elevação/sombra) e lista de entregas em título + detalhe
 - Elite em destaque (recomendado)
 - CTA principal: checkout Hubla (cartão/Pix)
-- Elite: **um** CTA de boleto TMB (`9DW254247E5`, R$ 1.297)
+- Elite: **um** CTA de boleto TMB (`9DW254247E5`) com o label “Opção para boleto” (sem valor no botão)
 - Sem rodapé de meios de pagamento
 - Query `?motivo=` contextualiza o bloqueio (busca, aulas, space, …)
 - Query `?destaque=elite` para quem já é PRO (upgrade Orion)
@@ -122,6 +127,7 @@ redirecionam para `/planos`. Links antigos `/?upgrade=1` também caem em `/plano
 - [x] Free: só Feed, Boas-vindas, Geral (+ perfil/notificações)
 - [x] Avisos e demais spaces exigem PRO
 - [x] Página `/planos` compara as duas ofertas com os links oficiais
+- [x] Sidebar e `/perfil` mostram badge PRO/Elite para quem fez upgrade
 - [x] Modal de bloqueio leva a `/planos` (CTA Ver planos)
 - [x] PRO não vê Orion liberado; clique vai a `/planos?destaque=elite`
 - [x] Webhook mapeia product id → pro ou elite

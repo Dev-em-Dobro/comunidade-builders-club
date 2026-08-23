@@ -12,6 +12,7 @@ import {
 import { MateriaisNav } from "@/components/materiais-nav";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { UpgradeProvider, useUpgrade } from "@/components/upgrade-modal";
+import { PlanBadge } from "@/components/plan-badge";
 import { isFreeSpaceSlug } from "@/lib/membership/capabilities";
 import {
   ICON_ADMIN,
@@ -417,9 +418,9 @@ function ShellInner({
             <p className="truncate text-sm font-medium text-foreground/90">
               {displayName}
             </p>
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-muted">
-              {isElite ? "Plano Elite" : isPaid ? "Plano PRO" : "Plano gratuito"}
-            </p>
+            <div className="mt-0.5">
+              <PlanBadge isPaid={isPaid} isElite={isElite} />
+            </div>
           </div>
         </div>
         <div className="mt-8 flex min-h-0 flex-1 flex-col overflow-y-auto">
