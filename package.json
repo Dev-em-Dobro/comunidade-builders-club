@@ -18,6 +18,7 @@
     "db:seed:aulas-panda": "npx tsx scripts/seed-aulas-panda.mts",
     "db:seed:devquest": "npx tsx scripts/seed-devquest-allowed.mts",
     "db:import-allowed": "npx tsx scripts/import-allowed-emails.mts",
+    "db:scan-space-mentions": "npx tsx scripts/scan-space-mentions.mts",
     "db:studio": "prisma studio",
     "mailpit": "docker compose up -d mailpit",
     "perf:lighthouse": "npx tsx scripts/perf-lighthouse.mts",

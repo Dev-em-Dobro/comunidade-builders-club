@@ -50,7 +50,7 @@ Se algo não abrir, confira se seu e-mail está na allowlist ou fale com o supor
     body: `## Navegação
 
 - **Feed** — timeline de todos os Spaces (exceto Boas-vindas)
-- **Spaces** — Avisos, Geral, Dúvidas, Freelas, Conquistas, Projetos
+- **Spaces** — Avisos, Geral, Dúvidas, Indicação Freela, Conquistas, Desafio Projetos
 - **Materiais de apoio** — entregáveis e kits
 - **Aulas** — vídeos quando disponíveis
 - **Notificações** — comentários, reações e menções
@@ -70,9 +70,9 @@ No Feed você pode alternar entre visão **reduzida** (cards compactos) e **expa
     body: `- **Avisos** — comunicados oficiais
 - **Geral** — papo do dia a dia
 - **Dúvidas** — perguntas técnicas e de carreira
-- **Freelas** — oportunidades entre a comunidade
-- **Conquistas** — celebre vitórias
-- **Projetos** — mostre o que está construindo
+- **Indicação Freela** — indique um freela para um colega
+- **Conquistas** — cliente fechado, proposta aceita, primeiro pagamento
+- **Desafio Projetos** — mostre o projeto que está construindo
 
 Prospecção de clientes e hunting de vagas fica no **Orion Lead Hunter** — não use a comunidade como board de vagas.`,
   },
