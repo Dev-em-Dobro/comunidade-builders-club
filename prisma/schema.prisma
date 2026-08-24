@@ -164,6 +164,20 @@ model AllowedEmail {
   @@map("allowed_email")
 }
 
+/// F054 — pedido de login cujo e-mail não estava na allowlist.
+model DeniedLoginAttempt {
+  id         String    @id @default(cuid())
+  email      String
+  /// Nesta base sempre `club`. Campo existe para export / espelho com o Orion.
+  app        String    @default("club")
+  createdAt  DateTime  @default(now())
+  resolvedAt DateTime?
+
+  @@index([createdAt])
+  @@index([email, createdAt])
+  @@map("denied_login_attempt")
+}
+
 /// F014 — idempotência do webhook Hubla.
 model HublaWebhookDelivery {
   idempotencyKey String   @id @map("idempotency_key")

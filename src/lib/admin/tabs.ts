@@ -1,5 +1,6 @@
 export const ADMIN_TABS = [
   { id: "allowlist", label: "Allowlist" },
+  { id: "tentativas", label: "Tentativas" },
   { id: "membros", label: "Membros" },
   { id: "aulas", label: "Aulas" },
   { id: "spaces", label: "Spaces" },

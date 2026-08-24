@@ -17,6 +17,7 @@ Diagnóstico, Outreach, Entregável — este último só na Fase 2 de migração
 | **Membro** | Usuário com membership na comunidade. |
 | **Membership** | Estado de acesso: `pending` \| `active` \| `revoked` + papel + **tier** `free` \| `pro` \| `elite` (`paid` legado = PRO; F041/F053). |
 | **Allowlist** | E-mails pré-aprovados (`AllowedEmail`); login → `active` (F012). |
+| **Tentativa recusada** | Pedido de entrada com e-mail **fora** da allowlist (`DeniedLoginAttempt`). Não bloqueia o login free (F041); alimenta a aba Admin (F054). |
 | **Papel (Role)** | `member` \| `instructor` \| `admin`. |
 | **Perfil** | Foto, nome de exibição, bio, data de entrada. |
 | **Space** | Categoria de discussão (Avisos, Geral, …). |

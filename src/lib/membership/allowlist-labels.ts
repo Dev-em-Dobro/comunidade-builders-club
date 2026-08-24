@@ -8,6 +8,7 @@ const SOURCE_LABELS: Record<string, string> = {
   orion: "Orion",
   csv: "CSV",
   devquest: "DevQuest",
+  "login-attempt": "tentativa de login",
 };
 
 export function labelAllowedEmailSource(source: string): string {
