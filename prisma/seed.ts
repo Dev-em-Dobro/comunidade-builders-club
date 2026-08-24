@@ -15,7 +15,8 @@ const SPACES = [
   {
     slug: "boas-vindas",
     name: "Boas-vindas",
-    description: "Orientações e primeiros passos na comunidade",
+    // F054 — texto de HML adotado como oficial (redesign da jornada F051).
+    description: "Tutorial e os três passos do primeiro dia",
     sortOrder: 0,
   },
   { slug: "avisos", name: "Avisos", description: "Comunicados oficiais", sortOrder: 1 },

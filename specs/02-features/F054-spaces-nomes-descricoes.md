@@ -49,9 +49,23 @@ antigos, então qualquer `db:seed` a partir de um checkout desatualizado
 regrediria HML. Alinhar o repo fecha essa porta.
 
 `seed-welcome-cards.mts` deixa de sobrescrever nome/descrição do space
-`boas-vindas` — esses campos pertencem a `prisma/seed.ts`. HML tem descrição
-ajustada à mão ("Tutorial e os três passos do primeiro dia") que era perdida a
-cada execução do script de cards.
+`boas-vindas` — esses campos pertencem a `prisma/seed.ts`.
+
+A descrição de `boas-vindas` passa a ser a de HML — "Tutorial e os três passos
+do primeiro dia" — decidida como oficial. Reflete o redesign da jornada (F051):
+tela com vídeo + trilha de três passos.
+
+### Divergência maior, fora do escopo desta feature
+O space `boas-vindas` tem **conteúdos diferentes** entre ambientes:
+
+- **HML** — 1 card ("Primeiros passos", trilha de 3 passos ao lado do vídeo)
+- **PROD** — 6 cards do layout antigo (hero, primeiros passos, como usar,
+  para que serve cada Space, engajamento, materiais e aulas)
+
+`seed-welcome-cards.mts` ainda descreve o layout de 6 cards. Rodá-lo contra HML
+recriaria os 5 cards que o redesign removeu. Levar o layout de HML para produção
+exigiria **remover** cards em produção — mudança destrutiva, que precisa de
+feature e decisão próprias. F054 não faz isso.
 
 ### Posts escritos por membros
 Posts e comentários escritos direto no app só existem no banco. O script
