@@ -25,9 +25,9 @@ Aqui ficam conversas, dúvidas, conquistas e avisos oficiais. Use este post como
 - **Avisos** — comunicados oficiais (leia sempre)
 - **Geral** — papo aberto do dia a dia
 - **Dúvidas** — perguntas técnicas e de carreira
-- **Indicação Freela** — indique um freela para um colega da comunidade
-- **Conquistas** — cliente fechado, proposta aceita, primeiro pagamento (conte como foi)
-- **Desafio Projetos** — mostre o projeto que está construindo, mesmo inacabado
+- **Indicação Freela** — se tiver um freela pra indicar pra um colega, poste aqui
+- **Conquistas** — cliente fechado, proposta aceita ou primeiro pagamento; conte como fechou a venda
+- **Desafio Projetos** — mostre o que está construindo
 
 Prospecção de clientes e hunting de freelas fica no **Orion Lead Hunter** — não use a comunidade como board de vagas.
 

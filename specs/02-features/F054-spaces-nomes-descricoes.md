@@ -33,6 +33,26 @@ usar os nomes novos:
 Ambos são idempotentes por marcador (`linkUrl`) e **atualizam** o post existente,
 então rodar o script corrige o conteúdo já publicado.
 
+### Estado dos ambientes em 2026-08-24
+Levantado por leitura direta dos bancos:
+
+- **HML** — já aplicado à mão: nomes novos, descrições de `freelas` e
+  `conquistas`, e o aviso fixado reescrito. Falta só a descrição de `projetos`.
+  O texto do repo foi alinhado ao que está no ar em HML (mesma redação), então
+  rodar o seed lá não gera churn.
+- **PROD** — nada aplicado: nomes e descrições antigos, aviso fixado antigo e
+  os dois cards de Boas-vindas (`como-usar-v1`, `spaces-v1`) citando "Freelas"
+  e "Projetos".
+
+O drift entre repo e HML era invisível: o seed do repo ainda tinha os textos
+antigos, então qualquer `db:seed` a partir de um checkout desatualizado
+regrediria HML. Alinhar o repo fecha essa porta.
+
+`seed-welcome-cards.mts` deixa de sobrescrever nome/descrição do space
+`boas-vindas` — esses campos pertencem a `prisma/seed.ts`. HML tem descrição
+ajustada à mão ("Tutorial e os três passos do primeiro dia") que era perdida a
+cada execução do script de cards.
+
 ### Posts escritos por membros
 Posts e comentários escritos direto no app só existem no banco. O script
 `scripts/scan-space-mentions.mts` varre `Post` e `Comment` procurando os nomes

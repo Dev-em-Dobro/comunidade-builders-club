@@ -70,9 +70,9 @@ No Feed você pode alternar entre visão **reduzida** (cards compactos) e **expa
     body: `- **Avisos** — comunicados oficiais
 - **Geral** — papo do dia a dia
 - **Dúvidas** — perguntas técnicas e de carreira
-- **Indicação Freela** — indique um freela para um colega
-- **Conquistas** — cliente fechado, proposta aceita, primeiro pagamento
-- **Desafio Projetos** — mostre o projeto que está construindo
+- **Indicação Freela** — se tiver um freela pra indicar pra um colega, poste aqui
+- **Conquistas** — cliente fechado, proposta aceita ou primeiro pagamento; conte como fechou a venda
+- **Desafio Projetos** — mostre o que está construindo
 
 Prospecção de clientes e hunting de vagas fica no **Orion Lead Hunter** — não use a comunidade como board de vagas.`,
   },
@@ -165,11 +165,10 @@ async function run(target: Target) {
         description: "Orientações e primeiros passos na comunidade",
         sortOrder: 0,
       },
-      update: {
-        name: "Boas-vindas",
-        description: "Orientações e primeiros passos na comunidade",
-        sortOrder: 0,
-      },
+      // F054 — nome/descrição de Space pertencem a prisma/seed.ts. Se o space
+      // já existe, este script não mexe nesses campos: HML tem descrição
+      // ajustada à mão que era sobrescrita a cada run.
+      update: {},
     });
 
     const author = await resolveAuthor(prisma);
