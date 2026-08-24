@@ -19,7 +19,7 @@ descrição.
 |---|---|---|
 | `conquistas` | Conquistas (inalterado) | Poste suas conquistas aqui, cliente fechado, proposta aceita, ou primeiro pagamento. Conte como foi o processo pra fechar a venda, isso ajuda a comunidade a crescer |
 | `freelas` | **Indicação Freela** | Se tiver um freela pra indicar pra um colega, poste aqui |
-| `projetos` | **Desafio Projetos** | pendente — texto virá do Pablo; até lá mantém "Mostre o que está construindo" |
+| `projetos` | **Desafio Projetos** | Poste aqui o projeto que você desenvolveu no desafio dos 7 dias. Pode ser só um site de amostra por enquanto, o importante é dar o primeiro passo, a venda vem depois |
 
 ### Conteúdo que cita os Spaces
 Os posts de orientação são semeados por script e citam os nomes antigos. Devem

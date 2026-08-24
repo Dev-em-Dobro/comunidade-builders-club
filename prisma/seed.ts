@@ -36,10 +36,10 @@ const SPACES = [
     sortOrder: 5,
   },
   {
-    // F054 — descrição nova virá do Pablo; até lá mantém a que está no ar.
     slug: "projetos",
     name: "Desafio Projetos",
-    description: "Mostre o que está construindo",
+    description:
+      "Poste aqui o projeto que você desenvolveu no desafio dos 7 dias. Pode ser só um site de amostra por enquanto, o importante é dar o primeiro passo, a venda vem depois",
     sortOrder: 6,
   },
 ] as const;
