@@ -38,11 +38,6 @@ export default async function SpacePage({ params }: Props) {
     await markWelcomeSeen(member.user.id);
   }
 
-  const { posts } = await listPosts({
-    spaceId: space.id,
-    viewerId: member.user.id,
-    take: 30,
-  });
   const isAdmin = member.membership.role === "admin";
 
   if (slug === WELCOME_SPACE_SLUG) {
@@ -60,25 +55,17 @@ export default async function SpacePage({ params }: Props) {
       <WelcomeSpaceView
         spaceName={space.name}
         spaceDescription={space.description}
-        isAdmin={isAdmin}
-        isPaid={isPaid}
-        currentUserId={member.user.id}
         tutorialEmbedUrl={tutorialEmbedUrl}
         tutorialTitle={WELCOME_TUTORIAL_VIDEO.title}
-        posts={posts.map((p) => ({
-          id: p.id,
-          title: p.title,
-          body: p.body,
-          imageUrl: p.imageUrl,
-          reactionCount: p.reactionCount,
-          commentCount: p.commentCount,
-          authorName: p.author.profile?.displayName ?? "Membro",
-          avatarUrl: p.author.profile?.avatarUrl ?? null,
-          createdAt: p.createdAt.toISOString(),
-        }))}
       />
     );
   }
+
+  const { posts } = await listPosts({
+    spaceId: space.id,
+    viewerId: member.user.id,
+    take: 30,
+  });
 
   return (
     <div className="feed-wrap">

@@ -2,7 +2,7 @@
 
 export const WELCOME_SPACE_SLUG = "boas-vindas" as const;
 
-/** Tutorial da comunidade na tela Boas-vindas (F023). Mesmo vídeo do M01. */
+/** Tutorial da comunidade na tela Boas-vindas (F023 / F055). Mesmo vídeo da 1ª aula do M01. */
 export const WELCOME_TUTORIAL_VIDEO = {
   pandaLibraryId: "77c52f03-dc6",
   pandaVideoExternalId: "38608c40-7b9a-4b30-a33e-287bf5072af3",

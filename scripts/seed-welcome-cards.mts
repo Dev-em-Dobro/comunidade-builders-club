@@ -1,5 +1,5 @@
 /**
- * Cria/atualiza cards de orientação no space Boas-vindas (F024).
+ * F055 — um card "Primeiros passos"; apaga o mural antigo.
  *
  *   npm run db:seed:welcome-cards -- --target=hml
  *   npm run db:seed:welcome-cards -- --target=prod --confirm
@@ -21,79 +21,25 @@ type Card = {
   sort: number;
 };
 
+/** F055 — mural antigo. A tela não usa mais estes posts. */
+const RETIRED_MARKERS = [
+  "builders-club://boas-vindas/hero-v1",
+  "builders-club://boas-vindas/como-usar-v1",
+  "builders-club://boas-vindas/spaces-v1",
+  "builders-club://boas-vindas/engajamento-v1",
+  "builders-club://boas-vindas/materiais-aulas-v1",
+];
+
 const CARDS: Card[] = [
   {
-    marker: "builders-club://boas-vindas/hero-v1",
-    sort: 0,
-    title: "Bem-vindo ao Builders Club",
-    body: `Seja bem-vindo(a) ao **Builders Club**, a comunidade pra quem quer construir e vender soluções com IA. Este espaço é o ponto de partida: leia os cards abaixo e comece pelo que fizer mais sentido agora.
-
-**Dica:** o **Feed** (fora dos Spaces) mostra a timeline da comunidade. Os Spaces organizam as conversas por tema.`,
-  },
-  {
     marker: "builders-club://boas-vindas/primeiros-passos-v1",
-    sort: 1,
+    sort: 0,
     title: "Primeiros passos",
-    body: `Comece assim:
+    body: `Trilha do primeiro dia (a tela de Boas-vindas já mostra isto ao lado do vídeo):
 
-1. Complete seu **Perfil** (nome de exibição — é o que aparece nas menções \`@Nome\`)
-2. Leia o Feed e o space **Avisos**
-3. Explore **Materiais de apoio** no menu
-4. Publique sua primeira mensagem no space **Geral** ou **Dúvidas**
-
-Se algo não abrir, confira se seu e-mail está na allowlist ou fale com o suporte do Builders Club.`,
-  },
-  {
-    marker: "builders-club://boas-vindas/como-usar-v1",
-    sort: 2,
-    title: "Como usar a plataforma",
-    body: `## Navegação
-
-- **Feed** — timeline de todos os Spaces (exceto Boas-vindas)
-- **Spaces** — Avisos, Geral, Dúvidas, Freelas, Conquistas, Projetos
-- **Materiais de apoio** — entregáveis e kits
-- **Aulas** — vídeos quando disponíveis
-- **Notificações** — comentários, reações e menções
-
-## Publicar
-
-Use o botão flutuante **Nova publicação** (nas páginas de Spaces), escolha o space e escreva. Markdown básico funciona (\`**negrito**\`, listas, links).
-
-## Visões do Feed
-
-No Feed você pode alternar entre visão **reduzida** (cards compactos) e **expandida** (post completo na lista).`,
-  },
-  {
-    marker: "builders-club://boas-vindas/spaces-v1",
-    sort: 3,
-    title: "Para que serve cada Space",
-    body: `- **Avisos** — comunicados oficiais
-- **Geral** — papo do dia a dia
-- **Dúvidas** — perguntas técnicas e de carreira
-- **Freelas** — oportunidades entre a comunidade
-- **Conquistas** — celebre vitórias
-- **Projetos** — mostre o que está construindo
-
-Prospecção de clientes e hunting de vagas fica no **Orion Lead Hunter** — não use a comunidade como board de vagas.`,
-  },
-  {
-    marker: "builders-club://boas-vindas/engajamento-v1",
-    sort: 4,
-    title: "Comentários, reações e menções",
-    body: `- Abra um post (ou um card de Boas-vindas) para **reagir** e **comentar**
-- Use **Responder** em um comentário (um nível de resposta)
-- Mencione alguém com \`@NomeExibido\` — a pessoa recebe notificação
-- O sino mostra o que é novo; clique para ir ao post`,
-  },
-  {
-    marker: "builders-club://boas-vindas/materiais-aulas-v1",
-    sort: 5,
-    title: "Materiais e aulas",
-    body: `No menu **Materiais de apoio** você encontra kits e guias (arsenal, prompts, contrato, etc.).
-
-Em **Aulas**, quando houver módulos publicados, assista aos vídeos e marque como concluído.
-
-Qualquer problema de acesso a materiais, avise a equipe do Builders Club.`,
+1. Completar o **perfil**
+2. Assistir as **aulas** (a primeira é o tutorial da comunidade)
+3. Postar na comunidade quando tiver **dúvida** ou **conquista**`,
   },
 ];
 
@@ -162,12 +108,12 @@ async function run(target: Target) {
       create: {
         slug: "boas-vindas",
         name: "Boas-vindas",
-        description: "Orientações e primeiros passos na comunidade",
+        description: "Tutorial e os três passos do primeiro dia",
         sortOrder: 0,
       },
       update: {
         name: "Boas-vindas",
-        description: "Orientações e primeiros passos na comunidade",
+        description: "Tutorial e os três passos do primeiro dia",
         sortOrder: 0,
       },
     });
@@ -175,7 +121,7 @@ async function run(target: Target) {
     const author = await resolveAuthor(prisma);
     console.log(`Autor: ${author.email}`);
 
-    // Datas escalonadas para o hero (sort 0) aparecer primeiro (createdAt desc + pinned).
+    // Datas só para o card único ficar estável (createdAt + pinned).
     const base = Date.now();
 
     for (const card of CARDS) {
@@ -212,6 +158,13 @@ async function run(target: Target) {
         });
         console.log(`Criado: ${card.title} (${created.id})`);
       }
+    }
+
+    const retired = await prisma.post.deleteMany({
+      where: { linkUrl: { in: RETIRED_MARKERS } },
+    });
+    if (retired.count > 0) {
+      console.log(`Removidos cards antigos: ${retired.count}`);
     }
   } finally {
     await prisma.$disconnect();

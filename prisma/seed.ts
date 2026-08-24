@@ -15,15 +15,15 @@ const SPACES = [
   {
     slug: "boas-vindas",
     name: "Boas-vindas",
-    description: "Orientações e primeiros passos na comunidade",
+    description: "Tutorial e os três passos do primeiro dia",
     sortOrder: 0,
   },
   { slug: "avisos", name: "Avisos", description: "Comunicados oficiais", sortOrder: 1 },
   { slug: "geral", name: "Geral", description: "Conversa aberta", sortOrder: 2 },
   { slug: "duvidas", name: "Dúvidas", description: "Perguntas e respostas", sortOrder: 3 },
-  { slug: "freelas", name: "Freelas", description: "Oportunidades de freela", sortOrder: 4 },
-  { slug: "conquistas", name: "Conquistas", description: "Vitórias da galera", sortOrder: 5 },
-  { slug: "projetos", name: "Projetos", description: "Mostre o que está construindo", sortOrder: 6 },
+  { slug: "freelas", name: "Indicação Freela", description: "Se tiver um freela pra indicar pra um colega, poste aqui", sortOrder: 4 },
+  { slug: "conquistas", name: "Conquistas", description: "Poste suas conquistas aqui, cliente fechado, proposta aceita, ou primeiro pagamento. Conte como foi o processo pra fechar a venda, isso ajuda a comunidade a crescer", sortOrder: 5 },
+  { slug: "projetos", name: "Desafio Projetos", description: "Mostre o que está construindo", sortOrder: 6 },
 ] as const;
 
 async function main() {

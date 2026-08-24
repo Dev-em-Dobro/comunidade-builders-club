@@ -47,12 +47,12 @@ async function main() {
     create: {
       slug: "boas-vindas",
       name: "Boas-vindas",
-      description: "Orientações e primeiros passos na comunidade",
+        description: "Tutorial e os três passos do primeiro dia",
       sortOrder: 0,
     },
     update: {
       name: "Boas-vindas",
-      description: "Orientações e primeiros passos na comunidade",
+        description: "Tutorial e os três passos do primeiro dia",
       sortOrder: 0,
     },
   });

@@ -30,7 +30,7 @@ Conteúdo e interação completos ficam para **paid** (compra Hubla / allowlist)
 
 ### Por que o feed é aberto
 O feed é a vitrine do produto: as vitórias e resultados dos alunos são postados
-em spaces pagos (ex.: **Conquistas**, **Projetos**). Esconder esses posts do free
+em spaces pagos (ex.: **Conquistas**, **Desafio Projetos**). Esconder esses posts do free
 tira justamente a prova social que motiva o upgrade. Free **lê**; o que converte
 é **participar** — comentar, reagir, publicar, navegar os spaces.
 

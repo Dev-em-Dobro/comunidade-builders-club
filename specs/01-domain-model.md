@@ -32,9 +32,9 @@ Diagnóstico, Outreach, Entregável — este último só na Fase 2 de migração
 | `avisos` | Avisos |
 | `geral` | Geral |
 | `duvidas` | Dúvidas |
-| `freelas` | Freelas |
+| `freelas` | Indicação Freela |
 | `conquistas` | Conquistas |
-| `projetos` | Projetos |
+| `projetos` | Desafio Projetos |
 
 > `vagas` removido — prospecção de oportunidades fica no Orion Lead Hunter.
 
