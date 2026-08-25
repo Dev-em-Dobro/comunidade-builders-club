@@ -23,7 +23,7 @@ const SPACES = [
   { slug: "duvidas", name: "Dúvidas", description: "Perguntas e respostas", sortOrder: 3 },
   { slug: "freelas", name: "Indicação Freela", description: "Se tiver um freela pra indicar pra um colega, poste aqui", sortOrder: 4 },
   { slug: "conquistas", name: "Conquistas", description: "Poste suas conquistas aqui, cliente fechado, proposta aceita, ou primeiro pagamento. Conte como foi o processo pra fechar a venda, isso ajuda a comunidade a crescer", sortOrder: 5 },
-  { slug: "projetos", name: "Desafio Projetos", description: "Mostre o que está construindo", sortOrder: 6 },
+  { slug: "projetos", name: "Desafio Projetos", description: "Poste aqui o projeto que você desenvolveu no desafio dos 7 dias. Pode ser só um site de amostra por enquanto, o importante é dar o primeiro passo, a venda vem depois", sortOrder: 6 },
 ] as const;
 
 async function main() {
