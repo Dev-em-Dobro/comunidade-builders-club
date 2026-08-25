@@ -46,7 +46,7 @@ export function ProgressDashboard({
   }, [students, q]);
 
   return (
-    <div className="mt-6 space-y-6">
+    <div className="mt-4 space-y-6">
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         <StatCard label="Alunos ativos" value={String(summary.activeMembers)} />
         <StatCard label="Aulas publicadas" value={String(summary.totalLessons)} />

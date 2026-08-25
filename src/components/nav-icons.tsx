@@ -94,6 +94,15 @@ export const ICON_BUSCA = (
   </NavIcon>
 );
 
+export const ICON_PLANOS = (
+  <NavIcon>
+    <rect x="3" y="8" width="18" height="4" rx="1" />
+    <rect x="3" y="14" width="18" height="4" rx="1" />
+    <path d="M7 8v4" />
+    <path d="M7 14v4" />
+  </NavIcon>
+);
+
 export const ICON_PERFIL = (
   <NavIcon>
     <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />

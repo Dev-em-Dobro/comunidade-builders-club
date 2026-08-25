@@ -32,6 +32,7 @@ model User {
   actorNotifs     Notification[] @relation("NotificationActor")
   lessonProgress  LessonProgress[]
   postViews       PostView[]
+  legalAcceptances LegalAcceptance[]
 
   @@unique([email])
   @@map("user")
@@ -95,10 +96,13 @@ enum MembershipStatus {
   revoked
 }
 
-/// F041 — freemium: free lê Feed/Boas-vindas/Geral/Avisos; paid libera o resto.
+/// F041 / F053 — free lê Feed/Boas-vindas/Geral; pro/elite liberam o resto.
+/// `paid` é legado F041 (tratado como pro).
 enum MembershipTier {
   free
   paid
+  pro
+  elite
 }
 
 enum Role {
@@ -139,9 +143,12 @@ model Membership {
   userId    String           @unique
   user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   status    MembershipStatus @default(pending)
-  /// F041 — free (leitura limitada) | paid (comunidade completa).
+  /// F041/F053 — free | pro | elite (`paid` legado = pro).
   tier      MembershipTier   @default(free)
   role      Role             @default(member)
+  /// F058 — cache da última versão legal aceita. Fonte da verdade é
+  /// `legal_acceptance`; aqui só para o hot path do bootstrap não custar query.
+  termosVersao String?       @map("termos_versao")
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
 
@@ -159,6 +166,38 @@ model AllowedEmail {
   createdAt DateTime @default(now())
 
   @@map("allowed_email")
+}
+
+/// F054 — pedido de login cujo e-mail não estava na allowlist.
+model DeniedLoginAttempt {
+  id         String    @id @default(cuid())
+  email      String
+  /// Nesta base sempre `club`. Campo existe para export / espelho com o Orion.
+  app        String    @default("club")
+  createdAt  DateTime  @default(now())
+  resolvedAt DateTime?
+
+  @@index([createdAt])
+  @@index([email, createdAt])
+  @@map("denied_login_attempt")
+}
+
+/// F058 — histórico de aceite dos documentos legais. Append-only: trocar a
+/// versão da Política não pode apagar a prova do aceite anterior.
+model LegalAcceptance {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// `termos` | `privacidade` (DOCUMENTOS_LEGAIS em src/lib/legal.ts).
+  documento String
+  versao    String
+  aceitoEm  DateTime @default(now()) @map("aceito_em")
+  ip        String?
+  userAgent String?  @map("user_agent")
+
+  @@unique([userId, documento, versao])
+  @@index([userId])
+  @@map("legal_acceptance")
 }
 
 /// F014 — idempotência do webhook Hubla.

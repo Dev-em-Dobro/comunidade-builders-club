@@ -1,108 +1,51 @@
-"use client";
+import Link from "next/link";
 
-import { useState } from "react";
-import { previewFromBody } from "@/lib/posts/title";
-import { PostModal } from "@/components/post-modal";
-
-export type WelcomeCardPost = {
-  id: string;
-  title: string;
-  body: string;
-  imageUrl: string | null;
-  reactionCount: number;
-  commentCount: number;
-  authorName: string;
-  avatarUrl: string | null;
-  createdAt: string;
-};
-
-function OrientationCard({
-  p,
-  onOpen,
-}: {
-  p: WelcomeCardPost;
-  onOpen: (id: string) => void;
-}) {
-  const title =
-    p.title?.trim() || previewFromBody(p.body, 70) || "Orientação";
-  return (
-    <button
-      type="button"
-      onClick={() => onOpen(p.id)}
-      className="post-card flex flex-col p-4 text-left transition-colors hover:bg-surface/50"
-    >
-      <h3 className="font-[family-name:var(--font-outfit)] text-sm font-semibold leading-snug sm:text-base">
-        {title}
-      </h3>
-      <p className="mt-1.5 line-clamp-2 text-sm text-muted">
-        {previewFromBody(p.body, 110)}
-      </p>
-    </button>
-  );
-}
+const STEPS = [
+  {
+    n: "1",
+    href: "/perfil",
+    label: "Completar o perfil",
+    hint: "Nome e foto — é assim que a comunidade te encontra.",
+  },
+  {
+    n: "2",
+    href: "/aulas",
+    label: "Assistir as aulas",
+    hint: "Comece pelo tutorial. A primeira aula é este vídeo, com o passo a passo da plataforma.",
+  },
+  {
+    n: "3",
+    href: "/spaces/conquistas",
+    label: "Postar na comunidade quando tiver dúvida ou conquista",
+    hint: "",
+  },
+] as const;
 
 export function WelcomeSpaceView({
   spaceName,
   spaceDescription,
-  posts,
-  isAdmin,
-  isPaid = true,
-  currentUserId,
   tutorialEmbedUrl,
+  tutorialVideoId,
   tutorialTitle,
 }: {
   spaceName: string;
   spaceDescription: string | null;
-  posts: WelcomeCardPost[];
-  isAdmin: boolean;
-  isPaid?: boolean;
-  currentUserId: string;
   tutorialEmbedUrl?: string | null;
+  tutorialVideoId?: string;
   tutorialTitle?: string;
 }) {
-  const [openId, setOpenId] = useState<string | null>(null);
-  const hero = posts[0];
-  const orientationCards = posts.slice(hero ? 1 : 0);
-  const sideCards = tutorialEmbedUrl
-    ? orientationCards.slice(0, 3)
-    : [];
-  const restCards = tutorialEmbedUrl
-    ? orientationCards.slice(3)
-    : orientationCards;
-
   return (
     <div className="feed-wrap-wide">
       <div>
         <h1 className="page-title">{spaceName}</h1>
-        {spaceDescription ? (
-          <p className="mt-1.5 text-sm text-muted">{spaceDescription}</p>
-        ) : (
-          <p className="mt-1.5 text-sm text-muted">
-            Orientações para começar bem na comunidade.
-          </p>
-        )}
+        <p className="mt-1.5 max-w-2xl text-sm text-muted">
+          {spaceDescription?.trim() ||
+            "Assista o tutorial e siga os três passos. Um caminho só — o suficiente para o primeiro dia."}
+        </p>
       </div>
 
-      {hero ? (
-        <button
-          type="button"
-          onClick={() => setOpenId(hero.id)}
-          className="post-card mt-4 w-full p-4 text-left transition-colors hover:bg-surface/50"
-        >
-          <h2 className="font-[family-name:var(--font-outfit)] text-lg font-semibold tracking-tight sm:text-xl">
-            {hero.title?.trim() ||
-              previewFromBody(hero.body, 80) ||
-              "Bem-vindo ao Builders Club"}
-          </h2>
-          <p className="mt-1 line-clamp-1 text-sm text-muted">
-            {previewFromBody(hero.body, 140)}
-          </p>
-          <p className="mt-2 text-xs font-medium text-accent">Abrir →</p>
-        </button>
-      ) : null}
-
       {tutorialEmbedUrl ? (
-        <div className="mt-5">
+        <div className="mt-6">
           <h2
             id="welcome-tutorial-title"
             className="font-[family-name:var(--font-outfit)] text-base font-semibold tracking-tight"
@@ -110,52 +53,82 @@ export function WelcomeSpaceView({
             {tutorialTitle ?? "Como usar a comunidade"}
           </h2>
           <p className="mt-1 text-sm text-muted">
-            Tutorial da plataforma. Os cards ao lado são os primeiros passos.
+            Oito minutos. Menu, Spaces, aulas — e onde postar sua primeira conquista.
           </p>
         </div>
       ) : null}
 
-      {posts.length === 0 && !tutorialEmbedUrl ? (
-        <p className="mt-10 text-sm text-muted">
-          Em breve: cards de orientação. Admins podem publicar neste space ou
-          rodar o seed de welcome cards.
-        </p>
-      ) : tutorialEmbedUrl || orientationCards.length > 0 ? (
-        <div className="mt-4 grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {tutorialEmbedUrl ? (
-            <div className="overflow-hidden rounded-2xl border border-border bg-black shadow-sm sm:col-span-2">
-              <div className="relative aspect-video w-full">
-                <iframe
-                  src={tutorialEmbedUrl}
-                  title={tutorialTitle ?? "Tutorial da comunidade"}
-                  className="absolute inset-0 h-full w-full"
-                  allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
-                  allowFullScreen
-                  referrerPolicy="origin"
-                />
-              </div>
+      <div className="mt-4 grid items-start gap-4 lg:grid-cols-3">
+        {tutorialEmbedUrl ? (
+          <div className="overflow-hidden rounded-2xl border border-border bg-black shadow-sm lg:col-span-2">
+            <div className="relative aspect-video w-full">
+              <iframe
+                id={tutorialVideoId ? `panda-${tutorialVideoId}` : undefined}
+                src={tutorialEmbedUrl}
+                title={tutorialTitle ?? "Tutorial da comunidade"}
+                className="absolute inset-0 h-full w-full"
+                style={{ border: "none" }}
+                allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+                allowFullScreen
+                referrerPolicy="origin"
+              />
             </div>
-          ) : null}
-          {sideCards.length > 0 ? (
-            <div className="contents lg:col-span-1 lg:flex lg:flex-col lg:gap-3">
-              {sideCards.map((p) => (
-                <OrientationCard key={p.id} p={p} onOpen={setOpenId} />
-              ))}
-            </div>
-          ) : null}
-          {restCards.map((p) => (
-            <OrientationCard key={p.id} p={p} onOpen={setOpenId} />
-          ))}
-        </div>
-      ) : null}
+          </div>
+        ) : (
+          <p className="text-sm text-muted lg:col-span-2">
+            Tutorial em breve. Enquanto isso, siga os três passos ao lado.
+          </p>
+        )}
 
-      <PostModal
-        postId={openId}
-        isAdmin={isAdmin}
-        isPaid={isPaid}
-        currentUserId={currentUserId}
-        onClose={() => setOpenId(null)}
-      />
+        <section className="post-card p-5 lg:col-span-1">
+          <h2 className="font-[family-name:var(--font-outfit)] text-base font-semibold tracking-tight">
+            Primeiros passos
+          </h2>
+          <ol className="mt-4 space-y-4">
+            {STEPS.map((step) => (
+              <li key={step.n} className="flex gap-3">
+                <span
+                  className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent/15 text-xs font-semibold text-accent"
+                  aria-hidden
+                >
+                  {step.n}
+                </span>
+                <div className="min-w-0">
+                  <Link
+                    href={step.href}
+                    className="font-medium text-foreground underline-offset-2 hover:text-accent hover:underline"
+                  >
+                    {step.label}
+                  </Link>
+                  <p className="mt-0.5 text-sm leading-snug text-muted">
+                    {step.n === "3" ? (
+                      <>
+                        Dúvida no space{" "}
+                        <Link
+                          href="/spaces/duvidas"
+                          className="font-medium text-foreground underline-offset-2 hover:text-accent hover:underline"
+                        >
+                          Dúvidas
+                        </Link>
+                        . Projeto ou vitória em{" "}
+                        <Link
+                          href="/spaces/conquistas"
+                          className="font-medium text-foreground underline-offset-2 hover:text-accent hover:underline"
+                        >
+                          Conquistas
+                        </Link>{" "}
+                        — a equipe avalia por lá.
+                      </>
+                    ) : (
+                      step.hint
+                    )}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
+      </div>
     </div>
   );
 }

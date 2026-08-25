@@ -33,7 +33,12 @@ Na Vercel → Project → Settings → Domains:
 Na Vercel, **não** use `DATABASE_URL_HML` / `DATABASE_URL_PROD` como nomes de runtime.
 O app lê `DATABASE_URL`. O que muda é o **valor por Environment** (Production vs Preview).
 
-As chaves `DATABASE_URL_HML` / `DATABASE_URL_PROD` / `ORION_DATABASE_URL` são só para scripts locais (`db:seed:envs`, `db:import-allowed`).
+As chaves `DATABASE_URL_HML` / `DATABASE_URL_PROD` continuam só para scripts locais (`db:seed:envs`, `db:import-allowed`).
+
+`ORION_DATABASE_URL` também é **runtime** na aba Progresso (F057): leitura
+das propostas e da primeira busca. Preview aponta para o Neon **staging** do
+Orion; Production para o Neon **prod**. Sem a env, os dois cards do Orion
+mostram indisponível (não zero).
 
 ### Matriz (obrigatórias)
 
@@ -46,7 +51,15 @@ As chaves `DATABASE_URL_HML` / `DATABASE_URL_PROD` / `ORION_DATABASE_URL` são s
 | `EMAIL_PROVIDER`        | `resend`                               | `resend` (ou mailpit só local)                 | `mailpit`               |
 | `BOOTSTRAP_ADMIN_EMAIL` | seu e-mail admin                       | mesmo ou de teste                              | seu e-mail              |
 | `HUBLA_WEBHOOK_TOKEN`   | token do webhook Hubla                 | mesmo ou dedicado de staging                   | obrigatório p/ webhook  |
-| `HUBLA_PRODUCT_ID`      | ID produto Builders Club (**obrigatório** no webhook) | mesmo                               | obrigatório p/ webhook  |
+| `HUBLA_PRODUCT_ID`      | Produto Club (allowlist `product.id`) | mesmo | obrigatório p/ webhook se os dois abaixo vazios |
+| `HUBLA_PRODUCT_ID_PRO`  | Produto PRO **separado** (se existir) | mesmo | opcional |
+| `HUBLA_PRODUCT_ID_ELITE`| Produto Elite **separado** (se existir) | mesmo | opcional |
+| `HUBLA_OFFER_ID_PRO`    | Offer id PRO no produto Club | mesmo | recomendado (PRO e Elite compartilham product.id) |
+| `HUBLA_OFFER_ID_ELITE`  | Offer id Elite no produto Club | mesmo | recomendado |
+| `HUBLA_CHECKOUT_URL_PRO` | Override checkout PRO | mesmo | opcional (default `pay.hub.la/XaY8…`) |
+| `HUBLA_CHECKOUT_URL_ELITE` | Override checkout Elite | mesmo | opcional (default `pay.hub.la/v1Ss…`) |
+| `ORION_APP_URL`         | URL do Orion (sidebar Elite) | mesmo | opcional |
+| `ORION_DATABASE_URL`    | Neon Orion **prod** (F057) | Neon Orion **staging** | opcional (HML) |
 | `TMB_WEBHOOK_TOKEN`     | Valor do webhook TMB (Mentoria)        | mesmo ou dedicado de staging                   | obrigatório p/ webhook TMB |
 | `TMB_WEBHOOK_HEADER`    | Chave do header (default `x-tmb-token`)| mesmo                                          | opcional                |
 
@@ -60,7 +73,7 @@ Na Hubla, configure o webhook apontando para:
 
 Header esperado: `x-hubla-token` = valor de `HUBLA_WEBHOOK_TOKEN`.
 
-Sem `HUBLA_PRODUCT_ID` o endpoint responde **503** (não processa eventos de outros produtos).
+Sem nenhum de `HUBLA_PRODUCT_ID` / `HUBLA_PRODUCT_ID_PRO` / `HUBLA_PRODUCT_ID_ELITE` / `HUBLA_OFFER_ID_PRO` / `HUBLA_OFFER_ID_ELITE` o endpoint responde **503**. PRO e Elite são ofertas do mesmo produto Club; o webhook casa `offers[].id` (F053).
 
 ### TMB Mentoria Freela (F047)
 
@@ -70,7 +83,8 @@ Na TMB (Vendas → Webhook):
 - **Chave:** `x-tmb-token` (ou o valor de `TMB_WEBHOOK_HEADER`)
 - **Valor:** = `TMB_WEBHOOK_TOKEN` na Vercel
 
-Codes liberados por default: `1AS249898VN`, `3XB272209KV`, `9DW254247E5`.
+Codes liberados por default: `1AS249898VN` (PRO / Mentoria), `3XB272209KV` e
+`9DW254247E5` (Elite boleto). Override Elite: `TMB_ELITE_CODES`.
 DevQuest continua via seed sazonal (não passa neste webhook).
 
 

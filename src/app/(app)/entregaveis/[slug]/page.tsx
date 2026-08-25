@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requirePaidMemberOrRedirect } from "@/lib/membership/require-member";
+import { hrefPlanos } from "@/lib/membership/capabilities";
 import { entregavelPorSlug } from "@/lib/entregaveis/catalogo";
 import { urlInternaEntregavel } from "@/lib/entregaveis/servir";
 
@@ -26,7 +27,7 @@ function IconeDownload() {
 }
 
 export default async function EntregavelPage({ params }: Props) {
-  const member = await requirePaidMemberOrRedirect();
+  const member = await requirePaidMemberOrRedirect(hrefPlanos({ motivo: "materiais" }));
   const { slug } = await params;
   const item = entregavelPorSlug(slug);
 

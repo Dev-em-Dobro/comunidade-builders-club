@@ -18,13 +18,19 @@ import {
 } from "@/actions/admin";
 import { AdminBulkAllowlist } from "@/components/admin-bulk-allowlist";
 import { AdminAulasPanel } from "@/components/admin-aulas-panel";
+import { AdminDeniedLogins } from "@/components/admin-denied-logins";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
+import {
+  listAllowlistWithoutUser,
+  listDeniedLoginGroups,
+} from "@/lib/admin/denied-logins";
 import {
   AdminTabs,
 } from "@/components/admin-tabs";
 import { isAdminTab, type AdminTabId } from "@/lib/admin/tabs";
 import { labelAllowedEmailSource } from "@/lib/membership/allowlist-labels";
 import type { MembershipStatus } from "@prisma/client";
+import { tierLabel } from "@/lib/membership/capabilities";
 
 type Props = {
   searchParams: Promise<{ status?: string; q?: string; tab?: string }>;
@@ -50,7 +56,7 @@ export default async function AdminPage({ searchParams }: Props) {
       : undefined;
   const q = sp.q?.trim() || undefined;
 
-  const [spaces, memberships, counts, allowed, modules] = await Promise.all([
+  const [spaces, memberships, counts, allowed, modules, deniedGroups, purchasesWithoutLogin] = await Promise.all([
     tab === "spaces" ? listSpaces() : Promise.resolve([]),
     tab === "membros"
       ? listMemberships({ status: statusFilter, q })
@@ -60,6 +66,8 @@ export default async function AdminPage({ searchParams }: Props) {
       : Promise.resolve({ pending: 0, active: 0, revoked: 0 }),
     tab === "allowlist" ? listAllowedEmails() : Promise.resolve([]),
     tab === "aulas" ? listAllModulesAdmin() : Promise.resolve([]),
+    tab === "tentativas" ? listDeniedLoginGroups() : Promise.resolve([]),
+    tab === "tentativas" ? listAllowlistWithoutUser() : Promise.resolve([]),
   ]);
 
   return (
@@ -79,6 +87,13 @@ export default async function AdminPage({ searchParams }: Props) {
       <Suspense fallback={<div className="mt-6 h-11 animate-pulse rounded-xl bg-surface" />}>
         <AdminTabs active={tab} />
       </Suspense>
+
+      {tab === "tentativas" ? (
+        <AdminDeniedLogins
+          groups={deniedGroups}
+          purchasesWithoutLogin={purchasesWithoutLogin}
+        />
+      ) : null}
 
       {tab === "allowlist" ? (
         <section className="mt-8">
@@ -186,7 +201,7 @@ export default async function AdminPage({ searchParams }: Props) {
                     {m.user.profile?.displayName ?? m.user.email}
                   </p>
                   <p className="text-xs text-muted">
-                    {m.user.email} · {m.status} · {m.role}
+                    {m.user.email} · {m.status} · {m.role} · {tierLabel(m.tier)}
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-1">

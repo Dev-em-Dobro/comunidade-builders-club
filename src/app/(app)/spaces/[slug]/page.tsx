@@ -3,6 +3,7 @@ import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
 import {
   isFreeSpaceSlug,
   isPaidMembership,
+  hrefPlanos,
 } from "@/lib/membership/capabilities";
 import { getSpaceBySlug } from "@/lib/spaces";
 import { listPosts } from "@/lib/posts";
@@ -10,6 +11,7 @@ import { markWelcomeSeen } from "@/lib/profile";
 import {
   WELCOME_SPACE_SLUG,
   WELCOME_TUTORIAL_VIDEO,
+  welcomeTutorialVideoId,
 } from "@/lib/spaces/constants";
 import { pandaEmbedUrl } from "@/lib/aulas";
 import { FeedList } from "@/components/feed-list";
@@ -30,26 +32,22 @@ export default async function SpacePage({ params }: Props) {
 
   const isPaid = isPaidMembership(member.membership);
   if (!isPaid && !isFreeSpaceSlug(slug)) {
-    redirect("/?upgrade=1");
+    redirect(hrefPlanos({ motivo: "space" }));
   }
 
   if (slug === WELCOME_SPACE_SLUG && !member.profile.welcomeSeenAt) {
     await markWelcomeSeen(member.user.id);
   }
 
-  const { posts } = await listPosts({
-    spaceId: space.id,
-    viewerId: member.user.id,
-    take: 30,
-  });
   const isAdmin = member.membership.role === "admin";
 
   if (slug === WELCOME_SPACE_SLUG) {
+    const tutorialVideoId = welcomeTutorialVideoId(isPaid);
     let tutorialEmbedUrl: string | null = null;
     try {
       tutorialEmbedUrl = pandaEmbedUrl(
         WELCOME_TUTORIAL_VIDEO.pandaLibraryId,
-        WELCOME_TUTORIAL_VIDEO.pandaVideoExternalId,
+        tutorialVideoId,
       );
     } catch {
       tutorialEmbedUrl = null;
@@ -59,25 +57,18 @@ export default async function SpacePage({ params }: Props) {
       <WelcomeSpaceView
         spaceName={space.name}
         spaceDescription={space.description}
-        isAdmin={isAdmin}
-        isPaid={isPaid}
-        currentUserId={member.user.id}
         tutorialEmbedUrl={tutorialEmbedUrl}
+        tutorialVideoId={tutorialVideoId}
         tutorialTitle={WELCOME_TUTORIAL_VIDEO.title}
-        posts={posts.map((p) => ({
-          id: p.id,
-          title: p.title,
-          body: p.body,
-          imageUrl: p.imageUrl,
-          reactionCount: p.reactionCount,
-          commentCount: p.commentCount,
-          authorName: p.author.profile?.displayName ?? "Membro",
-          avatarUrl: p.author.profile?.avatarUrl ?? null,
-          createdAt: p.createdAt.toISOString(),
-        }))}
       />
     );
   }
+
+  const { posts } = await listPosts({
+    spaceId: space.id,
+    viewerId: member.user.id,
+    take: 30,
+  });
 
   return (
     <div className="feed-wrap">

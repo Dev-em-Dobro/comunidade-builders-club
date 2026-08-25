@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { DM_Sans, Outfit } from "next/font/google";
 import { NOME_PRODUTO } from "@/lib/produto";
 import { THEME_BOOTSTRAP_SCRIPT } from "@/lib/theme";
+import { CookieConsent } from "@/components/cookie-consent";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -37,6 +38,7 @@ export default function RootLayout({
       </head>
       <body className={`${dmSans.variable} ${outfit.variable} font-sans`}>
         {children}
+        <CookieConsent />
       </body>
     </html>
   );

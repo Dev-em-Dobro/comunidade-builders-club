@@ -18,6 +18,7 @@ import {
   addAllowedEmailsBulk,
   removeAllowedEmail,
 } from "@/lib/membership/allowlist";
+import { markDeniedLoginsResolved } from "@/lib/admin/denied-logins";
 import { prisma } from "@/lib/db";
 import {
   createLesson,
@@ -255,4 +256,23 @@ export async function moveLessonAction(formData: FormData) {
   if (!id) throw new Error("Aula não encontrada.");
   await moveLesson(id, direction);
   bustAulasCache();
+}
+
+export async function grantDeniedLoginEmailAction(formData: FormData) {
+  await requireAdmin();
+  const email = String(formData.get("email") ?? "");
+  await addAllowedEmail({
+    email,
+    source: "login-attempt",
+    note: "liberado pela aba Tentativas (F054)",
+  });
+  await markDeniedLoginsResolved(email);
+  revalidatePath("/admin");
+}
+
+export async function resolveDeniedLoginAction(formData: FormData) {
+  await requireAdmin();
+  const email = String(formData.get("email") ?? "");
+  await markDeniedLoginsResolved(email);
+  revalidatePath("/admin");
 }
