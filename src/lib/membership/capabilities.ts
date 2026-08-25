@@ -128,8 +128,8 @@ export const UPGRADE_REASON_COPY: Record<
     body: "Reações fazem parte do acesso PRO e Elite.",
   },
   orion: {
-    title: "Orion é do plano Elite",
-    body: "O acesso ao Orion entra no Elite, junto com a reunião semanal em grupo.",
+    title: "Orion entra no PRO",
+    body: "O plano PRO libera o Orion no teto Free. O Elite soma reunião semanal e Orion com limites de Pro.",
   },
   geral: {
     title: "Desbloqueie o Builders Club",

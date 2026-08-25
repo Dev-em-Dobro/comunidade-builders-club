@@ -18,7 +18,7 @@ exige compra.
 |------|------|--------|
 | `free` | Login sem compra (ou após cancelamento) | Feed, Boas-vindas, Geral. Sem interagir. |
 | `pro` | Compra PRO (R$ 297) / allowlist / TMB Mentoria / `paid` legado | Comunidade + aulas + materiais + busca + interações |
-| `elite` | Compra Elite (R$ 997) | Tudo do PRO + acesso ao Orion |
+| `elite` | Compra Elite (R$ 997) | Tudo do PRO + Orion além do Free (cortesia Pro no Orion) |
 | `paid` | Legado F041 | Tratado como **PRO** (não remove acesso de quem já comprou) |
 
 `Membership.status` continua `active` para free, pro e elite. Cancelamento
@@ -50,6 +50,7 @@ Libera no Club:
 - Skills e templates (Materiais de apoio)
 - Busca
 - Ingresso pro evento (benefício da oferta; não é rota no MVP)
+- **Orion no plano Free** (teto Free do app; [F058](F058-pro-orion-free.md))
 
 **Promessa:** feche o 1º cliente em **90 dias**.
 
@@ -64,15 +65,16 @@ Boleto (TMB, R$ 1.297):
 | `9DW254247E5` | Checkout de boleto na página `/planos` — [pay.tmb.com.br/DevemDobro/9DW254247E5](https://pay.tmb.com.br/DevemDobro/9DW254247E5) |
 | `3XB272209KV` | Continua válido no webhook (concede Elite); não aparece como CTA |
 
-- Tudo do PRO
-- Acesso ao **Orion** (link na sidebar; `ORION_APP_URL`)
+- Tudo do PRO (inclui Orion Free)
+- **Orion além do Free** — cortesia de plano Pro no Orion enquanto `trial-pro-*`
 - 1 reunião semanal em grupo (benefício da oferta; não é rota no MVP)
 - + Skills e + Templates (mesmo catálogo de materiais no MVP; mais conteúdo
   depois, sem gate extra agora)
 
 **Promessa:** feche o 1º cliente em **90 dias**.
 
-Membro **PRO** que clica em Orion vai a `/planos?destaque=elite` (não revende o PRO).
+Membro **Free** que clica em Orion vai a `/planos` (motivo orion). PRO e Elite
+abrem o app (`ORION_APP_URL`).
 
 ## Hubla
 
@@ -108,7 +110,7 @@ Página **`/planos`** (liberada para free e PRO):
 - Elite: **um** CTA de boleto TMB (`9DW254247E5`) com o label “Opção para boleto” (sem valor no botão)
 - Sem rodapé de meios de pagamento
 - Query `?motivo=` contextualiza o bloqueio (busca, aulas, space, …)
-- Query `?destaque=elite` para quem já é PRO (upgrade Orion)
+- Query `?destaque=elite` para quem já é PRO (upsell reunião e Orion Pro)
 - Sem texto “oferta em definição”
 
 Modal de bloqueio (clique em busca, aulas, space, publicar, …):
@@ -129,6 +131,6 @@ redirecionam para `/planos`. Links antigos `/?upgrade=1` também caem em `/plano
 - [x] Página `/planos` compara as duas ofertas com os links oficiais
 - [x] Sidebar e `/perfil` mostram badge PRO/Elite para quem fez upgrade
 - [x] Modal de bloqueio leva a `/planos` (CTA Ver planos)
-- [x] PRO não vê Orion liberado; clique vai a `/planos?destaque=elite`
+- [x] PRO vê Orion liberado (plano Free no app; F058)
 - [x] Webhook mapeia product id → pro ou elite
 - [ ] Preview only (migrate HML; prod só após merge + confirmação)

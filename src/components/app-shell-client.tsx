@@ -232,7 +232,7 @@ function SidebarFooter({
           active={pathname.startsWith("/busca")}
         />
       )}
-      {isElite ? (
+      {isPaid ? (
         <a
           href={orionUrl}
           target="_blank"

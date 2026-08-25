@@ -87,6 +87,10 @@ export function ofertaPro(): ClubOffer {
         detail: "Acesso presencial à turma e à comunidade",
       },
       {
+        title: "Orion (plano Free)",
+        detail: "Motor de prospecção para encontrar e priorizar leads locais",
+      },
+      {
         title: "Comunidade",
         detail: "Spaces, posts e networking com outros builders",
       },
@@ -110,7 +114,7 @@ export function ofertaElite(): ClubOffer {
       },
       {
         title: "Acesso ao Orion",
-        detail: "Motor de prospecção para encontrar e priorizar leads locais",
+        detail: "Mesmo motor do PRO, com os limites de Pro enquanto durar a cortesia",
       },
       {
         title: "Reunião semanal em grupo",

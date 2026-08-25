@@ -106,7 +106,7 @@ export function UpgradeProvider({
   const eliteOnly = isPaid && !isElite;
   const planosHref = hrefPlanos({
     motivo: reason,
-    destaque: eliteOnly || reason === "orion" ? "elite" : undefined,
+    destaque: eliteOnly ? "elite" : undefined,
   });
 
   return (

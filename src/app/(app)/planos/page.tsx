@@ -38,11 +38,11 @@ export default async function PlanosPage({ searchParams }: Props) {
         {isElite
           ? "Você já está no Elite. Orion, reunião semanal e o restante do Club já entram no seu plano."
           : highlightElite && isPaid
-            ? "Você já tem o PRO. O Elite libera Orion, reunião semanal em grupo e material extra."
+            ? "Você já tem o PRO, com Orion no plano Free. O Elite libera reunião semanal, material extra e Orion com limites de Pro."
             : copy.body}
       </p>
 
-      {isElite ? (
+      {isPaid ? (
         <p className="mt-6">
           <a
             href={urlOrionApp()}
