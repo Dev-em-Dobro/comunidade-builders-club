@@ -25,11 +25,13 @@ export function WelcomeSpaceView({
   spaceName,
   spaceDescription,
   tutorialEmbedUrl,
+  tutorialVideoId,
   tutorialTitle,
 }: {
   spaceName: string;
   spaceDescription: string | null;
   tutorialEmbedUrl?: string | null;
+  tutorialVideoId?: string;
   tutorialTitle?: string;
 }) {
   return (
@@ -61,9 +63,11 @@ export function WelcomeSpaceView({
           <div className="overflow-hidden rounded-2xl border border-border bg-black shadow-sm lg:col-span-2">
             <div className="relative aspect-video w-full">
               <iframe
+                id={tutorialVideoId ? `panda-${tutorialVideoId}` : undefined}
                 src={tutorialEmbedUrl}
                 title={tutorialTitle ?? "Tutorial da comunidade"}
                 className="absolute inset-0 h-full w-full"
+                style={{ border: "none" }}
                 allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
                 allowFullScreen
                 referrerPolicy="origin"

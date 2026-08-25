@@ -68,7 +68,7 @@ Comentários no space Boas-vindas continuam desligados (F023).
 
 - Publicar o desafio de 7 dias (LP + post em Conquistas) — conteúdo
 - Recusar login (F054)
-- Mudar o vídeo (continua o mesmo ID)
+- Vídeo distinto por plano — [F058](F058-boas-vindas-video-por-tier.md)
 
 O seed de aulas (F051) agora lista o tutorial como 1ª aula do M01.
 Registros já no HML **não** mudam sozinhos (o seed não sobrescreve
