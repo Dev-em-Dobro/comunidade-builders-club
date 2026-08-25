@@ -3,7 +3,7 @@
 import { timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { processarWebhookHubla } from "@/lib/hubla";
-import { mapaProdutosHubla } from "@/lib/hubla/produtos";
+import { mapaOfertasHubla, mapaProdutosHubla, webhookHublaConfigurado } from "@/lib/hubla/produtos";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -29,11 +29,12 @@ export async function POST(request: NextRequest) {
   }
 
   const productPlanMap = mapaProdutosHubla();
-  if (productPlanMap.size === 0) {
+  const offerPlanMap = mapaOfertasHubla();
+  if (!webhookHublaConfigurado(productPlanMap, offerPlanMap)) {
     return NextResponse.json(
       {
         ok: false,
-        erro: "HUBLA_PRODUCT_ID / HUBLA_PRODUCT_ID_PRO / HUBLA_PRODUCT_ID_ELITE não configurado",
+        erro: "HUBLA_PRODUCT_ID / HUBLA_OFFER_ID_PRO / HUBLA_OFFER_ID_ELITE não configurado",
       },
       { status: 503 },
     );
@@ -64,6 +65,7 @@ export async function POST(request: NextRequest) {
   try {
     const resultado = await processarWebhookHubla(payload, {
       productPlanMap,
+      offerPlanMap,
       idempotencyKey,
       eventType,
     });

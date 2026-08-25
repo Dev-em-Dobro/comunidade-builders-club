@@ -51,9 +51,11 @@ mostram indisponível (não zero).
 | `EMAIL_PROVIDER`        | `resend`                               | `resend` (ou mailpit só local)                 | `mailpit`               |
 | `BOOTSTRAP_ADMIN_EMAIL` | seu e-mail admin                       | mesmo ou de teste                              | seu e-mail              |
 | `HUBLA_WEBHOOK_TOKEN`   | token do webhook Hubla                 | mesmo ou dedicado de staging                   | obrigatório p/ webhook  |
-| `HUBLA_PRODUCT_ID`      | ID legado (mapeia **PRO**) | mesmo                               | obrigatório p/ webhook se os dois abaixo vazios |
-| `HUBLA_PRODUCT_ID_PRO`  | ID produto PRO (R$ 297) | mesmo                               | recomendado |
-| `HUBLA_PRODUCT_ID_ELITE`| ID produto Elite (R$ 997) | mesmo                               | recomendado |
+| `HUBLA_PRODUCT_ID`      | Produto Club (allowlist `product.id`) | mesmo | obrigatório p/ webhook se os dois abaixo vazios |
+| `HUBLA_PRODUCT_ID_PRO`  | Produto PRO **separado** (se existir) | mesmo | opcional |
+| `HUBLA_PRODUCT_ID_ELITE`| Produto Elite **separado** (se existir) | mesmo | opcional |
+| `HUBLA_OFFER_ID_PRO`    | Offer id PRO no produto Club | mesmo | recomendado (PRO e Elite compartilham product.id) |
+| `HUBLA_OFFER_ID_ELITE`  | Offer id Elite no produto Club | mesmo | recomendado |
 | `HUBLA_CHECKOUT_URL_PRO` | Override checkout PRO | mesmo | opcional (default `pay.hub.la/XaY8…`) |
 | `HUBLA_CHECKOUT_URL_ELITE` | Override checkout Elite | mesmo | opcional (default `pay.hub.la/v1Ss…`) |
 | `ORION_APP_URL`         | URL do Orion (sidebar Elite) | mesmo | opcional |
@@ -71,7 +73,7 @@ Na Hubla, configure o webhook apontando para:
 
 Header esperado: `x-hubla-token` = valor de `HUBLA_WEBHOOK_TOKEN`.
 
-Sem nenhum de `HUBLA_PRODUCT_ID` / `HUBLA_PRODUCT_ID_PRO` / `HUBLA_PRODUCT_ID_ELITE` o endpoint responde **503**. Cada ID mapeia o grant para PRO ou Elite (F053).
+Sem nenhum de `HUBLA_PRODUCT_ID` / `HUBLA_PRODUCT_ID_PRO` / `HUBLA_PRODUCT_ID_ELITE` / `HUBLA_OFFER_ID_PRO` / `HUBLA_OFFER_ID_ELITE` o endpoint responde **503**. PRO e Elite são ofertas do mesmo produto Club; o webhook casa `offers[].id` (F053).
 
 ### TMB Mentoria Freela (F047)
 

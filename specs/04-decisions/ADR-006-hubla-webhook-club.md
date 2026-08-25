@@ -19,5 +19,6 @@ Sem acoplamento ao Neon do Orion.
 
 ## Consequências
 Hubla deve apontar webhook também para a URL do Club (ou duplicar destino).
-Envs: `HUBLA_WEBHOOK_TOKEN`, `HUBLA_PRODUCT_ID` (legado=PRO),
-`HUBLA_PRODUCT_ID_PRO`, `HUBLA_PRODUCT_ID_ELITE` (F053).
+Envs: `HUBLA_WEBHOOK_TOKEN`, `HUBLA_PRODUCT_ID` (produto Club),
+`HUBLA_OFFER_ID_PRO`, `HUBLA_OFFER_ID_ELITE`, e os product ids separados
+`HUBLA_PRODUCT_ID_PRO` / `HUBLA_PRODUCT_ID_ELITE` se a Hubla criar (F053).

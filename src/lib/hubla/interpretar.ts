@@ -1,5 +1,5 @@
-import { emailDoEvento, productIdDoEvento } from "./normalizar";
-import type { PlanoPagoHubla } from "./produtos";
+import { emailDoEvento, offerIdsDoEvento, productIdDoEvento } from "./normalizar";
+import { planoDoEventoHubla, type PlanoPagoHubla } from "./produtos";
 import {
   EVENTOS_CONCEDER,
   EVENTOS_REVOGAR,
@@ -7,10 +7,24 @@ import {
   type HublaWebhookPayload,
 } from "./tipos";
 
+export type FiltroHubla = {
+  productPlanMap?: Map<string, PlanoPagoHubla> | null;
+  offerPlanMap?: Map<string, PlanoPagoHubla> | null;
+};
+
 export function interpretarEventoHubla(
   payload: HublaWebhookPayload,
-  productPlanMap?: Map<string, PlanoPagoHubla> | null,
+  filtro?: Map<string, PlanoPagoHubla> | null | FiltroHubla,
 ): AcaoAllowlist {
+  const productPlanMap =
+    filtro && typeof filtro === "object" && "productPlanMap" in filtro
+      ? filtro.productPlanMap
+      : (filtro as Map<string, PlanoPagoHubla> | null | undefined);
+  const offerPlanMap =
+    filtro && typeof filtro === "object" && "offerPlanMap" in filtro
+      ? (filtro.offerPlanMap ?? new Map())
+      : new Map<string, PlanoPagoHubla>();
+
   const tipo = payload.type?.trim();
   if (!tipo) {
     return { acao: "ignorar", motivo: "tipo ausente" };
@@ -26,9 +40,21 @@ export function interpretarEventoHubla(
     return { acao: "ignorar", motivo: "product_id ausente" };
   }
 
-  const plan = productPlanMap?.get(productId) ?? null;
-  if (productPlanMap && productPlanMap.size > 0 && !plan) {
-    return { acao: "ignorar", motivo: "produto não filtrado" };
+  const offerIds = offerIdsDoEvento(event);
+  const plan =
+    productPlanMap || offerPlanMap.size > 0
+      ? planoDoEventoHubla({
+          productId,
+          offerIds,
+          productMap: productPlanMap ?? new Map(),
+          offerMap: offerPlanMap,
+        })
+      : "pro";
+
+  if ((productPlanMap && productPlanMap.size > 0) || offerPlanMap.size > 0) {
+    if (!plan) {
+      return { acao: "ignorar", motivo: "produto ou oferta não filtrados" };
+    }
   }
 
   const email = emailDoEvento(event);
@@ -41,10 +67,12 @@ export function interpretarEventoHubla(
     if (subStatus && subStatus !== "active") {
       return { acao: "ignorar", motivo: "subscription não active" };
     }
+    const offerId = offerIds.find((id) => offerPlanMap.get(id) === plan) ?? offerIds[0];
     return {
       acao: "conceder",
       email,
       productId,
+      ...(offerId ? { offerId } : {}),
       plan: plan ?? "pro",
       hublaUserId: event.user?.id,
       subscriptionId: event.subscription?.id,

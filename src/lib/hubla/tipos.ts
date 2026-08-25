@@ -2,6 +2,14 @@
 
 import type { PlanoPagoHubla } from "./produtos";
 
+export type HublaWebhookOffer = { id?: string; name?: string };
+
+export type HublaWebhookProduct = {
+  id?: string;
+  name?: string;
+  offers?: HublaWebhookOffer[];
+};
+
 export type HublaWebhookPayload = {
   type?: string;
   version?: string;
@@ -9,8 +17,8 @@ export type HublaWebhookPayload = {
 };
 
 export type HublaWebhookEvent = {
-  product?: { id?: string; name?: string };
-  products?: { id?: string; name?: string }[];
+  product?: HublaWebhookProduct;
+  products?: HublaWebhookProduct[];
   user?: {
     id?: string;
     email?: string;
@@ -20,6 +28,7 @@ export type HublaWebhookEvent = {
   subscription?: {
     id?: string;
     status?: string;
+    type?: string;
     payer?: { email?: string; id?: string };
   };
   invoice?: {
@@ -34,6 +43,7 @@ export type AcaoAllowlist =
       acao: "conceder";
       email: string;
       productId: string;
+      offerId?: string;
       plan: PlanoPagoHubla;
       hublaUserId?: string;
       subscriptionId?: string;

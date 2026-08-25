@@ -31,8 +31,11 @@ Emendas [F019](../../../specs/02-features/F019-webhook-hubla.md),
 [F019.1](../../../specs/02-features/F019.1-ativacao-acesso.md),
 [F041](../../../specs/02-features/F041-webhook-tmb.md).
 
-- `HUBLA_PRODUCT_ID_CLUB_PRO` = product id Hubla do PRO R$ 297. **Não** é
-  `HUBLA_PRODUCT_ID_PRO` (plano Pro do Orion / `trial-pro-*`).
+- `HUBLA_OFFER_ID_PRO` = `products[].offers[].id` do PRO R$ 297 no produto
+  Club (`VL3e0iDO3A32SyjJWr9S`). **Não** é o slug de checkout
+  (`XaY8QNfZlOO1XBgjzMfY`) nem `HUBLA_PRODUCT_ID_PRO` (plano Pro do Orion /
+  `trial-pro-*`). `HUBLA_PRODUCT_ID_CLUB_PRO` só se a Hubla criar produto
+  separado.
 - TMB Mentoria `1AS249898VN` grava entitlement de **acesso** (Free).
 - Cortesia Pro **não** dispara nesses grants — só Elite (legado / Elite Hubla
   / boleto `3XB` e `9DW`).
@@ -46,6 +49,6 @@ nova após a env gravar sozinha.
 - [x] Spec antes do código
 - [x] Card PRO lista Orion plano Free
 - [x] Sidebar PRO abre o Orion; Free segue bloqueado
-- [x] Webhook Orion concede acesso no product id do PRO Club e na Mentoria TMB
+- [x] Webhook Orion concede acesso na oferta PRO (`HUBLA_OFFER_ID_PRO`) e na Mentoria TMB
 - [x] Esses grants **não** criam cortesia `trial-pro-*`
 - [x] Elite inalterado (acesso + cortesia Pro)

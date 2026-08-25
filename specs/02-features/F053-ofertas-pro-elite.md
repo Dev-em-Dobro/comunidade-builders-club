@@ -78,18 +78,28 @@ abrem o app (`ORION_APP_URL`).
 
 ## Hubla
 
+PRO e Elite são **ofertas do mesmo produto** Hubla (`VL3e0iDO3A32SyjJWr9S`,
+"Builders Club"). O webhook recebe `event.product.id` igual nos dois; o
+discriminador é `event.products[].offers[].id`. O slug de checkout
+(`pay.hub.la/XaY8QNfZlOO1XBgjzMfY`) **não** entra no payload — não use como
+product id.
+
 Envs:
 
 | Env | Papel |
 |-----|--------|
 | `HUBLA_CHECKOUT_URL_PRO` | Override do checkout PRO |
 | `HUBLA_CHECKOUT_URL_ELITE` | Override do checkout Elite |
-| `HUBLA_PRODUCT_ID` | Legado — mapeia para **pro** |
-| `HUBLA_PRODUCT_ID_PRO` | ID do produto PRO |
-| `HUBLA_PRODUCT_ID_ELITE` | ID do produto Elite |
+| `HUBLA_PRODUCT_ID` | Produto Club — allowlist de `product.id` (legado sem oferta casa **pro**) |
+| `HUBLA_PRODUCT_ID_PRO` | Produto PRO **separado**, se a Hubla criar um |
+| `HUBLA_PRODUCT_ID_ELITE` | Produto Elite **separado**, se a Hubla criar um |
+| `HUBLA_OFFER_ID_PRO` | Offer id(s) do PRO R$ 297 (vírgula se houver cópia + oficial) |
+| `HUBLA_OFFER_ID_ELITE` | Offer id(s) do Elite R$ 997. Sem ela, oferta não-PRO no produto Club segue o mapa de produto |
 
-Webhook aceita qualquer ID do mapa. Sem nenhum ID → 503 (F021).
-`member_added` do produto PRO → `tier=pro`; do Elite → `tier=elite`.
+Webhook aceita o produto Club (e quaisquer IDs do mapa). Sem nenhum product id
+e sem nenhum offer id → 503 (F021). Com ofertas no evento: casa Elite →
+`tier=elite`; casa PRO → `tier=pro`; oferta desconhecida com só
+`HUBLA_OFFER_ID_PRO` setado → **elite** (não rebaixa quem comprou Elite).
 Grant nunca rebaixa (Elite + evento PRO permanece Elite).
 `member_removed` / reembolso → `tier=free`.
 
@@ -132,5 +142,5 @@ redirecionam para `/planos`. Links antigos `/?upgrade=1` também caem em `/plano
 - [x] Sidebar e `/perfil` mostram badge PRO/Elite para quem fez upgrade
 - [x] Modal de bloqueio leva a `/planos` (CTA Ver planos)
 - [x] PRO vê Orion liberado (plano Free no app; F058)
-- [x] Webhook mapeia product id → pro ou elite
+- [x] Webhook mapeia offer id (mesmo produto) → pro ou elite
 - [ ] Preview only (migrate HML; prod só após merge + confirmação)

@@ -77,7 +77,9 @@ export async function aplicarAcaoAllowlist(acao: AcaoAllowlist): Promise<void> {
     await addAllowedEmail({
       email: acao.email,
       source: "hubla",
-      note: `product:${acao.productId}`,
+      note: acao.offerId
+        ? `product:${acao.productId} offer:${acao.offerId}`
+        : `product:${acao.productId}`,
     });
     await concederPago(acao.email, acao.plan);
     return;
@@ -95,6 +97,7 @@ export async function processarWebhookHubla(
   payload: unknown,
   opts: {
     productPlanMap?: Map<string, PlanoPagoHubla> | null;
+    offerPlanMap?: Map<string, PlanoPagoHubla> | null;
     idempotencyKey?: string | null;
     eventType: string;
   },
@@ -105,10 +108,10 @@ export async function processarWebhookHubla(
     }
   }
 
-  const acao = interpretarEventoHubla(
-    payload as HublaWebhookPayload,
-    opts.productPlanMap,
-  );
+  const acao = interpretarEventoHubla(payload as HublaWebhookPayload, {
+    productPlanMap: opts.productPlanMap,
+    offerPlanMap: opts.offerPlanMap,
+  });
 
   if (acao.acao === "ignorar") {
     if (opts.idempotencyKey) {
