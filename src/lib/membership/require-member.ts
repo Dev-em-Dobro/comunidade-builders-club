@@ -1,10 +1,12 @@
 import type { Membership, Profile, Role } from "@prisma/client";
 import { cache } from "react";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import type { AuthUser } from "@/lib/auth";
 import { requireUser } from "@/lib/auth/require-user";
 import { AuthError, ForbiddenError } from "@/lib/auth/errors";
 import { ensureMemberBootstrap } from "./bootstrap";
+import type { ContextoAceite } from "./aceite-legal";
 import { hrefPlanos, isPaidMembership } from "./capabilities";
 import { UPGRADE_REQUIRED } from "./errors";
 
@@ -13,6 +15,18 @@ export type ActiveMember = {
   profile: Profile;
   membership: Membership;
 };
+
+/**
+ * F058 — origem do aceite. Só é lido aqui porque `bootstrap` fica em `src/lib`
+ * sem depender de Next; os headers já estão no request por causa da sessão.
+ */
+async function contextoAceite(): Promise<ContextoAceite> {
+  const h = await headers();
+  return {
+    ip: h.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null,
+    userAgent: h.get("user-agent"),
+  };
+}
 
 export { UPGRADE_REQUIRED } from "./errors";
 
@@ -24,6 +38,7 @@ export const requireActiveMember = cache(async (): Promise<ActiveMember> => {
     user.name,
     user.image,
     user.email,
+    await contextoAceite(),
   );
 
   if (!boot?.membership || !boot.profile) {
