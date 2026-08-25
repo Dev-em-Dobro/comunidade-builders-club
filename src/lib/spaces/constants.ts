@@ -1,6 +1,8 @@
 /** Slugs de Spaces com comportamento especial na UI. */
 
 export const WELCOME_SPACE_SLUG = "boas-vindas" as const;
+/** F056 / F057 — Desafio Projetos (ativação pagante). */
+export const PROJETOS_SPACE_SLUG = "projetos" as const;
 
 /** Tutorial da comunidade na tela Boas-vindas (F023 / F055). Mesmo vídeo da 1ª aula do M01. */
 export const WELCOME_TUTORIAL_VIDEO = {

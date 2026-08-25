@@ -33,7 +33,12 @@ Na Vercel → Project → Settings → Domains:
 Na Vercel, **não** use `DATABASE_URL_HML` / `DATABASE_URL_PROD` como nomes de runtime.
 O app lê `DATABASE_URL`. O que muda é o **valor por Environment** (Production vs Preview).
 
-As chaves `DATABASE_URL_HML` / `DATABASE_URL_PROD` / `ORION_DATABASE_URL` são só para scripts locais (`db:seed:envs`, `db:import-allowed`).
+As chaves `DATABASE_URL_HML` / `DATABASE_URL_PROD` continuam só para scripts locais (`db:seed:envs`, `db:import-allowed`).
+
+`ORION_DATABASE_URL` também é **runtime** na aba Progresso (F057): leitura
+das propostas e da primeira busca. Preview aponta para o Neon **staging** do
+Orion; Production para o Neon **prod**. Sem a env, os dois cards do Orion
+mostram indisponível (não zero).
 
 ### Matriz (obrigatórias)
 
@@ -52,6 +57,7 @@ As chaves `DATABASE_URL_HML` / `DATABASE_URL_PROD` / `ORION_DATABASE_URL` são s
 | `HUBLA_CHECKOUT_URL_PRO` | Override checkout PRO | mesmo | opcional (default `pay.hub.la/XaY8…`) |
 | `HUBLA_CHECKOUT_URL_ELITE` | Override checkout Elite | mesmo | opcional (default `pay.hub.la/v1Ss…`) |
 | `ORION_APP_URL`         | URL do Orion (sidebar Elite) | mesmo | opcional |
+| `ORION_DATABASE_URL`    | Neon Orion **prod** (F057) | Neon Orion **staging** | opcional (HML) |
 | `TMB_WEBHOOK_TOKEN`     | Valor do webhook TMB (Mentoria)        | mesmo ou dedicado de staging                   | obrigatório p/ webhook TMB |
 | `TMB_WEBHOOK_HEADER`    | Chave do header (default `x-tmb-token`)| mesmo                                          | opcional                |
 
