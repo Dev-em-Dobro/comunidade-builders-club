@@ -4,12 +4,22 @@ export const WELCOME_SPACE_SLUG = "boas-vindas" as const;
 /** F056 / F057 — Desafio Projetos (ativação pagante). */
 export const PROJETOS_SPACE_SLUG = "projetos" as const;
 
-/** Tutorial da comunidade na tela Boas-vindas (F023 / F055). Mesmo vídeo da 1ª aula do M01. */
+/** Tutoriais Panda na tela Boas-vindas (F023 / F055 / F058). */
 export const WELCOME_TUTORIAL_VIDEO = {
   pandaLibraryId: "77c52f03-dc6",
-  pandaVideoExternalId: "38608c40-7b9a-4b30-a33e-287bf5072af3",
   title: "Como usar a comunidade",
+  /** Plano gratuito. */
+  freeVideoExternalId: "79a1c579-1870-48bb-8bf7-5f16f0c1ec91",
+  /** Plano pago (e admin/instructor). */
+  paidVideoExternalId: "d3b5019d-49b8-479e-a150-7ea654dc7cf6",
 } as const;
+
+export function welcomeTutorialVideoId(isPaid: boolean): string {
+  return isPaid
+    ? WELCOME_TUTORIAL_VIDEO.paidVideoExternalId
+    : WELCOME_TUTORIAL_VIDEO.freeVideoExternalId;
+}
+
 export const AVISOS_SPACE_SLUG = "avisos" as const;
 /** Threads de comentários das aulas (oculto no menu / feed). */
 export const AULA_THREADS_SPACE_SLUG = "aula-threads" as const;

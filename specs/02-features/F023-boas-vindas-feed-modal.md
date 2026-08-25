@@ -24,6 +24,9 @@ plataforma é o que o vídeo ensina — ver [F055](F055-boas-vindas-trilha.md).
 - [x] Preferência de vista do Feed persistida em `localStorage`
 - [x] Primeiro acesso ao feed → Boas-vindas (F048)
 
+## Relacionado
+- F058 — tutorial Panda distinto para free e paid
+
 ## Fora de escopo
 - Dark theme estilo Circle
 - Calendário / ranking / gamificação

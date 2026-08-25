@@ -11,6 +11,7 @@ import { markWelcomeSeen } from "@/lib/profile";
 import {
   WELCOME_SPACE_SLUG,
   WELCOME_TUTORIAL_VIDEO,
+  welcomeTutorialVideoId,
 } from "@/lib/spaces/constants";
 import { pandaEmbedUrl } from "@/lib/aulas";
 import { FeedList } from "@/components/feed-list";
@@ -41,11 +42,12 @@ export default async function SpacePage({ params }: Props) {
   const isAdmin = member.membership.role === "admin";
 
   if (slug === WELCOME_SPACE_SLUG) {
+    const tutorialVideoId = welcomeTutorialVideoId(isPaid);
     let tutorialEmbedUrl: string | null = null;
     try {
       tutorialEmbedUrl = pandaEmbedUrl(
         WELCOME_TUTORIAL_VIDEO.pandaLibraryId,
-        WELCOME_TUTORIAL_VIDEO.pandaVideoExternalId,
+        tutorialVideoId,
       );
     } catch {
       tutorialEmbedUrl = null;
@@ -56,6 +58,7 @@ export default async function SpacePage({ params }: Props) {
         spaceName={space.name}
         spaceDescription={space.description}
         tutorialEmbedUrl={tutorialEmbedUrl}
+        tutorialVideoId={tutorialVideoId}
         tutorialTitle={WELCOME_TUTORIAL_VIDEO.title}
       />
     );
