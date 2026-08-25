@@ -11,3 +11,16 @@ export const OPERADOR_LEGAL = {
 } as const;
 
 export const ATUALIZADO_EM = "3 de agosto de 2026";
+
+/**
+ * F058 — versão dos documentos legais. Muda junto com `ATUALIZADO_EM`.
+ *
+ * O texto legal mora no código, então o histórico do git prova o que cada
+ * versão dizia — não é preciso guardar cópia do texto para comprovar o aceite.
+ */
+export const VERSAO_LEGAL = "2026-08-03";
+
+/** Documentos cujo aceite é registrado. */
+export const DOCUMENTOS_LEGAIS = ["termos", "privacidade"] as const;
+
+export type DocumentoLegal = (typeof DOCUMENTOS_LEGAIS)[number];

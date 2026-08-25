@@ -32,6 +32,7 @@ model User {
   actorNotifs     Notification[] @relation("NotificationActor")
   lessonProgress  LessonProgress[]
   postViews       PostView[]
+  legalAcceptances LegalAcceptance[]
 
   @@unique([email])
   @@map("user")
@@ -145,6 +146,9 @@ model Membership {
   /// F041/F053 — free | pro | elite (`paid` legado = pro).
   tier      MembershipTier   @default(free)
   role      Role             @default(member)
+  /// F058 — cache da última versão legal aceita. Fonte da verdade é
+  /// `legal_acceptance`; aqui só para o hot path do bootstrap não custar query.
+  termosVersao String?       @map("termos_versao")
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
 
@@ -176,6 +180,24 @@ model DeniedLoginAttempt {
   @@index([createdAt])
   @@index([email, createdAt])
   @@map("denied_login_attempt")
+}
+
+/// F058 — histórico de aceite dos documentos legais. Append-only: trocar a
+/// versão da Política não pode apagar a prova do aceite anterior.
+model LegalAcceptance {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// `termos` | `privacidade` (DOCUMENTOS_LEGAIS em src/lib/legal.ts).
+  documento String
+  versao    String
+  aceitoEm  DateTime @default(now()) @map("aceito_em")
+  ip        String?
+  userAgent String?  @map("user_agent")
+
+  @@unique([userId, documento, versao])
+  @@index([userId])
+  @@map("legal_acceptance")
 }
 
 /// F014 — idempotência do webhook Hubla.

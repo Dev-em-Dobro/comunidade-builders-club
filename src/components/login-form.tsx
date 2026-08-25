@@ -33,6 +33,8 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
     () => mensagemErroCallback(searchParams.get("error")),
     [searchParams],
   );
+  // F059 — volta da exclusão de conta.
+  const contaExcluida = searchParams.get("conta") === "excluida";
 
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
@@ -148,6 +150,12 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
               {error ? (
                 <p className="text-sm text-red-600 dark:text-red-400" role="alert">
                   {error}
+                </p>
+              ) : null}
+
+              {contaExcluida ? (
+                <p className="text-sm text-muted" role="status">
+                  Sua conta foi excluída. Seus dados pessoais foram removidos.
                 </p>
               ) : null}
 
