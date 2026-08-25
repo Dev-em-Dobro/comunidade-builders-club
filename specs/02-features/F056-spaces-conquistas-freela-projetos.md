@@ -14,7 +14,7 @@ um rótulo genérico. Slugs **não mudam** (`conquistas`, `freelas`,
 |------|------|-----------|
 | `conquistas` | Conquistas | Poste suas conquistas aqui, cliente fechado, proposta aceita, ou primeiro pagamento. Conte como foi o processo pra fechar a venda, isso ajuda a comunidade a crescer |
 | `freelas` | Indicação Freela | Se tiver um freela pra indicar pra um colega, poste aqui |
-| `projetos` | Desafio Projetos | Mostre o que está construindo *(nome novo; descrição anterior, o pedido não trocou o texto)* |
+| `projetos` | Desafio Projetos | Poste aqui o projeto que você desenvolveu no desafio dos 7 dias. Pode ser só um site de amostra por enquanto, o importante é dar o primeiro passo, a venda vem depois |
 
 ## Menções em posts
 
@@ -33,6 +33,8 @@ Busca em HML e produção (posts cujo body cita Freelas/Projetos):
 - [x] Menu/título de `/spaces/conquistas` com a descrição nova
 - [x] Menu de Freelas vira **Indicação Freela** + descrição de indicação
 - [x] Menu de Projetos vira **Desafio Projetos**
+- [ ] Descrição de `projetos` aponta o desafio dos 7 dias e tira o peso de
+      "ter que estar pronto" (site de amostra já vale)
 - [x] URLs `/spaces/freelas` e `/spaces/projetos` seguem iguais
 - [x] Aviso “Como usar” do Pablo usa os nomes novos
 
