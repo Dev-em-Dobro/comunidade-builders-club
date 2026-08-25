@@ -53,3 +53,4 @@ yarn-debug.log*
 # perf local
 scripts/perf-reports/
 
+.gstack/
