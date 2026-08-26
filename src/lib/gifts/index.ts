@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { PRESENTES_SPACE_SLUG } from "@/lib/spaces/constants";
 import { isGiftCrawler } from "./bots";
+import { giftAdminLabel } from "./link";
 import { sanitizeGiftSlug, sanitizeUtmValue } from "./origem";
 
 export async function getPublicGift(slug: string) {
@@ -28,6 +29,34 @@ export async function getPublicGift(slug: string) {
       },
     },
   });
+}
+
+export async function listGiftPostsAdmin() {
+  const rows = await prisma.post.findMany({
+    where: {
+      space: { slug: PRESENTES_SPACE_SLUG },
+      slug: { not: null },
+    },
+    select: { slug: true, title: true, body: true, linkUrl: true, createdAt: true },
+    orderBy: { createdAt: "desc" },
+  });
+  return rows.flatMap((r) =>
+    r.slug
+      ? [
+          {
+            slug: r.slug,
+            title: r.title,
+            label: giftAdminLabel({
+              slug: r.slug,
+              title: r.title,
+              body: r.body,
+              linkUrl: r.linkUrl,
+            }),
+            createdAt: r.createdAt,
+          },
+        ]
+      : [],
+  );
 }
 
 export async function recordGiftVisit(opts: {

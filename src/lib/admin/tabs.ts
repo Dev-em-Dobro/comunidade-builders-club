@@ -3,6 +3,7 @@ export const ADMIN_TABS = [
   { id: "tentativas", label: "Tentativas" },
   { id: "membros", label: "Membros" },
   { id: "aulas", label: "Aulas" },
+  { id: "presentes", label: "Presentes" },
   { id: "spaces", label: "Spaces" },
 ] as const;
 

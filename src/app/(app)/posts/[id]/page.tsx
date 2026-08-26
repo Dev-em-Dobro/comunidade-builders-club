@@ -32,7 +32,6 @@ export default async function PostPage({ params }: Props) {
   }
 
   const isPaid = isPaidMembership(member.membership);
-  // F041: free lê qualquer post da vitrine (feed). Interagir continua paid.
   if (!isPaid && !canFreeReadPost(post.space.slug)) {
     redirect(hrefPlanos());
   }

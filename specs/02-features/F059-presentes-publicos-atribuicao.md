@@ -36,15 +36,15 @@ Essa é a razão da prioridade.
 1. Post no Instagram
    └─ pessoa comenta a palavra-chave
 
-2. Automação envia o link no DM
-   https://<domínio>/presentes/agent-reach
-     ?utm_source=instagram
-     &utm_medium=dm
-     &utm_campaign=presentes
-     &utm_content=agente-2026-08-21
+2. Admin publica o presente no space Presentes (slug, ex. agent-reach).
+   Admin → Presentes gera o link (presente + nome da postagem + data).
+   Automação / Jaque envia no DM:
+   https://<domínio>/presentes/agent-reach/eu-quero-22-09-2026
+   (equivale a /presentes/agent-reach?utm_source=instagram&utm_medium=dm
+    &utm_campaign=presentes&utm_content=eu-quero-22-09-2026)
 
 3. Abre no NAVEGADOR INTERNO DO INSTAGRAM (webview)
-   └─ GET /presentes/agent-reach  → rota PÚBLICA, sem sessão
+   └─ GET /presentes/agent-reach/...  → rota PÚBLICA, sem sessão
       ├─ grava GiftVisit (utm_* + slug + referrer + createdAt)
       │  └─ só se NÃO for bot (ver "Filtro de bot")
       └─ seta cookie bc_origem, first-touch (só se ainda não existir)
@@ -87,7 +87,8 @@ Decisão e alternativas em **ADR-009**.
 
 | Rota | Acesso | Observação |
 |------|--------|------------|
-| `/presentes/[slug]` | **público** | um presente por vez. Fora de `(app)`, fora do matcher do middleware, sem `AppShell` |
+| `/presentes/[slug]` | **público** | um presente por vez. Fora de `(app)`, sem `AppShell`. UTMs na query |
+| `/presentes/[slug]/[utmContent]` | **público** | mesmo presente; UTM no path (link que a Admin gera para o DM) |
 | `/spaces/presentes` | logado (free+) | lista de todos os presentes — é o que a conta destrava |
 
 Um presente é público **apenas** quando está no space `presentes` **e** tem
@@ -142,7 +143,10 @@ evita discussão de LGPD (F020).
 ## Atribuição
 
 ### Cookie `bc_origem`
-- Setado no GET de `/presentes/[slug]`, a partir dos parâmetros UTM da URL
+- Setado no GET de `/presentes/[slug]` (e no path com UTM). Sem `utm_content`
+  ainda grava o **slug do presente** — senão `/presentes/foo` cria conta e some
+  do relatório
+- Com UTM (query ou `/presentes/[slug]/[utmContent]`), grava os dois
 - `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`, ~90 dias
 - **First-touch**: só escreve se ainda não existir. Se a pessoa abrir três
   presentes antes de se cadastrar, o crédito é do primeiro.
@@ -189,14 +193,31 @@ ignorado, nunca quebrar a página.
 | `utm_source` | `instagram` | de onde veio |
 | `utm_medium` | `dm` | como chegou — distingue de bio, stories |
 | `utm_campaign` | `presentes` | a iniciativa, para comparar com outras depois |
-| `utm_content` | `<palavra-chave>-<AAAA-MM-DD>` | **o post específico** — é o que fecha o funil |
+| `utm_content` | `<nome>-<DD-MM-AAAA>` | **o post específico** — é o que fecha o funil |
 
-`utm_content` usa a **palavra-chave da automação + data** (ex.:
-`agente-2026-08-21`). Assim o time de social amarra post ↔ número sem planilha
-paralela. Data em formato ISO porque ordena sozinha.
+`utm_content` usa o **nome da postagem + data** (ex.: `eu-quero-22-09-2026`).
+A Admin gera isso para a Jaque copiar. Query string com os quatro UTMs também
+vale — o path curto é só conveniência.
 
-Configurado uma vez por post dentro do fluxo da automação — sem digitação
-manual, sem risco de erro por pessoa.
+## Link do presente (Notion ou outro)
+
+Na leitura pública **não** mostrar a URL crua (nem no título, nem no corpo).
+O post da Jaque costuma ser só o link do Notion — isso vira um card:
+
+- Título legível extraído do slug do Notion (sem UUID, sem `fbclid`)
+- CTA **Abrir presente** em **nova aba** (`target=_blank`)
+- Se o `body` for só a URL, o card substitui o markdown
+
+Quem já escreveu um título de verdade no composer continua vendo esse título
+acima do card.
+
+### Popup ao voltar
+
+Clique no card marca a saída. Quando a aba do presente volta a ficar visível
+(`visibilitychange`), e a pessoa **não** está logada, abre um popup convidando
+a criar a conta. O CTA principal rola até o formulário OTP. Fechar o popup
+não impede de preencher o form embaixo. Não dispara de novo até um novo clique
+no presente.
 
 ## Cadastro — regras de tela
 
@@ -216,12 +237,12 @@ manual, sem risco de erro por pessoa.
 ## Space Presentes
 
 - `PRESENTES_SPACE_SLUG = "presentes"` em `src/lib/spaces/constants.ts`
-- Entra em `FREE_SPACE_SLUGS` (`src/lib/membership/capabilities.ts:7`) —
+- Entra em `FREE_SPACE_SLUGS` (`src/lib/membership/capabilities.ts`) —
   **sem isso a pessoa cria a conta para pegar os outros presentes e recebe
   cadeado + popup de upgrade exatamente no que foi prometido no Instagram**
 - Entra em `ADMIN_ONLY_PUBLISH_SLUGS` — só admin publica
-- Comentários: decidir se entra em `COMMENTS_DISABLED_SPACE_SLUGS`, como
-  Boas-vindas
+- Entra em `COMMENTS_DISABLED_SPACE_SLUGS`, como Boas-vindas
+- **Não** entra no feed global — o catálogo é `/spaces/presentes`
 
 ## Faixa de Boas-vindas
 
@@ -249,11 +270,14 @@ comentários no post → DMs enviadas → visitas no presente → cadastros
 Medir só cadastro esconde o diagnóstico: post que traz muito leitor e pouco
 cadastro é problema da página, não do post.
 
-Até a tela de Admin existir, a leitura é por SQL.
+Admin → aba Presentes mostra visitas, cadastros, pessoas e
+`assinou_plano_veio_de_uma_postagem` (tier pago atual + origem daquele post).
+Não há data da compra Hubla — só o plano de agora.
 
 ## Critérios
 
 - [x] `/presentes/[slug]` abre sem sessão, fora de `(app)` (matcher só seta cookie, sem login)
+- [x] `/presentes/[slug]/[utmContent]` abre o mesmo presente com origem no path
 - [x] Rota consulta por `slug` **e** valida o space — post de outro space não
       vaza
 - [x] Post sem `slug` não é publicamente acessível
@@ -262,6 +286,7 @@ Até a tela de Admin existir, a leitura é por SQL.
       **não** grava
 - [x] `igshid` e parâmetros desconhecidos não quebram a página
 - [x] Cookie `bc_origem` é first-touch — segunda visita não sobrescreve
+- [x] `/presentes/[slug]` sem UTM ainda carimba `originGiftSlug` no cadastro
 - [x] Cadastro por OTP na mesma aba cria a conta
 - [x] Tela de código avisa sobre **spam e promoções**
 - [x] `Membership` novo grava `originUtmContent`, `originGiftSlug` e `originAt`
@@ -269,14 +294,18 @@ Até a tela de Admin existir, a leitura é por SQL.
 - [x] `Profile.displayName` recebe nome + sobrenome
 - [x] Free abre `/spaces/presentes` sem cadeado
 - [x] Faixa de Boas-vindas aparece no presente após o cadastro
+- [x] URL do Notion (ou outro http) vira card com título legível + abre em nova aba
+- [x] Ao voltar da aba do presente, popup convida a criar a conta (só deslogado)
+- [x] Admin → aba Presentes gera `/presentes/{slug}/{nome}-{DD-MM-AAAA}`
+- [x] Admin → aba Presentes: visitas, cadastros, lista de pessoas e quem
+      assinou plano pago (`tier` pro/elite/paid + origem daquele post)
 - [ ] Testado **no celular, dentro do Instagram**, ponta a ponta: DM → leitura →
       cadastro → origem no banco
 
 ## Fora de escopo
 
-- Tela na Admin com visitas/cadastros/conversão por post (lê por SQL no início)
-- Atribuição de upgrade free → PRO/Elite. O `Membership` já carrega a origem,
-  então dá para cruzar depois sem perder dado — ver F053
+- Data exata da compra Hubla/TMB (aqui o pago é o **tier atual** com origem
+  daquele post — `assinou_plano_veio_de_uma_postagem`)
 - Fluxo de reset de senha (não há senha — ADR-009)
 - Comentários e reações na leitura anônima
 - Migrar os presentes que hoje estão no Notion
