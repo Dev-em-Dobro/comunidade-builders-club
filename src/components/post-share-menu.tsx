@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { MoreIcon } from "@/components/post-icons";
 
 /** Menu ⋯ com “Copiar link” do post. */
 export function PostShareMenu({ postId }: { postId: string }) {
@@ -50,13 +51,13 @@ export function PostShareMenu({ postId }: { postId: string }) {
     >
       <button
         type="button"
-        className="btn-ghost cursor-pointer px-2 py-1 text-base leading-none text-muted"
+        className="inline-flex cursor-pointer items-center rounded-lg px-1.5 py-1 text-muted transition-colors hover:text-accent"
         aria-label="Mais opções"
         aria-expanded={open}
         aria-haspopup="menu"
         onClick={() => setOpen((v) => !v)}
       >
-        ⋯
+        <MoreIcon />
       </button>
       {open ? (
         <div

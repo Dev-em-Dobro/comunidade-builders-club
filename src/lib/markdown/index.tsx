@@ -76,14 +76,46 @@ export function renderInlineMarkdown(text: string): ReactNode[] {
   return nodes;
 }
 
+/**
+ * Escala dos blocos. `reading` (F060) é a coluna de artigo da página do
+ * post: corpo 19px, títulos com escala editorial e mais respiro entre
+ * parágrafos. `default` é o feed, onde o post é só uma prévia.
+ */
+export type MarkdownVariant = "default" | "reading";
+
+const SCALE: Record<
+  MarkdownVariant,
+  { root: string; h2: string; h3: string; ul: string; pre: string; gap: string }
+> = {
+  default: {
+    root: "space-y-1 text-base leading-relaxed text-foreground/90 [&_p]:my-0",
+    h2: "mt-5 text-[15px] font-semibold text-foreground md:text-base",
+    h3: "mt-3 text-sm font-semibold text-foreground md:text-[15px]",
+    ul: "my-2 list-disc space-y-1 pl-5",
+    pre: "my-3 overflow-x-auto rounded-xl border border-border bg-surface p-3 font-mono text-[13px] leading-relaxed",
+    gap: "h-3",
+  },
+  reading: {
+    root: "space-y-1 text-[1.0625rem] leading-[1.7] text-foreground/90 [&_p]:my-0 md:text-[1.1875rem]",
+    h2: "mt-10 font-[family-name:var(--font-outfit)] text-[1.375rem] font-bold leading-tight tracking-tight text-foreground md:text-[1.625rem]",
+    h3: "mt-8 font-[family-name:var(--font-outfit)] text-[1.125rem] font-bold leading-snug tracking-tight text-foreground md:text-[1.25rem]",
+    ul: "my-4 list-disc space-y-2 pl-6 marker:text-muted",
+    pre: "my-6 overflow-x-auto rounded-xl border border-border bg-surface p-4 font-mono text-[0.9375rem] leading-relaxed",
+    gap: "h-5",
+  },
+};
+
 /** Blocos: parágrafos, listas `- ` / `* `, linhas. */
 export function MarkdownBody({
   body,
   className,
+  variant = "default",
 }: {
   body: string;
   className?: string;
+  variant?: MarkdownVariant;
 }) {
+  const scale = SCALE[variant];
   const lines = body.replace(/\r\n/g, "\n").split("\n");
   const blocks: ReactNode[] = [];
   let i = 0;
@@ -100,10 +132,7 @@ export function MarkdownBody({
       }
       if (i < lines.length) i += 1;
       blocks.push(
-        <pre
-          key={key++}
-          className="my-3 overflow-x-auto rounded-xl border border-border bg-surface p-3 font-mono text-[13px] leading-relaxed"
-        >
+        <pre key={key++} className={scale.pre}>
           <code>{codeLines.join("\n")}</code>
         </pre>,
       );
@@ -111,10 +140,7 @@ export function MarkdownBody({
     }
     if (/^###\s+/.test(line)) {
       blocks.push(
-        <h3
-          key={key++}
-          className="mt-3 text-sm font-semibold text-foreground md:text-[15px]"
-        >
+        <h3 key={key++} className={scale.h3}>
           {renderInlineMarkdown(line.replace(/^###\s+/, ""))}
         </h3>,
       );
@@ -123,10 +149,7 @@ export function MarkdownBody({
     }
     if (/^##\s+/.test(line)) {
       blocks.push(
-        <h2
-          key={key++}
-          className="mt-5 text-[15px] font-semibold text-foreground md:text-base"
-        >
+        <h2 key={key++} className={scale.h2}>
           {renderInlineMarkdown(line.replace(/^##\s+/, ""))}
         </h2>,
       );
@@ -140,7 +163,7 @@ export function MarkdownBody({
         i++;
       }
       blocks.push(
-        <ul key={key++} className="my-2 list-disc space-y-1 pl-5">
+        <ul key={key++} className={scale.ul}>
           {items.map((item, idx) => (
             <li key={idx}>{renderInlineMarkdown(item)}</li>
           ))}
@@ -157,7 +180,7 @@ export function MarkdownBody({
       }
       for (let b = 0; b < blanks; b++) {
         blocks.push(
-          <div key={key++} className="h-3" aria-hidden="true" />,
+          <div key={key++} className={scale.gap} aria-hidden="true" />,
         );
       }
       continue;
@@ -182,12 +205,7 @@ export function MarkdownBody({
   }
 
   return (
-    <div
-      className={
-        className ??
-        "space-y-1 text-base leading-relaxed text-foreground/90 [&_p]:my-0"
-      }
-    >
+    <div className={className ?? scale.root}>
       {blocks.length > 0 ? blocks : <p>{renderInlineMarkdown(body)}</p>}
     </div>
   );

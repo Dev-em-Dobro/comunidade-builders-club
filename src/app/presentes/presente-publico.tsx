@@ -90,13 +90,20 @@ export async function PresentePublico({
       ? null
       : gift.title?.trim() || previewFromBody(gift.body, 90) || "Presente";
   const authorName = gift.author.profile?.displayName ?? "Builders Club";
+  /**
+   * F060 — presente sem link é texto para ler: mostra o corpo.
+   * Antes só existia o caso "presente é um link", e `link?.showBody` deixava
+   * a página com o título sozinho.
+   */
+  const showBody = link ? link.showBody : gift.body.trim().length > 0;
 
   return (
     <div className="relative min-h-dvh px-4 py-10">
       <div className="absolute right-4 top-4 z-10">
         <ThemeToggle variant="icon" />
       </div>
-      <main className="mx-auto w-full max-w-xl">
+      {/* F060 — presente é leitura pública: mesma coluna e escala do post. */}
+      <main className="reading-wrap">
         <p className="font-[family-name:var(--font-outfit)] text-sm font-semibold uppercase tracking-[0.12em] text-accent">
           {NOME_PRODUTO}
         </p>
@@ -124,20 +131,22 @@ export async function PresentePublico({
           </div>
         ) : null}
 
-        <article className="post-card mt-6 p-6">
-          <p className="text-xs text-muted">{authorName}</p>
-          <h1
-            className={
-              title
-                ? "mt-2 font-[family-name:var(--font-outfit)] text-2xl font-bold tracking-tight"
-                : "sr-only"
-            }
-          >
+        <article className="mt-8">
+          <h1 className={title ? "reading-title" : "sr-only"}>
             {title ?? link?.title ?? "Presente"}
           </h1>
-          {link?.showBody ? (
-            <div className="mt-4">
-              <MarkdownBody body={gift.body} />
+          <p className="mt-4 text-sm text-muted">
+            {authorName} ·{" "}
+            {gift.createdAt.toLocaleDateString("pt-BR", {
+              day: "2-digit",
+              month: "long",
+              year: "numeric",
+            })}
+          </p>
+          <div className="mt-5 border-t border-border/70" />
+          {showBody ? (
+            <div className="mt-8">
+              <MarkdownBody body={gift.body} variant="reading" />
             </div>
           ) : null}
           {link ? (
@@ -157,7 +166,7 @@ export async function PresentePublico({
         </article>
 
         {!user ? (
-          <div className="mt-8">
+          <div className="mx-auto mt-12 w-full max-w-xl">
             <GiftSignupForm />
           </div>
         ) : null}

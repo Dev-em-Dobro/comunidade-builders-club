@@ -15,6 +15,7 @@
     "db:seed:aviso": "npx tsx scripts/seed-aviso-boas-vindas.mts",
     "db:seed:boas-vindas": "npx tsx scripts/seed-boas-vindas.mts",
     "db:seed:welcome-cards": "npx tsx scripts/seed-welcome-cards.mts",
+    "db:seed:dev-posts": "npx tsx scripts/seed-dev-posts.mts",
     "db:seed:aulas-panda": "npx tsx scripts/seed-aulas-panda.mts",
     "db:seed:devquest": "npx tsx scripts/seed-devquest-allowed.mts",
     "db:import-allowed": "npx tsx scripts/import-allowed-emails.mts",
