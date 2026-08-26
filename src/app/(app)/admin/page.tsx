@@ -8,6 +8,8 @@ import {
 } from "@/lib/admin/members";
 import { listAllowedEmails } from "@/lib/membership/allowlist";
 import { listAllModulesAdmin } from "@/lib/aulas";
+import { listUtmPostMetrics } from "@/lib/gifts/metricas";
+import { listGiftPostsAdmin } from "@/lib/gifts";
 import {
   addAllowedEmailAction,
   createSpaceAction,
@@ -18,6 +20,8 @@ import {
 } from "@/actions/admin";
 import { AdminBulkAllowlist } from "@/components/admin-bulk-allowlist";
 import { AdminAulasPanel } from "@/components/admin-aulas-panel";
+import { AdminGiftLinks } from "@/components/admin-gift-links";
+import { AdminGiftMetrics } from "@/components/admin-gift-metrics";
 import { AdminDeniedLogins } from "@/components/admin-denied-logins";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import {
@@ -56,7 +60,7 @@ export default async function AdminPage({ searchParams }: Props) {
       : undefined;
   const q = sp.q?.trim() || undefined;
 
-  const [spaces, memberships, counts, allowed, modules, deniedGroups, purchasesWithoutLogin] = await Promise.all([
+  const [spaces, memberships, counts, allowed, modules, deniedGroups, purchasesWithoutLogin, utmMetrics, giftPosts] = await Promise.all([
     tab === "spaces" ? listSpaces() : Promise.resolve([]),
     tab === "membros"
       ? listMemberships({ status: statusFilter, q })
@@ -68,6 +72,8 @@ export default async function AdminPage({ searchParams }: Props) {
     tab === "aulas" ? listAllModulesAdmin() : Promise.resolve([]),
     tab === "tentativas" ? listDeniedLoginGroups() : Promise.resolve([]),
     tab === "tentativas" ? listAllowlistWithoutUser() : Promise.resolve([]),
+    tab === "presentes" ? listUtmPostMetrics() : Promise.resolve([]),
+    tab === "presentes" ? listGiftPostsAdmin() : Promise.resolve([]),
   ]);
 
   return (
@@ -282,6 +288,26 @@ export default async function AdminPage({ searchParams }: Props) {
             publicados aparecem para membros.
           </p>
           <AdminAulasPanel modules={modules} />
+        </section>
+      ) : null}
+
+      {tab === "presentes" ? (
+        <section className="mt-8">
+          <h2 className="text-lg font-semibold">Links para o Instagram</h2>
+          <p className="mt-1 text-sm text-muted">
+            Publique o presente no space Presentes (com slug) e copie o link
+            do DM. Quem abre lê o conteúdo e se cadastra na mesma página.
+          </p>
+          <AdminGiftLinks
+            gifts={giftPosts.map((g) => ({ slug: g.slug, label: g.label }))}
+          />
+
+          <h3 className="mt-10 text-base font-semibold">Desempenho por post</h3>
+          <p className="mt-1 text-sm text-muted">
+            Visitas no link, cadastros e quem depois assinou plano pago
+            (PRO/Elite) com origem naquela postagem.
+          </p>
+          <AdminGiftMetrics rows={utmMetrics} />
         </section>
       ) : null}
 

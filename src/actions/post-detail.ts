@@ -70,8 +70,10 @@ export async function getPostDetailAction(
   const post = await getPost(postId, { viewerId: member.user.id });
   if (!post) return null;
 
-  // F041: mesma política de leitura da página do post.
-  if (!isPaidMembership(member.membership) && !canFreeReadPost(post.space.slug)) {
+  if (
+    !isPaidMembership(member.membership) &&
+    !canFreeReadPost(post.space.slug)
+  ) {
     return null;
   }
 

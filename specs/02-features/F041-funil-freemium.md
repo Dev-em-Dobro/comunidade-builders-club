@@ -24,8 +24,9 @@ Conteúdo e interação completos ficam para **paid** (compra Hubla / allowlist)
   `aula-threads`, que ficam fora do feed para todos os tiers)
 - **Abrir e ler qualquer post do feed**, inclusive de space pago — post
   completo, mídia e comentários
-- Spaces: **Boas-vindas**, **Geral**, **Presentes** (F059 — sem isso o cadastro
-  pelo Instagram cai em cadeado no que foi prometido). Avisos é PRO+ desde F053.
+- Spaces: **Boas-vindas**, **Geral**, **Presentes** (F059 — catálogo logado;
+  sem isso o cadastro pelo Instagram cai em cadeado no que foi prometido).
+  Avisos é PRO+ desde F053.
 - **Notificações**
 - **Perfil**
 

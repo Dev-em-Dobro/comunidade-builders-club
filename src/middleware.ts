@@ -7,11 +7,13 @@ import {
   origemCookieOptions,
   sanitizeGiftSlug,
   sanitizeUtmValue,
+  CADASTRO_LANDING_SLUG,
 } from "@/lib/gifts/origem";
 
 function isProtectedPath(pathname: string): boolean {
   if (pathname === "/") return true;
   if (pathname.startsWith("/presentes")) return false;
+  if (pathname.startsWith("/cadastro")) return false;
   return (
     pathname.startsWith("/spaces") ||
     pathname.startsWith("/posts") ||
@@ -28,14 +30,27 @@ function isProtectedPath(pathname: string): boolean {
 
 function applyOrigemCookie(request: NextRequest, response: NextResponse) {
   const { pathname } = request.nextUrl;
-  if (!pathname.startsWith("/presentes/")) return response;
   if (request.cookies.get(ORIGEM_COOKIE)) return response;
 
-  const utmContent = sanitizeUtmValue(
-    request.nextUrl.searchParams.get("utm_content"),
-  );
-  const giftSlug = sanitizeGiftSlug(pathname.split("/")[2] ?? "");
-  if (!utmContent || !giftSlug) return response;
+  const segments = pathname.split("/").filter(Boolean);
+  let giftSlug: string | null = null;
+  let utmContent: string | null = null;
+
+  if (segments[0] === "cadastro") {
+    giftSlug = CADASTRO_LANDING_SLUG;
+    utmContent =
+      sanitizeUtmValue(request.nextUrl.searchParams.get("utm_content")) ??
+      sanitizeUtmValue(segments[1] ?? "");
+  } else if (segments[0] === "presentes") {
+    giftSlug = sanitizeGiftSlug(segments[1] ?? "");
+    utmContent =
+      sanitizeUtmValue(request.nextUrl.searchParams.get("utm_content")) ??
+      sanitizeUtmValue(segments[2] ?? "");
+  } else {
+    return response;
+  }
+
+  if (!giftSlug) return response;
 
   response.cookies.set(
     ORIGEM_COOKIE,
@@ -85,5 +100,6 @@ export const config = {
     "/aguardando",
     "/login",
     "/presentes/:path*",
+    "/cadastro/:path*",
   ],
 };

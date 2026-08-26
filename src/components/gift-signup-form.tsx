@@ -7,7 +7,15 @@ import { completarCadastroPresenteAction } from "@/actions/gifts";
 
 type Step = "form" | "otp";
 
-export function GiftSignupForm() {
+type Props = {
+  headline?: string;
+  subhead?: string;
+};
+
+export function GiftSignupForm({
+  headline = "Crie sua conta e pegue os outros presentes",
+  subhead = "Conta gratuita. Você recebe um código no e-mail e continua nesta tela.",
+}: Props) {
   const router = useRouter();
   const [step, setStep] = useState<Step>("form");
   const [firstName, setFirstName] = useState("");
@@ -81,13 +89,13 @@ export function GiftSignupForm() {
 
   if (alreadyHadAccount) {
     return (
-      <div className="rounded-2xl border border-border/80 bg-card p-6">
+      <div id="cadastro-presente" className="rounded-2xl border border-border/80 bg-card p-6">
         <p className="text-sm font-semibold text-foreground">
           Você já tem conta, entramos com ela
         </p>
         <p className="mt-2 text-sm leading-relaxed text-muted">
-          Este e-mail já pertencia a um membro. A origem deste presente não
-          foi alterada.
+          Este e-mail já pertencia a um membro. A origem deste link não foi
+          alterada.
         </p>
       </div>
     );
@@ -96,6 +104,7 @@ export function GiftSignupForm() {
   if (step === "otp") {
     return (
       <form
+        id="cadastro-presente"
         onSubmit={onVerify}
         className="rounded-2xl border border-border/80 bg-card p-6"
       >
@@ -153,14 +162,15 @@ export function GiftSignupForm() {
 
   return (
     <form
+      id="cadastro-presente"
       onSubmit={onSend}
       className="rounded-2xl border border-border/80 bg-card p-6"
     >
       <p className="text-sm font-semibold text-foreground">
-        Crie sua conta e pegue os outros presentes
+        {headline}
       </p>
       <p className="mt-2 text-sm leading-relaxed text-muted">
-        Conta gratuita. Você recebe um código no e-mail e continua nesta tela.
+        {subhead}
       </p>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <label className="text-xs font-medium text-muted">
