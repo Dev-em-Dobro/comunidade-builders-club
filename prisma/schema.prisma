@@ -146,6 +146,10 @@ model Membership {
   /// F041/F053 — free | pro | elite (`paid` legado = pro).
   tier      MembershipTier   @default(free)
   role      Role             @default(member)
+  /// F059 — origem do cadastro. Gravado SÓ na criação, nunca em update.
+  originUtmContent String?   @map("origin_utm_content")
+  originGiftSlug   String?   @map("origin_gift_slug")
+  originAt         DateTime? @map("origin_at")
   /// F058 — cache da última versão legal aceita. Fonte da verdade é
   /// `legal_acceptance`; aqui só para o hot path do bootstrap não custar query.
   termosVersao String?       @map("termos_versao")
@@ -231,6 +235,8 @@ model Post {
   /// F018 — título gerado automaticamente a partir do body.
   title          String    @default("")
   body           String
+  /// F059 — presente publicável: slug preenchido = leitura pública liberada.
+  slug           String?   @unique
   imageUrl       String?
   linkUrl        String?
   videoUrl       String?
@@ -264,6 +270,22 @@ model PostView {
   @@unique([postId, userId])
   @@index([userId])
   @@map("post_view")
+}
+
+/// F059 — chegada anônima em um presente, com UTM. Uma linha por visita.
+model GiftVisit {
+  id          String   @id @default(cuid())
+  giftSlug    String   @map("gift_slug")
+  utmSource   String?  @map("utm_source")
+  utmMedium   String?  @map("utm_medium")
+  utmCampaign String?  @map("utm_campaign")
+  utmContent  String?  @map("utm_content")
+  referrer    String?
+  createdAt   DateTime @default(now())
+
+  @@index([utmContent, createdAt])
+  @@index([giftSlug, createdAt])
+  @@map("gift_visit")
 }
 
 model Comment {

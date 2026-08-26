@@ -19,11 +19,12 @@ const SPACES = [
     sortOrder: 0,
   },
   { slug: "avisos", name: "Avisos", description: "Comunicados oficiais", sortOrder: 1 },
-  { slug: "geral", name: "Geral", description: "Conversa aberta", sortOrder: 2 },
-  { slug: "duvidas", name: "Dúvidas", description: "Perguntas e respostas", sortOrder: 3 },
-  { slug: "freelas", name: "Indicação Freela", description: "Se tiver um freela pra indicar pra um colega, poste aqui", sortOrder: 4 },
-  { slug: "conquistas", name: "Conquistas", description: "Poste suas conquistas aqui, cliente fechado, proposta aceita, ou primeiro pagamento. Conte como foi o processo pra fechar a venda, isso ajuda a comunidade a crescer", sortOrder: 5 },
-  { slug: "projetos", name: "Desafio Projetos", description: "Poste aqui o projeto que você desenvolveu no desafio dos 7 dias. Pode ser só um site de amostra por enquanto, o importante é dar o primeiro passo, a venda vem depois", sortOrder: 6 },
+  { slug: "presentes", name: "Presentes", description: "Conteúdos liberados da divulgação", sortOrder: 2 },
+  { slug: "geral", name: "Geral", description: "Conversa aberta", sortOrder: 3 },
+  { slug: "duvidas", name: "Dúvidas", description: "Perguntas e respostas", sortOrder: 4 },
+  { slug: "freelas", name: "Indicação Freela", description: "Se tiver um freela pra indicar pra um colega, poste aqui", sortOrder: 5 },
+  { slug: "conquistas", name: "Conquistas", description: "Poste suas conquistas aqui, cliente fechado, proposta aceita, ou primeiro pagamento. Conte como foi o processo pra fechar a venda, isso ajuda a comunidade a crescer", sortOrder: 6 },
+  { slug: "projetos", name: "Desafio Projetos", description: "Poste aqui o projeto que você desenvolveu no desafio dos 7 dias. Pode ser só um site de amostra por enquanto, o importante é dar o primeiro passo, a venda vem depois", sortOrder: 7 },
 ] as const;
 
 async function main() {

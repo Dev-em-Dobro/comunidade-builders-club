@@ -314,14 +314,18 @@ function NovaPublicacaoFab({
   if (
     !isAdmin &&
     (pathname.startsWith("/spaces/boas-vindas") ||
-      pathname.startsWith("/spaces/avisos"))
+      pathname.startsWith("/spaces/avisos") ||
+      pathname.startsWith("/spaces/presentes"))
   ) {
     return null;
   }
 
   const spaceSlug = pathname.split("/")[2] ?? "";
   const href =
-    spaceSlug && spaceSlug !== "boas-vindas" && spaceSlug !== "avisos"
+    spaceSlug &&
+    spaceSlug !== "boas-vindas" &&
+    spaceSlug !== "avisos" &&
+    spaceSlug !== "presentes"
       ? `/nova?space=${spaceSlug}`
       : "/nova";
 

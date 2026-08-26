@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="360" viewBox="0 0 980 360" role="img">
+<title>Medição de cadastros por post do Instagram</title>
+<desc>utm_content no link vira visita e, no cadastro, origem no Membership.</desc>
+<rect width="980" height="360" fill="#fdfbf7"/>
+<g font-family="'Comic Sans MS', 'Segoe Print', cursive" fill="#1e1e1e">
+
+<text x="490" y="36" text-anchor="middle" font-size="20" font-weight="700">Como a Dev mede qual post trouxe gente</text>
+
+<path d="M40.0,73.0 Q160.0,65.0 280.0,72.0 Q285.0,110.0 280.0,148.0 Q160.0,155.0 40.0,147.0 Q35.0,110.0 40.0,73.0 Z" fill="#ffec99" fill-opacity="0.55" stroke="#1e1e1e" stroke-width="2" stroke-linejoin="round"/>
+<text x="160.0" y="101.0" text-anchor="middle" font-size="16" font-weight="700">Post do Instagram</text>
+<text x="160.0" y="124.0" text-anchor="middle" font-size="13">keyword + data</text>
+
+<text x="160" y="172" text-anchor="middle" font-size="12" fill="#5f5e5a">ex: agente-2026-08-21</text>
+
+<path d="M280,110 Q319.0,116 358,110" fill="none" stroke="#1e1e1e" stroke-width="2" stroke-linecap="round"/>
+<polygon points="358.0,110.0 348.3,115.3 348.3,104.7" fill="#1e1e1e"/>
+<text x="319.0" y="94" text-anchor="middle" font-size="13">1. vai no link do DM</text>
+
+
+<path d="M360.0,73.0 Q500.0,65.0 640.0,72.0 Q645.0,110.0 640.0,148.0 Q500.0,155.0 360.0,147.0 Q355.0,110.0 360.0,73.0 Z" fill="#eebefa" fill-opacity="0.55" stroke="#1e1e1e" stroke-width="2" stroke-linejoin="round"/>
+<text x="500.0" y="101.0" text-anchor="middle" font-size="16" font-weight="700">URL do presente</text>
+<text x="500.0" y="124.0" text-anchor="middle" font-size="13">utm_content = aquele post</text>
+
+
+<path d="M430,150 Q436,180.0 430,210" fill="none" stroke="#1e1e1e" stroke-width="2" stroke-linecap="round"/>
+<polygon points="430.0,210.0 424.7,200.3 435.3,200.3" fill="#1e1e1e"/>
+<text x="446" y="184.0" font-size="13">2a. visita humana</text>
+
+
+<path d="M570,150 Q576,180.0 570,210" fill="none" stroke="#1e1e1e" stroke-width="2" stroke-linecap="round"/>
+<polygon points="570.0,210.0 564.7,200.3 575.3,200.3" fill="#1e1e1e"/>
+<text x="586" y="184.0" font-size="13">2b. first-touch</text>
+
+
+<path d="M300.0,215.0 Q410.0,207.0 520.0,214.0 Q525.0,252.0 520.0,290.0 Q410.0,297.0 300.0,289.0 Q295.0,252.0 300.0,215.0 Z" fill="#a5d8ff" fill-opacity="0.55" stroke="#1e1e1e" stroke-width="2" stroke-linejoin="round"/>
+<text x="410.0" y="243.0" text-anchor="middle" font-size="16" font-weight="700">GiftVisit</text>
+<text x="410.0" y="266.0" text-anchor="middle" font-size="13">quantos abriram</text>
+
+
+<path d="M560.0,215.0 Q685.0,207.0 810.0,214.0 Q815.0,252.0 810.0,290.0 Q685.0,297.0 560.0,289.0 Q555.0,252.0 560.0,215.0 Z" fill="#b2f2bb" fill-opacity="0.55" stroke="#1e1e1e" stroke-width="2" stroke-linejoin="round"/>
+<text x="685.0" y="243.0" text-anchor="middle" font-size="16" font-weight="700">Membership.origin</text>
+<text x="685.0" y="266.0" text-anchor="middle" font-size="13">quantos criaram conta</text>
+
+<text x="490" y="330" text-anchor="middle" font-size="13">O post em si não entra no banco. O identificador é o utm_content.</text>
+
+</g>
+</svg>

@@ -4,7 +4,11 @@ import type { Membership, MembershipTier } from "@prisma/client";
 import { AULA_THREADS_SPACE_SLUG } from "@/lib/spaces/constants";
 
 /** Spaces cuja *página* é liberada para free (sidebar sem cadeado). */
-export const FREE_SPACE_SLUGS = ["boas-vindas", "geral"] as const;
+export const FREE_SPACE_SLUGS = [
+  "boas-vindas",
+  "geral",
+  "presentes",
+] as const;
 
 export type FreeSpaceSlug = (typeof FREE_SPACE_SLUGS)[number];
 
