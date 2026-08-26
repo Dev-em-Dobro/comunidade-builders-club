@@ -57,3 +57,6 @@ scripts/perf-reports/
 
 # rascunho local do texto de PR
 /pr-das-mudancas.md
+/fazer-depois.md
+/testar-passo-a-passo-emproducao.md
+/mudanca-presente.md
