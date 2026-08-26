@@ -1,7 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useRef, useState, useTransition, type ReactNode } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
+  type ReactNode,
+} from "react";
 import { toggleReactionAction, createCommentAction } from "@/actions/engagement";
 import {
   deletePostAction,
@@ -15,6 +21,7 @@ import {
 import { MentionTextarea } from "@/components/mention-textarea";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { useUpgradeOptional } from "@/components/upgrade-modal";
+import { HeartIcon } from "@/components/post-icons";
 import { MarkdownBody } from "@/lib/markdown";
 import { UPGRADE_REQUIRED } from "@/lib/membership/errors";
 
@@ -34,6 +41,103 @@ async function uploadFile(file: File): Promise<{ url: string; kind: string }> {
     throw new Error(data.error ?? "Falha no upload.");
   }
   return { url: data.url, kind: data.kind ?? "image" };
+}
+
+/**
+ * F060 — reagir vira ícone + contagem (era o botão "Reagir (3)").
+ * Usado na barra de interações do post e no card expandido.
+ *
+ * O coração pinta e conta na hora do clique (estado otimista) — esperar o
+ * round-trip faria a animação tocar num ícone ainda cinza. Se o servidor
+ * recusar, volta ao valor real.
+ */
+export function ReactionButton({
+  postId,
+  liked,
+  reactionCount,
+  isPaid = true,
+}: {
+  postId: string;
+  liked: boolean;
+  reactionCount: number;
+  isPaid?: boolean;
+}) {
+  const router = useRouter();
+  const upgrade = useUpgradeOptional();
+  const [, start] = useTransition();
+  const [otimista, setOtimista] = useState<{
+    liked: boolean;
+    count: number;
+  } | null>(null);
+  /** Muda a cada clique: a key remonta o nó e reinicia a animação. */
+  const [anim, setAnim] = useState<{ n: number; liked: boolean }>({
+    n: 0,
+    liked: false,
+  });
+
+  // Chegou dado novo do servidor: o otimista cumpriu o papel.
+  useEffect(() => {
+    setOtimista(null);
+  }, [liked, reactionCount]);
+
+  const marcado = otimista?.liked ?? liked;
+  const total = otimista?.count ?? reactionCount;
+
+  function reagir() {
+    if (!isPaid) {
+      upgrade?.openUpgrade("reagir");
+      return;
+    }
+    const proximo = !marcado;
+    setOtimista({ liked: proximo, count: Math.max(0, total + (proximo ? 1 : -1)) });
+    setAnim((a) => ({ n: a.n + 1, liked: proximo }));
+
+    start(async () => {
+      try {
+        await toggleReactionAction(postId);
+        router.refresh();
+      } catch (e) {
+        setOtimista(null);
+        if (e instanceof Error && e.message.includes(UPGRADE_REQUIRED)) {
+          upgrade?.openUpgrade("reagir");
+        }
+      }
+    });
+  }
+
+  const corDoIcone = marcado
+    ? "text-red-500 dark:text-red-400"
+    : "transition-colors group-hover:text-red-500";
+
+  return (
+    <button
+      type="button"
+      className="group inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-1.5 py-1 text-muted transition-colors"
+      aria-pressed={marcado}
+      aria-label={marcado ? "Remover reação" : "Reagir"}
+      title={marcado ? "Remover reação" : "Reagir"}
+      onClick={reagir}
+    >
+      <span className="relative inline-flex items-center justify-center">
+        <span
+          key={anim.n}
+          className={`inline-flex ${
+            anim.n === 0 ? "" : anim.liked ? "heart-pop" : "heart-undo"
+          }`}
+        >
+          <HeartIcon filled={marcado} className={corDoIcone} />
+        </span>
+        {anim.n > 0 && anim.liked ? (
+          <HeartIcon
+            key={`sobe-${anim.n}`}
+            filled
+            className="heart-float pointer-events-none absolute inset-0 text-red-500 dark:text-red-400"
+          />
+        ) : null}
+      </span>
+      <span className="text-[13px] tabular-nums">{total}</span>
+    </button>
+  );
 }
 
 export function PostActions({
@@ -67,7 +171,6 @@ export function PostActions({
   compact?: boolean;
 }) {
   const router = useRouter();
-  const upgrade = useUpgradeOptional();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pending, start] = useTransition();
   const [editing, setEditing] = useState(false);
@@ -115,32 +218,12 @@ export function PostActions({
     >
       <div className="flex flex-wrap items-center gap-2">
         {!compact ? (
-          <button
-            type="button"
-            className="btn-outline cursor-pointer text-xs"
-            disabled={pending}
-            onClick={() => {
-              if (!isPaid) {
-                upgrade?.openUpgrade("reagir");
-                return;
-              }
-              start(async () => {
-                try {
-                  await toggleReactionAction(postId);
-                  router.refresh();
-                } catch (e) {
-                  if (
-                    e instanceof Error &&
-                    e.message.includes(UPGRADE_REQUIRED)
-                  ) {
-                    upgrade?.openUpgrade("reagir");
-                  }
-                }
-              });
-            }}
-          >
-            {liked ? "Remover reação" : "Reagir"} ({reactionCount})
-          </button>
+          <ReactionButton
+            postId={postId}
+            liked={liked}
+            reactionCount={reactionCount}
+            isPaid={isPaid}
+          />
         ) : null}
         {isAdmin ? (
           <button
