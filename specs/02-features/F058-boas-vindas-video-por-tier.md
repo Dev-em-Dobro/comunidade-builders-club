@@ -33,5 +33,5 @@ Só a `src` do iframe muda.
 ## Fora de escopo
 - Admin para trocar os IDs (constantes no código)
 - Trilha de Primeiros passos diferente por plano
-- Trocar o vídeo da 1ª aula do M01 no catálogo
+- Trocar o vídeo da aula “Como usar a comunidade” — feito em [F060](F060-aula-desafio-quick-win.md) (vídeo pago)
 - Progresso / conclusão do tutorial
