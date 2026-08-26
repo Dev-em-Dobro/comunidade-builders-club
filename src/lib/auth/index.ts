@@ -6,6 +6,7 @@ import { prisma } from "@/lib/db";
 import { sendMagicLinkEmail, sendOtpEmail } from "@/lib/email";
 import { NOME_PRODUTO } from "@/lib/produto";
 import { ensureMemberBootstrap } from "@/lib/membership/bootstrap";
+import { recordDeniedLoginIfUnauthorized } from "@/lib/admin/denied-logins";
 import { loadAuthEnv } from "./env";
 
 const env = loadAuthEnv();
@@ -55,6 +56,7 @@ export const auth = betterAuth({
             user.image,
             user.email,
           );
+          await recordDeniedLoginIfUnauthorized(user.email);
         },
       },
     },
@@ -63,6 +65,7 @@ export const auth = betterAuth({
     magicLink({
       expiresIn: 60 * 5,
       sendMagicLink: async ({ email, url }) => {
+        await recordDeniedLoginIfUnauthorized(email);
         await sendMagicLinkEmail({ to: email, url });
       },
     }),

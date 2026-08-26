@@ -5,6 +5,7 @@ import {
   canFreeReadPost,
   isFreeSpaceSlug,
   isPaidMembership,
+  hrefPlanos,
 } from "@/lib/membership/capabilities";
 import { getPost, recordPostView } from "@/lib/posts";
 import {
@@ -33,7 +34,7 @@ export default async function PostPage({ params }: Props) {
   const isPaid = isPaidMembership(member.membership);
   // F041: free lê qualquer post da vitrine (feed). Interagir continua paid.
   if (!isPaid && !canFreeReadPost(post.space.slug)) {
-    redirect("/?upgrade=1");
+    redirect(hrefPlanos());
   }
 
   void recordPostView(post.id, member.user.id);

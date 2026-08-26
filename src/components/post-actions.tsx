@@ -331,7 +331,7 @@ export function CommentForm({
     return (
       <div className="mt-3 rounded-xl border border-border bg-surface/40 p-4">
         <p className="text-sm text-muted">
-          Comentários fazem parte do acesso completo.
+          Comentários fazem parte do acesso PRO e Elite.
         </p>
         <button
           type="button"

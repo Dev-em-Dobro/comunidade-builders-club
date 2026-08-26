@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { requirePaidMemberOrRedirect } from "@/lib/membership/require-member";
+import { hrefPlanos } from "@/lib/membership/capabilities";
 import { searchAll } from "@/lib/search";
 import { PostCard } from "@/components/post-card";
 
 type Props = { searchParams: Promise<{ q?: string }> };
 
 export default async function BuscaPage({ searchParams }: Props) {
-  const member = await requirePaidMemberOrRedirect();
+  const member = await requirePaidMemberOrRedirect(hrefPlanos({ motivo: "busca" }));
 
   const { q = "" } = await searchParams;
   const results = q.trim().length >= 2 ? await searchAll(q) : null;

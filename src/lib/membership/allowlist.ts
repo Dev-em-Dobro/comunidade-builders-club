@@ -30,19 +30,15 @@ export async function addAllowedEmail(opts: {
     },
   });
 
-  // F041 — allowlist promove para paid se o user já existir.
+  // F053 — allowlist promove para pro se o user já existir (não rebaixa elite).
   const user = await prisma.user.findUnique({ where: { email } });
   if (user) {
     const m = await prisma.membership.findUnique({ where: { userId: user.id } });
-    if (m && m.role !== "admin") {
+    if (m) {
+      const tier = m.tier === "elite" ? "elite" : "pro";
       await prisma.membership.update({
         where: { userId: user.id },
-        data: { status: "active", tier: "paid" },
-      });
-    } else if (m?.role === "admin") {
-      await prisma.membership.update({
-        where: { userId: user.id },
-        data: { status: "active", tier: "paid" },
+        data: { status: "active", tier },
       });
     }
   }

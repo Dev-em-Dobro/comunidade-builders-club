@@ -101,8 +101,45 @@ export default function PrivacidadePage() {
       </section>
 
       <section className="space-y-3">
+        <h2 className="text-base font-semibold text-foreground">4. Cookies</h2>
+        <p>
+          Usamos o mínimo necessário para o serviço funcionar:
+        </p>
+        <ul className="list-disc space-y-2 pl-5">
+          <li>
+            <strong className="font-medium text-foreground">
+              Sessão (necessário):
+            </strong>{" "}
+            cookie do Better Auth que mantém você conectado. Sem ele não há
+            login. Por ser estritamente necessário, não depende de
+            consentimento prévio.
+          </li>
+          <li>
+            <strong className="font-medium text-foreground">
+              Preferência de tema:
+            </strong>{" "}
+            claro ou escuro, guardado no seu navegador (armazenamento local, não
+            é cookie) só para a tela abrir do jeito que você deixou.
+          </li>
+          <li>
+            <strong className="font-medium text-foreground">
+              Medição (opcional):
+            </strong>{" "}
+            só com o seu aceite no aviso de cookies. Enquanto você não aceitar,
+            nenhum script de medição é carregado. Recusar não afeta o acesso à
+            comunidade.
+          </li>
+        </ul>
+        <p>
+          Sua escolha fica guardada em um cookie próprio por 6 meses. Para
+          mudar, apague os cookies do site no seu navegador — o aviso aparece de
+          novo.
+        </p>
+      </section>
+
+      <section className="space-y-3">
         <h2 className="text-base font-semibold text-foreground">
-          4. Compartilhamento
+          5. Compartilhamento
         </h2>
         <p>
           Compartilhamos dados com subprocessadores necessários ao serviço,
@@ -116,19 +153,23 @@ export default function PrivacidadePage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-base font-semibold text-foreground">5. Retenção</h2>
+        <h2 className="text-base font-semibold text-foreground">6. Retenção</h2>
         <p>
           Mantemos os dados enquanto a conta/membership existir e for
-          necessária à prestação do serviço. Você pode solicitar exclusão da
-          conta e dos dados associados pelo contato abaixo; atenderemos no
-          prazo legal, ressalvadas retenções obrigatórias e conteúdo cuja
-          remoção afete direitos de terceiros ou obrigações legais.
+          necessária à prestação do serviço. Você pode excluir sua conta a
+          qualquer momento em <strong className="font-medium">Perfil</strong>:
+          nome, e-mail, bio e foto são removidos na hora e o acesso é
+          encerrado. O que você publicou continua na comunidade sem
+          identificação, assinado como &ldquo;Membro removido&rdquo; — remover
+          também as conversas afetaria quem respondeu a elas. Para qualquer
+          outro pedido, use o contato abaixo; atenderemos no prazo legal,
+          ressalvadas retenções obrigatórias.
         </p>
       </section>
 
       <section className="space-y-3">
         <h2 className="text-base font-semibold text-foreground">
-          6. Seus direitos (LGPD)
+          7. Seus direitos (LGPD)
         </h2>
         <p>
           Você pode solicitar confirmação de tratamento, acesso, correção,
@@ -139,7 +180,7 @@ export default function PrivacidadePage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-base font-semibold text-foreground">7. Segurança</h2>
+        <h2 className="text-base font-semibold text-foreground">8. Segurança</h2>
         <p>
           Adotamos medidas técnicas e organizacionais razoáveis: autenticação
           sem senha (OAuth / magic link / código por e-mail), controle de
@@ -151,7 +192,7 @@ export default function PrivacidadePage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-base font-semibold text-foreground">8. Contato</h2>
+        <h2 className="text-base font-semibold text-foreground">9. Contato</h2>
         <p>
           Pedidos de titulares e privacidade:{" "}
           <a

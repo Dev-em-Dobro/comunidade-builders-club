@@ -1,4 +1,5 @@
 import { requirePaidMemberOrRedirect } from "@/lib/membership/require-member";
+import { hrefPlanos } from "@/lib/membership/capabilities";
 import {
   listCompletedLessonIds,
   listPublishedModules,
@@ -7,7 +8,7 @@ import { EmptyState } from "@/components/empty-state";
 import { AulasCatalog, mapModule } from "@/components/aulas-catalog";
 
 export default async function AulasPage() {
-  const member = await requirePaidMemberOrRedirect();
+  const member = await requirePaidMemberOrRedirect(hrefPlanos({ motivo: "aulas" }));
   const [modules, completed] = await Promise.all([
     listPublishedModules(),
     listCompletedLessonIds(member.user.id),

@@ -1,18 +1,15 @@
-// F014 / F021 — POST /api/webhooks/hubla (Hubla → AllowedEmail + membership).
+// F014 / F021 / F053 — POST /api/webhooks/hubla (Hubla → AllowedEmail + membership).
 
 import { timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { processarWebhookHubla } from "@/lib/hubla";
+import { mapaOfertasHubla, mapaProdutosHubla, webhookHublaConfigurado } from "@/lib/hubla/produtos";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 function tokenEsperado(): string | null {
   return process.env.HUBLA_WEBHOOK_TOKEN?.trim() || null;
-}
-
-function productIdFiltro(): string | null {
-  return process.env.HUBLA_PRODUCT_ID?.trim() || null;
 }
 
 function tokenValido(recebido: string, esperado: string): boolean {
@@ -31,10 +28,14 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const productId = productIdFiltro();
-  if (!productId) {
+  const productPlanMap = mapaProdutosHubla();
+  const offerPlanMap = mapaOfertasHubla();
+  if (!webhookHublaConfigurado(productPlanMap, offerPlanMap)) {
     return NextResponse.json(
-      { ok: false, erro: "HUBLA_PRODUCT_ID não configurado" },
+      {
+        ok: false,
+        erro: "HUBLA_PRODUCT_ID / HUBLA_OFFER_ID_PRO / HUBLA_OFFER_ID_ELITE não configurado",
+      },
       { status: 503 },
     );
   }
@@ -63,7 +64,8 @@ export async function POST(request: NextRequest) {
 
   try {
     const resultado = await processarWebhookHubla(payload, {
-      productIdFiltro: productId,
+      productPlanMap,
+      offerPlanMap,
       idempotencyKey,
       eventType,
     });

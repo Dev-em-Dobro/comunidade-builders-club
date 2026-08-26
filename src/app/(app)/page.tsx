@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
 import { listPosts } from "@/lib/posts";
-import { isPaidMembership } from "@/lib/membership/capabilities";
+import { hrefPlanos, isPaidMembership } from "@/lib/membership/capabilities";
 import {
   AULA_THREADS_SPACE_SLUG,
   PRESENTES_SPACE_SLUG,
@@ -92,8 +92,9 @@ export default async function HomePage({ searchParams }: Props) {
     redirect(`/spaces/${WELCOME_SPACE_SLUG}`);
   }
 
-  const { error } = await searchParams;
+  const { error, upgrade } = await searchParams;
   if (error) redirect("/");
+  if (upgrade === "1") redirect(hrefPlanos());
 
   const isPaid = isPaidMembership(member.membership);
   const isAdmin = member.membership.role === "admin";
@@ -117,12 +118,12 @@ export default async function HomePage({ searchParams }: Props) {
             ) : (
               <>
                 Plano gratuito: leitura do feed liberada. Comentar, reagir e os
-                spaces exclusivos são do acesso completo.{" "}
+                spaces da comunidade são do PRO e do Elite.{" "}
                 <Link
-                  href="/?upgrade=1"
+                  href={hrefPlanos()}
                   className="font-medium text-accent hover:underline"
                 >
-                  Desbloquear tudo
+                  Ver planos
                 </Link>
               </>
             )}

@@ -1,9 +1,17 @@
 // F014 / F041 — persistência Hubla → AllowedEmail + Membership.tier.
 
+import type { MembershipTier } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { addAllowedEmail, removeAllowedEmail } from "@/lib/membership/allowlist";
 import { interpretarEventoHubla } from "./interpretar";
+import type { PlanoPagoHubla } from "./produtos";
 import type { AcaoAllowlist, HublaWebhookPayload } from "./tipos";
+
+function rankPago(tier: MembershipTier | PlanoPagoHubla): number {
+  if (tier === "elite") return 3;
+  if (tier === "pro" || tier === "paid") return 2;
+  return 1;
+}
 
 export async function jaProcessouIdempotency(key: string): Promise<boolean> {
   const row = await prisma.hublaWebhookDelivery.findUnique({
@@ -24,7 +32,10 @@ export async function registrarEntrega(
   });
 }
 
-async function concederPaid(email: string): Promise<void> {
+async function concederPago(
+  email: string,
+  plan: PlanoPagoHubla,
+): Promise<void> {
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) return;
   const m = await prisma.membership.findUnique({ where: { userId: user.id } });
@@ -33,22 +44,17 @@ async function concederPaid(email: string): Promise<void> {
       data: {
         userId: user.id,
         status: "active",
-        tier: "paid",
+        tier: plan,
         role: "member",
       },
     });
     return;
   }
-  if (m.role === "admin") {
-    await prisma.membership.update({
-      where: { userId: user.id },
-      data: { status: "active", tier: "paid" },
-    });
-    return;
-  }
+  const nextTier =
+    rankPago(plan) >= rankPago(m.tier) ? plan : m.tier;
   await prisma.membership.update({
     where: { userId: user.id },
-    data: { status: "active", tier: "paid" },
+    data: { status: "active", tier: nextTier },
   });
 }
 
@@ -71,9 +77,11 @@ export async function aplicarAcaoAllowlist(acao: AcaoAllowlist): Promise<void> {
     await addAllowedEmail({
       email: acao.email,
       source: "hubla",
-      note: `product:${acao.productId}`,
+      note: acao.offerId
+        ? `product:${acao.productId} offer:${acao.offerId}`
+        : `product:${acao.productId}`,
     });
-    await concederPaid(acao.email);
+    await concederPago(acao.email, acao.plan);
     return;
   }
 
@@ -88,7 +96,8 @@ export async function aplicarAcaoAllowlist(acao: AcaoAllowlist): Promise<void> {
 export async function processarWebhookHubla(
   payload: unknown,
   opts: {
-    productIdFiltro?: string | null;
+    productPlanMap?: Map<string, PlanoPagoHubla> | null;
+    offerPlanMap?: Map<string, PlanoPagoHubla> | null;
     idempotencyKey?: string | null;
     eventType: string;
   },
@@ -99,10 +108,10 @@ export async function processarWebhookHubla(
     }
   }
 
-  const acao = interpretarEventoHubla(
-    payload as HublaWebhookPayload,
-    opts.productIdFiltro,
-  );
+  const acao = interpretarEventoHubla(payload as HublaWebhookPayload, {
+    productPlanMap: opts.productPlanMap,
+    offerPlanMap: opts.offerPlanMap,
+  });
 
   if (acao.acao === "ignorar") {
     if (opts.idempotencyKey) {

@@ -84,9 +84,9 @@ As postagens pertencem a uma categoria. Categorias iniciais:
 - Avisos
 - Geral
 - Dúvidas
-- Freelas
+- Indicação Freela
 - Conquistas
-- Projetos
+- Desafio Projetos
 
 > Space **Vagas** fora do escopo da comunidade — prospecção fica no Orion Lead Hunter.
 

@@ -13,11 +13,14 @@ export type TmbVendaPayload = {
   titulo?: string | null;
 };
 
+export type PlanoTmb = "pro" | "elite";
+
 export type AcaoTmb =
   | {
       acao: "conceder";
       email: string;
       productId: string;
+      plan: PlanoTmb;
       pedido: string;
       nome?: string;
       lancamentoId?: string;
@@ -25,11 +28,16 @@ export type AcaoTmb =
   | { acao: "revogar"; email: string; productId: string; pedido: string }
   | { acao: "ignorar"; motivo: string };
 
-/** Codes das 3 ofertas Mentoria Freela (checkout pay.tmb.com.br). */
-export const TMB_MENTORIA_CODES_DEFAULT = [
-  "1AS249898VN",
+/** Boleto Elite (F053) — checkout TMB. */
+export const TMB_ELITE_CODES_DEFAULT = [
   "3XB272209KV",
   "9DW254247E5",
+] as const;
+
+/** Codes aceitos no webhook (Mentoria PRO + boleto Elite). */
+export const TMB_MENTORIA_CODES_DEFAULT = [
+  "1AS249898VN",
+  ...TMB_ELITE_CODES_DEFAULT,
 ] as const;
 
 export const STATUS_PEDIDO_GRANT = "efetivado";

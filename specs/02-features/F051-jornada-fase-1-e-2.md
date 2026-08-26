@@ -15,8 +15,8 @@ confirmação.
 ```
 FASE 1 — Do zero ao primeiro sim     ← raiz (rascunho)
 ├── Comece por aqui                  ← M01
+│   ├── Como usar a comunidade       ← 1ª aula; mesmo vídeo da Boas-vindas (F055)
 │   ├── Introdução ao Builders Club
-│   ├── Como usar a comunidade       ← mesmo vídeo da tela Boas-vindas
 │   ├── Bem-vindo e mapa da jornada
 │   └── O que você vai construir…
 ├── Escolha o nicho e o que vender   ← M02

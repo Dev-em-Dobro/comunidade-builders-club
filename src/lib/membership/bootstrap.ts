@@ -1,8 +1,14 @@
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
 import type { Membership, Profile } from "@prisma/client";
+import { VERSAO_LEGAL } from "@/lib/legal";
 import { isEmailAllowed } from "./allowlist";
 import { parseOrigemCookie, ORIGEM_COOKIE } from "@/lib/gifts/origem";
+import {
+  precisaRegistrarAceite,
+  registrarAceiteLegal,
+  type ContextoAceite,
+} from "./aceite-legal";
 
 export type BootstrapResult = {
   membership: Membership;
@@ -12,10 +18,39 @@ export type BootstrapResult = {
 /**
  * Garante Profile + Membership no login (F041 freemium).
  *
- * Hot path (membro active + profile): **1 query** no Postgres.
+ * Hot path (membro active + profile, aceite em dia): **1 query** no Postgres.
  * Email vem da sessão quando possível (sem SELECT em user).
+ *
+ * F058 — `contexto` (IP / user-agent) só é usado quando há aceite a registrar,
+ * o que acontece no primeiro login e quando a versão dos documentos muda.
  */
 export async function ensureMemberBootstrap(
+  userId: string,
+  name: string,
+  image: string | null | undefined,
+  emailFromSession?: string | null,
+  contexto?: ContextoAceite,
+): Promise<BootstrapResult | null> {
+  const resultado = await resolverBootstrap(
+    userId,
+    name,
+    image,
+    emailFromSession,
+  );
+  if (!resultado) return null;
+
+  if (!precisaRegistrarAceite(resultado.membership.termosVersao)) {
+    return resultado;
+  }
+
+  await registrarAceiteLegal(userId, contexto);
+  return {
+    ...resultado,
+    membership: { ...resultado.membership, termosVersao: VERSAO_LEGAL },
+  };
+}
+
+async function resolverBootstrap(
   userId: string,
   name: string,
   image: string | null | undefined,
@@ -43,7 +78,7 @@ export async function ensureMemberBootstrap(
     if (isBootstrapAdmin && existing.role !== "admin") {
       const membership = await prisma.membership.update({
         where: { userId },
-        data: { status: "active", tier: "paid", role: "admin" },
+        data: { status: "active", tier: "elite", role: "admin" },
       });
       return { membership, profile };
     }
@@ -71,7 +106,7 @@ export async function ensureMemberBootstrap(
       data: {
         userId,
         status: "active",
-        tier: allowed || isBootstrapAdmin ? "paid" : "free",
+        tier: isBootstrapAdmin ? "elite" : allowed ? "pro" : "free",
         role: isBootstrapAdmin ? "admin" : "member",
         ...(origin
           ? {
@@ -89,7 +124,7 @@ export async function ensureMemberBootstrap(
     if (isBootstrapAdmin) {
       const membership = await prisma.membership.update({
         where: { userId },
-        data: { status: "active", tier: "paid", role: "admin" },
+        data: { status: "active", tier: "elite", role: "admin" },
       });
       return { membership, profile: nextProfile };
     }
@@ -101,7 +136,7 @@ export async function ensureMemberBootstrap(
       where: { userId },
       data: {
         status: "active",
-        tier: allowed || isBootstrapAdmin ? "paid" : "free",
+        tier: isBootstrapAdmin ? "elite" : allowed ? "pro" : "free",
         ...(isBootstrapAdmin ? { role: "admin" as const } : {}),
       },
     });

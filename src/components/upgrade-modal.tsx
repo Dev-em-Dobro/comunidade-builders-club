@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   createContext,
   useCallback,
@@ -8,48 +9,18 @@ import {
   useMemo,
   useState,
 } from "react";
-import type { UpgradeReason } from "@/lib/membership/capabilities";
-
-const REASON_COPY: Record<UpgradeReason, { title: string; body: string }> = {
-  space: {
-    title: "Space exclusivo para membros",
-    body: "Faça upgrade do Builders Club para entrar neste space e participar das conversas.",
-  },
-  materiais: {
-    title: "Materiais para membros",
-    body: "O arsenal, prompts, contratos e kits ficam liberados na versão completa do Builders Club.",
-  },
-  aulas: {
-    title: "Aulas para membros",
-    body: "Assista às aulas e marque progresso com o acesso completo do Builders Club.",
-  },
-  busca: {
-    title: "Busca para membros",
-    body: "Pesquisar posts e membros faz parte do acesso completo.",
-  },
-  publicar: {
-    title: "Publicar é para membros",
-    body: "Para criar publicações, comente e participe ativamente, faça o upgrade.",
-  },
-  comentar: {
-    title: "Comentar é para membros",
-    body: "Interações (comentários e respostas) ficam liberadas no acesso completo.",
-  },
-  reagir: {
-    title: "Reagir é para membros",
-    body: "Reações fazem parte do acesso completo do Builders Club.",
-  },
-  geral: {
-    title: "Desbloqueie o Builders Club",
-    body: "Você está no plano gratuito. Com o acesso completo, libera spaces, materiais, aulas e interações.",
-  },
-};
+import {
+  hrefPlanos,
+  UPGRADE_REASON_COPY,
+  type UpgradeReason,
+} from "@/lib/membership/capabilities";
 
 type UpgradeCtx = {
   isPaid: boolean;
-  checkoutUrl: string;
+  isElite: boolean;
   openUpgrade: (reason?: UpgradeReason) => void;
   requirePaid: (reason?: UpgradeReason) => boolean;
+  requireElite: (reason?: UpgradeReason) => boolean;
 };
 
 const Ctx = createContext<UpgradeCtx | null>(null);
@@ -69,12 +40,12 @@ export function useUpgradeOptional() {
 
 export function UpgradeProvider({
   isPaid,
-  checkoutUrl,
+  isElite = false,
   children,
   autoOpen = false,
 }: {
   isPaid: boolean;
-  checkoutUrl: string;
+  isElite?: boolean;
   children: React.ReactNode;
   autoOpen?: boolean;
 }) {
@@ -95,6 +66,15 @@ export function UpgradeProvider({
     [isPaid, openUpgrade],
   );
 
+  const requireElite = useCallback(
+    (r: UpgradeReason = "orion") => {
+      if (isElite) return true;
+      openUpgrade(r);
+      return false;
+    },
+    [isElite, openUpgrade],
+  );
+
   useEffect(() => {
     if (autoOpen && !isPaid) {
       setReason("geral");
@@ -102,12 +82,32 @@ export function UpgradeProvider({
     }
   }, [autoOpen, isPaid]);
 
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
   const value = useMemo(
-    () => ({ isPaid, checkoutUrl, openUpgrade, requirePaid }),
-    [isPaid, checkoutUrl, openUpgrade, requirePaid],
+    () => ({
+      isPaid,
+      isElite,
+      openUpgrade,
+      requirePaid,
+      requireElite,
+    }),
+    [isPaid, isElite, openUpgrade, requirePaid, requireElite],
   );
 
-  const copy = REASON_COPY[reason];
+  const copy = UPGRADE_REASON_COPY[reason];
+  const eliteOnly = isPaid && !isElite;
+  const planosHref = hrefPlanos({
+    motivo: reason,
+    destaque: eliteOnly ? "elite" : undefined,
+  });
 
   return (
     <Ctx.Provider value={value}>
@@ -124,40 +124,35 @@ export function UpgradeProvider({
             role="dialog"
             aria-modal="true"
             aria-labelledby="upgrade-title"
-            className="relative z-10 w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl"
+            className="relative z-10 w-full max-w-md rounded-2xl border border-border bg-card p-5 shadow-2xl sm:p-6"
           >
             <p className="text-xs font-semibold uppercase tracking-wide text-accent">
               Builders Club
             </p>
             <h2
               id="upgrade-title"
-              className="mt-2 font-[family-name:var(--font-outfit)] text-xl font-bold"
+              className="mt-2 font-[family-name:var(--font-outfit)] text-xl font-bold sm:text-2xl"
             >
-              {copy.title}
+              {eliteOnly ? "Evolua para o Elite" : copy.title}
             </h2>
             <p className="mt-2 text-[15px] leading-relaxed text-muted">
-              {copy.body}
+              {eliteOnly
+                ? "Você já tem o PRO. O Elite libera Orion, reunião semanal em grupo e material extra."
+                : copy.body}
             </p>
-            <div className="mt-6 flex flex-col gap-2 sm:flex-row-reverse">
-              <a
-                href={checkoutUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-primary flex-1 text-center"
-              >
-                Comprar Builders Club
-              </a>
+
+            <div className="mt-6 flex items-center justify-between gap-3">
               <button
                 type="button"
-                className="btn-ghost flex-1"
+                className="btn-ghost cursor-pointer px-2 text-sm"
                 onClick={() => setOpen(false)}
               >
                 Agora não
               </button>
+              <Link href={planosHref} className="btn-primary" onClick={() => setOpen(false)}>
+                Ver planos
+              </Link>
             </div>
-            <p className="mt-4 text-center text-xs text-muted">
-              Oferta em definição — o link pode ser atualizado em breve.
-            </p>
           </div>
         </div>
       ) : null}

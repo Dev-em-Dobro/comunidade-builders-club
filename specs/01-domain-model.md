@@ -15,8 +15,9 @@ Diagnóstico, Outreach, Entregável — este último só na Fase 2 de migração
 | Termo | Significado |
 |-------|-------------|
 | **Membro** | Usuário com membership na comunidade. |
-| **Membership** | Estado de acesso: `pending` \| `active` \| `revoked` + papel. |
+| **Membership** | Estado de acesso: `pending` \| `active` \| `revoked` + papel + **tier** `free` \| `pro` \| `elite` (`paid` legado = PRO; F041/F053). |
 | **Allowlist** | E-mails pré-aprovados (`AllowedEmail`); login → `active` (F012). |
+| **Tentativa recusada** | Pedido de entrada com e-mail **fora** da allowlist (`DeniedLoginAttempt`). Não bloqueia o login free (F041); alimenta a aba Admin (F054). |
 | **Papel (Role)** | `member` \| `instructor` \| `admin`. |
 | **Perfil** | Foto, nome de exibição, bio, data de entrada. |
 | **Space** | Categoria de discussão (Avisos, Geral, …). |
@@ -25,6 +26,9 @@ Diagnóstico, Outreach, Entregável — este último só na Fase 2 de migração
 | **Comentário** | Resposta a um Post (1 nível no MVP). |
 | **Reação** | Curtida/reação a Post ou Comentário. |
 | **Notificação** | Aviso in-app (comentário, reação, resposta). |
+| **Entrada (CS)** | Relógio da reunião de CS (F057): compra (allowlist Hubla/TMB/Orion) para pagante; primeiro login para Free. Recorte ≥ 2026-08-24. |
+| **Ativação pagante** | Post com link público no Desafio Projetos (`projetos`) em até 7 dias da entrada (F057). |
+| **Ativação Free** | Primeira busca (coleta de Lead) no Orion em até 3 dias da entrada (F057). |
 
 ## Spaces iniciais (seed)
 
@@ -34,9 +38,9 @@ Diagnóstico, Outreach, Entregável — este último só na Fase 2 de migração
 | `presentes` | Presentes |
 | `geral` | Geral |
 | `duvidas` | Dúvidas |
-| `freelas` | Freelas |
+| `freelas` | Indicação Freela |
 | `conquistas` | Conquistas |
-| `projetos` | Projetos |
+| `projetos` | Desafio Projetos |
 
 > `vagas` removido — prospecção de oportunidades fica no Orion Lead Hunter.
 

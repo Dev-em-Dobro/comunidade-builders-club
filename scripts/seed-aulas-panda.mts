@@ -62,19 +62,19 @@ const CATALOG: ModuleSeed[] = [
         sortOrder: 0,
         lessons: [
           {
+            slug: "tutorial-intro-comunidade",
+            title: "Como usar a comunidade",
+            description:
+              "Tutorial da plataforma: Feed, Spaces, Aulas e como circular na comunidade. O mesmo vídeo aparece na tela de Boas-vindas. Primeira aula da jornada (F055).",
+            pandaVideoExternalId: "38608c40-7b9a-4b30-a33e-287bf5072af3",
+            sortOrder: 0,
+          },
+          {
             slug: "aula-introducao-builders-club",
             title: "Introdução ao Builders Club",
             description:
               "Aula de abertura: o que é o Builders Club, para quem é e como você entra na jornada.",
             pandaVideoExternalId: "19fad82c-70df-4dd1-ab5d-a6b44b18a58f",
-            sortOrder: 0,
-          },
-          {
-            slug: "tutorial-intro-comunidade",
-            title: "Como usar a comunidade",
-            description:
-              "Tutorial da plataforma: Feed, Spaces, Aulas e como circular na comunidade. O mesmo vídeo aparece na tela de Boas-vindas.",
-            pandaVideoExternalId: "38608c40-7b9a-4b30-a33e-287bf5072af3",
             sortOrder: 1,
           },
           {
