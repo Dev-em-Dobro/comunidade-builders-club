@@ -139,9 +139,20 @@ export const ICON_NOVA = (
   </NavIcon>
 );
 
+export const ICON_PRESENTES = (
+  <NavIcon>
+    <path d="M20 12v10H4V12" />
+    <path d="M2 7h20v5H2z" />
+    <path d="M12 22V7" />
+    <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
+    <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
+  </NavIcon>
+);
+
 const SPACE_ICONS: Record<string, React.ReactNode> = {
   "boas-vindas": ICON_BOAS_VINDAS,
   avisos: ICON_AVISOS,
+  presentes: ICON_PRESENTES,
   geral: ICON_GERAL,
   duvidas: ICON_DUVIDAS,
   freelas: ICON_FREELAS,

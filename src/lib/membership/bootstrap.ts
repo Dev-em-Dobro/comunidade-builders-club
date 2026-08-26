@@ -1,6 +1,8 @@
+import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
 import type { Membership, Profile } from "@prisma/client";
 import { isEmailAllowed } from "./allowlist";
+import { parseOrigemCookie, ORIGEM_COOKIE } from "@/lib/gifts/origem";
 
 export type BootstrapResult = {
   membership: Membership;
@@ -64,12 +66,20 @@ export async function ensureMemberBootstrap(
   }
 
   if (!existing) {
+    const origin = await readOrigemFromCookie();
     const membership = await prisma.membership.create({
       data: {
         userId,
         status: "active",
         tier: allowed || isBootstrapAdmin ? "paid" : "free",
         role: isBootstrapAdmin ? "admin" : "member",
+        ...(origin
+          ? {
+              originUtmContent: origin.utmContent,
+              originGiftSlug: origin.giftSlug,
+              originAt: new Date(),
+            }
+          : {}),
       },
     });
     return { membership, profile: nextProfile };
@@ -99,4 +109,13 @@ export async function ensureMemberBootstrap(
   }
 
   return { membership: existing, profile: nextProfile };
+}
+
+async function readOrigemFromCookie() {
+  try {
+    const jar = await cookies();
+    return parseOrigemCookie(jar.get(ORIGEM_COOKIE)?.value);
+  } catch {
+    return null;
+  }
 }

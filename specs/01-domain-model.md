@@ -21,6 +21,7 @@ Diagnóstico, Outreach, Entregável — este último só na Fase 2 de migração
 | **Perfil** | Foto, nome de exibição, bio, data de entrada. |
 | **Space** | Categoria de discussão (Avisos, Geral, …). |
 | **Post** | Publicação num Space (texto + mídia opcional). |
+| **Presente** | Post do space `presentes` com `slug` preenchido. Leitura **pública** em `/presentes/[slug]`; lista logada em `/spaces/presentes` (F059). |
 | **Comentário** | Resposta a um Post (1 nível no MVP). |
 | **Reação** | Curtida/reação a Post ou Comentário. |
 | **Notificação** | Aviso in-app (comentário, reação, resposta). |
@@ -30,6 +31,7 @@ Diagnóstico, Outreach, Entregável — este último só na Fase 2 de migração
 | Slug | Nome |
 |------|------|
 | `avisos` | Avisos |
+| `presentes` | Presentes |
 | `geral` | Geral |
 | `duvidas` | Dúvidas |
 | `freelas` | Freelas |

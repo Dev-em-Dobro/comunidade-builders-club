@@ -13,6 +13,7 @@ Orion, adaptadas ao Builders Club.
 - [x] Conteúdo adaptado à comunidade (não ao Lead Hunter)
 - [x] Links no login
 - [x] Data de atualização visível
+- [x] Cookie `bc_origem` e `GiftVisit` (sem IP) descritos na política (F059)
 
 ## Arquivos
 - `src/lib/legal.ts`

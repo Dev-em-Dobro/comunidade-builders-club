@@ -39,9 +39,9 @@ export default function PrivacidadePage() {
         <ul className="list-disc space-y-2 pl-5">
           <li>
             <strong className="font-medium text-foreground">Conta:</strong>{" "}
-            e-mail, nome (quando o provedor OAuth informar), foto de perfil
-            (se fornecida), identificadores de sessão e metadados de
-            autenticação (Better Auth).
+            e-mail, nome (quando o provedor OAuth informar ou no cadastro por
+            código), foto de perfil (se fornecida), identificadores de sessão
+            e metadados de autenticação (Better Auth).
           </li>
           <li>
             <strong className="font-medium text-foreground">Perfil:</strong>{" "}
@@ -65,6 +65,15 @@ export default function PrivacidadePage() {
             <strong className="font-medium text-foreground">Uso técnico:</strong>{" "}
             logs operacionais mínimos necessários para manter o serviço e
             segurança (sem gravar tokens de sessão em claro em logs de app).
+          </li>
+          <li>
+            <strong className="font-medium text-foreground">
+              Atribuição de presentes (F059):
+            </strong>{" "}
+            cookie first-touch <code>bc_origem</code> (qual divulgação gerou
+            o cadastro) e visitas anônimas ao presente (slug + UTM +
+            referrer, <strong>sem IP</strong>), só para medir o funil da
+            divulgação.
           </li>
         </ul>
       </section>
@@ -98,10 +107,10 @@ export default function PrivacidadePage() {
         <p>
           Compartilhamos dados com subprocessadores necessários ao serviço,
           por exemplo: hospedagem (ex.: Vercel), banco (ex.: Neon), e-mail
-          transacional do magic link (ex.: Resend), provedor de vídeo das
-          aulas (ex.: Panda Video) e, quando aplicável, a Hubla para
-          sincronizar elegibilidade de acesso. Conteúdo que você publica na
-          comunidade fica visível aos demais membros ativos. Não vendemos
+          transacional (magic link e código OTP, ex.: Resend), provedor de
+          vídeo das aulas (ex.: Panda Video) e, quando aplicável, a Hubla
+          para sincronizar elegibilidade de acesso. Conteúdo que você publica
+          na comunidade fica visível aos demais membros ativos. Não vendemos
           dados pessoais.
         </p>
       </section>
@@ -133,7 +142,8 @@ export default function PrivacidadePage() {
         <h2 className="text-base font-semibold text-foreground">7. Segurança</h2>
         <p>
           Adotamos medidas técnicas e organizacionais razoáveis: autenticação
-          sem senha (OAuth/magic link), controle de membership, HTTPS na
+          sem senha (OAuth / magic link / código por e-mail), controle de
+          membership, HTTPS na
           hospedagem, validação de inputs e acesso a materiais apenas para
           membros ativos. Nenhum sistema é 100% seguro — reporte incidentes
           para {emailPrivacidade}.

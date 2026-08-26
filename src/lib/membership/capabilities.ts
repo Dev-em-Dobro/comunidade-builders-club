@@ -8,6 +8,7 @@ export const FREE_SPACE_SLUGS = [
   "boas-vindas",
   "geral",
   "avisos",
+  "presentes",
 ] as const;
 
 export type FreeSpaceSlug = (typeof FREE_SPACE_SLUGS)[number];

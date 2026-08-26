@@ -8,7 +8,10 @@ export const WELCOME_TUTORIAL_VIDEO = {
   pandaVideoExternalId: "38608c40-7b9a-4b30-a33e-287bf5072af3",
   title: "Como usar a comunidade",
 } as const;
+
 export const AVISOS_SPACE_SLUG = "avisos" as const;
+/** Presentes divulgados no Instagram — leitura pública por slug (F059). */
+export const PRESENTES_SPACE_SLUG = "presentes" as const;
 /** Threads de comentários das aulas (oculto no menu / feed). */
 export const AULA_THREADS_SPACE_SLUG = "aula-threads" as const;
 
@@ -16,11 +19,15 @@ export const AULA_THREADS_SPACE_SLUG = "aula-threads" as const;
 export const ADMIN_ONLY_PUBLISH_SLUGS = [
   WELCOME_SPACE_SLUG,
   AVISOS_SPACE_SLUG,
+  PRESENTES_SPACE_SLUG,
   AULA_THREADS_SPACE_SLUG,
 ] as const;
 
 /** Spaces sem comentários (orientação / não conversa). */
-export const COMMENTS_DISABLED_SPACE_SLUGS = [WELCOME_SPACE_SLUG] as const;
+export const COMMENTS_DISABLED_SPACE_SLUGS = [
+  WELCOME_SPACE_SLUG,
+  PRESENTES_SPACE_SLUG,
+] as const;
 
 /** Não listar no sidebar nem no Feed global. */
 export const HIDDEN_NAV_SPACE_SLUGS = [AULA_THREADS_SPACE_SLUG] as const;

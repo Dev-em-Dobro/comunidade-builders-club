@@ -19,11 +19,12 @@ const SPACES = [
     sortOrder: 0,
   },
   { slug: "avisos", name: "Avisos", description: "Comunicados oficiais", sortOrder: 1 },
-  { slug: "geral", name: "Geral", description: "Conversa aberta", sortOrder: 2 },
-  { slug: "duvidas", name: "Dúvidas", description: "Perguntas e respostas", sortOrder: 3 },
-  { slug: "freelas", name: "Freelas", description: "Oportunidades de freela", sortOrder: 4 },
-  { slug: "conquistas", name: "Conquistas", description: "Vitórias da galera", sortOrder: 5 },
-  { slug: "projetos", name: "Projetos", description: "Mostre o que está construindo", sortOrder: 6 },
+  { slug: "presentes", name: "Presentes", description: "Conteúdos liberados da divulgação", sortOrder: 2 },
+  { slug: "geral", name: "Geral", description: "Conversa aberta", sortOrder: 3 },
+  { slug: "duvidas", name: "Dúvidas", description: "Perguntas e respostas", sortOrder: 4 },
+  { slug: "freelas", name: "Freelas", description: "Oportunidades de freela", sortOrder: 5 },
+  { slug: "conquistas", name: "Conquistas", description: "Vitórias da galera", sortOrder: 6 },
+  { slug: "projetos", name: "Projetos", description: "Mostre o que está construindo", sortOrder: 7 },
 ] as const;
 
 async function main() {

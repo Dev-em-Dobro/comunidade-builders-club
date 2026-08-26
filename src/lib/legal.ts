@@ -10,4 +10,4 @@ export const OPERADOR_LEGAL = {
   produto: NOME_PRODUTO,
 } as const;
 
-export const ATUALIZADO_EM = "3 de agosto de 2026";
+export const ATUALIZADO_EM = "25 de agosto de 2026";

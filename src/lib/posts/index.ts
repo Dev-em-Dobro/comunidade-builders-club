@@ -4,8 +4,17 @@ import { notifyMany } from "@/lib/notifications";
 import { resolveMentionedUserIds } from "@/lib/mentions";
 import { titleFromBody } from "@/lib/posts/title";
 import { optionalHttpsUrl, optionalMediaUrl } from "@/lib/security/urls";
-import { isAdminOnlyPublishSpace } from "@/lib/spaces/constants";
+import { isAdminOnlyPublishSpace, PRESENTES_SPACE_SLUG } from "@/lib/spaces/constants";
 import { ForbiddenError } from "@/lib/auth/errors";
+import { Prisma } from "@prisma/client";
+
+export const giftPostSlugSchema = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .min(2)
+  .max(80)
+  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug: minúsculas, números e hífens");
 
 export const createPostSchema = z.object({
   spaceId: z.string().min(1),
@@ -13,6 +22,14 @@ export const createPostSchema = z.object({
   imageUrl: optionalMediaUrl,
   linkUrl: optionalHttpsUrl,
   videoUrl: optionalMediaUrl,
+  slug: z
+    .union([z.string(), z.null(), z.undefined()])
+    .transform((v) => {
+      if (v == null) return null;
+      const trimmed = String(v).trim();
+      if (!trimmed) return null;
+      return giftPostSlugSchema.parse(trimmed);
+    }),
 });
 
 export const updatePostSchema = z.object({
@@ -201,30 +218,47 @@ export async function createPost(
   opts: { isAdmin: boolean },
 ) {
   const data = createPostSchema.parse(raw);
-  await assertCanPostToSpace(data.spaceId, opts.isAdmin);
+  const space = await assertCanPostToSpace(data.spaceId, opts.isAdmin);
+  let slug: string | null = null;
+  if (data.slug) {
+    if (!opts.isAdmin || space.slug !== PRESENTES_SPACE_SLUG) {
+      throw new ForbiddenError(
+        "Slug público só vale em Presentes, publicado por admin.",
+      );
+    }
+    slug = data.slug;
+  }
   const title = titleFromBody(data.body);
-  const post = await prisma.post.create({
-    data: {
-      authorId,
-      spaceId: data.spaceId,
-      title,
-      body: data.body,
-      imageUrl: data.imageUrl || null,
-      linkUrl: data.linkUrl || null,
-      videoUrl: data.videoUrl || null,
-    },
-    include: postInclude,
-  });
+  try {
+    const post = await prisma.post.create({
+      data: {
+        authorId,
+        spaceId: data.spaceId,
+        title,
+        body: data.body,
+        slug,
+        imageUrl: data.imageUrl || null,
+        linkUrl: data.linkUrl || null,
+        videoUrl: data.videoUrl || null,
+      },
+      include: postInclude,
+    });
 
-  const mentioned = await resolveMentionedUserIds(data.body, authorId);
-  await notifyMany(mentioned, {
-    actorId: authorId,
-    type: "mention_in_post",
-    postId: post.id,
-    snippet: data.body,
-  });
+    const mentioned = await resolveMentionedUserIds(data.body, authorId);
+    await notifyMany(mentioned, {
+      actorId: authorId,
+      type: "mention_in_post",
+      postId: post.id,
+      snippet: data.body,
+    });
 
-  return post;
+    return post;
+  } catch (e) {
+    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
+      throw new Error("Este slug de presente já está em uso.");
+    }
+    throw e;
+  }
 }
 
 export async function updatePost(

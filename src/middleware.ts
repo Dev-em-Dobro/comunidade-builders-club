@@ -1,9 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
 import { safeCallbackPath } from "@/lib/security/urls";
+import {
+  encodeOrigemCookie,
+  ORIGEM_COOKIE,
+  origemCookieOptions,
+  sanitizeGiftSlug,
+  sanitizeUtmValue,
+} from "@/lib/gifts/origem";
 
 function isProtectedPath(pathname: string): boolean {
   if (pathname === "/") return true;
+  if (pathname.startsWith("/presentes")) return false;
   return (
     pathname.startsWith("/spaces") ||
     pathname.startsWith("/posts") ||
@@ -16,6 +24,25 @@ function isProtectedPath(pathname: string): boolean {
     pathname.startsWith("/admin") ||
     pathname.startsWith("/aguardando")
   );
+}
+
+function applyOrigemCookie(request: NextRequest, response: NextResponse) {
+  const { pathname } = request.nextUrl;
+  if (!pathname.startsWith("/presentes/")) return response;
+  if (request.cookies.get(ORIGEM_COOKIE)) return response;
+
+  const utmContent = sanitizeUtmValue(
+    request.nextUrl.searchParams.get("utm_content"),
+  );
+  const giftSlug = sanitizeGiftSlug(pathname.split("/")[2] ?? "");
+  if (!utmContent || !giftSlug) return response;
+
+  response.cookies.set(
+    ORIGEM_COOKIE,
+    encodeOrigemCookie({ utmContent, giftSlug }),
+    origemCookieOptions(request.nextUrl.protocol === "https:"),
+  );
+  return response;
 }
 
 export function middleware(request: NextRequest) {
@@ -38,7 +65,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  return NextResponse.next();
+  return applyOrigemCookie(request, NextResponse.next());
 }
 
 export const config = {
@@ -57,5 +84,6 @@ export const config = {
     "/admin/:path*",
     "/aguardando",
     "/login",
+    "/presentes/:path*",
   ],
 };

@@ -37,8 +37,10 @@ export default async function NovaPublicacaoPage({ searchParams }: Props) {
       <p className="mt-1.5 text-sm text-muted">
         Escolha o space e escreva. O título aparece no feed automaticamente.
         {!isAdmin ? (
-          <> Spaces Boas-vindas e Avisos são reservados à equipe.</>
-        ) : null}
+          <> Spaces Boas-vindas, Avisos e Presentes são reservados à equipe.</>
+        ) : (
+          <> Em Presentes, o slug vira a URL pública (/presentes/seu-slug).</>
+        )}
       </p>
       <div className="mt-8">
         {spaces.length === 0 ? (
@@ -46,7 +48,11 @@ export default async function NovaPublicacaoPage({ searchParams }: Props) {
             Nenhum space disponível para publicar.
           </p>
         ) : (
-          <Composer spaces={spaces} defaultSpaceId={defaultSpaceId} />
+          <Composer
+            spaces={spaces}
+            defaultSpaceId={defaultSpaceId}
+            isAdmin={isAdmin}
+          />
         )}
       </div>
     </div>
