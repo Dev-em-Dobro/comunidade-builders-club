@@ -19,12 +19,22 @@ export type BoletoCheckout = {
   url: string;
 };
 
+/**
+ * Preço da oferta com a parcela separada do à vista: o card destaca o
+ * parcelado (`installments`x de `installmentPrice`) e deixa o à vista como
+ * linha secundária. O parcelado tem acréscimo — não anunciar "sem juros".
+ */
+export type OfferPricing = {
+  installments: number;
+  installmentPrice: string;
+  fullPrice: string;
+  boletoPrice?: string;
+};
+
 export type ClubOffer = {
   id: OfferId;
   name: string;
-  priceLabel: string;
-  installments: string;
-  extraPriceNote?: string;
+  pricing: OfferPricing;
   paymentHint?: string;
   promise: string;
   highlights: OfferHighlight[];
@@ -65,8 +75,11 @@ export function ofertaPro(): ClubOffer {
   return {
     id: "pro",
     name: "PRO",
-    priceLabel: "R$ 297",
-    installments: "ou 6x de R$ 55,18",
+    pricing: {
+      installments: 6,
+      installmentPrice: "R$ 55,18",
+      fullPrice: "R$ 297",
+    },
     paymentHint: "Pagamento em cartão ou Pix",
     promise: PROMESSA_PRIMEIRO_CLIENTE,
     highlights: [
@@ -83,8 +96,8 @@ export function ofertaPro(): ClubOffer {
         detail: "Proposta, contrato e materiais para fechar e executar",
       },
       {
-        title: "Ingresso do evento",
-        detail: "Acesso presencial à turma e à comunidade",
+        title: "Ingresso da Imersão 2 a 5k com IA",
+        detail: "Acesso ao próximo evento online da Imersão",
       },
       {
         title: "Orion (plano Free)",
@@ -103,18 +116,21 @@ export function ofertaElite(): ClubOffer {
   return {
     id: "elite",
     name: "Elite",
-    priceLabel: "R$ 997",
-    installments: "ou 12x de R$ 101,30",
-    extraPriceNote: "ou boleto de R$ 1.297",
+    pricing: {
+      installments: 12,
+      installmentPrice: "R$ 101,30",
+      fullPrice: "R$ 997",
+      boletoPrice: "R$ 1.297",
+    },
     promise: PROMESSA_PRIMEIRO_CLIENTE,
     highlights: [
       {
         title: "Tudo do PRO",
-        detail: "Aulas, comunidade, skills, templates e ingresso do evento",
+        detail: "Aulas, comunidade, skills, templates e ingresso da Imersão",
       },
       {
-        title: "Acesso ao Orion",
-        detail: "Mesmo motor do PRO, com os limites de Pro enquanto durar a cortesia",
+        title: "Acesso ao Orion (plano PRO por 90 dias)",
+        detail: "Motor de prospecção com limites bem acima do plano Free",
       },
       {
         title: "Reunião semanal em grupo",
