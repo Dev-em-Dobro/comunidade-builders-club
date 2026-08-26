@@ -443,7 +443,11 @@ Vamos acessar o Google AI Studio, criar um projeto, gerar a chave de API e enten
 
   "fase-1-m01-comece-por-aqui/aula-introducao-builders-club": `Aula de abertura do Builders Club: o que é a comunidade, para quem é e como você entra na jornada de construir e vender soluções com IA.`,
 
-  "fase-1-m01-comece-por-aqui/tutorial-intro-comunidade": `Tutorial da plataforma: como usar o Feed, os Spaces, as Aulas e circular na comunidade. Este vídeo também aparece na tela de Boas-vindas.`,
+  "fase-1-m01-comece-por-aqui/tutorial-intro-comunidade": `Tutorial da plataforma: como usar o Feed, os Spaces, as Aulas e circular na comunidade. Este é o mesmo vídeo da tela de Boas-vindas para quem tem acesso completo.`,
+
+  "fase-1-m01-comece-por-aqui/desafio-quick-win-lovable": `Primeiro projeto do desafio de 7 dias: montar uma landing no Lovable para um estabelecimento da sua rede quente.
+
+Poste o resultado no space **Desafio Projetos**. Pode ser um site de amostra — o importante é dar o primeiro passo.`,
 
   "fase-1-m01-comece-por-aqui/bem-vindo-e-mapa-da-jornada": `Boas-vindas à formação: como ela funciona, o mapa das fases, como usar a plataforma, as regras e a primeira ação do aluno.`,
 

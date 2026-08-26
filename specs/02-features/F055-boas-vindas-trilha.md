@@ -66,7 +66,7 @@ Comentários no space Boas-vindas continuam desligados (F023).
 
 ## Fora de escopo
 
-- Publicar o desafio de 7 dias (LP + post em Conquistas) — conteúdo
+- Publicar o desafio de 7 dias (LP + post) — conteúdo em [F060](F060-aula-desafio-quick-win.md)
 - Recusar login (F054)
 - Vídeo distinto por plano — [F058](F058-boas-vindas-video-por-tier.md)
 

@@ -5,7 +5,8 @@
  *   npm run db:seed:aulas-panda -- --target=prod --confirm
  *
  * Idempotente por slug. Não altera `published` nem `sortOrder` se o
- * registro já existir (ordem do admin prevalece).
+ * registro já existir (ordem do admin prevalece), **exceto** o M01
+ * Comece por aqui (F060: `forceLessonSort`).
  * Títulos da jornada e da formação IA/n8n: amigáveis (sem Mxx-Lxx
  * nem prefixo `Aula N —`).
  */
@@ -13,6 +14,7 @@ import { config } from "dotenv";
 import { PrismaClient } from "@prisma/client";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { WELCOME_TUTORIAL_VIDEO } from "../src/lib/spaces/constants.ts";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 config({ path: resolve(root, ".env"), override: true });
@@ -38,6 +40,8 @@ type ModuleSeed = {
   sortOrder: number;
   lessons: LessonSeed[];
   children?: ModuleSeed[];
+  /** F060 — regrava sortOrder das aulas deste módulo. */
+  forceLessonSort?: boolean;
 };
 
 function thumb(externalId: string) {
@@ -58,24 +62,33 @@ const CATALOG: ModuleSeed[] = [
         slug: "fase-1-m01-comece-por-aqui",
         title: "Comece por aqui",
         description:
-          "Introdução ao clube, tutorial da comunidade, mapa da formação e o que você vai construir e vender com IA.\n\nEntregável: apresentar-se no grupo e definir um nicho inicial.",
+          "Introdução ao clube, tutorial da comunidade, desafio quick win no Lovable, mapa da formação e o que você vai construir e vender com IA.\n\nEntregável: apresentar-se no grupo, definir um nicho inicial e postar o quick win no Desafio Projetos.",
         sortOrder: 0,
+        forceLessonSort: true,
         lessons: [
-          {
-            slug: "tutorial-intro-comunidade",
-            title: "Como usar a comunidade",
-            description:
-              "Tutorial da plataforma: Feed, Spaces, Aulas e como circular na comunidade. O mesmo vídeo aparece na tela de Boas-vindas. Primeira aula da jornada (F055).",
-            pandaVideoExternalId: "38608c40-7b9a-4b30-a33e-287bf5072af3",
-            sortOrder: 0,
-          },
           {
             slug: "aula-introducao-builders-club",
             title: "Introdução ao Builders Club",
             description:
               "Aula de abertura: o que é o Builders Club, para quem é e como você entra na jornada.",
             pandaVideoExternalId: "19fad82c-70df-4dd1-ab5d-a6b44b18a58f",
+            sortOrder: 0,
+          },
+          {
+            slug: "tutorial-intro-comunidade",
+            title: "Como usar a comunidade",
+            description:
+              "Tutorial da plataforma: Feed, Spaces, Aulas e como circular na comunidade. Mesmo vídeo da tela de Boas-vindas no plano pago (F058/F060).",
+            pandaVideoExternalId: WELCOME_TUTORIAL_VIDEO.paidVideoExternalId,
             sortOrder: 1,
+          },
+          {
+            slug: "desafio-quick-win-lovable",
+            title: "Quick win no Lovable",
+            description:
+              "Primeiro projeto do desafio de 7 dias: montar uma landing no Lovable para um estabelecimento da sua rede quente e postar no space Desafio Projetos.",
+            pandaVideoExternalId: "f32d7741-a581-4904-a8cf-e9fc4de2b018",
+            sortOrder: 2,
           },
           {
             slug: "bem-vindo-e-mapa-da-jornada",
@@ -83,7 +96,7 @@ const CATALOG: ModuleSeed[] = [
             description:
               "Boas-vindas, como funciona a formação, mapa das fases, como usar a plataforma, regras e a primeira ação.",
             pandaVideoExternalId: "e413fe2b-8f93-408b-bb03-3fa6684c8f33",
-            sortOrder: 2,
+            sortOrder: 3,
           },
           {
             slug: "o-que-voce-vai-construir",
@@ -91,7 +104,7 @@ const CATALOG: ModuleSeed[] = [
             description:
               "Nivelamento: o que é a formação, o que não é, e o objetivo de construir e vender soluções com IA.",
             pandaVideoExternalId: "9986fcaa-be0f-479b-8e51-8015baa04fde",
-            sortOrder: 3,
+            sortOrder: 4,
           },
         ],
       },
@@ -857,6 +870,8 @@ async function upsertModule(
         : null,
       moduleId: module.id,
       slug: lesson.slug,
+      ...(lesson.description ? { description: lesson.description } : {}),
+      ...(seed.forceLessonSort ? { sortOrder: lesson.sortOrder } : {}),
     };
     if (found) {
       await prisma.lesson.update({
@@ -869,7 +884,7 @@ async function upsertModule(
           ...lessonData,
           sortOrder: lesson.sortOrder,
           description: lesson.description || null,
-          published: false,
+          published: module.published,
         },
       });
     }
