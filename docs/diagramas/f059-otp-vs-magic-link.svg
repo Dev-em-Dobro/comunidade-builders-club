@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="370" viewBox="0 0 980 370" role="img">
+<title>OTP vs magic link no webview do Instagram</title>
+<desc>Magic link abre outro navegador e perde o cookie; OTP fica na mesma aba.</desc>
+<rect width="980" height="370" fill="#fdfbf7"/>
+<g font-family="'Comic Sans MS', 'Segoe Print', cursive" fill="#1e1e1e">
+
+<text x="490" y="34" text-anchor="middle" font-size="20" font-weight="700">Por que OTP, e não magic link</text>
+
+<text x="40" y="70" font-size="15" font-weight="700">Magic link — perde a origem</text>
+
+<path d="M40.0,89.0 Q140.0,81.0 240.0,88.0 Q245.0,122.0 240.0,156.0 Q140.0,163.0 40.0,155.0 Q35.0,122.0 40.0,89.0 Z" fill="#eebefa" fill-opacity="0.55" stroke="#1e1e1e" stroke-width="2" stroke-linejoin="round"/>
+<text x="140.0" y="113.0" text-anchor="middle" font-size="16" font-weight="700">Webview Instagram</text>
+<text x="140.0" y="136.0" text-anchor="middle" font-size="13">cookie bc_origem</text>
+
+
+<path d="M240,122 Q279.0,128 318,122" fill="none" stroke="#1e1e1e" stroke-width="2" stroke-linecap="round"/>
+<polygon points="318.0,122.0 308.3,127.3 308.3,116.7" fill="#1e1e1e"/>
+<text x="279.0" y="106" text-anchor="middle" font-size="13">1. abre o e-mail</text>
+
+
+<path d="M320.0,89.0 Q420.0,81.0 520.0,88.0 Q525.0,122.0 520.0,156.0 Q420.0,163.0 320.0,155.0 Q315.0,122.0 320.0,89.0 Z" fill="#ffec99" fill-opacity="0.55" stroke="#1e1e1e" stroke-width="2" stroke-linejoin="round"/>
+<text x="420.0" y="113.0" text-anchor="middle" font-size="16" font-weight="700">Gmail / Chrome</text>
+<text x="420.0" y="136.0" text-anchor="middle" font-size="13">outro navegador</text>
+
+
+<path d="M520,122 Q559.0,128 598,122" fill="none" stroke="#1e1e1e" stroke-width="2" stroke-linecap="round"/>
+<polygon points="598.0,122.0 588.3,127.3 588.3,116.7" fill="#1e1e1e"/>
+<text x="559.0" y="106" text-anchor="middle" font-size="13">2. cria a sessão</text>
+
+
+<path d="M600.0,89.0 Q720.0,81.0 840.0,88.0 Q845.0,122.0 840.0,156.0 Q720.0,163.0 600.0,155.0 Q595.0,122.0 600.0,89.0 Z" fill="#e5e3da" fill-opacity="0.55" stroke="#1e1e1e" stroke-width="2" stroke-linejoin="round"/>
+<text x="720.0" y="113.0" text-anchor="middle" font-size="16" font-weight="700">Conta sem origem</text>
+<text x="720.0" y="136.0" text-anchor="middle" font-size="13">cookie não veio junto</text>
+
+
+<text x="40" y="210" font-size="15" font-weight="700">OTP — fecha o funil</text>
+
+<path d="M40.0,229.0 Q140.0,221.0 240.0,228.0 Q245.0,262.0 240.0,296.0 Q140.0,303.0 40.0,295.0 Q35.0,262.0 40.0,229.0 Z" fill="#eebefa" fill-opacity="0.55" stroke="#1e1e1e" stroke-width="2" stroke-linejoin="round"/>
+<text x="140.0" y="253.0" text-anchor="middle" font-size="16" font-weight="700">Webview Instagram</text>
+<text x="140.0" y="276.0" text-anchor="middle" font-size="13">cookie bc_origem</text>
+
+
+<path d="M240,262 Q279.0,268 318,262" fill="none" stroke="#1e1e1e" stroke-width="2" stroke-linecap="round"/>
+<polygon points="318.0,262.0 308.3,267.3 308.3,256.7" fill="#1e1e1e"/>
+<text x="279.0" y="246" text-anchor="middle" font-size="13">1. lê o código</text>
+
+
+<path d="M320.0,229.0 Q420.0,221.0 520.0,228.0 Q525.0,262.0 520.0,296.0 Q420.0,303.0 320.0,295.0 Q315.0,262.0 320.0,229.0 Z" fill="#ffec99" fill-opacity="0.55" stroke="#1e1e1e" stroke-width="2" stroke-linejoin="round"/>
+<text x="420.0" y="253.0" text-anchor="middle" font-size="16" font-weight="700">E-mail</text>
+<text x="420.0" y="276.0" text-anchor="middle" font-size="13">só olha o número</text>
+
+
+<path d="M520,262 Q559.0,268 598,262" fill="none" stroke="#1e1e1e" stroke-width="2" stroke-linecap="round"/>
+<polygon points="598.0,262.0 588.3,267.3 588.3,256.7" fill="#1e1e1e"/>
+<text x="559.0" y="246" text-anchor="middle" font-size="13">2. cola na mesma aba</text>
+
+
+<path d="M600.0,229.0 Q720.0,221.0 840.0,228.0 Q845.0,262.0 840.0,296.0 Q720.0,303.0 600.0,295.0 Q595.0,262.0 600.0,229.0 Z" fill="#b2f2bb" fill-opacity="0.55" stroke="#1e1e1e" stroke-width="2" stroke-linejoin="round"/>
+<text x="720.0" y="253.0" text-anchor="middle" font-size="16" font-weight="700">Conta com origem</text>
+<text x="720.0" y="276.0" text-anchor="middle" font-size="13">utm_content no Membership</text>
+
+<text x="490" y="340" text-anchor="middle" font-size="13">Cinza = origem perdida · Verde = atribuição gravada</text>
+
+</g>
+</svg>

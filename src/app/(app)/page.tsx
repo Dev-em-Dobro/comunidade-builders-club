@@ -6,6 +6,7 @@ import { listPosts } from "@/lib/posts";
 import { hrefPlanos, isPaidMembership } from "@/lib/membership/capabilities";
 import {
   AULA_THREADS_SPACE_SLUG,
+  PRESENTES_SPACE_SLUG,
   WELCOME_SPACE_SLUG,
 } from "@/lib/spaces/constants";
 import { FeedList } from "@/components/feed-list";
@@ -47,7 +48,11 @@ async function HomeFeed({
   // F041: feed é vitrine — free vê a timeline inteira; o cadeado fica no card
   // (space pago abre modal de upgrade em vez de navegar).
   const { posts } = await listPosts({
-    excludeSpaceSlugs: [WELCOME_SPACE_SLUG, AULA_THREADS_SPACE_SLUG],
+    excludeSpaceSlugs: [
+      WELCOME_SPACE_SLUG,
+      AULA_THREADS_SPACE_SLUG,
+      PRESENTES_SPACE_SLUG,
+    ],
     viewerId: userId,
     take: 30,
   });

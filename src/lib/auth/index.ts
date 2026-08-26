@@ -1,9 +1,9 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { magicLink } from "better-auth/plugins";
+import { emailOTP, magicLink } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
 import { prisma } from "@/lib/db";
-import { sendMagicLinkEmail } from "@/lib/email";
+import { sendMagicLinkEmail, sendOtpEmail } from "@/lib/email";
 import { NOME_PRODUTO } from "@/lib/produto";
 import { ensureMemberBootstrap } from "@/lib/membership/bootstrap";
 import { recordDeniedLoginIfUnauthorized } from "@/lib/admin/denied-logins";
@@ -67,6 +67,15 @@ export const auth = betterAuth({
       sendMagicLink: async ({ email, url }) => {
         await recordDeniedLoginIfUnauthorized(email);
         await sendMagicLinkEmail({ to: email, url });
+      },
+    }),
+    emailOTP({
+      otpLength: 6,
+      expiresIn: 60 * 10,
+      allowedAttempts: 3,
+      disableSignUp: false,
+      sendVerificationOTP: async ({ email, otp }) => {
+        await sendOtpEmail({ to: email, otp });
       },
     }),
     nextCookies(),

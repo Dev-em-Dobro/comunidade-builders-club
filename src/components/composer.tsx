@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition } from "react";
 import { createPostAction } from "@/actions/posts";
 import { MentionTextarea } from "@/components/mention-textarea";
+import { PRESENTES_SPACE_SLUG } from "@/lib/spaces/constants";
 
 const MEDIA_ACCEPT =
   "image/jpeg,image/png,image/gif,video/mp4,.jpg,.jpeg,.png,.gif,.mp4";
@@ -26,9 +27,11 @@ async function uploadFile(file: File): Promise<{ url: string; kind: string }> {
 export function Composer({
   spaces,
   defaultSpaceId,
+  isAdmin = false,
 }: {
   spaces: { id: string; name: string; slug?: string }[];
   defaultSpaceId?: string;
+  isAdmin?: boolean;
 }) {
   const router = useRouter();
   const [pending, start] = useTransition();
@@ -38,7 +41,10 @@ export function Composer({
   const [videoUrl, setVideoUrl] = useState("");
   const [linkUrl, setLinkUrl] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [spaceId, setSpaceId] = useState(defaultSpaceId ?? spaces[0]?.id ?? "");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const selected = spaces.find((s) => s.id === spaceId);
+  const showGiftSlug = isAdmin && selected?.slug === PRESENTES_SPACE_SLUG;
 
   async function onPick(file: File | undefined) {
     if (!file) return;
@@ -71,7 +77,11 @@ export function Composer({
             if (videoUrl) fd.set("videoUrl", videoUrl);
             if (linkUrl.trim()) fd.set("linkUrl", linkUrl.trim());
             const result = await createPostAction(fd);
-            router.push(`/posts/${result.id}`);
+            if (result.giftSlug) {
+              router.push(`/presentes/${result.giftSlug}`);
+            } else {
+              router.push(`/posts/${result.id}`);
+            }
             router.refresh();
           } catch (e) {
             setError(e instanceof Error ? e.message : "Falha ao publicar.");
@@ -90,7 +100,8 @@ export function Composer({
         <select
           name="spaceId"
           className="input mt-1.5 cursor-pointer"
-          defaultValue={defaultSpaceId ?? spaces[0]?.id}
+          value={spaceId}
+          onChange={(e) => setSpaceId(e.target.value)}
           required
         >
           {spaces.map((s) => (
@@ -100,6 +111,23 @@ export function Composer({
           ))}
         </select>
       </label>
+      {showGiftSlug ? (
+        <label className="mt-3 block text-xs font-medium text-muted">
+          Slug público (URL do Instagram)
+          <input
+            className="input mt-1.5 font-mono"
+            name="slug"
+            required
+            pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
+            minLength={2}
+            maxLength={80}
+            placeholder="agent-reach"
+          />
+          <span className="mt-1 block text-[11px]">
+            Vira /presentes/agent-reach. Sem slug o post não é público.
+          </span>
+        </label>
+      ) : null}
       <MentionTextarea
         name="body"
         className="input mt-3 min-h-36 resize-y text-[15px] leading-relaxed"

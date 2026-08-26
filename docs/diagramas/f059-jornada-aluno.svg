@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="360" viewBox="0 0 980 360" role="img">
+<title>Jornada do aluno no presente público</title>
+<desc>Do comentário no Instagram até a conta free com origem do post.</desc>
+<rect width="980" height="360" fill="#fdfbf7"/>
+<g font-family="'Comic Sans MS', 'Segoe Print', cursive" fill="#1e1e1e">
+
+<text x="490" y="36" text-anchor="middle" font-size="20" font-weight="700">Jornada do aluno — presente → conta free</text>
+
+<path d="M30.0,63.0 Q135.0,55.0 240.0,62.0 Q245.0,99.0 240.0,136.0 Q135.0,143.0 30.0,135.0 Q25.0,99.0 30.0,63.0 Z" fill="#ffec99" fill-opacity="0.55" stroke="#1e1e1e" stroke-width="2" stroke-linejoin="round"/>
+<text x="135.0" y="90.0" text-anchor="middle" font-size="16" font-weight="700">Post no Instagram</text>
+<text x="135.0" y="113.0" text-anchor="middle" font-size="13">keyword no comentário</text>
+
+
+<path d="M240,99 Q279.0,105 318,99" fill="none" stroke="#1e1e1e" stroke-width="2" stroke-linecap="round"/>
+<polygon points="318.0,99.0 308.3,104.3 308.3,93.7" fill="#1e1e1e"/>
+<text x="279.0" y="83" text-anchor="middle" font-size="13">1. comenta a keyword</text>
+
+
+<path d="M320.0,63.0 Q435.0,55.0 550.0,62.0 Q555.0,99.0 550.0,136.0 Q435.0,143.0 320.0,135.0 Q315.0,99.0 320.0,63.0 Z" fill="#ffec99" fill-opacity="0.55" stroke="#1e1e1e" stroke-width="2" stroke-linejoin="round"/>
+<text x="435.0" y="90.0" text-anchor="middle" font-size="16" font-weight="700">DM da automação</text>
+<text x="435.0" y="113.0" text-anchor="middle" font-size="13">link + utm_content</text>
+
+
+<path d="M550,99 Q589.0,105 628,99" fill="none" stroke="#1e1e1e" stroke-width="2" stroke-linecap="round"/>
+<polygon points="628.0,99.0 618.3,104.3 618.3,93.7" fill="#1e1e1e"/>
+<text x="589.0" y="83" text-anchor="middle" font-size="13">2. envia o presente</text>
+
+
+<path d="M630.0,63.0 Q755.0,55.0 880.0,62.0 Q885.0,99.0 880.0,136.0 Q755.0,143.0 630.0,135.0 Q625.0,99.0 630.0,63.0 Z" fill="#eebefa" fill-opacity="0.55" stroke="#1e1e1e" stroke-width="2" stroke-linejoin="round"/>
+<text x="755.0" y="90.0" text-anchor="middle" font-size="16" font-weight="700">Página do Club</text>
+<text x="755.0" y="113.0" text-anchor="middle" font-size="13">/presentes/agent-reach</text>
+
+
+<path d="M755,138 Q761,168.0 755,198" fill="none" stroke="#1e1e1e" stroke-width="2" stroke-linecap="round"/>
+<polygon points="755.0,198.0 749.7,188.3 760.3,188.3" fill="#1e1e1e"/>
+<text x="637" y="172.0" font-size="13">3. lê sem login</text>
+
+
+<path d="M80.0,203.0 Q220.0,195.0 360.0,202.0 Q365.0,239.0 360.0,276.0 Q220.0,283.0 80.0,275.0 Q75.0,239.0 80.0,203.0 Z" fill="#eebefa" fill-opacity="0.55" stroke="#1e1e1e" stroke-width="2" stroke-linejoin="round"/>
+<text x="220.0" y="230.0" text-anchor="middle" font-size="16" font-weight="700">CTA: criar conta</text>
+<text x="220.0" y="253.0" text-anchor="middle" font-size="13">nome, sobrenome, e-mail</text>
+
+
+<path d="M360,239 Q404.0,245 448,239" fill="none" stroke="#1e1e1e" stroke-width="2" stroke-linecap="round"/>
+<polygon points="448.0,239.0 438.3,244.3 438.3,233.7" fill="#1e1e1e"/>
+<text x="404.0" y="223" text-anchor="middle" font-size="13">4. manda o código</text>
+
+
+<path d="M450.0,203.0 Q555.0,195.0 660.0,202.0 Q665.0,239.0 660.0,276.0 Q555.0,283.0 450.0,275.0 Q445.0,239.0 450.0,203.0 Z" fill="#ffec99" fill-opacity="0.55" stroke="#1e1e1e" stroke-width="2" stroke-linejoin="round"/>
+<text x="555.0" y="230.0" text-anchor="middle" font-size="16" font-weight="700">E-mail OTP</text>
+<text x="555.0" y="253.0" text-anchor="middle" font-size="13">6 dígitos · 10 min</text>
+
+
+<path d="M660,239 Q699.0,245 738,239" fill="none" stroke="#1e1e1e" stroke-width="2" stroke-linecap="round"/>
+<polygon points="738.0,239.0 728.3,244.3 728.3,233.7" fill="#1e1e1e"/>
+<text x="699.0" y="223" text-anchor="middle" font-size="13">5. cola na mesma tela</text>
+
+
+<path d="M740.0,203.0 Q850.0,195.0 960.0,202.0 Q965.0,239.0 960.0,276.0 Q850.0,283.0 740.0,275.0 Q735.0,239.0 740.0,203.0 Z" fill="#a5d8ff" fill-opacity="0.55" stroke="#1e1e1e" stroke-width="2" stroke-linejoin="round"/>
+<text x="850.0" y="230.0" text-anchor="middle" font-size="16" font-weight="700">Conta free</text>
+<text x="850.0" y="253.0" text-anchor="middle" font-size="13">origem do post gravada</text>
+
+<text x="490" y="330" text-anchor="middle" font-size="13">Amarelo = Instagram / e-mail · Roxo = tela do Club · Azul = membership no banco</text>
+
+</g>
+</svg>

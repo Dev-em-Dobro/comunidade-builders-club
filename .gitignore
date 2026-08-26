@@ -54,3 +54,9 @@ yarn-debug.log*
 scripts/perf-reports/
 
 .gstack/
+
+# rascunho local do texto de PR
+/pr-das-mudancas.md
+/fazer-depois.md
+/testar-passo-a-passo-emproducao.md
+/mudanca-presente.md

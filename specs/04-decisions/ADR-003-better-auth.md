@@ -8,7 +8,8 @@ Login de membros sem senha, sessão server-side, adapter Prisma. Contas
 **independentes** do Orion (sem SSO).
 
 ## Decisão
-Better Auth + adapter Prisma. Métodos: **Google OAuth** + **magic link**.
+Better Auth + adapter Prisma. Métodos: **Google OAuth** + **magic link** +
+**OTP por e-mail** (ADR-009 / F059, para o webview do Instagram).
 Modelos: `User`, `Session`, `Account`, `Verification`.
 Helper `requireUser()` / `requireActiveMember()` nas Server Actions.
 Middleware protege rotas do app; `/login` e callbacks públicos.

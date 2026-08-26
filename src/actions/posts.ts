@@ -29,6 +29,7 @@ export async function createPostAction(formData: FormData) {
     imageUrl: String(formData.get("imageUrl") ?? "") || null,
     linkUrl: String(formData.get("linkUrl") ?? "") || null,
     videoUrl: String(formData.get("videoUrl") ?? "") || null,
+    slug: String(formData.get("slug") ?? "") || null,
   };
   try {
     createPostSchema.parse(raw);
@@ -36,7 +37,7 @@ export async function createPostAction(formData: FormData) {
     revalidatePath("/");
     revalidatePath(`/spaces/${post.space.slug}`);
     revalidatePath("/nova");
-    return { id: post.id, spaceSlug: post.space.slug };
+    return { id: post.id, spaceSlug: post.space.slug, giftSlug: post.slug };
   } catch (e) {
     actionError(e);
   }
