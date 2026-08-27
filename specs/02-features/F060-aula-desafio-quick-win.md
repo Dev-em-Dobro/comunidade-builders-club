@@ -15,7 +15,7 @@ A ordem no catálogo (e no seed, com `forceLessonSort` neste módulo):
 1. Introdução ao Builders Club
 2. Como usar a comunidade — vídeo **pago** das Boas-vindas
    (`d3b5019d-49b8-479e-a150-7ea654dc7cf6` · F058)
-3. **Quick win no Lovable** — nova (depois do tutorial)
+3. **Desafio primeiro projeto em 7 dias com Lovable** — nova (depois do tutorial)
 4. Bem-vindo e mapa da jornada
 5. O que você vai construir e vender com IA
 
@@ -25,7 +25,7 @@ A ordem no catálogo (e no seed, com `forceLessonSort` neste módulo):
 |-------|--------|
 | Módulo | `fase-1-m01-comece-por-aqui` |
 | Slug | `desafio-quick-win-lovable` |
-| Título | Quick win no Lovable |
+| Título | Desafio primeiro projeto em 7 dias com Lovable |
 | Panda `video_external_id` | `f32d7741-a581-4904-a8cf-e9fc4de2b018` |
 | Library | `77c52f03-dc6` |
 | Dashboard (não usar no embed) | `9191d82e-05c6-47ee-b42e-7dd52cfff993` |
@@ -50,7 +50,13 @@ produção com `--target=prod --confirm`.
 
 ## Critérios
 
-- [x] M01 tem a aula Quick win no Lovable como 3ª, depois do tutorial
+- [x] M01 tem a aula do desafio como 3ª, depois do tutorial
+
+> **Renomeada em 27/08/2026.** "Quick win no Lovable" →
+> **"Desafio primeiro projeto em 7 dias com Lovable"**. O título antigo não
+> dizia o que a aula é: "quick win" é jargão interno, e a aula é a porta do
+> desafio de 7 dias. O **slug não mudou** (`desafio-quick-win-lovable`), então a
+> URL da aula continua a mesma.
 - [x] Player da aula usa `video_external_id`, não o UUID do dashboard
 - [x] `/aulas/.../tutorial-intro-comunidade` usa o vídeo pago das Boas-vindas
 - [x] HML e produção atualizados após confirmação
