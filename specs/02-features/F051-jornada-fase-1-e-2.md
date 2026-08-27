@@ -17,7 +17,7 @@ FASE 1 — Do zero ao primeiro sim     ← raiz (rascunho)
 ├── Comece por aqui                  ← M01
 │   ├── Introdução ao Builders Club
 │   ├── Como usar a comunidade       ← vídeo pago das Boas-vindas (F058/F060)
-│   ├── Quick win no Lovable         ← desafio 7 dias (F060)
+│   ├── Desafio primeiro projeto…    ← desafio 7 dias (F060)
 │   ├── Bem-vindo e mapa da jornada
 │   └── O que você vai construir…
 ├── Escolha o nicho e o que vender   ← M02
