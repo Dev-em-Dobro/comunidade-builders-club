@@ -49,7 +49,8 @@ Libera no Club:
 - Aulas gravadas
 - Skills e templates (Materiais de apoio)
 - Busca
-- Ingresso pro evento (benefício da oferta; não é rota no MVP)
+- Ingresso da **Imersão 2 a 5k com IA** — próximo evento **online** da Imersão
+  (benefício da oferta; não é rota no MVP). Não é evento presencial.
 - **Orion no plano Free** (teto Free do app; [F058](F058-pro-orion-free.md))
 
 **Promessa:** feche o 1º cliente em **90 dias**.
@@ -65,8 +66,9 @@ Boleto (TMB, R$ 1.297):
 | `9DW254247E5` | Checkout de boleto na página `/planos` — [pay.tmb.com.br/DevemDobro/9DW254247E5](https://pay.tmb.com.br/DevemDobro/9DW254247E5) |
 | `3XB272209KV` | Continua válido no webhook (concede Elite); não aparece como CTA |
 
-- Tudo do PRO (inclui Orion Free)
-- **Orion além do Free** — cortesia de plano Pro no Orion enquanto `trial-pro-*`
+- Tudo do PRO (inclui Orion Free e o ingresso da Imersão 2 a 5k com IA)
+- **Orion além do Free** — cortesia de plano **Pro por 90 dias** no Orion
+  (enquanto `trial-pro-*`)
 - 1 reunião semanal em grupo (benefício da oferta; não é rota no MVP)
 - + Skills e + Templates (mesmo catálogo de materiais no MVP; mais conteúdo
   depois, sem gate extra agora)
@@ -116,6 +118,14 @@ Página **`/planos`** (liberada para free e PRO):
 - Dois cards lado a lado (empilhados no mobile): PRO vs Elite
 - Cards com destaque, hover (elevação/sombra) e lista de entregas em título + detalhe
 - Elite em destaque (recomendado)
+- **Preço com o parcelamento em destaque** — o número grande do card é a parcela
+  (`6x de R$ 55,18` no PRO, `12x de R$ 101,30` no Elite), com rótulo
+  “Parcele em até”. O valor à vista vira linha secundária (`ou R$ 297 à vista`),
+  e o boleto Elite (`R$ 1.297`) segue como nota menor.
+- **Não** afirmar “sem juros”: o parcelado tem acréscimo (6x → R$ 331,08;
+  12x → R$ 1.215,60)
+- A promessa aparece **sem o rótulo “Promessa:”** — só a frase
+  “Feche o 1º cliente em 90 dias”, separada da lista por um filete
 - CTA principal: checkout Hubla (cartão/Pix)
 - Elite: **um** CTA de boleto TMB (`9DW254247E5`) com o label “Opção para boleto” (sem valor no botão)
 - Sem rodapé de meios de pagamento

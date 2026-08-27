@@ -49,12 +49,28 @@ function OfferCard({
           </span>
         ) : null}
       </div>
-      <p className="mt-2 font-[family-name:var(--font-outfit)] text-3xl font-bold">
-        {offer.priceLabel}
+      <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-muted">
+        Parcele em até
       </p>
-      <p className="mt-1 text-sm text-muted">{offer.installments}</p>
-      {offer.extraPriceNote ? (
-        <p className="mt-0.5 text-xs text-muted">{offer.extraPriceNote}</p>
+      <p className="mt-1 flex flex-wrap items-baseline gap-x-1.5 font-[family-name:var(--font-outfit)] leading-none">
+        <span className="text-lg font-semibold text-foreground">
+          {offer.pricing.installments}x de
+        </span>
+        <span className="text-4xl font-bold tracking-tight text-foreground">
+          {offer.pricing.installmentPrice}
+        </span>
+      </p>
+      <p className="mt-2 text-sm text-muted">
+        ou{" "}
+        <span className="font-semibold text-foreground">
+          {offer.pricing.fullPrice}
+        </span>{" "}
+        à vista
+      </p>
+      {offer.pricing.boletoPrice ? (
+        <p className="mt-0.5 text-xs text-muted">
+          ou boleto de {offer.pricing.boletoPrice}
+        </p>
       ) : null}
       <ul className="mt-5 flex flex-col gap-3">
         {offer.highlights.map((item) => (
@@ -73,8 +89,8 @@ function OfferCard({
           </li>
         ))}
       </ul>
-      <p className="mt-5 text-sm font-medium text-foreground">
-        Promessa: {offer.promise}
+      <p className="mt-5 border-t border-border/60 pt-4 text-sm font-semibold text-foreground">
+        {offer.promise}
       </p>
       {current ? (
         <div className="mt-auto pt-5">

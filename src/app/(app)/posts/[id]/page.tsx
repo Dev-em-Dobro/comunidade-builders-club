@@ -13,7 +13,6 @@ import {
   parseLessonDiscussionMarker,
 } from "@/lib/aulas";
 import { PostDetailContent } from "@/components/post-detail-content";
-import { previewFromBody } from "@/lib/posts/title";
 import type { PostDetailDto } from "@/actions/post-detail";
 
 type Props = { params: Promise<{ id: string }> };
@@ -75,22 +74,19 @@ export default async function PostPage({ params }: Props) {
     })),
   };
 
-  const title =
-    post.title?.trim() || previewFromBody(post.body, 90) || "Publicação";
-
   // Free não entra no space pago: o "voltar" leva ao feed, de onde ele veio.
   const canOpenSpace = isPaid || isFreeSpaceSlug(post.space.slug);
 
+  // F060: coluna de leitura (`--bc-reading`), não a largura do feed.
   return (
-    <div className="feed-wrap">
+    <div className="reading-wrap">
       <Link
         href={canOpenSpace ? `/spaces/${post.space.slug}` : "/"}
         className="cursor-pointer text-sm font-medium text-accent hover:underline"
       >
         ← {canOpenSpace ? post.space.name : "Feed"}
       </Link>
-      <div className="mt-4">
-        <h1 className="sr-only">{title}</h1>
+      <div className="mt-6">
         <PostDetailContent
           post={dto}
           isAdmin={isAdmin}

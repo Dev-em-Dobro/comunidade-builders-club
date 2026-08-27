@@ -21,6 +21,7 @@ export default async function AppSegmentLayout({
       isPaid={isPaid}
       isElite={isElite}
       displayName={member.profile.displayName}
+      email={member.user.email}
       avatarUrl={member.profile.avatarUrl}
     >
       {children}

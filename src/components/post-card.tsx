@@ -5,9 +5,10 @@ import { useRouter } from "next/navigation";
 import { previewFromBody } from "@/lib/posts/title";
 import { MarkdownBody } from "@/lib/markdown";
 import { OptimizedMediaImage } from "@/components/optimized-media-image";
-import { PostActions } from "@/components/post-actions";
+import { PostActions, ReactionButton } from "@/components/post-actions";
 import { PostMedia } from "@/components/post-media";
 import { PostShareMenu } from "@/components/post-share-menu";
+import { CommentIcon, EyeIcon, PostStat } from "@/components/post-icons";
 
 export type PostCardData = {
   id: string;
@@ -47,23 +48,32 @@ function Avatar({
   name,
   url,
   priority = false,
+  /** F060 — na listagem o avatar é linha de crédito, não coluna. */
+  size = "lg",
 }: {
   name: string;
   url: string | null | undefined;
   priority?: boolean;
+  size?: "sm" | "lg";
 }) {
+  const box =
+    size === "sm" ? "h-6 w-6" : "h-11 w-11 sm:h-12 sm:w-12";
   if (url) {
     return (
       <OptimizedMediaImage
         src={url}
         variant="avatar"
         priority={priority}
-        className="h-11 w-11 shrink-0 rounded-full object-cover ring-2 ring-surface sm:h-12 sm:w-12"
+        className={`${box} shrink-0 rounded-full object-cover ring-2 ring-surface`}
       />
     );
   }
   return (
-    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-accent/15 text-sm font-bold text-accent sm:h-12 sm:w-12 sm:text-base">
+    <div
+      className={`${box} flex shrink-0 items-center justify-center rounded-full bg-accent/15 font-bold text-accent ${
+        size === "sm" ? "text-[11px]" : "text-sm sm:text-base"
+      }`}
+    >
       {name.slice(0, 1).toUpperCase()}
     </div>
   );
@@ -103,6 +113,50 @@ function MetaLine({
         </span>
       ) : null}
     </p>
+  );
+}
+
+/**
+ * F060 — linha de crédito da listagem: avatar pequeno, autor, space e data
+ * em uma linha só, para o título passar a mandar no card.
+ */
+function CreditLine({
+  post,
+  name,
+  avatarUrl,
+  showSpace,
+  pinned,
+  priorityAvatar,
+}: {
+  post: PostCardData;
+  name: string;
+  avatarUrl: string | null | undefined;
+  showSpace: boolean;
+  pinned: boolean;
+  priorityAvatar: boolean;
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      <Avatar name={name} url={avatarUrl} priority={priorityAvatar} size="sm" />
+      <p className="min-w-0 truncate text-sm text-muted">
+        <span className="font-semibold text-foreground">{name}</span>
+        {showSpace ? (
+          <>
+            {" em "}
+            <span className="font-medium text-accent/90">
+              {post.space.name}
+            </span>
+          </>
+        ) : null}
+        {" · "}
+        {formatDate(post.createdAt)}
+      </p>
+      {pinned ? (
+        <span className="shrink-0 rounded-md bg-accent/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-accent">
+          Fixado
+        </span>
+      ) : null}
+    </div>
   );
 }
 
@@ -184,9 +238,7 @@ export function PostCard({
                 }
               }}
             >
-              <h2 className="mt-3 font-[family-name:var(--font-outfit)] text-lg font-semibold leading-snug tracking-tight text-foreground">
-                {title}
-              </h2>
+              <h2 className="post-card-title mt-3">{title}</h2>
               <div className="mt-3">
                 <MarkdownBody body={post.body} />
               </div>
@@ -198,16 +250,17 @@ export function PostCard({
               />
             </div>
 
-            <div className="mt-2 flex flex-wrap gap-3 text-sm text-muted">
-              <span>
-                {post.viewCount}{" "}
-                {post.viewCount === 1 ? "leitura" : "leituras"}
-              </span>
-              <span>
-                {post.commentCount}{" "}
-                {post.commentCount === 1 ? "comentário" : "comentários"}
-              </span>
-              <span className="ml-auto font-medium text-accent">Ler →</span>
+            <div className="post-stat-row mt-3">
+              <PostStat
+                icon={<CommentIcon />}
+                count={post.commentCount}
+                label={post.commentCount === 1 ? "comentário" : "comentários"}
+              />
+              <PostStat
+                icon={<EyeIcon />}
+                count={post.viewCount}
+                label={post.viewCount === 1 ? "leitura" : "leituras"}
+              />
             </div>
 
             {actions}
@@ -218,67 +271,68 @@ export function PostCard({
   }
 
   return (
-    <article className="post-card relative animate-[fadeIn_0.35s_ease-out] p-0">
-      <div className="absolute right-3 top-3 z-10">
-        <PostShareMenu postId={post.id} />
-      </div>
+    <article className="post-card animate-[fadeIn_0.35s_ease-out] p-0">
       <Link
         href={href}
-        className="block cursor-pointer p-5 pb-3 pr-12 transition-colors hover:bg-surface/40"
+        className="block cursor-pointer p-5 pb-4 transition-colors hover:bg-surface/40"
       >
-        <div className="flex gap-3">
-          <Avatar name={name} url={avatarUrl} priority={priorityAvatar} />
-          <div className="min-w-0 flex-1">
-            <div className="min-w-0">
-              <p className="truncate text-[15px] font-semibold text-foreground md:text-base">
-                {name}
-              </p>
-              <MetaLine post={post} showSpace={showSpace} pinned={pinned} />
-            </div>
+        <CreditLine
+          post={post}
+          name={name}
+          avatarUrl={avatarUrl}
+          showSpace={showSpace}
+          pinned={pinned}
+          priorityAvatar={priorityAvatar}
+        />
 
-            <h2 className="mt-3 font-[family-name:var(--font-outfit)] text-lg font-semibold leading-snug tracking-tight text-foreground">
-              {title}
-            </h2>
-            {preview && preview !== title ? (
-              <p className="mt-1.5 line-clamp-2 text-[15px] leading-relaxed text-muted md:text-base">
-                {preview}
-              </p>
-            ) : null}
+        <h2 className="post-card-title mt-3 line-clamp-3">{title}</h2>
+        {preview && preview !== title ? (
+          <p className="mt-2 line-clamp-2 text-[15px] leading-relaxed text-muted md:text-base">
+            {preview}
+          </p>
+        ) : null}
 
-            {post.imageUrl ? (
-              <OptimizedMediaImage
-                src={post.imageUrl}
-                variant="feed"
-                priority={priorityMedia}
-                className="mt-3 max-h-40 w-full rounded-xl object-cover"
-              />
-            ) : null}
-            {!post.imageUrl &&
-            post.linkUrl &&
-            !post.linkUrl.startsWith("builders-club://") ? (
-              <p className="mt-2 truncate text-xs font-medium text-accent">
-                {post.linkUrl}
-              </p>
-            ) : null}
-
-            <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-border/70 pt-3 text-sm text-muted">
-              <span>
-                {post.viewCount}{" "}
-                {post.viewCount === 1 ? "leitura" : "leituras"}
-              </span>
-              <span>
-                {post.reactionCount}{" "}
-                {post.reactionCount === 1 ? "reação" : "reações"}
-              </span>
-              <span>
-                {post.commentCount}{" "}
-                {post.commentCount === 1 ? "comentário" : "comentários"}
-              </span>
-              <span className="ml-auto font-medium text-accent">Ler →</span>
-            </div>
-          </div>
-        </div>
+        {post.imageUrl ? (
+          <OptimizedMediaImage
+            src={post.imageUrl}
+            variant="feed"
+            priority={priorityMedia}
+            className="mt-4 max-h-40 w-full rounded-xl object-cover"
+          />
+        ) : null}
+        {!post.imageUrl &&
+        post.linkUrl &&
+        !post.linkUrl.startsWith("builders-club://") ? (
+          <p className="mt-2 truncate text-xs font-medium text-accent">
+            {post.linkUrl}
+          </p>
+        ) : null}
       </Link>
+
+      <div className="flex items-center gap-4 border-t border-border/70 px-5 py-2.5">
+        <div className="post-stat-row">
+          <ReactionButton
+            postId={post.id}
+            liked={liked}
+            reactionCount={post.reactionCount}
+            isPaid={isPaid}
+          />
+          <PostStat
+            icon={<CommentIcon />}
+            count={post.commentCount}
+            label={post.commentCount === 1 ? "comentário" : "comentários"}
+          />
+          <PostStat
+            icon={<EyeIcon />}
+            count={post.viewCount}
+            label={post.viewCount === 1 ? "leitura" : "leituras"}
+          />
+        </div>
+        <div className="ml-auto shrink-0">
+          <PostShareMenu postId={post.id} />
+        </div>
+      </div>
+
       {canManage ? (
         <div className="border-t border-border/60 px-5 py-3">{actions}</div>
       ) : null}
