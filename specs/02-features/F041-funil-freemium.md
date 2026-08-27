@@ -54,8 +54,15 @@ Gate de `/spaces/[slug]` continua igual: space pago redireciona free para
 `/planos`. Links antigos `/?upgrade=1` redirecionam para `/planos`.
 
 ## Hubla
-- `conceder` → `tier=paid` + `status=active` + allowlist
+- `conceder` (`member_added`, `invoice.payment_succeeded`, `subscription.activated`)
+  → `tier=pro|elite` + `status=active` + allowlist. Vale para quem **já é free**
+  (F059: cadastrou pelo presente e depois comprou em `/planos`).
+- Login / bootstrap **não** promove free → pago só porque o e-mail está na
+  allowlist. Quem já tem membership active fica como está até o webhook.
+- Conta **nova** com e-mail já na allowlist (comprou antes de criar conta)
+  continua nascendo paga — funil antigo.
 - `revogar` → `tier=free` (mantém `active`; admin não desce)
+- Origem F059 no Membership **não** é alterada na compra nem no login
 
 ## UI
 - Menus pagos com ícone de cadeado

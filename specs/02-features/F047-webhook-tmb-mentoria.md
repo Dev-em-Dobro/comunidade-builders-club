@@ -35,7 +35,7 @@ Override: `TMB_PRODUCT_CODES` (CSV). Codes Elite: `TMB_ELITE_CODES` (default
 ## Regras
 | Condição | Ação |
 |----------|------|
-| `status_pedido=Efetivado` **e** `status_financeiro=Adimplente` **e** `code` na lista | `AllowedEmail` source=`tmb` + Membership `active` / `pro` ou `elite` conforme o code |
+| `status_pedido=Efetivado` **e** `status_financeiro=Adimplente` **e** `code` na lista | `AllowedEmail` source=`tmb` + Membership `active` / `pro` ou `elite` conforme o code. Quem já é **free** (F059) sobe o plano; origem do cadastro **não** muda. Lookup de User case-insensitive. |
 | `status_pedido` ∈ cancelado/estornado **ou** `status_financeiro=Inadimplente` | remove allowlist + `tier=free` (não revoga login; admin intacto) |
 | Demais / code fora da lista / e-mail inválido | ignora (200) |
 

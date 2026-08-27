@@ -47,10 +47,24 @@ type HublaWebhookEventLike = {
 };
 
 export function emailDoEvento(event: HublaWebhookEventLike): string | null {
-  return (
-    normalizarEmailHubla(event.user?.email) ??
-    normalizarEmailHubla(event.subscription?.payer?.email) ??
-    normalizarEmailHubla(event.invoice?.user?.email) ??
-    normalizarEmailHubla(event.invoice?.payer?.email)
-  );
+  return emailsDoEvento(event)[0] ?? null;
+}
+
+/** Todos os e-mails do payload, já normalizados e sem duplicata. */
+export function emailsDoEvento(event: HublaWebhookEventLike): string[] {
+  const candidatos = [
+    event.user?.email,
+    event.subscription?.payer?.email,
+    event.invoice?.user?.email,
+    event.invoice?.payer?.email,
+  ];
+  const vistos = new Set<string>();
+  const emails: string[] = [];
+  for (const raw of candidatos) {
+    const email = normalizarEmailHubla(raw);
+    if (!email || vistos.has(email)) continue;
+    vistos.add(email);
+    emails.push(email);
+  }
+  return emails;
 }
