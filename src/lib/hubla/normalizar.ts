@@ -18,26 +18,35 @@ export function productIdDoEvento(event: {
   return primeiro || null;
 }
 
-type OfertaHubla = { id?: string };
+type OfertaHubla = { id?: string; isOrderBump?: boolean };
 type ProdutoComOfertas = { offers?: OfertaHubla[] };
 
+/**
+ * IDs da oferta comprada (`products[].offers`), não o catálogo do produto.
+ * Com order bump, fica a oferta principal (`isOrderBump !== true`).
+ */
 export function offerIdsDoEvento(event: {
   product?: ProdutoComOfertas;
   products?: ProdutoComOfertas[];
 }): string[] {
-  const ids: string[] = [];
+  const ofertas: { id: string; isOrderBump: boolean }[] = [];
   const seen = new Set<string>();
-  const add = (raw?: string) => {
-    const id = raw?.trim();
+  const add = (offer?: OfertaHubla) => {
+    const id = offer?.id?.trim();
     if (!id || seen.has(id)) return;
     seen.add(id);
-    ids.push(id);
+    ofertas.push({ id, isOrderBump: offer?.isOrderBump === true });
   };
-  for (const offer of event.product?.offers ?? []) add(offer.id);
+
   for (const product of event.products ?? []) {
-    for (const offer of product.offers ?? []) add(offer.id);
+    for (const offer of product.offers ?? []) add(offer);
   }
-  return ids;
+  if (ofertas.length === 0) {
+    for (const offer of event.product?.offers ?? []) add(offer);
+  }
+
+  const principais = ofertas.filter((o) => !o.isOrderBump);
+  return (principais.length > 0 ? principais : ofertas).map((o) => o.id);
 }
 
 type HublaWebhookEventLike = {

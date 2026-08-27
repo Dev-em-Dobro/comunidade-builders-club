@@ -67,6 +67,48 @@ describe("interpretarEventoHubla — F014 / F059", () => {
     assert.equal(acao.motivo, "tipo não tratado: invoice.created");
   });
 
+  it("checkout PRO concede pro mesmo com catálogo Elite no product.offers", () => {
+    const offerPlanMap = new Map([
+      ["offer-pro", "pro" as const],
+      ["offer-elite", "elite" as const],
+    ]);
+    const acao = interpretarEventoHubla(
+      payload("invoice.payment_succeeded", {
+        product: {
+          id: PRODUCT_ID,
+          offers: [{ id: "offer-pro" }, { id: "offer-elite" }],
+        },
+        products: [{ id: PRODUCT_ID, offers: [{ id: "offer-pro" }] }],
+      }),
+      {
+        productPlanMap: new Map([[PRODUCT_ID, "pro"]]),
+        offerPlanMap,
+      },
+    );
+    assert.equal(acao.acao, "conceder");
+    if (acao.acao !== "conceder") return;
+    assert.equal(acao.plan, "pro");
+  });
+
+  it("checkout Elite concede elite", () => {
+    const offerPlanMap = new Map([
+      ["offer-pro", "pro" as const],
+      ["offer-elite", "elite" as const],
+    ]);
+    const acao = interpretarEventoHubla(
+      payload("invoice.payment_succeeded", {
+        products: [{ id: PRODUCT_ID, offers: [{ id: "offer-elite" }] }],
+      }),
+      {
+        productPlanMap: new Map([[PRODUCT_ID, "pro"]]),
+        offerPlanMap,
+      },
+    );
+    assert.equal(acao.acao, "conceder");
+    if (acao.acao !== "conceder") return;
+    assert.equal(acao.plan, "elite");
+  });
+
   it("reúne e-mails do user, pagador da assinatura e da fatura", () => {
     const emails = emailsDoEvento({
       user: { email: "User@Example.com" },

@@ -2,7 +2,11 @@
 
 import type { PlanoPagoHubla } from "./produtos";
 
-export type HublaWebhookOffer = { id?: string; name?: string };
+export type HublaWebhookOffer = {
+  id?: string;
+  name?: string;
+  isOrderBump?: boolean;
+};
 
 export type HublaWebhookProduct = {
   id?: string;

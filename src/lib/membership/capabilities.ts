@@ -3,11 +3,22 @@
 import type { Membership, MembershipTier } from "@prisma/client";
 import { AULA_THREADS_SPACE_SLUG } from "@/lib/spaces/constants";
 
-/** Spaces cuja *página* é liberada para free (sidebar sem cadeado). */
+/**
+ * Spaces cuja *página* é liberada para free (sidebar sem cadeado).
+ *
+ * F063 — abertos quase todos: o free não pode publicar em lugar nenhum (o gate
+ * de publicar é outro), então manter a leitura trancada só escondia a prova de
+ * que a comunidade funciona. `freelas` fica de fora porque indicação de freela
+ * é troca entre membros pagantes; `aula-threads` é conteúdo de aula.
+ */
 export const FREE_SPACE_SLUGS = [
   "boas-vindas",
-  "geral",
+  "avisos",
   "presentes",
+  "geral",
+  "duvidas",
+  "conquistas",
+  "projetos",
 ] as const;
 
 export type FreeSpaceSlug = (typeof FREE_SPACE_SLUGS)[number];
@@ -121,7 +132,7 @@ export const UPGRADE_REASON_COPY: Record<
   },
   publicar: {
     title: "Publicar é para membros",
-    body: "Para criar publicações e participar de verdade, escolha o PRO ou o Elite.",
+    body: "Para criar publicações e participar da comunidade, escolha o PRO ou o Elite.",
   },
   comentar: {
     title: "Comentar é para membros",

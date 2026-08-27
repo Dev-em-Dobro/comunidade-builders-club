@@ -81,10 +81,9 @@ abrem o app (`ORION_APP_URL`).
 ## Hubla
 
 PRO e Elite são **ofertas do mesmo produto** Hubla (`VL3e0iDO3A32SyjJWr9S`,
-"Builders Club"). O webhook recebe `event.product.id` igual nos dois; o
-discriminador é `event.products[].offers[].id`. O slug de checkout
-(`pay.hub.la/XaY8QNfZlOO1XBgjzMfY`) **não** entra no payload — não use como
-product id.
+"Builders Club"). O webhook recebe `event.product.id` igual nos dois. O slug
+de checkout (`pay.hub.la/XaY8QNfZlOO1XBgjzMfY`) **não** entra no payload —
+não use como product id.
 
 Envs:
 
@@ -95,14 +94,20 @@ Envs:
 | `HUBLA_PRODUCT_ID` | Produto Club — allowlist de `product.id` (legado sem oferta casa **pro**) |
 | `HUBLA_PRODUCT_ID_PRO` | Produto PRO **separado**, se a Hubla criar um |
 | `HUBLA_PRODUCT_ID_ELITE` | Produto Elite **separado**, se a Hubla criar um |
-| `HUBLA_OFFER_ID_PRO` | Offer id(s) do PRO R$ 297 (vírgula se houver cópia + oficial) |
-| `HUBLA_OFFER_ID_ELITE` | Offer id(s) do Elite R$ 997. Sem ela, oferta não-PRO no produto Club segue o mapa de produto |
+| `HUBLA_OFFER_ID_PRO` | Offer id(s) do PRO (vírgula se houver cópia + oficial). Preço da oferta na Hubla pode mudar (ex. teste R$ 10) — o id é que conta. |
+| `HUBLA_OFFER_ID_ELITE` | Offer id(s) do Elite. Sem ela, oferta desconhecida no produto Club segue o mapa de produto (`HUBLA_PRODUCT_ID` → **pro**) |
 
 Webhook aceita o produto Club (e quaisquer IDs do mapa). Sem nenhum product id
-e sem nenhum offer id → 503 (F021). Com ofertas no evento: casa Elite →
-`tier=elite`; casa PRO → `tier=pro`; oferta desconhecida com só
-`HUBLA_OFFER_ID_PRO` setado → **elite** (não rebaixa quem comprou Elite).
-Grant nunca rebaixa (Elite + evento PRO permanece Elite).
+e sem nenhum offer id → 503 (F021).
+
+Discriminador: **`event.products[].offers[].id` da compra**, não o catálogo em
+`event.product.offers`. Checkout PRO (`HUBLA_OFFER_ID_PRO`) → `tier=pro`.
+Checkout Elite (`HUBLA_OFFER_ID_ELITE`) → `tier=elite`. Se o payload listar as
+duas (order bump), vale a oferta principal (`isOrderBump !== true`). Não
+conceder Elite só porque o id Elite aparece no catálogo do produto.
+
+Oferta desconhecida com só `HUBLA_OFFER_ID_PRO` setado → mapa de produto
+(Club = **pro**). Grant nunca rebaixa (Elite + evento PRO permanece Elite).
 `member_removed` / reembolso → `tier=free`.
 
 TMB (F047): codes `9DW254247E5` e `3XB272209KV` concedem **elite**
@@ -119,11 +124,17 @@ Página **`/planos`** (liberada para free e PRO):
 - Cards com destaque, hover (elevação/sombra) e lista de entregas em título + detalhe
 - Elite em destaque (recomendado)
 - **Preço com o parcelamento em destaque** — o número grande do card é a parcela
-  (`6x de R$ 55,18` no PRO, `12x de R$ 101,30` no Elite), com rótulo
+  (`12x de R$ 30,18` no PRO, `12x de R$ 101,30` no Elite), com rótulo
   “Parcele em até”. O valor à vista vira linha secundária (`ou R$ 297 à vista`),
   e o boleto Elite (`R$ 1.297`) segue como nota menor.
-- **Não** afirmar “sem juros”: o parcelado tem acréscimo (6x → R$ 331,08;
-  12x → R$ 1.215,60)
+- **Não** afirmar “sem juros”: o parcelado tem acréscimo (PRO 12x → R$ 362,16,
+  22% sobre o à vista; Elite 12x → R$ 1.215,60)
+
+> **27/08/2026 — PRO passa de 6x para 12x.** Era `6x de R$ 55,18`
+> (R$ 331,08, 11,5% de acréscimo). Agora `12x de R$ 30,18` = R$ 362,16, 22%
+> sobre os R$ 297 à vista. O à vista **não** mudou. Parcela menor na vitrine,
+> acréscimo maior no total — o que reforça a regra acima de nunca escrever
+> “sem juros”.
 - A promessa aparece **sem o rótulo “Promessa:”** — só a frase
   “Feche o 1º cliente em 90 dias”, separada da lista por um filete
 - CTA principal: checkout Hubla (cartão/Pix)
