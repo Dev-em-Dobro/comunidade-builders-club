@@ -42,6 +42,7 @@ export type AcaoAllowlist =
   | {
       acao: "conceder";
       email: string;
+      emails: string[];
       productId: string;
       offerId?: string;
       plan: PlanoPagoHubla;
@@ -51,8 +52,22 @@ export type AcaoAllowlist =
   | { acao: "revogar"; email: string; productId: string }
   | { acao: "ignorar"; motivo: string };
 
-export const EVENTOS_CONCEDER = new Set(["customer.member_added"]);
+export const EVENTOS_CONCEDER = new Set([
+  "customer.member_added",
+  "invoice.payment_succeeded",
+  "subscription.activated",
+]);
 export const EVENTOS_REVOGAR = new Set([
   "customer.member_removed",
   "invoice.refunded",
+]);
+
+/** Assinatura que não deve conceder acesso. Sem status ou `completed` passa. */
+export const STATUS_ASSINATURA_BLOQUEADOS = new Set([
+  "canceled",
+  "cancelled",
+  "unpaid",
+  "refunded",
+  "past_due",
+  "expired",
 ]);

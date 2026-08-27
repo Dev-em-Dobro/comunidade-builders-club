@@ -22,6 +22,7 @@ export type UtmPostMetric = {
   pessoas: UtmPostPerson[];
 };
 
+/** F059 — pago agora (PRO/Elite/paid) + origem daquele post. Admin/instrutor não conta. */
 function assinouPlanoVeioDaPostagem(p: {
   tier: MembershipTier;
   role: Role;

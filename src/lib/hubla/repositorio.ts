@@ -2,7 +2,7 @@
 
 import type { MembershipTier } from "@prisma/client";
 import { prisma } from "@/lib/db";
-import { addAllowedEmail, removeAllowedEmail } from "@/lib/membership/allowlist";
+import { addAllowedEmail, findUserByEmail, removeAllowedEmail } from "@/lib/membership/allowlist";
 import { interpretarEventoHubla } from "./interpretar";
 import type { PlanoPagoHubla } from "./produtos";
 import type { AcaoAllowlist, HublaWebhookPayload } from "./tipos";
@@ -33,10 +33,10 @@ export async function registrarEntrega(
 }
 
 async function concederPago(
-  email: string,
+  emails: string[],
   plan: PlanoPagoHubla,
 ): Promise<void> {
-  const user = await prisma.user.findUnique({ where: { email } });
+  const user = await findUserPorEmails(emails);
   if (!user) return;
   const m = await prisma.membership.findUnique({ where: { userId: user.id } });
   if (!m) {
@@ -58,9 +58,17 @@ async function concederPago(
   });
 }
 
+async function findUserPorEmails(emails: string[]) {
+  for (const email of emails) {
+    const user = await findUserByEmail(email);
+    if (user) return user;
+  }
+  return null;
+}
+
 /** F041 — cancelamento Hubla desce para free (não revoga o login). */
 async function downgradeParaFree(email: string): Promise<void> {
-  const user = await prisma.user.findUnique({ where: { email } });
+  const user = await findUserByEmail(email);
   if (!user) return;
   const m = await prisma.membership.findUnique({ where: { userId: user.id } });
   if (!m || m.role === "admin") return;
@@ -81,7 +89,7 @@ export async function aplicarAcaoAllowlist(acao: AcaoAllowlist): Promise<void> {
         ? `product:${acao.productId} offer:${acao.offerId}`
         : `product:${acao.productId}`,
     });
-    await concederPago(acao.email, acao.plan);
+    await concederPago(acao.emails.length > 0 ? acao.emails : [acao.email], acao.plan);
     return;
   }
 

@@ -1,8 +1,9 @@
-import { emailDoEvento, offerIdsDoEvento, productIdDoEvento } from "./normalizar";
+import { emailDoEvento, emailsDoEvento, offerIdsDoEvento, productIdDoEvento } from "./normalizar";
 import { planoDoEventoHubla, type PlanoPagoHubla } from "./produtos";
 import {
   EVENTOS_CONCEDER,
   EVENTOS_REVOGAR,
+  STATUS_ASSINATURA_BLOQUEADOS,
   type AcaoAllowlist,
   type HublaWebhookPayload,
 } from "./tipos";
@@ -57,20 +58,22 @@ export function interpretarEventoHubla(
     }
   }
 
-  const email = emailDoEvento(event);
+  const emails = emailsDoEvento(event);
+  const email = emails[0] ?? emailDoEvento(event);
   if (!email) {
     return { acao: "ignorar", motivo: "email ausente" };
   }
 
   if (EVENTOS_CONCEDER.has(tipo)) {
     const subStatus = event.subscription?.status?.toLowerCase();
-    if (subStatus && subStatus !== "active") {
-      return { acao: "ignorar", motivo: "subscription não active" };
+    if (subStatus && STATUS_ASSINATURA_BLOQUEADOS.has(subStatus)) {
+      return { acao: "ignorar", motivo: "subscription não paga" };
     }
     const offerId = offerIds.find((id) => offerPlanMap.get(id) === plan) ?? offerIds[0];
     return {
       acao: "conceder",
       email,
+      emails,
       productId,
       ...(offerId ? { offerId } : {}),
       plan: plan ?? "pro",
