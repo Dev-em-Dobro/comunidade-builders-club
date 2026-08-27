@@ -19,6 +19,24 @@ function WhatsAppIcon() {
   );
 }
 
+function MailIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-4 w-4"
+      aria-hidden
+    >
+      <rect x="2" y="4" width="20" height="16" rx="2" />
+      <path d="m2 7 10 6 10-6" />
+    </svg>
+  );
+}
+
 function Secao({
   titulo,
   descricao,
@@ -97,7 +115,8 @@ export default async function ConfiguracoesPage() {
             pagamento, atualizar dados de cobrança ou cancelar, fale com a
             gente — a gente resolve com você.
           </p>
-          <div className="mt-3 flex flex-wrap gap-2">
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            {/* Enquanto não houver WhatsApp, o e-mail é o canal principal. */}
             {whatsapp ? (
               <a
                 href={whatsapp}
@@ -109,9 +128,11 @@ export default async function ConfiguracoesPage() {
                 Falar no WhatsApp
               </a>
             ) : null}
-            <a href={emailSuporteUrl()} className="btn-ghost">
-              {EMAIL_SUPORTE}
+            <a href={emailSuporteUrl()} className="btn-outline gap-2">
+              <MailIcon />
+              Enviar e-mail
             </a>
+            <span className="text-sm text-muted">{EMAIL_SUPORTE}</span>
           </div>
         </div>
       </Secao>

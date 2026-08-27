@@ -55,8 +55,12 @@ Página nova, agrupando o que hoje está espalhado:
 > que é onde a operação realmente acontece.
 
 Contato centralizado em `src/lib/suporte.ts` (`WHATSAPP_SUPORTE`,
-`EMAIL_SUPORTE`). O botão de WhatsApp só renderiza se o número estiver
-configurado; o e-mail é sempre exibido.
+`EMAIL_SUPORTE`).
+
+**No MVP o canal é só o e-mail** (`suportedevquest@gmail.com`). O atendimento
+por WhatsApp entra depois: o código já está pronto e o botão aparece sozinho
+assim que `NEXT_PUBLIC_WHATSAPP_SUPORTE` for preenchida (só dígitos, com DDI).
+Sem a variável, nada quebra — o e-mail é a ação principal.
 
 ## Menu resultante
 
@@ -86,7 +90,8 @@ Builders Club
 - [ ] Busca é uma lupa ao lado da pill; sem plano pago abre o upgrade
 - [ ] `Materiais de apoio` é um único item apontando para `/entregaveis`
 - [ ] `/configuracoes` existe com Conta, Plano e pagamento, Aparência e Excluir conta
-- [ ] Bloco de suporte em Configurações com WhatsApp (se configurado) e e-mail
+- [ ] Bloco de suporte em Configurações com e-mail como canal principal
+- [ ] Botão de WhatsApp aparece sozinho quando `NEXT_PUBLIC_WHATSAPP_SUPORTE` for preenchida (fase 2)
 - [ ] `Excluir conta` sai de `/perfil`
 - [ ] Drawer mobile tem a mesma pill e o mesmo popup
 - [ ] Rodapé some com Planos, Perfil, Tema e Sair como itens soltos
