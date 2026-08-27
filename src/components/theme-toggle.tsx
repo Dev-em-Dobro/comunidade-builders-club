@@ -48,7 +48,8 @@ function MoonIcon() {
 export function ThemeToggle({
   variant = "menu",
 }: {
-  variant?: "menu" | "icon";
+  /** `popup` = item do menu do usuário na sidebar (F062). */
+  variant?: "menu" | "icon" | "popup";
 }) {
   const [theme, setTheme] = useState<Theme>("light");
 
@@ -75,6 +76,21 @@ export function ThemeToggle({
         title={label}
       >
         {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+      </button>
+    );
+  }
+
+  if (variant === "popup") {
+    return (
+      <button
+        type="button"
+        role="menuitem"
+        className="menu-item"
+        onClick={toggle}
+        aria-label={label}
+      >
+        {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+        {theme === "dark" ? "Tema claro" : "Tema escuro"}
       </button>
     );
   }
