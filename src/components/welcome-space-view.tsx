@@ -1,6 +1,15 @@
 import Link from "next/link";
 
-const STEPS = [
+type Step = {
+  n: string;
+  href: string;
+  label: string;
+  hint: string;
+  /** Passo 3 do pago tem links embutidos no texto. */
+  richHint?: boolean;
+};
+
+const STEPS_PAGO: Step[] = [
   {
     n: "1",
     href: "/perfil",
@@ -18,8 +27,38 @@ const STEPS = [
     href: "/spaces/conquistas",
     label: "Postar na comunidade quando tiver dúvida ou conquista",
     hint: "",
+    richHint: true,
   },
-] as const;
+];
+
+/**
+ * F063 — a trilha do free só pode ter o que ele consegue fazer.
+ *
+ * A anterior era a mesma dos dois tiers e dava 4 cadeados em 5 links no
+ * primeiro minuto. Publicar continua sendo PRO+ (gate por tier, independente do
+ * acesso ao space), então nenhum passo pede para postar: os três são leitura ou
+ * edição do próprio perfil.
+ */
+const STEPS_FREE: Step[] = [
+  {
+    n: "1",
+    href: "/perfil",
+    label: "Completar o perfil",
+    hint: "Nome e foto — é assim que a comunidade te encontra.",
+  },
+  {
+    n: "2",
+    href: "/spaces/conquistas",
+    label: "Ver o que a comunidade está fechando",
+    hint: "Cliente fechado, proposta aceita, primeiro pagamento — com quanto cobraram e como entregaram.",
+  },
+  {
+    n: "3",
+    href: "/spaces/presentes",
+    label: "Pegar os outros presentes",
+    hint: "Os kits liberados ficam todos aqui, abertos para você.",
+  },
+];
 
 export function WelcomeSpaceView({
   spaceName,
@@ -27,13 +66,18 @@ export function WelcomeSpaceView({
   tutorialEmbedUrl,
   tutorialVideoId,
   tutorialTitle,
+  isPaid,
 }: {
   spaceName: string;
   spaceDescription: string | null;
   tutorialEmbedUrl?: string | null;
   tutorialVideoId?: string;
   tutorialTitle?: string;
+  /** F063 — a trilha do free não pode ter link bloqueado. */
+  isPaid: boolean;
 }) {
+  const steps = isPaid ? STEPS_PAGO : STEPS_FREE;
+
   return (
     <div className="feed-wrap-wide">
       <div>
@@ -53,7 +97,7 @@ export function WelcomeSpaceView({
             {tutorialTitle ?? "Como usar a comunidade"}
           </h2>
           <p className="mt-1 text-sm text-muted">
-            Oito minutos. Menu, Spaces, aulas — e onde postar sua primeira conquista.
+            Quer saber quem são os builders? Assista o vídeo abaixo.
           </p>
         </div>
       ) : null}
@@ -85,7 +129,7 @@ export function WelcomeSpaceView({
             Primeiros passos
           </h2>
           <ol className="mt-4 space-y-4">
-            {STEPS.map((step) => (
+            {steps.map((step) => (
               <li key={step.n} className="flex gap-3">
                 <span
                   className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent/15 text-xs font-semibold text-accent"
@@ -101,7 +145,7 @@ export function WelcomeSpaceView({
                     {step.label}
                   </Link>
                   <p className="mt-0.5 text-sm leading-snug text-muted">
-                    {step.n === "3" ? (
+                    {step.richHint ? (
                       <>
                         Dúvida no space{" "}
                         <Link
