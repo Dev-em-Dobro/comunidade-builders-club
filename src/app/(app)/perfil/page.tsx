@@ -5,7 +5,6 @@ import {
 } from "@/lib/membership/capabilities";
 import { ProfileForm } from "@/components/profile-form";
 import { PlanBadge } from "@/components/plan-badge";
-import { ExcluirConta } from "@/components/excluir-conta";
 
 export default async function PerfilPage() {
   const member = await requireActiveMemberOrRedirect();
@@ -35,8 +34,6 @@ export default async function PerfilPage() {
         bio={profile.bio}
         avatarUrl={profile.avatarUrl}
       />
-
-      <ExcluirConta />
     </>
   );
 }

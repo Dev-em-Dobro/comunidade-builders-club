@@ -140,7 +140,7 @@
   }
 
   .nav-space {
-    @apply rounded-xl px-3 py-2.5 text-[15px] text-foreground/75 transition-colors hover:bg-surface hover:text-foreground;
+    @apply rounded-xl px-3 py-2 text-[15px] text-foreground/75 transition-colors hover:bg-surface hover:text-foreground;
   }
 
   .nav-space-active {
@@ -153,6 +153,50 @@
 
   .nav-cta-active {
     @apply ring-2 ring-accent/40 ring-offset-2 ring-offset-sidebar;
+  }
+
+  /* F062 — pill do usuário no rodapé da sidebar e itens do popup. */
+  .user-pill {
+    @apply flex min-w-0 flex-1 cursor-pointer items-center gap-2 rounded-full py-1 pl-1 pr-2 text-left transition-colors hover:bg-surface;
+  }
+
+  .menu-item {
+    @apply flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-[14px] font-medium text-foreground/85 transition-colors hover:bg-surface hover:text-foreground;
+  }
+
+  .menu-item-active {
+    @apply bg-surface text-accent;
+  }
+
+  /*
+   * F062 — a lista de spaces raramente estoura a altura, mas quando estoura a
+   * barra padrão come 15px e polui o menu. Fica invisível e só materializa no
+   * hover da própria lista.
+   */
+  .sidebar-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+  }
+
+  .sidebar-scroll:hover {
+    scrollbar-color: rgb(148 163 184 / 0.45) transparent;
+  }
+
+  .sidebar-scroll::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .sidebar-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .sidebar-scroll::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 9999px;
+  }
+
+  .sidebar-scroll:hover::-webkit-scrollbar-thumb {
+    background: rgb(148 163 184 / 0.45);
   }
 
   .feed-wrap {

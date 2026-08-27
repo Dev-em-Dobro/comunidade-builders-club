@@ -4,23 +4,20 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { NOME_PRODUTO } from "@/lib/produto";
-import { LogoutButton } from "@/components/logout-button";
 import {
   NotificationBell,
   type NotifPreview,
 } from "@/components/notification-bell";
-import { MateriaisNav } from "@/components/materiais-nav";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { UpgradeProvider, useUpgrade } from "@/components/upgrade-modal";
-import { PlanBadge } from "@/components/plan-badge";
+import { UserMenu } from "@/components/user-menu";
 import { isFreeSpaceSlug } from "@/lib/membership/capabilities";
 import {
   ICON_ADMIN,
   ICON_AULAS,
   ICON_BUSCA,
+  ICON_MATERIAIS,
   ICON_NOVA,
-  ICON_PLANOS,
-  ICON_PERFIL,
   ICON_PROGRESSO,
   ICON_TODOS,
   iconForSpace,
@@ -85,6 +82,50 @@ function FeedLink({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
+/**
+ * F062 — um item só para os materiais. As categorias continuam existindo em
+ * `/entregaveis/{slug}`, mas agora se chega nelas pela própria página.
+ */
+function MateriaisLink({
+  locked,
+  onNavigate,
+}: {
+  locked: boolean;
+  onNavigate?: () => void;
+}) {
+  const pathname = usePathname();
+  const { openUpgrade } = useUpgrade();
+  const active = pathname.startsWith("/entregaveis");
+
+  if (locked) {
+    return (
+      <button
+        type="button"
+        onClick={() => {
+          openUpgrade("materiais");
+          onNavigate?.();
+        }}
+        className="nav-space flex w-full cursor-pointer items-center gap-2 text-left opacity-80"
+      >
+        {ICON_MATERIAIS}
+        <span className="min-w-0 flex-1 truncate">Materiais de apoio</span>
+        <LockIcon />
+      </button>
+    );
+  }
+
+  return (
+    <Link
+      href="/entregaveis"
+      onClick={onNavigate}
+      className={`nav-space flex items-center gap-2 ${active ? "nav-space-active" : ""}`}
+    >
+      {ICON_MATERIAIS}
+      <span className="truncate">Materiais de apoio</span>
+    </Link>
+  );
+}
+
 function SpaceNav({
   spaces,
   isPaid,
@@ -99,7 +140,7 @@ function SpaceNav({
 
   return (
     <nav className="flex flex-col gap-0.5">
-      <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">
+      <p className="mb-1.5 px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">
         Spaces
       </p>
       {spaces.map((s) => {
@@ -139,6 +180,79 @@ function SpaceNav({
   );
 }
 
+function LockedGhost({
+  label,
+  icon,
+  reason,
+  active,
+  onNavigate,
+}: {
+  label: string;
+  icon: React.ReactNode;
+  reason: "aulas" | "busca";
+  active: boolean;
+  onNavigate?: () => void;
+}) {
+  const { openUpgrade } = useUpgrade();
+  return (
+    <button
+      type="button"
+      className={`btn-ghost w-full cursor-pointer justify-start gap-2 ${active ? "text-accent" : ""}`}
+      onClick={() => {
+        openUpgrade(reason);
+        onNavigate?.();
+      }}
+    >
+      {icon}
+      <span className="flex-1 text-left">{label}</span>
+      <LockIcon />
+    </button>
+  );
+}
+
+/** F062 — busca virou lupa ao lado da pill, como na referência. */
+function BuscaButton({
+  isPaid,
+  onNavigate,
+}: {
+  isPaid: boolean;
+  onNavigate?: () => void;
+}) {
+  const pathname = usePathname();
+  const { openUpgrade } = useUpgrade();
+  const active = pathname.startsWith("/busca");
+  const className = `btn-ghost shrink-0 px-2 ${active ? "text-accent" : ""}`;
+
+  if (!isPaid) {
+    return (
+      <button
+        type="button"
+        className={className}
+        aria-label="Busca (requer upgrade)"
+        title="Busca"
+        onClick={() => {
+          openUpgrade("busca");
+          onNavigate?.();
+        }}
+      >
+        {ICON_BUSCA}
+      </button>
+    );
+  }
+
+  return (
+    <Link
+      href="/busca"
+      className={className}
+      aria-label="Busca"
+      title="Busca"
+      onClick={onNavigate}
+    >
+      {ICON_BUSCA}
+    </Link>
+  );
+}
+
 function SidebarFooter({
   unread,
   isAdmin,
@@ -146,6 +260,9 @@ function SidebarFooter({
   isElite,
   orionUrl,
   notifPreview,
+  displayName,
+  email,
+  avatarUrl,
   onNavigate,
 }: {
   unread: number;
@@ -154,50 +271,16 @@ function SidebarFooter({
   isElite: boolean;
   orionUrl: string;
   notifPreview: NotifPreview[];
+  displayName: string;
+  email: string;
+  avatarUrl?: string | null;
   onNavigate?: () => void;
 }) {
   const pathname = usePathname();
   const { openUpgrade } = useUpgrade();
 
-  function LockedGhost({
-    label,
-    icon,
-    reason,
-    active,
-  }: {
-    label: string;
-    icon: React.ReactNode;
-    reason: "aulas" | "busca";
-    active: boolean;
-  }) {
-    return (
-      <button
-        type="button"
-        className={`btn-ghost w-full cursor-pointer justify-start gap-2 ${active ? "text-accent" : ""}`}
-        onClick={() => {
-          openUpgrade(reason);
-          onNavigate?.();
-        }}
-      >
-        {icon}
-        <span className="flex-1 text-left">{label}</span>
-        <LockIcon />
-      </button>
-    );
-  }
-
   return (
-    <div className="relative z-[100] mt-auto flex flex-col gap-0.5 border-t border-border pt-4">
-      {!isElite ? (
-        <Link
-          href="/planos"
-          className={`btn-ghost justify-start gap-2 ${pathname.startsWith("/planos") ? "text-accent" : ""}`}
-          onClick={onNavigate}
-        >
-          {ICON_PLANOS}
-          Planos
-        </Link>
-      ) : null}
+    <div className="relative z-[100] mt-auto flex flex-col gap-0.5 border-t border-border pt-3">
       {isPaid ? (
         <Link
           href="/aulas"
@@ -213,23 +296,7 @@ function SidebarFooter({
           icon={ICON_AULAS}
           reason="aulas"
           active={pathname.startsWith("/aulas")}
-        />
-      )}
-      {isPaid ? (
-        <Link
-          href="/busca"
-          className={`btn-ghost justify-start gap-2 ${pathname.startsWith("/busca") ? "text-accent" : ""}`}
-          onClick={onNavigate}
-        >
-          {ICON_BUSCA}
-          Busca
-        </Link>
-      ) : (
-        <LockedGhost
-          label="Busca"
-          icon={ICON_BUSCA}
-          reason="busca"
-          active={pathname.startsWith("/busca")}
+          onNavigate={onNavigate}
         />
       )}
       {isPaid ? (
@@ -258,14 +325,6 @@ function SidebarFooter({
         </button>
       )}
       <NotificationBell unread={unread} items={notifPreview} />
-      <Link
-        href="/perfil"
-        className={`btn-ghost justify-start gap-2 ${pathname.startsWith("/perfil") ? "text-accent" : ""}`}
-        onClick={onNavigate}
-      >
-        {ICON_PERFIL}
-        Perfil
-      </Link>
       {isAdmin ? (
         <>
           <Link
@@ -293,8 +352,17 @@ function SidebarFooter({
           </Link>
         </>
       ) : null}
-      <ThemeToggle />
-      <LogoutButton />
+      <div className="mt-1.5 flex items-center gap-1 border-t border-border pt-2.5">
+        <UserMenu
+          displayName={displayName}
+          email={email}
+          avatarUrl={avatarUrl}
+          isPaid={isPaid}
+          isElite={isElite}
+          onNavigate={onNavigate}
+        />
+        <BuscaButton isPaid={isPaid} onNavigate={onNavigate} />
+      </div>
     </div>
   );
 }
@@ -358,6 +426,7 @@ function NovaPublicacaoFab({
 function ShellInner({
   children,
   displayName,
+  email,
   isAdmin,
   isPaid,
   isElite,
@@ -369,6 +438,7 @@ function ShellInner({
 }: {
   children: React.ReactNode;
   displayName: string;
+  email: string;
   isAdmin: boolean;
   isPaid: boolean;
   isElite: boolean;
@@ -394,8 +464,6 @@ function ShellInner({
     return () => window.removeEventListener("keydown", onKey);
   }, [drawerOpen]);
 
-  const initial = displayName.slice(0, 1).toUpperCase();
-
   return (
     <div className="flex min-h-dvh w-full">
       <aside className="sticky top-0 z-40 hidden h-dvh w-[260px] shrink-0 flex-col border-r border-border bg-sidebar/95 p-5 backdrop-blur-md md:flex">
@@ -405,34 +473,12 @@ function ShellInner({
         >
           {NOME_PRODUTO}
         </Link>
-        <div className="mt-4 flex items-center gap-2.5">
-          {avatarUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={avatarUrl}
-              alt=""
-              className="h-8 w-8 rounded-full object-cover ring-2 ring-surface"
-            />
-          ) : (
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/15 text-xs font-bold text-accent">
-              {initial}
-            </div>
-          )}
-          <div className="min-w-0">
-            <p className="truncate text-sm font-medium text-foreground/90">
-              {displayName}
-            </p>
-            <div className="mt-0.5">
-              <PlanBadge isPaid={isPaid} isElite={isElite} />
-            </div>
-          </div>
-        </div>
-        <div className="mt-8 flex min-h-0 flex-1 flex-col overflow-y-auto">
+        <div className="sidebar-scroll mt-5 flex min-h-0 flex-1 flex-col overflow-y-auto">
           <FeedLink />
-          <div className="my-5 border-t border-border" />
+          <div className="my-3 border-t border-border" />
           <SpaceNav spaces={spaces} isPaid={isPaid} />
-          <div className="my-5 border-t border-border" />
-          <MateriaisNav locked={!isPaid} />
+          <div className="my-3 border-t border-border" />
+          <MateriaisLink locked={!isPaid} />
         </div>
         <SidebarFooter
           unread={unread}
@@ -441,6 +487,9 @@ function ShellInner({
           isElite={isElite}
           orionUrl={orionUrl}
           notifPreview={notifPreview}
+          displayName={displayName}
+          email={email}
+          avatarUrl={avatarUrl}
         />
       </aside>
 
@@ -469,16 +518,16 @@ function ShellInner({
                 Fechar
               </button>
             </div>
-            <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+            <div className="sidebar-scroll flex min-h-0 flex-1 flex-col overflow-y-auto">
               <FeedLink onNavigate={() => setDrawerOpen(false)} />
-              <div className="my-5 border-t border-border" />
+              <div className="my-3 border-t border-border" />
               <SpaceNav
                 spaces={spaces}
                 isPaid={isPaid}
                 onNavigate={() => setDrawerOpen(false)}
               />
-              <div className="my-5 border-t border-border" />
-              <MateriaisNav
+              <div className="my-3 border-t border-border" />
+              <MateriaisLink
                 locked={!isPaid}
                 onNavigate={() => setDrawerOpen(false)}
               />
@@ -490,6 +539,9 @@ function ShellInner({
               isElite={isElite}
               orionUrl={orionUrl}
               notifPreview={notifPreview}
+              displayName={displayName}
+              email={email}
+              avatarUrl={avatarUrl}
               onNavigate={() => setDrawerOpen(false)}
             />
           </aside>
@@ -542,6 +594,7 @@ function ShellInner({
 export function AppShellClient({
   children,
   displayName,
+  email,
   isAdmin,
   isPaid,
   isElite,
@@ -554,6 +607,7 @@ export function AppShellClient({
 }: {
   children: React.ReactNode;
   displayName: string;
+  email: string;
   isAdmin: boolean;
   isPaid: boolean;
   isElite: boolean;
@@ -608,6 +662,7 @@ export function AppShellClient({
     >
       <ShellInner
         displayName={displayName}
+        email={email}
         isAdmin={isAdmin}
         isPaid={isPaid}
         isElite={isElite}

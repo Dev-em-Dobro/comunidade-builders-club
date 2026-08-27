@@ -13,6 +13,7 @@ export function AppShell({
   isPaid,
   isElite,
   displayName,
+  email,
   avatarUrl,
 }: {
   children: React.ReactNode;
@@ -21,11 +22,14 @@ export function AppShell({
   isPaid: boolean;
   isElite: boolean;
   displayName: string;
+  /** F062 — exibido no topo do popup da pill do usuário. */
+  email: string;
   avatarUrl?: string | null;
 }) {
   return (
     <AppShellClient
       displayName={displayName}
+      email={email}
       isAdmin={isAdmin}
       isPaid={isPaid}
       isElite={isElite}
