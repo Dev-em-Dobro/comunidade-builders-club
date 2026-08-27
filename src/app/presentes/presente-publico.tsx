@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { NOME_PRODUTO } from "@/lib/produto";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { GiftSignupForm } from "@/components/gift-signup-form";
-import { GiftOpenCard } from "@/components/gift-open-card";
 import { MarkdownBody } from "@/lib/markdown";
 import { PostMedia } from "@/components/post-media";
 import { previewFromBody } from "@/lib/posts/title";
@@ -84,11 +83,14 @@ export async function PresentePublico({
     body: gift.body,
     linkUrl: gift.linkUrl,
   });
-  const title = link?.showComposerTitle
+  /**
+   * F059 — antes, presente com link e sem título de composer caía em `null`, e
+   * o <h1> virava `sr-only` porque o card "Abrir presente" já mostrava o
+   * título na tela. Sem o card, isso deixaria a página sem título visível.
+   */
+  const title = link
     ? link.title
-    : link
-      ? null
-      : gift.title?.trim() || previewFromBody(gift.body, 90) || "Presente";
+    : gift.title?.trim() || previewFromBody(gift.body, 90) || "Presente";
   const authorName = gift.author.profile?.displayName ?? "Builders Club";
   /**
    * F060 — presente sem link é texto para ler: mostra o corpo.
@@ -132,9 +134,7 @@ export async function PresentePublico({
         ) : null}
 
         <article className="mt-8">
-          <h1 className={title ? "reading-title" : "sr-only"}>
-            {title ?? link?.title ?? "Presente"}
-          </h1>
+          <h1 className="reading-title">{title}</h1>
           <p className="mt-4 text-sm text-muted">
             {authorName} ·{" "}
             {gift.createdAt.toLocaleDateString("pt-BR", {
@@ -149,18 +149,16 @@ export async function PresentePublico({
               <MarkdownBody body={gift.body} variant="reading" />
             </div>
           ) : null}
-          {link ? (
-            <GiftOpenCard
-              href={link.href}
-              title={link.title}
-              sourceLabel={link.sourceLabel}
-              promptSignup={!user}
-            />
-          ) : null}
+          {/*
+           * F059 — o card "Abrir presente" saiu: ele repetia o <h1> da página
+           * logo abaixo do corpo. O link volta a sair pelo PostMedia, que o
+           * card suprimia — sem isso, presentes cujo `linkUrl` não aparece no
+           * corpo (whisper-local, hermes, os de teste) ficariam sem link.
+           */}
           <PostMedia
             imageUrl={gift.imageUrl}
             videoUrl={gift.videoUrl}
-            linkUrl={link ? null : gift.linkUrl}
+            linkUrl={gift.linkUrl}
             priority
           />
         </article>
