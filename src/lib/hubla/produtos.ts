@@ -25,7 +25,8 @@ export function mapaProdutosHubla(): Map<string, PlanoPagoHubla> {
 
   if (legado) map.set(legado, "pro");
   if (pro) map.set(pro, "pro");
-  if (elite) map.set(elite, "elite");
+  // Mesmo product.id que o Club: PRO/Elite discriminam por oferta, não daqui.
+  if (elite && elite !== legado && elite !== pro) map.set(elite, "elite");
 
   return map;
 }
@@ -50,9 +51,11 @@ export function webhookHublaConfigurado(
 }
 
 /**
- * Oferta casa primeiro. Com só HUBLA_OFFER_ID_PRO, oferta desconhecida no
- * produto Club não vira PRO — cai no mapa de produto (legado) ou elite se o
- * produto mapeia elite. Sem ofertas no evento, usa o mapa de produto.
+ * Casa o id da oferta comprada: PRO → pro, Elite → elite.
+ * Várias ofertas no mesmo evento (order bump): cada id conta; se PRO e Elite
+ * aparecerem juntos, não escolhe Elite por padrão — quem chama já deve ter
+ * filtrado a oferta principal (`isOrderBump !== true`).
+ * Oferta desconhecida cai no mapa de produto (Club = pro), nunca em elite.
  */
 export function planoDoEventoHubla(opts: {
   productId: string;
@@ -64,19 +67,23 @@ export function planoDoEventoHubla(opts: {
   const offerMap = opts.offerMap ?? mapaOfertasHubla();
 
   if (offerMap.size > 0 && opts.offerIds.length > 0) {
-    let foundPro = false;
-    let temOfertaElite = false;
-    for (const plan of offerMap.values()) {
-      if (plan === "elite") temOfertaElite = true;
-    }
+    const matched = new Set<PlanoPagoHubla>();
     for (const id of opts.offerIds) {
       const plan = offerMap.get(id);
-      if (plan === "elite") return "elite";
-      if (plan === "pro") foundPro = true;
+      if (plan) matched.add(plan);
     }
-    if (foundPro) return "pro";
-    if (temOfertaElite) return null;
-    return productMap.has(opts.productId) ? "elite" : null;
+    if (matched.size === 1) {
+      const plan = [...matched][0];
+      return plan ?? null;
+    }
+    if (matched.has("pro") && matched.has("elite")) {
+      return "pro";
+    }
+    if (matched.size === 0) {
+      const temOfertaElite = [...offerMap.values()].includes("elite");
+      if (temOfertaElite) return null;
+      return productMap.get(opts.productId) ?? null;
+    }
   }
 
   return productMap.get(opts.productId) ?? null;
