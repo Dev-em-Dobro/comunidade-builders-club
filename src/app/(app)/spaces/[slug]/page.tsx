@@ -60,6 +60,7 @@ export default async function SpacePage({ params }: Props) {
         tutorialEmbedUrl={tutorialEmbedUrl}
         tutorialVideoId={tutorialVideoId}
         tutorialTitle={WELCOME_TUTORIAL_VIDEO.title}
+        isPaid={isPaid}
       />
     );
   }
