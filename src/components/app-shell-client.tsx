@@ -210,35 +210,14 @@ function LockedGhost({
   );
 }
 
-/** F062 — busca virou lupa ao lado da pill, como na referência. */
-function BuscaButton({
-  isPaid,
-  onNavigate,
-}: {
-  isPaid: boolean;
-  onNavigate?: () => void;
-}) {
+/**
+ * F062 — busca virou lupa ao lado da pill, como na referência.
+ * F063 — liberada para free; o gate passou a ser o conteúdo do resultado.
+ */
+function BuscaButton({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
-  const { openUpgrade } = useUpgrade();
   const active = pathname.startsWith("/busca");
   const className = `btn-ghost shrink-0 px-2 ${active ? "text-accent" : ""}`;
-
-  if (!isPaid) {
-    return (
-      <button
-        type="button"
-        className={className}
-        aria-label="Busca (requer upgrade)"
-        title="Busca"
-        onClick={() => {
-          openUpgrade("busca");
-          onNavigate?.();
-        }}
-      >
-        {ICON_BUSCA}
-      </button>
-    );
-  }
 
   return (
     <Link
@@ -361,7 +340,7 @@ function SidebarFooter({
           isElite={isElite}
           onNavigate={onNavigate}
         />
-        <BuscaButton isPaid={isPaid} onNavigate={onNavigate} />
+        <BuscaButton onNavigate={onNavigate} />
       </div>
     </div>
   );

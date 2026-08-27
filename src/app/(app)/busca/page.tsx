@@ -1,16 +1,23 @@
 import Link from "next/link";
-import { requirePaidMemberOrRedirect } from "@/lib/membership/require-member";
-import { hrefPlanos } from "@/lib/membership/capabilities";
+import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
+import { isPaidMembership } from "@/lib/membership/capabilities";
 import { searchAll } from "@/lib/search";
 import { PostCard } from "@/components/post-card";
 
 type Props = { searchParams: Promise<{ q?: string }> };
 
 export default async function BuscaPage({ searchParams }: Props) {
-  const member = await requirePaidMemberOrRedirect(hrefPlanos({ motivo: "busca" }));
+  /**
+   * F063 — busca liberada para free. O gate deixa de ser a porta e passa a ser
+   * o conteúdo: `searchAll` restringe os resultados aos spaces do free, para a
+   * listagem não virar vitrine de space pago.
+   */
+  const member = await requireActiveMemberOrRedirect();
+  const isPaid = isPaidMembership(member.membership);
 
   const { q = "" } = await searchParams;
-  const results = q.trim().length >= 2 ? await searchAll(q) : null;
+  const results =
+    q.trim().length >= 2 ? await searchAll(q, { isPaid }) : null;
 
   return (
     <>

@@ -237,6 +237,48 @@ Pago: mantém os três passos atuais (perfil, aulas, postar).
 
 O vídeo tutorial já varia por tier (`welcomeTutorialVideoId`); só a lista muda.
 
+### 5. Reagir liberado para o free
+
+> ✅ **Implementado em 27/08/2026.**
+
+Reagir sai do gate PRO. **Comentar e publicar continuam PRO+.**
+
+O gate era duplo e os dois caíram: o cliente (`post-actions.tsx`, que abria o
+modal antes de tentar) e o servidor (`toggleReactionAction`, que exigia
+`requirePaidMember`). Só o cliente não bastaria — a Server Action recusaria.
+
+Efeito colateral: `UPGRADE_REASON_COPY.reagir` fica sem uso, e o `catch` de
+`UPGRADE_REQUIRED` no botão virou código morto (removido). A prop `isPaid` do
+`ReactionButton` foi eliminada, junto com os três call sites.
+
+**Por quê:** reagir é o degrau mais barato de participação. Quem chegou de um
+presente e não pode nem curtir um post não tem como sinalizar interesse — e a
+comunidade não tem como perceber que ele existe.
+
+### 6. Busca liberada para o free, com filtro no resultado
+
+> ✅ **Implementado em 27/08/2026.**
+
+`/busca` deixa de exigir PRO. O gate **muda de lugar**: em vez de barrar a
+porta, filtra o conteúdo.
+
+- `busca/page.tsx` troca `requirePaidMemberOrRedirect` por
+  `requireActiveMemberOrRedirect` e passa `isPaid` para `searchAll`
+- `searchAll(q, { isPaid })` restringe posts **e** spaces: pago vê tudo menos
+  `aula-threads`; free vê só `FREE_SPACE_SLUGS`
+- A lupa da sidebar (F062) perde o gate e a prop `isPaid`
+- `isFreeAppPath` passa a listar `/busca`
+
+O default de `isPaid` é `true`, então chamadas antigas de `searchAll` não mudam
+de comportamento.
+
+> ⚠️ **Inconsistência conhecida, a decidir.** O feed é vitrine
+> (`canFreeReadPost`): o free vê e abre post de **qualquer** space, inclusive
+> `freelas`. A busca, agora, **não** devolve esses posts. Ou seja, existe post
+> que o free alcança pelo feed mas não encontra buscando. As duas regras
+> precisam convergir — ou a busca acompanha o feed, ou o feed passa a respeitar
+> `FREE_SPACE_SLUGS`.
+
 ## Pendente — levantado no teste de 27/08/2026
 
 Percorrido como usuário free real. O roteiro do teste e o do vídeo ficam

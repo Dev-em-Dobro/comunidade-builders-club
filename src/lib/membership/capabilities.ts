@@ -66,6 +66,8 @@ export function isFreeAppPath(pathname: string): boolean {
   if (pathname.startsWith("/notificacoes")) return true;
   if (pathname.startsWith("/perfil")) return true;
   if (pathname.startsWith("/planos")) return true;
+  /** F063 — busca liberada; o filtro é no resultado, não na porta. */
+  if (pathname.startsWith("/busca")) return true;
   if (pathname.startsWith("/posts/")) return true; // detalhe: gate por space do post
   if (pathname.startsWith("/spaces/")) {
     const slug = pathname.split("/")[2] ?? "";

@@ -55,15 +55,12 @@ export function ReactionButton({
   postId,
   liked,
   reactionCount,
-  isPaid = true,
 }: {
   postId: string;
   liked: boolean;
   reactionCount: number;
-  isPaid?: boolean;
 }) {
   const router = useRouter();
-  const upgrade = useUpgradeOptional();
   const [, start] = useTransition();
   const [otimista, setOtimista] = useState<{
     liked: boolean;
@@ -83,11 +80,8 @@ export function ReactionButton({
   const marcado = otimista?.liked ?? liked;
   const total = otimista?.count ?? reactionCount;
 
+  // F063 — reagir é livre para free. Comentar e publicar seguem no gate PRO.
   function reagir() {
-    if (!isPaid) {
-      upgrade?.openUpgrade("reagir");
-      return;
-    }
     const proximo = !marcado;
     setOtimista({ liked: proximo, count: Math.max(0, total + (proximo ? 1 : -1)) });
     setAnim((a) => ({ n: a.n + 1, liked: proximo }));
@@ -96,11 +90,9 @@ export function ReactionButton({
       try {
         await toggleReactionAction(postId);
         router.refresh();
-      } catch (e) {
+      } catch {
+        // Reagir não tem mais gate de plano; qualquer falha só desfaz o otimista.
         setOtimista(null);
-        if (e instanceof Error && e.message.includes(UPGRADE_REQUIRED)) {
-          upgrade?.openUpgrade("reagir");
-        }
       }
     });
   }
@@ -222,7 +214,6 @@ export function PostActions({
             postId={postId}
             liked={liked}
             reactionCount={reactionCount}
-            isPaid={isPaid}
           />
         ) : null}
         {isAdmin ? (

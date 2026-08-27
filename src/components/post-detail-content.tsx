@@ -151,7 +151,6 @@ export function PostDetailContent({
               postId={post.id}
               liked={post.liked}
               reactionCount={post.reactionCount}
-              isPaid={isPaid}
             />
             <PostStat
               icon={<CommentIcon />}

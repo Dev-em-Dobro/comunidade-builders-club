@@ -1,7 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireAdmin, requirePaidMember } from "@/lib/membership/require-member";
+import {
+  requireActiveMember,
+  requireAdmin,
+  requirePaidMember,
+} from "@/lib/membership/require-member";
 import {
   createComment,
   createCommentSchema,
@@ -44,8 +48,9 @@ export async function deleteCommentAction(commentId: string, postId: string) {
   revalidatePath(`/posts/${postId}`);
 }
 
+/** F063 — reagir é livre para free; comentar segue exigindo PRO. */
 export async function toggleReactionAction(postId: string) {
-  const { user } = await requirePaidMember();
+  const { user } = await requireActiveMember();
   const result = await togglePostReaction(user.id, postId);
   revalidatePath(`/posts/${postId}`);
   revalidatePath("/");

@@ -315,7 +315,6 @@ export function PostCard({
             postId={post.id}
             liked={liked}
             reactionCount={post.reactionCount}
-            isPaid={isPaid}
           />
           <PostStat
             icon={<CommentIcon />}
