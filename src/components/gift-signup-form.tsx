@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth/client";
 import { completarCadastroPresenteAction } from "@/actions/gifts";
+import { WELCOME_SPACE_SLUG } from "@/lib/spaces/constants";
 
 type Step = "form" | "otp";
 
@@ -79,7 +80,12 @@ export function GiftSignupForm({
         window.setTimeout(() => router.refresh(), 2200);
         return;
       }
-      router.refresh();
+      /**
+       * Cadastro novo vai direto para Boas-vindas. Antes era `router.refresh()`:
+       * a pessoa continuava no rodapé da página do presente, sem scroll para a
+       * mensagem de sucesso, sem saber que já estava dentro.
+       */
+      router.push(`/spaces/${WELCOME_SPACE_SLUG}`);
     } catch {
       setError("Não foi possível entrar.");
     } finally {

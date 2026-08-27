@@ -201,23 +201,37 @@ vale — o path curto é só conveniência.
 
 ## Link do presente (Notion ou outro)
 
-Na leitura pública **não** mostrar a URL crua (nem no título, nem no corpo).
-O post da Jaque costuma ser só o link do Notion — isso vira um card:
+O título legível continua sendo extraído do slug do Notion (sem UUID, sem
+`fbclid`) por `giftLinkView`, e vira o `<h1>` da página.
 
-- Título legível extraído do slug do Notion (sem UUID, sem `fbclid`)
-- CTA **Abrir presente** em **nova aba** (`target=_blank`)
-- Se o `body` for só a URL, o card substitui o markdown
+O link sai pelo `PostMedia`, como em qualquer post: uma linha compacta com a
+URL e `target=_blank`.
 
-Quem já escreveu um título de verdade no composer continua vendo esse título
-acima do card.
+### Card "Abrir presente" — removido
 
-### Popup ao voltar
+> **Removido em 27/08/2026.** O card repetia o `<h1>` da página logo abaixo do
+> corpo: com `showComposerTitle = true` (o caso de todos os presentes reais),
+> o título aparecia duas vezes na mesma tela.
 
-Clique no card marca a saída. Quando a aba do presente volta a ficar visível
-(`visibilitychange`), e a pessoa **não** está logada, abre um popup convidando
-a criar a conta. O CTA principal rola até o formulário OTP. Fechar o popup
-não impede de preencher o form embaixo. Não dispara de novo até um novo clique
-no presente.
+Consequências registradas:
+
+- O `<h1>` **sempre** fica visível. Antes, presente com link e sem título de
+  composer caía em `title = null` e o `<h1>` virava `sr-only`, porque o card
+  já mostrava o título. Sem o card, isso deixaria a página sem título.
+- O `PostMedia` volta a receber `gift.linkUrl` (o card suprimia com
+  `linkUrl={link ? null : gift.linkUrl}`). Sem isso, presentes cujo `linkUrl`
+  **não** aparece no corpo ficariam sem link — em 27/08/2026 esse era o caso de
+  4 dos 6 presentes em produção (`whisper-local`, `hermes` e os dois de teste).
+
+### Popup ao voltar — removido junto
+
+O popup de "Já leu o presente?" vivia dentro do `GiftOpenCard` e era armado
+pelo clique **no card**. Sem card, não há clique para armar, então saiu junto.
+
+O `GiftSignupForm` inline continua sendo o caminho de conversão da página.
+Recuperar o componente: `git show <commit>^:src/components/gift-open-card.tsx`.
+[F063](F063-funil-presente-conta-free.md) planejava reaproveitar esse popup
+trocando a copy — se for retomado, precisa de um novo gatilho.
 
 ## Cadastro — regras de tela
 

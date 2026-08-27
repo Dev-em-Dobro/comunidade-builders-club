@@ -60,3 +60,8 @@ scripts/perf-reports/
 /fazer-depois.md
 /testar-passo-a-passo-emproducao.md
 /mudanca-presente.md
+
+# Roteiros internos de QA — citam ambiente de homologacao e o e-mail do
+# bootstrap admin. Repositorio publico: nao versionar.
+docs/roteiro-*.md
+docs/correcoes-do-free.md
