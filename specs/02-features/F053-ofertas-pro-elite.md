@@ -119,11 +119,17 @@ Página **`/planos`** (liberada para free e PRO):
 - Cards com destaque, hover (elevação/sombra) e lista de entregas em título + detalhe
 - Elite em destaque (recomendado)
 - **Preço com o parcelamento em destaque** — o número grande do card é a parcela
-  (`6x de R$ 55,18` no PRO, `12x de R$ 101,30` no Elite), com rótulo
+  (`12x de R$ 30,18` no PRO, `12x de R$ 101,30` no Elite), com rótulo
   “Parcele em até”. O valor à vista vira linha secundária (`ou R$ 297 à vista`),
   e o boleto Elite (`R$ 1.297`) segue como nota menor.
-- **Não** afirmar “sem juros”: o parcelado tem acréscimo (6x → R$ 331,08;
-  12x → R$ 1.215,60)
+- **Não** afirmar “sem juros”: o parcelado tem acréscimo (PRO 12x → R$ 362,16,
+  22% sobre o à vista; Elite 12x → R$ 1.215,60)
+
+> **27/08/2026 — PRO passa de 6x para 12x.** Era `6x de R$ 55,18`
+> (R$ 331,08, 11,5% de acréscimo). Agora `12x de R$ 30,18` = R$ 362,16, 22%
+> sobre os R$ 297 à vista. O à vista **não** mudou. Parcela menor na vitrine,
+> acréscimo maior no total — o que reforça a regra acima de nunca escrever
+> “sem juros”.
 - A promessa aparece **sem o rótulo “Promessa:”** — só a frase
   “Feche o 1º cliente em 90 dias”, separada da lista por um filete
 - CTA principal: checkout Hubla (cartão/Pix)

@@ -76,8 +76,8 @@ export function ofertaPro(): ClubOffer {
     id: "pro",
     name: "PRO",
     pricing: {
-      installments: 6,
-      installmentPrice: "R$ 55,18",
+      installments: 12,
+      installmentPrice: "R$ 30,18",
       fullPrice: "R$ 297",
     },
     paymentHint: "Pagamento em cartão ou Pix",
