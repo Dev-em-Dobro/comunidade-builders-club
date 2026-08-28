@@ -848,6 +848,8 @@ async function upsertModule(
           sortOrder: seed.sortOrder,
           parentId,
           published: false,
+          // F065 — só na criação; o admin (e a migration) mandam depois.
+          freeAccess: seed.slug === "fase-1-m01-comece-por-aqui",
         },
       });
 

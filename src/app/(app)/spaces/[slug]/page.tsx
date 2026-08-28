@@ -12,6 +12,7 @@ import {
   WELCOME_SPACE_SLUG,
   WELCOME_TUTORIAL_VIDEO,
   welcomeTutorialVideoId,
+  isFreePublishSpace,
 } from "@/lib/spaces/constants";
 import { pandaEmbedUrl } from "@/lib/aulas";
 import { FeedList } from "@/components/feed-list";
@@ -87,7 +88,7 @@ export default async function SpacePage({ params }: Props) {
           <EmptyState
             title="Nenhum post neste space"
             description={
-              isPaid
+              isPaid || isFreePublishSpace(slug)
                 ? "Comece a conversa — use o botão Nova publicação."
                 : "Ainda não há publicações aqui."
             }

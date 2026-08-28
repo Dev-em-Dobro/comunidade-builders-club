@@ -9,7 +9,8 @@ Catálogo de módulos/aulas com playback via Panda Video (ADR-005).
 ## Modelo
 
 - `Module` — título, slug, descrição, ordem, publicado; `parentId` opcional
-  (formação → módulo → submódulo · F050)
+  (formação → módulo → submódulo · F050); `freeAccess` (F065 — herda para
+  descendentes; free assiste o ramo marcado, hoje o M01 Comece por aqui)
 - `Lesson` — título, descrição em Markdown seguro (ADR-007),
   `pandaVideoExternalId` e `pandaLibraryId` **opcionais** (aula só de
   material, sem player), ordem, `moduleId`, publicado
@@ -19,11 +20,12 @@ Somente módulo **publicado** na raiz entra no catálogo do aluno. Rascunho
 (e qualquer descendente) fica só no admin.
 
 Progresso do aluno (cards em `/aulas`, % na sidebar do player e
-`/admin/progresso`): o denominador é **todas as aulas publicadas na
-árvore**, inclusive aula só de material e submódulos de formação
-(IA / n8n · F050/F052). Rascunho não entra. Publicar aulas novas baixa
-o % de quem ainda não as concluiu. A lista do admin segue a ordem da
-jornada (raiz → trilha → submódulo → aula), com o caminho do módulo.
+`/admin/progresso`): o denominador é **as aulas publicadas a que aquele
+aluno tem acesso** (F065). Pago / staff = árvore publicada inteira.
+Free = só o ramo com `Module.freeAccess` (hoje o M01 Comece por aqui). Inclusive aula só de
+material. Rascunho não entra. Completions fora do escopo não entram no
+numerador. A lista do admin segue a ordem da jornada (raiz → trilha →
+submódulo → aula), com o caminho do módulo.
 
 Descrição da aula: mesmo subset de posts (`**`, listas, `` ` ``, `##`, bloco
 ` ``` `). Links `http(s)` e downloads internos (`/materiais/arquivo.zip`)

@@ -1,5 +1,8 @@
+import type { MembershipTier } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { listPublishedModules } from "@/lib/aulas";
+import { FASE_1_M01_SLUG } from "@/lib/aulas/access";
+import { isPaidMembership } from "@/lib/membership/capabilities";
 import { WELCOME_SPACE_SLUG } from "@/lib/spaces/constants";
 
 export type StudentProgressRow = {
@@ -7,6 +10,7 @@ export type StudentProgressRow = {
   displayName: string;
   email: string;
   role: string;
+  tier: MembershipTier;
   joinedAt: Date;
   completedCount: number;
   totalLessons: number;
@@ -21,46 +25,56 @@ export type StudentProgressRow = {
 
 type PublishedNode = {
   title: string;
+  slug: string;
   sortOrder: number;
+  freeAccess: boolean;
   lessons: Array<{ id: string; title: string; sortOrder: number }>;
   children?: PublishedNode[];
 };
 
-/** Mesma árvore do catálogo do aluno, na ordem da jornada. */
-export async function getPublishedLessonsCatalog() {
-  const roots = await listPublishedModules();
-  const lessons: Array<{
-    id: string;
-    title: string;
-    sortOrder: number;
-    module: { title: string; sortOrder: number };
-  }> = [];
+export type CatalogLesson = {
+  id: string;
+  title: string;
+  sortOrder: number;
+  freeAccess: boolean;
+  module: { title: string; sortOrder: number };
+};
 
-  function walk(mod: PublishedNode, path: string[]) {
+/** Mesma árvore do catálogo do aluno, na ordem da jornada. */
+export async function getPublishedLessonsCatalog(): Promise<CatalogLesson[]> {
+  const roots = await listPublishedModules();
+  const lessons: CatalogLesson[] = [];
+
+  function walk(mod: PublishedNode, path: string[], inheritedFree: boolean) {
     const titles = [...path, mod.title];
     const moduleTitle = titles.join(" › ");
+    const freeAccess =
+      inheritedFree ||
+      mod.freeAccess ||
+      mod.slug === FASE_1_M01_SLUG;
     for (const lesson of mod.lessons) {
       lessons.push({
         id: lesson.id,
         title: lesson.title,
         sortOrder: lesson.sortOrder,
+        freeAccess,
         module: { title: moduleTitle, sortOrder: mod.sortOrder },
       });
     }
     for (const child of mod.children ?? []) {
-      walk(child, titles);
+      walk(child, titles, freeAccess);
     }
   }
 
   for (const root of roots) {
-    walk(root, []);
+    walk(root, [], false);
   }
   return lessons;
 }
 
 /** Progresso de aulas + atividade de posts por membro active. */
 export async function listStudentsLessonProgress(): Promise<{
-  lessons: Awaited<ReturnType<typeof getPublishedLessonsCatalog>>;
+  lessons: CatalogLesson[];
   students: StudentProgressRow[];
   summary: {
     activeMembers: number;
@@ -73,8 +87,11 @@ export async function listStudentsLessonProgress(): Promise<{
   };
 }> {
   const lessons = await getPublishedLessonsCatalog();
-  const totalLessons = lessons.length;
+  const publishedCount = lessons.length;
   const lessonIdSet = new Set(lessons.map((l) => l.id));
+  const freeLessonIds = new Set(
+    lessons.filter((l) => l.freeAccess).map((l) => l.id),
+  );
 
   const memberships = await prisma.membership.findMany({
     where: { status: "active" },
@@ -118,8 +135,11 @@ export async function listStudentsLessonProgress(): Promise<{
   );
 
   const students: StudentProgressRow[] = memberships.map((m) => {
+    const paid = isPaidMembership(m);
+    const accessibleIds = paid ? lessonIdSet : freeLessonIds;
+    const totalLessons = accessibleIds.size;
     const completed = m.user.lessonProgress.filter((p) =>
-      lessonIdSet.has(p.lessonId),
+      accessibleIds.has(p.lessonId),
     );
     const completedCount = completed.length;
     const percent =
@@ -140,6 +160,7 @@ export async function listStudentsLessonProgress(): Promise<{
       displayName: m.user.profile?.displayName ?? m.user.email,
       email: m.user.email,
       role: m.role,
+      tier: m.tier,
       joinedAt: m.user.profile?.joinedAt ?? m.createdAt,
       completedCount,
       totalLessons,
@@ -173,10 +194,10 @@ export async function listStudentsLessonProgress(): Promise<{
     students,
     summary: {
       activeMembers: students.length,
-      totalLessons,
+      totalLessons: publishedCount,
       averagePercent,
       completedAll: students.filter(
-        (s) => totalLessons > 0 && s.completedCount === totalLessons,
+        (s) => s.totalLessons > 0 && s.completedCount === s.totalLessons,
       ).length,
       notStarted: students.filter((s) => s.completedCount === 0).length,
       totalPosts,

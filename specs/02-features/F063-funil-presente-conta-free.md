@@ -204,8 +204,9 @@ A nota do e-mail ficou **sob a grade** de cards, não sob cada CTA.
 Adicionar `conquistas` a `FREE_SPACE_SLUGS` (`capabilities.ts`).
 
 - Free **lê** a página do space e os posts
-- Free **não** publica, não comenta e não reage — os gates de `publicar`,
-  `comentar` e `reagir` continuam PRO+, com o modal de upgrade de sempre
+- Free **não** publica nem comenta fora de `projetos`, e não reage — os
+  gates de `publicar` / `comentar` / `reagir` continuam PRO+ **exceto**
+  Desafio Projetos (F065: publicar e comentar só nesse space)
 - O composer não aparece para free (não deve renderizar e falhar no submit)
 
 É o "ver o que a comunidade tá fazendo" que justifica o cadastro na decisão 1.
@@ -215,12 +216,12 @@ Adicionar `conquistas` a `FREE_SPACE_SLUGS` (`capabilities.ts`).
 `WelcomeSpaceView` passa a receber `isPaid` e escolher a lista de passos. Nenhum
 passo pode apontar para rota bloqueada no tier de quem está lendo.
 
-Free:
+Free (F065 — Comece por aqui liberado; nenhum href cadeado):
 
 1. **Completar o perfil** → `/perfil`
-2. **Ver quem está fechando cliente** → `/spaces/conquistas`
-3. ~~**Conhecer os planos** → `/planos`~~ → **Pegar os outros presentes** →
-   `/spaces/presentes`
+2. **Assistir as primeiras aulas** → `/aulas`
+3. **Ver o que a comunidade está fechando** → `/spaces/conquistas`
+4. **Pegar os outros presentes** → `/spaces/presentes`
 
 Pago: mantém os três passos atuais (perfil, aulas, postar).
 
@@ -258,17 +259,15 @@ de homologação e qual e-mail recebe admin no bootstrap, e este repositório é
       o Club e por que criar conta, hoje ausente.
 - [ ] **E-mail do código OTP sem contexto** — chega só com o código, sem dizer
       por que entrar na comunidade.
-- [ ] **Playlist de aulas gratuitas** para o free (aumento de consciência) —
-      feature própria, precisa de spec.
+- [x] **Playlist de aulas gratuitas** para o free — [F065](F065-aulas-fase-1-free.md)
+      (só o Comece por aqui; catálogo com cadeado no restante).
 - [ ] **Regravar o vídeo de boas-vindas do free** — roteiro no doc local (ver
       acima). Trocar `WELCOME_TUTORIAL_VIDEO.freeVideoExternalId` depois de
       subir no Panda.
 
 ## Fora de escopo
 
-- **Aula ou skill gratuita.** É o próximo passo natural, mas exige mecanismo
-  novo (flag de aula/skill liberada) e decisão editorial de qual conteúdo abrir.
-  Fica para depois de medir o efeito de 1–4, que não custam conteúdo nenhum.
+- Skill gratuita / Fase 2. Aula da Fase 1 para o free: [F065](F065-aulas-fase-1-free.md).
 - Mudança de preço, de checkout ou de webhook
 - Indexação pública de Conquistas — o space continua exigindo conta; free não é
   público

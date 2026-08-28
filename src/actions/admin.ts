@@ -31,6 +31,7 @@ import {
   updateModule,
   moveLesson,
   moveModule,
+  setModuleFreeAccess,
 } from "@/lib/aulas";
 
 function bustSpacesCache() {
@@ -152,6 +153,7 @@ export async function createModuleAction(formData: FormData) {
     coverImageUrl: String(formData.get("coverImageUrl") ?? "") || null,
     sortOrder: Number(formData.get("sortOrder") ?? 0),
     published: formData.get("published") === "on",
+    freeAccess: formData.get("freeAccess") === "on",
     parentId: String(formData.get("parentId") ?? "") || null,
   };
   moduleSchema.parse(raw);
@@ -168,10 +170,20 @@ export async function updateModuleAction(id: string, formData: FormData) {
     coverImageUrl: String(formData.get("coverImageUrl") ?? "") || null,
     sortOrder: Number(formData.get("sortOrder") ?? 0),
     published: formData.get("published") === "on",
+    freeAccess: formData.get("freeAccess") === "on",
     parentId: String(formData.get("parentId") ?? "") || null,
   };
   moduleSchema.parse(raw);
   await updateModule(id, raw);
+  bustAulasCache();
+}
+
+export async function setModuleFreeAccessAction(formData: FormData) {
+  await requireAdmin();
+  const id = String(formData.get("id") ?? "");
+  if (!id) throw new Error("Módulo inválido.");
+  const freeAccess = formData.get("freeAccess") === "true";
+  await setModuleFreeAccess(id, freeAccess);
   bustAulasCache();
 }
 

@@ -36,11 +36,10 @@ Fica:
 1. Título do space + uma linha de contexto
 2. Player Panda (`tutorial-intro-comunidade`, já em
    [F023](F023-boas-vindas-feed-modal.md) / `WELCOME_TUTORIAL_VIDEO`)
-3. Um card **Primeiros passos**:
-   1. Completar o perfil → `/perfil`
-   2. Assistir as aulas → `/aulas`
-   3. Postar na comunidade quando tiver dúvida ou conquista →
-      `/spaces/duvidas` e `/spaces/conquistas`
+3. Um card **Primeiros passos** — a lista **depende do tier** (F063 / F065).
+   Pago: perfil, aulas, postar. Free (F065): perfil, **assistir as
+   primeiras aulas** (`/aulas`), conquistas, presentes. Nenhum passo do
+   free aponta para rota cadeada.
 
 Navegação (Feed, Spaces, menções, materiais) **não ganha casa nova**:
 é o que o vídeo já ensina.
@@ -59,7 +58,7 @@ Comentários no space Boas-vindas continuam desligados (F023).
 ## Critérios
 
 - [x] `/spaces/boas-vindas` mostra o tutorial Panda
-- [x] Um único card **Primeiros passos** com as três linhas acima
+- [x] Um único card **Primeiros passos** (lista por tier · F063 / F065)
 - [x] Não renderiza os cinco cards antigos (mesmo que ainda existam no banco)
 - [x] Primeiro acesso → Boas-vindas (F048) continua igual
 - [x] Cadastro free continua vendo Boas-vindas (F041)

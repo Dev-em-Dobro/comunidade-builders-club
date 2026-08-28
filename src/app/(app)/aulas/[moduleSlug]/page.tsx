@@ -1,11 +1,8 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { requirePaidMemberOrRedirect } from "@/lib/membership/require-member";
-import { hrefPlanos } from "@/lib/membership/capabilities";
-import {
-  listCompletedLessonIds,
-  listPublishedModules,
-} from "@/lib/aulas";
+import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
+import { listCompletedLessonIds } from "@/lib/aulas";
+import { listPublishedModules } from "@/lib/aulas/published-modules";
 import { EmptyState } from "@/components/empty-state";
 import {
   findModuleBySlug,
@@ -19,7 +16,7 @@ type Props = {
 
 export default async function AulasModulePage({ params }: Props) {
   const { moduleSlug } = await params;
-  const member = await requirePaidMemberOrRedirect(hrefPlanos({ motivo: "aulas" }));
+  const member = await requireActiveMemberOrRedirect();
   const [modules, completed] = await Promise.all([
     listPublishedModules(),
     listCompletedLessonIds(member.user.id),

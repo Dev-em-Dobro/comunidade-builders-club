@@ -359,6 +359,8 @@ model Module {
   coverImageUrl String?
   sortOrder     Int      @default(0)
   published     Boolean  @default(false)
+  /// F065 — free assiste este módulo e os descendentes.
+  freeAccess    Boolean  @default(false)
   /// F050 — módulo interno (subpasta). Null = primeiro nível do catálogo.
   parentId      String?
   parent        Module?  @relation("ModuleTree", fields: [parentId], references: [id], onDelete: Cascade)

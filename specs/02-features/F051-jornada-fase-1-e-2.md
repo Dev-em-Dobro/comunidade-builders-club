@@ -45,6 +45,8 @@ numeração antiga (`Aula 15`, `Aula 04`, …).
 - Entregável do módulo vai na **descrição do módulo**, não como aula em vídeo.
 - **HML:** jornada publicada para preview em `/aulas`. **Produção:** rascunho
   até o usuário confirmar.
+- **F065:** só o M01 (`fase-1-m01-comece-por-aqui`) tem `freeAccess`.
+  M02–M05 e Fase 2 não. Free assiste o Comece por aqui; não comenta.
 
 ## Catálogo Panda
 

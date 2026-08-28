@@ -2,6 +2,7 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { authClient } from "@/lib/auth/client";
 import { NOME_PRODUTO } from "@/lib/produto";
 import { safeCallbackPath } from "@/lib/security/urls";
@@ -169,6 +170,15 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
                   Política de Privacidade
                 </a>
                 .
+              </p>
+              <p className="text-center text-sm text-muted">
+                Não tem conta?{" "}
+                <Link
+                  href="/cadastro"
+                  className="font-semibold text-accent hover:underline"
+                >
+                  Criar conta grátis
+                </Link>
               </p>
             </div>
           )}
