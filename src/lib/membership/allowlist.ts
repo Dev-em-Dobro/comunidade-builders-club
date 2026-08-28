@@ -4,6 +4,13 @@ export function normalizarEmail(email: string): string {
   return email.trim().toLowerCase();
 }
 
+export async function findUserByEmail(email: string) {
+  const n = normalizarEmail(email);
+  return prisma.user.findFirst({
+    where: { email: { equals: n, mode: "insensitive" } },
+  });
+}
+
 export async function isEmailAllowed(email: string): Promise<boolean> {
   const row = await prisma.allowedEmail.findUnique({
     where: { email: normalizarEmail(email) },
@@ -30,8 +37,9 @@ export async function addAllowedEmail(opts: {
     },
   });
 
-  // F053 — allowlist promove para pro se o user já existir (não rebaixa elite).
-  const user = await prisma.user.findUnique({ where: { email } });
+  // F053 / F014 — allowlist promove quem já tem conta (não rebaixa elite).
+  // Não mexe em originUtmContent / originGiftSlug / originAt.
+  const user = await findUserByEmail(email);
   if (user) {
     const m = await prisma.membership.findUnique({ where: { userId: user.id } });
     if (m) {

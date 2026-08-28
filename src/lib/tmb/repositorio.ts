@@ -1,7 +1,7 @@
 // F047 — TMB vendas → AllowedEmail + Membership.tier.
 
 import { prisma } from "@/lib/db";
-import { addAllowedEmail, removeAllowedEmail } from "@/lib/membership/allowlist";
+import { addAllowedEmail, findUserByEmail, removeAllowedEmail } from "@/lib/membership/allowlist";
 import {
   idempotencyKeyTmb,
   interpretarVendaTmb,
@@ -35,7 +35,7 @@ async function registrarEntrega(
 }
 
 async function concederPago(email: string, plan: PlanoTmb): Promise<void> {
-  const user = await prisma.user.findUnique({ where: { email } });
+  const user = await findUserByEmail(email);
   if (!user) return;
   const m = await prisma.membership.findUnique({ where: { userId: user.id } });
   if (!m) {
@@ -57,7 +57,7 @@ async function concederPago(email: string, plan: PlanoTmb): Promise<void> {
 }
 
 async function downgradeParaFree(email: string): Promise<void> {
-  const user = await prisma.user.findUnique({ where: { email } });
+  const user = await findUserByEmail(email);
   if (!user) return;
   const m = await prisma.membership.findUnique({ where: { userId: user.id } });
   if (!m || m.role === "admin") return;

@@ -74,6 +74,7 @@ async function resolverBootstrap(
   const profile = row.profile;
 
   // Fast-path: já active + profile — sem allowlist.
+  // Free que já tem conta NÃO sobe de plano aqui (F059/F041): só webhook Hubla/TMB.
   if (existing?.status === "active" && profile) {
     if (isBootstrapAdmin && existing.role !== "admin") {
       const membership = await prisma.membership.update({

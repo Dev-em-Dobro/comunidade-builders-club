@@ -18,26 +18,35 @@ export function productIdDoEvento(event: {
   return primeiro || null;
 }
 
-type OfertaHubla = { id?: string };
+type OfertaHubla = { id?: string; isOrderBump?: boolean };
 type ProdutoComOfertas = { offers?: OfertaHubla[] };
 
+/**
+ * IDs da oferta comprada (`products[].offers`), não o catálogo do produto.
+ * Com order bump, fica a oferta principal (`isOrderBump !== true`).
+ */
 export function offerIdsDoEvento(event: {
   product?: ProdutoComOfertas;
   products?: ProdutoComOfertas[];
 }): string[] {
-  const ids: string[] = [];
+  const ofertas: { id: string; isOrderBump: boolean }[] = [];
   const seen = new Set<string>();
-  const add = (raw?: string) => {
-    const id = raw?.trim();
+  const add = (offer?: OfertaHubla) => {
+    const id = offer?.id?.trim();
     if (!id || seen.has(id)) return;
     seen.add(id);
-    ids.push(id);
+    ofertas.push({ id, isOrderBump: offer?.isOrderBump === true });
   };
-  for (const offer of event.product?.offers ?? []) add(offer.id);
+
   for (const product of event.products ?? []) {
-    for (const offer of product.offers ?? []) add(offer.id);
+    for (const offer of product.offers ?? []) add(offer);
   }
-  return ids;
+  if (ofertas.length === 0) {
+    for (const offer of event.product?.offers ?? []) add(offer);
+  }
+
+  const principais = ofertas.filter((o) => !o.isOrderBump);
+  return (principais.length > 0 ? principais : ofertas).map((o) => o.id);
 }
 
 type HublaWebhookEventLike = {
@@ -47,10 +56,24 @@ type HublaWebhookEventLike = {
 };
 
 export function emailDoEvento(event: HublaWebhookEventLike): string | null {
-  return (
-    normalizarEmailHubla(event.user?.email) ??
-    normalizarEmailHubla(event.subscription?.payer?.email) ??
-    normalizarEmailHubla(event.invoice?.user?.email) ??
-    normalizarEmailHubla(event.invoice?.payer?.email)
-  );
+  return emailsDoEvento(event)[0] ?? null;
+}
+
+/** Todos os e-mails do payload, já normalizados e sem duplicata. */
+export function emailsDoEvento(event: HublaWebhookEventLike): string[] {
+  const candidatos = [
+    event.user?.email,
+    event.subscription?.payer?.email,
+    event.invoice?.user?.email,
+    event.invoice?.payer?.email,
+  ];
+  const vistos = new Set<string>();
+  const emails: string[] = [];
+  for (const raw of candidatos) {
+    const email = normalizarEmailHubla(raw);
+    if (!email || vistos.has(email)) continue;
+    vistos.add(email);
+    emails.push(email);
+  }
+  return emails;
 }

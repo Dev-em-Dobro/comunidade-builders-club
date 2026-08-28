@@ -81,10 +81,9 @@ abrem o app (`ORION_APP_URL`).
 ## Hubla
 
 PRO e Elite são **ofertas do mesmo produto** Hubla (`VL3e0iDO3A32SyjJWr9S`,
-"Builders Club"). O webhook recebe `event.product.id` igual nos dois; o
-discriminador é `event.products[].offers[].id`. O slug de checkout
-(`pay.hub.la/XaY8QNfZlOO1XBgjzMfY`) **não** entra no payload — não use como
-product id.
+"Builders Club"). O webhook recebe `event.product.id` igual nos dois. O slug
+de checkout (`pay.hub.la/XaY8QNfZlOO1XBgjzMfY`) **não** entra no payload —
+não use como product id.
 
 Envs:
 
@@ -95,14 +94,20 @@ Envs:
 | `HUBLA_PRODUCT_ID` | Produto Club — allowlist de `product.id` (legado sem oferta casa **pro**) |
 | `HUBLA_PRODUCT_ID_PRO` | Produto PRO **separado**, se a Hubla criar um |
 | `HUBLA_PRODUCT_ID_ELITE` | Produto Elite **separado**, se a Hubla criar um |
-| `HUBLA_OFFER_ID_PRO` | Offer id(s) do PRO R$ 297 (vírgula se houver cópia + oficial) |
-| `HUBLA_OFFER_ID_ELITE` | Offer id(s) do Elite R$ 997. Sem ela, oferta não-PRO no produto Club segue o mapa de produto |
+| `HUBLA_OFFER_ID_PRO` | Offer id(s) do PRO (vírgula se houver cópia + oficial). Preço da oferta na Hubla pode mudar (ex. teste R$ 10) — o id é que conta. |
+| `HUBLA_OFFER_ID_ELITE` | Offer id(s) do Elite. Sem ela, oferta desconhecida no produto Club segue o mapa de produto (`HUBLA_PRODUCT_ID` → **pro**) |
 
 Webhook aceita o produto Club (e quaisquer IDs do mapa). Sem nenhum product id
-e sem nenhum offer id → 503 (F021). Com ofertas no evento: casa Elite →
-`tier=elite`; casa PRO → `tier=pro`; oferta desconhecida com só
-`HUBLA_OFFER_ID_PRO` setado → **elite** (não rebaixa quem comprou Elite).
-Grant nunca rebaixa (Elite + evento PRO permanece Elite).
+e sem nenhum offer id → 503 (F021).
+
+Discriminador: **`event.products[].offers[].id` da compra**, não o catálogo em
+`event.product.offers`. Checkout PRO (`HUBLA_OFFER_ID_PRO`) → `tier=pro`.
+Checkout Elite (`HUBLA_OFFER_ID_ELITE`) → `tier=elite`. Se o payload listar as
+duas (order bump), vale a oferta principal (`isOrderBump !== true`). Não
+conceder Elite só porque o id Elite aparece no catálogo do produto.
+
+Oferta desconhecida com só `HUBLA_OFFER_ID_PRO` setado → mapa de produto
+(Club = **pro**). Grant nunca rebaixa (Elite + evento PRO permanece Elite).
 `member_removed` / reembolso → `tier=free`.
 
 TMB (F047): codes `9DW254247E5` e `3XB272209KV` concedem **elite**

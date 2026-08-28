@@ -285,8 +285,14 @@ Medir só cadastro esconde o diagnóstico: post que traz muito leitor e pouco
 cadastro é problema da página, não do post.
 
 Admin → aba Presentes mostra visitas, cadastros, pessoas e
-`assinou_plano_veio_de_uma_postagem` (tier pago atual + origem daquele post).
-Não há data da compra Hubla — só o plano de agora.
+`assinou_plano_veio_de_uma_postagem`: membro **pago agora** (PRO/Elite/`paid`)
+**e** origem daquele post. Admin/instrutor não conta. Não é coluna no banco.
+
+A compra é F014 (Hubla: `invoice.payment_succeeded` / `subscription.activated`
+além de `member_added`) e F047 (TMB). O webhook **só** muda `status` + `tier`.
+Não regrava origem. Login não promove free.
+
+Não há data da compra Hubla na tela — só o plano de agora.
 
 ## Critérios
 
@@ -313,6 +319,8 @@ Não há data da compra Hubla — só o plano de agora.
 - [x] Admin → aba Presentes gera `/presentes/{slug}/{nome}-{DD-MM-AAAA}`
 - [x] Admin → aba Presentes: visitas, cadastros, lista de pessoas e quem
       assinou plano pago (`tier` pro/elite/paid + origem daquele post)
+- [x] Free que compra depois (Hubla/TMB) vira PRO/Elite **sem** perder origem;
+      a coluna `assinou_plano_veio_de_uma_postagem` passa a **sim**
 - [ ] Testado **no celular, dentro do Instagram**, ponta a ponta: DM → leitura →
       cadastro → origem no banco
 
@@ -330,7 +338,8 @@ Não há data da compra Hubla — só o plano de agora.
 |------|---------|
 | **ADR-009** | novo — OTP como método de auth |
 | **F002** | acrescentar OTP aos métodos de login |
-| **F041** | `presentes` entra em `FREE_SPACE_SLUGS` |
+| **F014** | pagamento Hubla também promove o free que já tem conta |
+| **F041** | `presentes` entra em `FREE_SPACE_SLUGS`; login não promove free |
 | **F048** | nenhuma — `F048:20-21` já cobre o caso |
 | **F020** | cookie de atribuição e `GiftVisit` entram na política de privacidade |
 | **01-domain-model** | termo novo: **Presente** |
