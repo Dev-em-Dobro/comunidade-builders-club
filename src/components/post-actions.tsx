@@ -23,6 +23,7 @@ import { ConfirmDialog } from "@/components/confirm-dialog";
 import { useUpgradeOptional } from "@/components/upgrade-modal";
 import { HeartIcon } from "@/components/post-icons";
 import { MarkdownBody } from "@/lib/markdown";
+import { isFreePublishSpace } from "@/lib/spaces/constants";
 import { UPGRADE_REQUIRED } from "@/lib/membership/errors";
 
 const MEDIA_ACCEPT =
@@ -180,7 +181,9 @@ export function PostActions({
   const [editVideo, setEditVideo] = useState(videoUrl ?? "");
   const [uploading, setUploading] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const canManage = Boolean(isPaid && (isAdmin || isAuthor));
+  const canManage = Boolean(
+    (isAdmin || isAuthor) && (isPaid || isFreePublishSpace(spaceSlug)),
+  );
 
   function openEditor() {
     setEditing((v) => !v);

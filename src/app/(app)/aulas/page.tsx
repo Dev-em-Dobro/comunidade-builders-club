@@ -1,14 +1,13 @@
-import { requirePaidMemberOrRedirect } from "@/lib/membership/require-member";
-import { hrefPlanos } from "@/lib/membership/capabilities";
-import {
-  listCompletedLessonIds,
-  listPublishedModules,
-} from "@/lib/aulas";
+import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
+import { isPaidMembership } from "@/lib/membership/capabilities";
+import { listCompletedLessonIds } from "@/lib/aulas";
+import { listPublishedModules } from "@/lib/aulas/published-modules";
 import { EmptyState } from "@/components/empty-state";
 import { AulasCatalog, mapModule } from "@/components/aulas-catalog";
 
 export default async function AulasPage() {
-  const member = await requirePaidMemberOrRedirect(hrefPlanos({ motivo: "aulas" }));
+  const member = await requireActiveMemberOrRedirect();
+  const isPaid = isPaidMembership(member.membership);
   const [modules, completed] = await Promise.all([
     listPublishedModules(),
     listCompletedLessonIds(member.user.id),
@@ -20,7 +19,9 @@ export default async function AulasPage() {
     <div className="feed-wrap-wide">
       <h1 className="page-title">Aulas</h1>
       <p className="mt-2 text-sm text-muted">
-        Escolha um módulo para ver as aulas.
+        {isPaid
+          ? "Escolha um módulo para ver as aulas."
+          : "O Comece por aqui está liberado no gratuito. O resto da formação aparece com cadeado."}
       </p>
 
       {catalog.length === 0 ? (
@@ -31,7 +32,7 @@ export default async function AulasPage() {
           />
         </div>
       ) : (
-        <AulasCatalog modules={catalog} />
+        <AulasCatalog modules={catalog} isPaid={isPaid} />
       )}
     </div>
   );

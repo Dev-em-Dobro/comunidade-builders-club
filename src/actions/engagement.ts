@@ -1,7 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireAdmin, requirePaidMember } from "@/lib/membership/require-member";
+import {
+  requireAdmin,
+  requireActiveMember,
+  requirePaidMember,
+} from "@/lib/membership/require-member";
+import { isPaidMembership } from "@/lib/membership/capabilities";
 import {
   createComment,
   createCommentSchema,
@@ -12,7 +17,7 @@ import {
 } from "@/lib/engagement";
 
 export async function createCommentAction(formData: FormData) {
-  const { user } = await requirePaidMember();
+  const { user, membership } = await requireActiveMember();
   const parentRaw = String(formData.get("parentId") ?? "").trim();
   const raw = {
     postId: String(formData.get("postId") ?? ""),
@@ -20,20 +25,24 @@ export async function createCommentAction(formData: FormData) {
     parentId: parentRaw || null,
   };
   createCommentSchema.parse(raw);
-  await createComment(user.id, raw);
+  await createComment(user.id, raw, {
+    isPaid: isPaidMembership(membership),
+  });
   revalidatePath(`/posts/${raw.postId}`);
   revalidatePath("/");
   revalidatePath("/aulas", "layout");
 }
 
 export async function updateCommentAction(formData: FormData) {
-  const { user, membership } = await requirePaidMember();
+  const { user, membership } = await requireActiveMember();
   const commentId = String(formData.get("commentId") ?? "");
   const postId = String(formData.get("postId") ?? "");
   const raw = { body: String(formData.get("body") ?? "") };
   updateCommentSchema.parse(raw);
   const isAdmin = membership.role === "admin";
-  await updateComment(commentId, user.id, isAdmin, raw);
+  await updateComment(commentId, user.id, isAdmin, raw, {
+    isPaid: isPaidMembership(membership),
+  });
   revalidatePath(`/posts/${postId}`);
   revalidatePath("/aulas", "layout");
 }

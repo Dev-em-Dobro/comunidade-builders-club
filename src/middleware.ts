@@ -37,10 +37,12 @@ function applyOrigemCookie(request: NextRequest, response: NextResponse) {
   let utmContent: string | null = null;
 
   if (segments[0] === "cadastro") {
-    giftSlug = CADASTRO_LANDING_SLUG;
+    // F066 — /cadastro genérico não tem origem; só /cadastro/[utm] (ou ?utm_content=).
     utmContent =
       sanitizeUtmValue(request.nextUrl.searchParams.get("utm_content")) ??
       sanitizeUtmValue(segments[1] ?? "");
+    if (!utmContent) return response;
+    giftSlug = CADASTRO_LANDING_SLUG;
   } else if (segments[0] === "presentes") {
     giftSlug = sanitizeGiftSlug(segments[1] ?? "");
     utmContent =
@@ -100,6 +102,7 @@ export const config = {
     "/aguardando",
     "/login",
     "/presentes/:path*",
+    "/cadastro",
     "/cadastro/:path*",
   ],
 };

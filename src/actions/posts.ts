@@ -2,7 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { ZodError } from "zod";
-import { requireAdmin, requirePaidMember } from "@/lib/membership/require-member";
+import {
+  requireAdmin,
+  requireActiveMember,
+} from "@/lib/membership/require-member";
+import { isPaidMembership } from "@/lib/membership/capabilities";
 import {
   createPost,
   createPostSchema,
@@ -21,8 +25,9 @@ function actionError(e: unknown): never {
 }
 
 export async function createPostAction(formData: FormData) {
-  const { user, membership } = await requirePaidMember();
+  const { user, membership } = await requireActiveMember();
   const isAdmin = membership.role === "admin";
+  const isPaid = isPaidMembership(membership);
   const raw = {
     spaceId: String(formData.get("spaceId") ?? ""),
     body: String(formData.get("body") ?? ""),
@@ -33,7 +38,7 @@ export async function createPostAction(formData: FormData) {
   };
   try {
     createPostSchema.parse(raw);
-    const post = await createPost(user.id, raw, { isAdmin });
+    const post = await createPost(user.id, raw, { isAdmin, isPaid });
     revalidatePath("/");
     revalidatePath(`/spaces/${post.space.slug}`);
     revalidatePath("/nova");
@@ -44,8 +49,9 @@ export async function createPostAction(formData: FormData) {
 }
 
 export async function updatePostAction(formData: FormData) {
-  const { user, membership } = await requirePaidMember();
+  const { user, membership } = await requireActiveMember();
   const isAdmin = membership.role === "admin";
+  const isPaid = isPaidMembership(membership);
   const postId = String(formData.get("postId") ?? "");
   const raw = {
     body: String(formData.get("body") ?? ""),
@@ -55,7 +61,7 @@ export async function updatePostAction(formData: FormData) {
   };
   try {
     updatePostSchema.parse(raw);
-    const post = await updatePost(postId, user.id, isAdmin, raw);
+    const post = await updatePost(postId, user.id, isAdmin, raw, { isPaid });
     revalidatePath("/");
     revalidatePath(`/spaces/${post.space.slug}`);
     revalidatePath(`/posts/${post.id}`);
@@ -66,10 +72,11 @@ export async function updatePostAction(formData: FormData) {
 }
 
 export async function deletePostAction(postId: string, spaceSlug: string) {
-  const { user, membership } = await requirePaidMember();
+  const { user, membership } = await requireActiveMember();
   const isAdmin = membership.role === "admin";
+  const isPaid = isPaidMembership(membership);
   try {
-    await deletePost(postId, user.id, isAdmin);
+    await deletePost(postId, user.id, isAdmin, { isPaid });
   } catch (e) {
     actionError(e);
   }

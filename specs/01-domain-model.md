@@ -56,6 +56,6 @@ Diagnóstico, Outreach, Entregável — este último só na Fase 2 de migração
 | Termo | Significado |
 |-------|-------------|
 | **Formação** | Módulo raiz de um produto (ex.: Fase 1 da jornada, IA e Automações). |
-| **Módulo** | Agrupamento de aulas ou de submódulos. Pode ter `parentId` (F050). |
+| **Módulo** | Agrupamento de aulas ou de submódulos. Pode ter `parentId` (F050). `freeAccess` (F065) libera o ramo para o membro free assistir. |
 | **Submódulo** | Módulo interno (pasta da Panda) dentro de um módulo. |
 | **Aula** | Lição com referência Panda Video (`videoExternalId`, `libraryId`). |

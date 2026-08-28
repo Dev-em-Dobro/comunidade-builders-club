@@ -3,7 +3,8 @@ import { prisma } from "@/lib/db";
 import { ForbiddenError } from "@/lib/auth/errors";
 import { createNotification, notifyMany } from "@/lib/notifications";
 import { resolveMentionedUserIds } from "@/lib/mentions";
-import { isCommentsDisabledSpace } from "@/lib/spaces/constants";
+import { isCommentsDisabledSpace, isFreeCommentSpace } from "@/lib/spaces/constants";
+import { UPGRADE_REQUIRED } from "@/lib/membership/errors";
 
 export const createCommentSchema = z.object({
   postId: z.string().min(1),
@@ -14,6 +15,7 @@ export const createCommentSchema = z.object({
 export async function createComment(
   authorId: string,
   raw: z.infer<typeof createCommentSchema>,
+  opts: { isPaid: boolean },
 ) {
   const data = createCommentSchema.parse(raw);
 
@@ -26,6 +28,9 @@ export async function createComment(
     throw new ForbiddenError(
       "Comentários estão desativados neste espaço.",
     );
+  }
+  if (!opts.isPaid && !isFreeCommentSpace(post.space.slug)) {
+    throw new ForbiddenError(UPGRADE_REQUIRED);
   }
 
   let threadParentId: string | null = data.parentId || null;
@@ -136,11 +141,18 @@ export async function updateComment(
   actorId: string,
   isAdmin: boolean,
   raw: z.infer<typeof updateCommentSchema>,
+  opts: { isPaid: boolean },
 ) {
-  const existing = await prisma.comment.findUnique({ where: { id } });
+  const existing = await prisma.comment.findUnique({
+    where: { id },
+    include: { post: { select: { space: { select: { slug: true } } } } },
+  });
   if (!existing) throw new Error("Comentário não encontrado.");
   if (!isAdmin && existing.authorId !== actorId) {
     throw new ForbiddenError("Você só pode editar seus próprios comentários.");
+  }
+  if (!opts.isPaid && !isAdmin && !isFreeCommentSpace(existing.post.space.slug)) {
+    throw new ForbiddenError(UPGRADE_REQUIRED);
   }
   const data = updateCommentSchema.parse(raw);
   return prisma.comment.update({

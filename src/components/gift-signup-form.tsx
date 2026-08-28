@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { authClient } from "@/lib/auth/client";
 import { completarCadastroPresenteAction } from "@/actions/gifts";
 import { WELCOME_SPACE_SLUG } from "@/lib/spaces/constants";
@@ -11,11 +12,14 @@ type Step = "form" | "otp";
 type Props = {
   headline?: string;
   subhead?: string;
+  /** F066 — link de volta ao login (cadastro genérico). */
+  alreadyMemberHref?: string;
 };
 
 export function GiftSignupForm({
   headline = "Crie sua conta e pegue os outros presentes",
   subhead = "Conta gratuita. Você recebe um código no e-mail e continua nesta tela.",
+  alreadyMemberHref,
 }: Props) {
   const router = useRouter();
   const [step, setStep] = useState<Step>("form");
@@ -233,6 +237,17 @@ export function GiftSignupForm({
         </a>
         .
       </p>
+      {alreadyMemberHref ? (
+        <p className="mt-4 text-center text-sm text-muted">
+          Já tem conta?{" "}
+          <Link
+            href={alreadyMemberHref}
+            className="font-semibold text-accent hover:underline"
+          >
+            Entrar
+          </Link>
+        </p>
+      ) : null}
     </form>
   );
 }

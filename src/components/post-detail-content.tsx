@@ -15,7 +15,7 @@ import { OptimizedMediaImage } from "@/components/optimized-media-image";
 import { PostMedia } from "@/components/post-media";
 import { PostShareMenu } from "@/components/post-share-menu";
 import type { PostDetailDto } from "@/actions/post-detail";
-import { isCommentsDisabledSpace } from "@/lib/spaces/constants";
+import { isCommentsDisabledSpace, isFreeCommentSpace } from "@/lib/spaces/constants";
 
 function CommentBlock({
   comment,
@@ -101,6 +101,7 @@ export function PostDetailContent({
   const title =
     post.title?.trim() || previewFromBody(post.body, 90) || "Publicação";
   const commentsDisabled = isCommentsDisabledSpace(post.space.slug);
+  const canComment = isPaid || isFreeCommentSpace(post.space.slug);
 
   return (
     <div>
@@ -203,7 +204,7 @@ export function PostDetailContent({
           <h3 className="font-[family-name:var(--font-outfit)] text-lg font-semibold">
             Comentários ({post.commentCount})
           </h3>
-          <CommentForm postId={post.id} isPaid={isPaid} onDone={onCommentDone} />
+          <CommentForm postId={post.id} isPaid={canComment} onDone={onCommentDone} />
           {post.comments.length === 0 ? (
             <div className="mt-4">
               <EmptyState
@@ -220,7 +221,7 @@ export function PostDetailContent({
                   postId={post.id}
                   isAdmin={isAdmin}
                   currentUserId={currentUserId}
-                  isPaid={isPaid}
+                  isPaid={canComment}
                   onCommentDone={onCommentDone}
                 />
               ))}

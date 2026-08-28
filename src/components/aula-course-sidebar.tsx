@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
   type AulaModuleCard,
+  LockMark,
   progressPct,
   sidebarGroups,
 } from "@/components/aulas-catalog";
@@ -12,10 +13,12 @@ export function AulaCourseSidebar({
   root,
   currentModuleSlug,
   currentLessonSlug,
+  isPaid = true,
 }: {
   root: AulaModuleCard;
   currentModuleSlug: string;
   currentLessonSlug: string;
+  isPaid?: boolean;
 }) {
   const groups = sidebarGroups(root);
   const sections = groups.flatMap((g) => g.sections);
@@ -71,6 +74,9 @@ export function AulaCourseSidebar({
                   <span className="min-w-0 flex-1 text-sm font-semibold leading-snug">
                     {section.title}
                   </span>
+                  {!isPaid && !section.freeAccess ? (
+                    <LockMark className="h-3.5 w-3.5 shrink-0 text-muted" />
+                  ) : null}
                 </button>
                 {open ? (
                   <ul className="border-t border-border px-3 pb-3 pt-1">
@@ -78,6 +84,7 @@ export function AulaCourseSidebar({
                       const active =
                         l.slug === currentLessonSlug &&
                         l.moduleSlug === currentModuleSlug;
+                      const locked = !isPaid && !l.freeAccess;
                       return (
                         <li key={l.id}>
                           <Link
@@ -99,6 +106,9 @@ export function AulaCourseSidebar({
                               aria-hidden
                             />
                             <span className="min-w-0 flex-1">{l.title}</span>
+                            {locked ? (
+                              <LockMark className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted" />
+                            ) : null}
                           </Link>
                         </li>
                       );

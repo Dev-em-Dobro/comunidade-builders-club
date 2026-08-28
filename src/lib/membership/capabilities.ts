@@ -6,10 +6,10 @@ import { AULA_THREADS_SPACE_SLUG } from "@/lib/spaces/constants";
 /**
  * Spaces cuja *página* é liberada para free (sidebar sem cadeado).
  *
- * F063 — abertos quase todos: o free não pode publicar em lugar nenhum (o gate
- * de publicar é outro), então manter a leitura trancada só escondia a prova de
- * que a comunidade funciona. `freelas` fica de fora porque indicação de freela
- * é troca entre membros pagantes; `aula-threads` é conteúdo de aula.
+ * F063 — abertos quase todos: o free publica só em `projetos` (F065);
+ * nos outros spaces a leitura aberta é vitrine. `freelas` fica de fora
+ * porque indicação de freela é troca entre membros pagantes;
+ * `aula-threads` é conteúdo de aula.
  */
 export const FREE_SPACE_SLUGS = [
   "boas-vindas",
@@ -67,6 +67,8 @@ export function isFreeAppPath(pathname: string): boolean {
   if (pathname.startsWith("/perfil")) return true;
   if (pathname.startsWith("/planos")) return true;
   if (pathname.startsWith("/posts/")) return true; // detalhe: gate por space do post
+  if (pathname.startsWith("/aulas")) return true;
+  if (pathname.startsWith("/nova")) return true;
   if (pathname.startsWith("/spaces/")) {
     const slug = pathname.split("/")[2] ?? "";
     return isFreeSpaceSlug(slug);
@@ -123,8 +125,8 @@ export const UPGRADE_REASON_COPY: Record<
     body: "Arsenal, prompts, contratos e kits ficam liberados no PRO. O Elite ainda soma mais material.",
   },
   aulas: {
-    title: "Aulas para membros",
-    body: "A formação gravada e o acompanhamento de progresso entram no PRO e no Elite.",
+    title: "O resto da formação é para membros",
+    body: "O Comece por aqui está no gratuito. PRO e Elite abrem o resto da formação, materiais e o acompanhamento completo.",
   },
   busca: {
     title: "Busca para membros",
