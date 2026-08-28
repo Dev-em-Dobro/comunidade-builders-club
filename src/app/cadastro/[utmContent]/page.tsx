@@ -85,6 +85,7 @@ export default async function CadastroOrigemPage({ params }: Props) {
             <GiftSignupForm
               headline="Criar conta no Builders Club"
               subhead="Conta gratuita. Código no e-mail, você cola nesta mesma tela."
+              alreadyMemberHref="/login"
             />
           </div>
         ) : null}

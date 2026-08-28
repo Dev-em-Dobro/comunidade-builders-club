@@ -11,6 +11,13 @@ Planos pagos PRO/Elite e checkout oficial: [F053](F053-ofertas-pro-elite.md)
 Qualquer pessoa pode entrar no Builders Club como **free** (cadastro).
 Conteúdo e interação completos ficam para **paid** (compra Hubla / allowlist).
 
+## Entrada (F066)
+
+`/login` é para quem **já tem conta** (Google + magic link). Quem ainda
+não tem vai em **Criar conta grátis** → `/cadastro` (nome, e-mail,
+código OTP — sem senha). Os dois caminhos passam pelo mesmo bootstrap:
+sem allowlist → `tier: free`. Pagar não é opção nessa tela; é `/planos`.
+
 ## Tiers
 | Tier | Quem |
 |------|------|
@@ -29,6 +36,9 @@ Conteúdo e interação completos ficam para **paid** (compra Hubla / allowlist)
   Avisos é PRO+ desde F053.
 - **Notificações**
 - **Perfil**
+- **Aulas do Comece por aqui** (M01 da Fase 1) — assiste e conclui;
+  catálogo inteiro visível com cadeado no restante (F065)
+- **Publicar e comentar no Desafio Projetos** (`projetos`) — F065
 
 ### Por que o feed é aberto
 O feed é a vitrine do produto: as vitórias e resultados dos alunos são postados
@@ -37,10 +47,14 @@ tira justamente a prova social que motiva o upgrade. Free **lê**; o que convert
 é **participar** — comentar, reagir, publicar, navegar os spaces.
 
 ## Free não pode (cadeado + popup upgrade)
-- Outros Spaces (a *página* do space), **Materiais**, **Aulas**, **Busca**
-- Publicar, comentar, reagir, fixar, editar (interações)
-- FAB Nova publicação
-- Threads de aula (`aula-threads`) — conteúdo pago, nunca aparece no feed
+- Spaces fora de `FREE_SPACE_SLUGS` (a *página* do space), **Materiais**, **Busca**, Orion
+- Publicar fora de `projetos`, comentar fora de `projetos`, reagir, fixar
+- FAB Nova publicação **exceto** em `/spaces/projetos` (F065)
+- Comentar em threads de aula (`aula-threads`) — o free **assiste** o
+  Comece por aqui, não participa da discussão (F065)
+- Assistir aulas **além** do M01 (`Module.freeAccess` · F065). O
+  catálogo `/aulas` é visível por inteiro, com cadeado no que continua
+  pago.
 
 ## Leitura de post — regra
 | Space do post | Free abre `/posts/[id]`? |
@@ -78,4 +92,6 @@ Gate de `/spaces/[slug]` continua igual: space pago redireciona free para
 - [x] Preview only
 - [x] Feed do free lista posts de todos os spaces visíveis
 - [x] Free abre o detalhe de qualquer post do feed (só `aula-threads` barrado)
-- [x] Interações no post seguem bloqueadas para free
+- [x] Interações no post seguem bloqueadas para free, **exceto**
+      publicar e comentar em `projetos` (F065)
+- [x] Cadastro grátis visível a partir do login ([F066](F066-cadastro-conta-gratis.md))
