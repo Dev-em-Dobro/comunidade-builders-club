@@ -9,6 +9,7 @@ import {
   deleteModuleAction,
   moveLessonAction,
   moveModuleAction,
+  setModuleFreeAccessAction,
   updateLessonDescriptionAction,
 } from "@/actions/admin";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
@@ -29,6 +30,7 @@ export type AdminModule = {
   title: string;
   description?: string | null;
   published: boolean;
+  freeAccess: boolean;
   sortOrder: number;
   coverImageUrl: string | null;
   lessons: AdminLesson[];
@@ -108,6 +110,36 @@ function slugify(value: string): string {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 80);
+}
+
+function FreeAccessToggle({
+  moduleId,
+  freeAccess,
+}: {
+  moduleId: string;
+  freeAccess: boolean;
+}) {
+  return (
+    <form action={setModuleFreeAccessAction}>
+      <input type="hidden" name="id" value={moduleId} />
+      <input type="hidden" name="freeAccess" value={freeAccess ? "false" : "true"} />
+      <button
+        type="submit"
+        className={
+          freeAccess
+            ? "rounded-full bg-accent/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-accent"
+            : "rounded-full bg-surface px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted"
+        }
+        title={
+          freeAccess
+            ? "Livre para o plano gratuito (e descendentes). Clique para tirar."
+            : "Pago. Clique para liberar este ramo ao plano gratuito."
+        }
+      >
+        {freeAccess ? "free" : "pago"}
+      </button>
+    </form>
+  );
 }
 
 function StatusDot({ published }: { published: boolean }) {
@@ -271,15 +303,18 @@ function ModuleTree({
             />
           ))}
         </details>
-        <MoveDelete
-          itemId={mod.id}
-          moveAction={moveModuleAction}
-          upDisabled={index === 0}
-          downDisabled={index === siblingCount - 1}
-          removeAction={deleteModuleAction.bind(null, mod.id)}
-          removeLabel="Remover"
-          removeMessage={`Remover "${mod.title}" e tudo o que estiver dentro?`}
-        />
+        <div className="flex shrink-0 items-center gap-1">
+          <FreeAccessToggle moduleId={mod.id} freeAccess={mod.freeAccess} />
+          <MoveDelete
+            itemId={mod.id}
+            moveAction={moveModuleAction}
+            upDisabled={index === 0}
+            downDisabled={index === siblingCount - 1}
+            removeAction={deleteModuleAction.bind(null, mod.id)}
+            removeLabel="Remover"
+            removeMessage={`Remover "${mod.title}" e tudo o que estiver dentro?`}
+          />
+        </div>
       </div>
     </div>
   );
@@ -333,6 +368,10 @@ function CreateModuleForm({ modules }: { modules: AdminModule[] }) {
       <input name="sortOrder" type="number" className="input" defaultValue={0} />
       <label className="flex items-center gap-2 text-sm">
         <input type="checkbox" name="published" /> Publicado
+      </label>
+      <label className="flex items-center gap-2 text-sm">
+        <input type="checkbox" name="freeAccess" /> Livre para o plano gratuito
+        (este módulo e os filhos)
       </label>
       <button type="submit" className="btn-primary">
         Criar módulo

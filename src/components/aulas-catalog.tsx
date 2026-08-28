@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { snippetFromBody } from "@/lib/markdown/text";
+import { FASE_1_M01_SLUG } from "@/lib/aulas/access";
 
 export type AulaLessonCard = {
   id: string;
@@ -10,6 +11,7 @@ export type AulaLessonCard = {
   thumbnailUrl: string | null;
   moduleSlug: string;
   completed: boolean;
+  freeAccess: boolean;
 };
 
 export type AulaModuleCard = {
@@ -18,6 +20,7 @@ export type AulaModuleCard = {
   title: string;
   description: string | null;
   coverImageUrl: string | null;
+  freeAccess: boolean;
   lessons: AulaLessonCard[];
   children?: AulaModuleCard[];
 };
@@ -28,6 +31,7 @@ type ModuleNode = {
   title: string;
   description: string | null;
   coverImageUrl: string | null;
+  freeAccess: boolean;
   lessons: Array<{
     id: string;
     slug: string;
@@ -38,13 +42,37 @@ type ModuleNode = {
   children?: ModuleNode[];
 };
 
-export function mapModule(mod: ModuleNode, completed: Set<string>): AulaModuleCard {
+export function LockMark({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className ?? "h-4 w-4"}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      aria-hidden
+    >
+      <rect x="5" y="11" width="14" height="10" rx="2" />
+      <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+    </svg>
+  );
+}
+
+export function mapModule(
+  mod: ModuleNode,
+  completed: Set<string>,
+  inheritedFree = false,
+): AulaModuleCard {
+  const freeAccess =
+    inheritedFree || Boolean(mod.freeAccess) || mod.slug === FASE_1_M01_SLUG;
   return {
     id: mod.id,
     slug: mod.slug,
     title: mod.title,
     description: mod.description,
     coverImageUrl: mod.coverImageUrl,
+    freeAccess,
     lessons: mod.lessons.map((l) => ({
       id: l.id,
       slug: l.slug,
@@ -53,8 +81,11 @@ export function mapModule(mod: ModuleNode, completed: Set<string>): AulaModuleCa
       thumbnailUrl: l.thumbnailUrl,
       moduleSlug: mod.slug,
       completed: completed.has(l.id),
+      freeAccess,
     })),
-    children: (mod.children ?? []).map((child) => mapModule(child, completed)),
+    children: (mod.children ?? []).map((child) =>
+      mapModule(child, completed, freeAccess),
+    ),
   };
 }
 
@@ -147,48 +178,70 @@ export function progressPct(mod: AulaModuleCard): number {
   return Math.round((completedCount(mod) / total) * 100);
 }
 
-function LessonRows({ lessons }: { lessons: AulaLessonCard[] }) {
+/** Card raiz sem selo Pago se algum descendente for free (F065 — M01). */
+export function treeHasFreeAccess(mod: AulaModuleCard): boolean {
+  if (mod.freeAccess) return true;
+  return (mod.children ?? []).some(treeHasFreeAccess);
+}
+
+function LessonRows({
+  lessons,
+  isPaid,
+}: {
+  lessons: AulaLessonCard[];
+  isPaid: boolean;
+}) {
   if (lessons.length === 0) return null;
   return (
     <ul className="divide-y divide-border">
-      {lessons.map((l) => (
-        <li key={l.id}>
-          <Link
-            href={`/aulas/${l.moduleSlug}/${l.slug}`}
-            className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-surface/60 sm:gap-4 sm:px-5"
-          >
-            {l.thumbnailUrl ? (
-              <Image
-                src={l.thumbnailUrl}
-                alt=""
-                width={96}
-                height={56}
-                className="h-12 w-20 shrink-0 rounded-md object-cover sm:h-14 sm:w-24"
-                sizes="96px"
-              />
-            ) : (
-              <div className="flex h-12 w-20 shrink-0 items-center justify-center rounded-md bg-surface text-[10px] font-semibold uppercase tracking-wide text-muted sm:h-14 sm:w-24">
-                Vídeo
+      {lessons.map((l) => {
+        const locked = !isPaid && !l.freeAccess;
+        return (
+          <li key={l.id}>
+            <Link
+              href={`/aulas/${l.moduleSlug}/${l.slug}`}
+              className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-surface/60 sm:gap-4 sm:px-5"
+            >
+              {l.thumbnailUrl ? (
+                <Image
+                  src={l.thumbnailUrl}
+                  alt=""
+                  width={96}
+                  height={56}
+                  className="h-12 w-20 shrink-0 rounded-md object-cover sm:h-14 sm:w-24"
+                  sizes="96px"
+                />
+              ) : (
+                <div className="flex h-12 w-20 shrink-0 items-center justify-center rounded-md bg-surface text-[10px] font-semibold uppercase tracking-wide text-muted sm:h-14 sm:w-24">
+                  Vídeo
+                </div>
+              )}
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-[15px] font-semibold text-foreground md:text-base">
+                  {l.title}
+                </p>
+                <p className="text-sm text-muted">
+                  {locked ? "Plano pago" : "Vídeo"}
+                </p>
               </div>
-            )}
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-[15px] font-semibold text-foreground md:text-base">
-                {l.title}
-              </p>
-              <p className="text-sm text-muted">Vídeo</p>
-            </div>
-            {l.completed ? (
-              <span className="shrink-0 text-xs font-semibold uppercase tracking-wide text-accent">
-                Concluída
-              </span>
-            ) : (
-              <span className="shrink-0 text-sm font-medium text-accent">
-                Assistir →
-              </span>
-            )}
-          </Link>
-        </li>
-      ))}
+              {locked ? (
+                <span className="inline-flex shrink-0 items-center gap-1 text-sm font-medium text-muted">
+                  <LockMark className="h-3.5 w-3.5" />
+                  Cadeado
+                </span>
+              ) : l.completed ? (
+                <span className="shrink-0 text-xs font-semibold uppercase tracking-wide text-accent">
+                  Concluída
+                </span>
+              ) : (
+                <span className="shrink-0 text-sm font-medium text-accent">
+                  Assistir →
+                </span>
+              )}
+            </Link>
+          </li>
+        );
+      })}
     </ul>
   );
 }
@@ -196,9 +249,11 @@ function LessonRows({ lessons }: { lessons: AulaLessonCard[] }) {
 function ModuleBranch({
   mod,
   depth,
+  isPaid,
 }: {
   mod: AulaModuleCard;
   depth: number;
+  isPaid: boolean;
 }) {
   const children = mod.children ?? [];
   const headingClass =
@@ -237,9 +292,14 @@ function ModuleBranch({
           ) : null}
         </div>
       </div>
-      <LessonRows lessons={mod.lessons} />
+      <LessonRows lessons={mod.lessons} isPaid={isPaid} />
       {children.map((child) => (
-        <ModuleBranch key={child.id} mod={child} depth={depth + 1} />
+        <ModuleBranch
+          key={child.id}
+          mod={child}
+          depth={depth + 1}
+          isPaid={isPaid}
+        />
       ))}
     </div>
   );
@@ -266,7 +326,13 @@ function Cover({ src, title }: { src: string | null; title: string }) {
   );
 }
 
-export function AulasCatalog({ modules }: { modules: AulaModuleCard[] }) {
+export function AulasCatalog({
+  modules,
+  isPaid = true,
+}: {
+  modules: AulaModuleCard[];
+  isPaid?: boolean;
+}) {
   if (modules.length === 0) return null;
 
   return (
@@ -274,6 +340,7 @@ export function AulasCatalog({ modules }: { modules: AulaModuleCard[] }) {
       {modules.map((mod) => {
         const total = contentCount(mod);
         const pct = progressPct(mod);
+        const locked = !isPaid && !treeHasFreeAccess(mod);
         const summary = mod.description
           ? snippetFromBody(mod.description, 140)
           : null;
@@ -285,6 +352,12 @@ export function AulasCatalog({ modules }: { modules: AulaModuleCard[] }) {
             >
               <div className="relative aspect-video w-full overflow-hidden bg-surface">
                 <Cover src={coverOf(mod)} title={mod.title} />
+                {locked ? (
+                  <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-background/90 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-foreground shadow-sm">
+                    <LockMark className="h-3 w-3" />
+                    Pago
+                  </span>
+                ) : null}
               </div>
               <div className="flex flex-1 flex-col p-4 sm:p-5">
                 <h2 className="font-[family-name:var(--font-outfit)] text-lg font-semibold leading-snug">
@@ -318,16 +391,27 @@ export function AulasCatalog({ modules }: { modules: AulaModuleCard[] }) {
   );
 }
 
-export function AulasModuleOutline({ mod }: { mod: AulaModuleCard }) {
+export function AulasModuleOutline({
+  mod,
+  isPaid = true,
+}: {
+  mod: AulaModuleCard;
+  isPaid?: boolean;
+}) {
   const children = mod.children ?? [];
   if (mod.lessons.length === 0 && children.length === 0) {
     return null;
   }
   return (
     <div className="mt-8 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-      <LessonRows lessons={mod.lessons} />
+      <LessonRows lessons={mod.lessons} isPaid={isPaid} />
       {children.map((child) => (
-        <ModuleBranch key={child.id} mod={child} depth={1} />
+        <ModuleBranch
+          key={child.id}
+          mod={child}
+          depth={1}
+          isPaid={isPaid}
+        />
       ))}
     </div>
   );

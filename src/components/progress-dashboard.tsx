@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { StudentProgressRow } from "@/lib/admin/progress";
+import { tierLabel } from "@/lib/membership/capabilities";
 
 type LessonMeta = {
   id: string;
@@ -105,6 +106,9 @@ export function ProgressDashboard({
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold">
                       {s.displayName}
+                      <span className="ml-2 rounded-md bg-surface px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted">
+                        {tierLabel(s.tier)}
+                      </span>
                       {s.role === "admin" ? (
                         <span className="ml-2 rounded-md bg-accent/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-accent">
                           Admin

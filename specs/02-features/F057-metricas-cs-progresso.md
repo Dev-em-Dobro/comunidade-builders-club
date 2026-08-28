@@ -116,9 +116,18 @@ Mês calendário corrente em `America/Sao_Paulo` (não a semana fechada).
 
 Mostrar **X de Y (Z%)**. Y = 0 → `0 de 0`, sem porcentagem.
 
+## Tabela de aulas (abaixo dos cards)
+
+F065: cada linha expõe o `tier` (Gratuito / PRO / Elite). O % de aulas
+usa o denominador **acessível** àquele aluno — free sobre o Comece por
+aqui (F065), pago sobre o catálogo publicado. Os cards 1–6 desta spec
+**não** mudam o
+recorte: continuam separados por origem/plano.
+
 ## Fora de escopo
 
-- Recortar os cards antigos de aulas/posts (continuam no total da base).
+- Recortar os cards antigos de aulas/posts (continuam no total da base;
+  o % por aluno passa a ser por acesso · F065).
 - Gravar histórico de troca de tier.
 - Consultar API Hubla/TMB.
 - Worker/fila (ADR-002 do Club).

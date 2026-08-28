@@ -32,12 +32,9 @@ const STEPS_PAGO: Step[] = [
 ];
 
 /**
- * F063 — a trilha do free só pode ter o que ele consegue fazer.
- *
- * A anterior era a mesma dos dois tiers e dava 4 cadeados em 5 links no
- * primeiro minuto. Publicar continua sendo PRO+ (gate por tier, independente do
- * acesso ao space), então nenhum passo pede para postar: os três são leitura ou
- * edição do próprio perfil.
+ * F063 / F065 — a trilha do free só pode ter o que ele consegue fazer.
+ * Publicar fora de projetos continua PRO+. O Comece por aqui (F065) entra
+ * como passo 2.
  */
 const STEPS_FREE: Step[] = [
   {
@@ -48,12 +45,18 @@ const STEPS_FREE: Step[] = [
   },
   {
     n: "2",
+    href: "/aulas",
+    label: "Assistir as primeiras aulas",
+    hint: "O Comece por aqui está liberado. Assista e conheça o método; o resto da formação entra no plano pago.",
+  },
+  {
+    n: "3",
     href: "/spaces/conquistas",
     label: "Ver o que a comunidade está fechando",
     hint: "Cliente fechado, proposta aceita, primeiro pagamento — com quanto cobraram e como entregaram.",
   },
   {
-    n: "3",
+    n: "4",
     href: "/spaces/presentes",
     label: "Pegar os outros presentes",
     hint: "Os kits liberados ficam todos aqui, abertos para você.",
@@ -84,7 +87,9 @@ export function WelcomeSpaceView({
         <h1 className="page-title">{spaceName}</h1>
         <p className="mt-1.5 max-w-2xl text-sm text-muted">
           {spaceDescription?.trim() ||
-            "Assista o tutorial e siga os três passos. Um caminho só — o suficiente para o primeiro dia."}
+            (isPaid
+              ? "Assista o tutorial e siga os três passos. Um caminho só — o suficiente para o primeiro dia."
+              : "Assista o tutorial e siga os quatro passos. Um caminho só — o suficiente para o primeiro dia.")}
         </p>
       </div>
 
@@ -120,7 +125,7 @@ export function WelcomeSpaceView({
           </div>
         ) : (
           <p className="text-sm text-muted lg:col-span-2">
-            Tutorial em breve. Enquanto isso, siga os três passos ao lado.
+            Tutorial em breve. Enquanto isso, siga os passos ao lado.
           </p>
         )}
 

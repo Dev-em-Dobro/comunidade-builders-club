@@ -1,15 +1,19 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requirePaidMemberOrRedirect } from "@/lib/membership/require-member";
-import { hrefPlanos } from "@/lib/membership/capabilities";
+import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
+import {
+  hrefPlanos,
+  isPaidMembership,
+} from "@/lib/membership/capabilities";
+import { canWatchLesson } from "@/lib/aulas/access";
 import {
   ensureLessonDiscussionPost,
   getLessonForMember,
   getLessonProgress,
   listCompletedLessonIds,
-  listPublishedModules,
   pandaEmbedUrl,
 } from "@/lib/aulas";
+import { listPublishedModules } from "@/lib/aulas/published-modules";
 import { getPost } from "@/lib/posts";
 import { MarkLessonCompleteButton } from "@/components/mark-lesson-complete-button";
 import {
@@ -33,16 +37,18 @@ type Props = {
 
 export default async function LessonPage({ params }: Props) {
   const { moduleSlug, lessonSlug } = await params;
-  const member = await requirePaidMemberOrRedirect(hrefPlanos({ motivo: "aulas" }));
+  const member = await requireActiveMemberOrRedirect();
+  const isPaid = isPaidMembership(member.membership);
 
   const lesson = await getLessonForMember(moduleSlug, lessonSlug);
   if (!lesson) notFound();
 
+  const canWatch = canWatchLesson(isPaid, lesson.module);
   const hasVideo = Boolean(
     lesson.pandaLibraryId && lesson.pandaVideoExternalId,
   );
   let embed: string | null = null;
-  if (hasVideo) {
+  if (canWatch && hasVideo) {
     try {
       embed = pandaEmbedUrl(
         lesson.pandaLibraryId!,
@@ -90,7 +96,7 @@ export default async function LessonPage({ params }: Props) {
         <div>
           <div className="overflow-hidden rounded-2xl border border-border bg-black shadow-sm">
             <div className="relative aspect-video w-full">
-              {embed ? (
+              {canWatch && embed ? (
                 <iframe
                   src={embed}
                   title={lesson.title}
@@ -98,7 +104,7 @@ export default async function LessonPage({ params }: Props) {
                   allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
                   allowFullScreen
                 />
-              ) : (
+              ) : canWatch ? (
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-card px-6 text-center">
                   <p className="font-[family-name:var(--font-outfit)] text-lg font-semibold">
                     Material de apoio
@@ -107,6 +113,22 @@ export default async function LessonPage({ params }: Props) {
                     Esta aula não tem vídeo. Baixe os arquivos na descrição
                     abaixo.
                   </p>
+                </div>
+              ) : (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-card px-6 text-center">
+                  <p className="font-[family-name:var(--font-outfit)] text-lg font-semibold">
+                    Esta aula é do plano pago
+                  </p>
+                  <p className="mt-2 max-w-sm text-sm text-muted">
+                    A Fase 1 começa no gratuito com o Comece por aqui.
+                    O resto da formação entra no PRO e no Elite.
+                  </p>
+                  <Link
+                    href={hrefPlanos({ motivo: "aulas" })}
+                    className="btn-primary mt-4"
+                  >
+                    Ver planos
+                  </Link>
                 </div>
               )}
             </div>
@@ -141,6 +163,7 @@ export default async function LessonPage({ params }: Props) {
               root={root}
               currentModuleSlug={moduleSlug}
               currentLessonSlug={lessonSlug}
+              isPaid={isPaid}
             />
           </div>
         ) : null}
@@ -154,20 +177,22 @@ export default async function LessonPage({ params }: Props) {
             </p>
             <h1 className="page-title mt-1">{lesson.title}</h1>
           </div>
-          {progress?.completedAt ? (
-            <p className="inline-flex items-center gap-2 rounded-xl border border-accent/30 bg-accent/10 px-4 py-2 text-[15px] font-semibold text-accent">
-              <span aria-hidden>✓</span>
-              Concluída
-            </p>
-          ) : (
-            <MarkLessonCompleteButton
-              lessonId={lesson.id}
-              moduleSlug={moduleSlug}
-              lessonSlug={lessonSlug}
-              label="Concluir"
-              className="rounded-xl border border-border bg-card px-4 py-2 text-[15px] font-semibold hover:border-accent/40"
-            />
-          )}
+          {canWatch ? (
+            progress?.completedAt ? (
+              <p className="inline-flex items-center gap-2 rounded-xl border border-accent/30 bg-accent/10 px-4 py-2 text-[15px] font-semibold text-accent">
+                <span aria-hidden>✓</span>
+                Concluída
+              </p>
+            ) : (
+              <MarkLessonCompleteButton
+                lessonId={lesson.id}
+                moduleSlug={moduleSlug}
+                lessonSlug={lessonSlug}
+                label="Concluir"
+                className="rounded-xl border border-border bg-card px-4 py-2 text-[15px] font-semibold hover:border-accent/40"
+              />
+            )
+          ) : null}
         </div>
 
         <div className="mt-6">
@@ -192,7 +217,22 @@ export default async function LessonPage({ params }: Props) {
                 </p>
                 {discussion ? (
                   <>
-                    <CommentForm postId={discussion.id} />
+                    {isPaid ? (
+                      <CommentForm postId={discussion.id} isPaid />
+                    ) : (
+                      <div className="mt-3 rounded-xl border border-border bg-surface/40 p-4">
+                        <p className="text-sm text-muted">
+                          Assistir o Comece por aqui é gratuito. Comentar
+                          nas aulas faz parte do PRO e do Elite.
+                        </p>
+                        <Link
+                          href={hrefPlanos({ motivo: "comentar" })}
+                          className="btn-primary mt-3 inline-flex text-sm"
+                        >
+                          Desbloquear para comentar
+                        </Link>
+                      </div>
+                    )}
                     {discussion.comments.length === 0 ? (
                       <div className="mt-4">
                         <EmptyState
@@ -223,6 +263,7 @@ export default async function LessonPage({ params }: Props) {
                                   <ReplyToggle
                                     postId={discussion.id}
                                     parentId={c.id}
+                                    isPaid={isPaid}
                                   />
                                 }
                               />
@@ -251,6 +292,7 @@ export default async function LessonPage({ params }: Props) {
                                             <ReplyToggle
                                               postId={discussion.id}
                                               parentId={r.id}
+                                              isPaid={isPaid}
                                             />
                                           }
                                         />

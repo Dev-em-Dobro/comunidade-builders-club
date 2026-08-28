@@ -1,6 +1,12 @@
-import { unstable_cache } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
+import { ForbiddenError } from "@/lib/auth/errors";
+import { UPGRADE_REQUIRED } from "@/lib/membership/errors";
+import { canWatchLesson } from "./access";
+
+export { canWatchLesson, moduleAllowsFree, FASE_1_M01_SLUG } from "./access";
+export type { ModuleAccessNode } from "./access";
+export { listPublishedModules } from "./published-modules";
 
 /** Só alfanumérico / hífen / underscore — evita host injection no embed. */
 const PANDA_ID_RE = /^[a-zA-Z0-9_-]+$/;
@@ -35,6 +41,7 @@ export const moduleSchema = z.object({
   coverImageUrl: z.string().trim().max(2000).optional().nullable().or(z.literal("")),
   sortOrder: z.coerce.number().int().min(0).max(9999).default(0),
   published: z.boolean().default(false),
+  freeAccess: z.boolean().default(false),
   parentId: z
     .string()
     .trim()
@@ -74,58 +81,6 @@ export const lessonSchema = z.object({
   sortOrder: z.coerce.number().int().min(0).max(9999).default(0),
   published: z.boolean().default(false),
 });
-
-const publishedLessonSelect = {
-  id: true,
-  slug: true,
-  title: true,
-  description: true,
-  thumbnailUrl: true,
-  sortOrder: true,
-} as const;
-
-const publishedModuleFields = {
-  id: true,
-  slug: true,
-  title: true,
-  description: true,
-  coverImageUrl: true,
-  sortOrder: true,
-  lessons: {
-    where: { published: true },
-    orderBy: { sortOrder: "asc" as const },
-    select: publishedLessonSelect,
-  },
-};
-
-const listPublishedModulesCached = unstable_cache(
-  async () =>
-    prisma.module.findMany({
-      where: { published: true, parentId: null },
-      select: {
-        ...publishedModuleFields,
-        children: {
-          where: { published: true },
-          orderBy: { sortOrder: "asc" },
-          select: {
-            ...publishedModuleFields,
-            children: {
-              where: { published: true },
-              orderBy: { sortOrder: "asc" },
-              select: publishedModuleFields,
-            },
-          },
-        },
-      },
-      orderBy: { sortOrder: "asc" },
-    }),
-  ["published-modules"],
-  { revalidate: 120, tags: ["aulas"] },
-);
-
-export async function listPublishedModules() {
-  return listPublishedModulesCached();
-}
 
 export async function listAllModulesAdmin() {
   return prisma.module.findMany({
@@ -184,6 +139,7 @@ export async function createModule(raw: z.infer<typeof moduleSchema>) {
       coverImageUrl: data.coverImageUrl || null,
       sortOrder: data.sortOrder,
       published: data.published,
+      freeAccess: data.freeAccess,
       parentId: parentIdFrom(data),
     },
   });
@@ -203,8 +159,16 @@ export async function updateModule(
       coverImageUrl: data.coverImageUrl || null,
       sortOrder: data.sortOrder,
       published: data.published,
+      freeAccess: data.freeAccess,
       parentId: parentIdFrom(data),
     },
+  });
+}
+
+export async function setModuleFreeAccess(id: string, freeAccess: boolean) {
+  return prisma.module.update({
+    where: { id },
+    data: { freeAccess },
   });
 }
 
@@ -321,7 +285,29 @@ export async function getLessonProgress(userId: string, lessonId: string) {
   });
 }
 
-export async function markLessonCompleted(userId: string, lessonId: string) {
+const lessonModuleAncestors = {
+  include: { parent: { include: { parent: true } } },
+} as const;
+
+export async function markLessonCompleted(
+  userId: string,
+  lessonId: string,
+  opts: { isPaid: boolean },
+) {
+  const lesson = await prisma.lesson.findFirst({
+    where: { id: lessonId, published: true, module: { published: true } },
+    include: { module: lessonModuleAncestors },
+  });
+  if (!lesson) throw new Error("Aula não encontrada.");
+  type Ancestor = { published: boolean; parent?: Ancestor | null } | null;
+  let ancestor: Ancestor = lesson.module.parent;
+  while (ancestor) {
+    if (!ancestor.published) throw new Error("Aula não encontrada.");
+    ancestor = ancestor.parent ?? null;
+  }
+  if (!canWatchLesson(opts.isPaid, lesson.module)) {
+    throw new ForbiddenError(UPGRADE_REQUIRED);
+  }
   return prisma.lessonProgress.upsert({
     where: { userId_lessonId: { userId, lessonId } },
     create: {

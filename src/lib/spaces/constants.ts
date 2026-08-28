@@ -34,6 +34,10 @@ export const ADMIN_ONLY_PUBLISH_SLUGS = [
   AULA_THREADS_SPACE_SLUG,
 ] as const;
 
+/** F065 — free publica e comenta só no Desafio Projetos. */
+export const FREE_PUBLISH_SLUGS = [PROJETOS_SPACE_SLUG] as const;
+export const FREE_COMMENT_SLUGS = [PROJETOS_SPACE_SLUG] as const;
+
 /** Spaces sem comentários (orientação / não conversa). */
 export const COMMENTS_DISABLED_SPACE_SLUGS = [
   WELCOME_SPACE_SLUG,
@@ -45,6 +49,14 @@ export const HIDDEN_NAV_SPACE_SLUGS = [AULA_THREADS_SPACE_SLUG] as const;
 
 export function isAdminOnlyPublishSpace(slug: string): boolean {
   return (ADMIN_ONLY_PUBLISH_SLUGS as readonly string[]).includes(slug);
+}
+
+export function isFreePublishSpace(slug: string): boolean {
+  return (FREE_PUBLISH_SLUGS as readonly string[]).includes(slug);
+}
+
+export function isFreeCommentSpace(slug: string): boolean {
+  return (FREE_COMMENT_SLUGS as readonly string[]).includes(slug);
 }
 
 export function isCommentsDisabledSpace(slug: string): boolean {

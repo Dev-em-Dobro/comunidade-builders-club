@@ -12,6 +12,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { UpgradeProvider, useUpgrade } from "@/components/upgrade-modal";
 import { UserMenu } from "@/components/user-menu";
 import { isFreeSpaceSlug } from "@/lib/membership/capabilities";
+import { isFreePublishSpace } from "@/lib/spaces/constants";
 import {
   ICON_ADMIN,
   ICON_AULAS,
@@ -180,36 +181,6 @@ function SpaceNav({
   );
 }
 
-function LockedGhost({
-  label,
-  icon,
-  reason,
-  active,
-  onNavigate,
-}: {
-  label: string;
-  icon: React.ReactNode;
-  reason: "aulas" | "busca";
-  active: boolean;
-  onNavigate?: () => void;
-}) {
-  const { openUpgrade } = useUpgrade();
-  return (
-    <button
-      type="button"
-      className={`btn-ghost w-full cursor-pointer justify-start gap-2 ${active ? "text-accent" : ""}`}
-      onClick={() => {
-        openUpgrade(reason);
-        onNavigate?.();
-      }}
-    >
-      {icon}
-      <span className="flex-1 text-left">{label}</span>
-      <LockIcon />
-    </button>
-  );
-}
-
 /** F062 — busca virou lupa ao lado da pill, como na referência. */
 function BuscaButton({
   isPaid,
@@ -281,24 +252,14 @@ function SidebarFooter({
 
   return (
     <div className="relative z-[100] mt-auto flex flex-col gap-0.5 border-t border-border pt-3">
-      {isPaid ? (
-        <Link
-          href="/aulas"
-          className={`btn-ghost justify-start gap-2 ${pathname.startsWith("/aulas") ? "text-accent" : ""}`}
-          onClick={onNavigate}
-        >
-          {ICON_AULAS}
-          Aulas
-        </Link>
-      ) : (
-        <LockedGhost
-          label="Aulas"
-          icon={ICON_AULAS}
-          reason="aulas"
-          active={pathname.startsWith("/aulas")}
-          onNavigate={onNavigate}
-        />
-      )}
+      <Link
+        href="/aulas"
+        className={`btn-ghost justify-start gap-2 ${pathname.startsWith("/aulas") ? "text-accent" : ""}`}
+        onClick={onNavigate}
+      >
+        {ICON_AULAS}
+        Aulas
+      </Link>
       {isPaid ? (
         <a
           href={orionUrl}
@@ -401,6 +362,18 @@ function NovaPublicacaoFab({
     "fixed bottom-5 right-5 z-40 inline-flex h-14 cursor-pointer items-center gap-2 rounded-full bg-accent px-5 text-sm font-semibold text-white shadow-lg shadow-accent/30 transition hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent md:bottom-8 md:right-8";
 
   if (!isPaid) {
+    if (isFreePublishSpace(spaceSlug)) {
+      return (
+        <Link
+          href={`/nova?space=${spaceSlug}`}
+          className={className}
+          aria-label="Nova publicação"
+        >
+          {ICON_NOVA}
+          <span className="pr-0.5">Nova publicação</span>
+        </Link>
+      );
+    }
     return (
       <button
         type="button"
