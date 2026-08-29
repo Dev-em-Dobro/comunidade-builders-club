@@ -61,17 +61,19 @@ export function WelcomeTutorialPlayer({
       />
       <span className="absolute inset-0 bg-black/10 transition-colors group-hover:bg-black/25" />
       {/*
-       * F068 — play no rodapé, não no centro: a arte tem a headline no meio
-       * e o botão centralizado cobria "com IA".
+       * F068 — play centralizado e pequeno: grande demais ele atropela a
+       * headline da arte. A sombra é o que dá destaque, não o tamanho.
        */}
-      <span className="absolute inset-0 flex items-end justify-end pb-[7%] pr-[7%]">
-        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/95 shadow-lg transition-transform group-hover:scale-105 sm:h-16 sm:w-16">
+      <span className="absolute inset-0 flex items-center justify-center">
+        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/95 shadow-[0_6px_24px_rgba(0,0,0,0.55)] transition-transform group-hover:scale-110 sm:h-14 sm:w-14">
+          {/* Triângulo pelo centroide: vértices (9,6.5) (9,17.5) (18,12)
+              centram em (12,12) — sem `ml` para compensar. */}
           <svg
             viewBox="0 0 24 24"
             aria-hidden
-            className="ml-1 h-7 w-7 fill-slate-900 sm:h-9 sm:w-9"
+            className="h-5 w-5 fill-slate-900 sm:h-6 sm:w-6"
           >
-            <path d="M8 5v14l11-7z" />
+            <path d="M9 6.5v11l9-5.5z" />
           </svg>
         </span>
       </span>
