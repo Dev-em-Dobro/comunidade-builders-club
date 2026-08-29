@@ -48,7 +48,9 @@ const STEPS_FREE: Step[] = [
     n: "2",
     href: "/aulas",
     label: "Assistir as primeiras aulas",
-    hint: "O Comece por aqui está liberado. Assista e conheça o método; o resto da formação entra no plano pago.",
+    // F067 — a trilha é onboarding, não pitch: sai a menção ao plano pago,
+    // que fechava o passo na tranca em vez do próximo movimento dela.
+    hint: "O Comece por aqui está liberado. Assista e conheça o método — é a base de tudo o que vem depois.",
   },
   {
     n: "3",

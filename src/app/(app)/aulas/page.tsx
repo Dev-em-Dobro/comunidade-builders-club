@@ -19,9 +19,11 @@ export default async function AulasPage() {
     <div className="feed-wrap-wide">
       <h1 className="page-title">Aulas</h1>
       <p className="mt-2 text-sm text-muted">
+        {/* F067 — a linha do free termina no que ela ganha, não no cadeado:
+            é a última coisa que ela lê antes de escolher onde clicar. */}
         {isPaid
           ? "Escolha um módulo para ver as aulas."
-          : "O Comece por aqui está liberado no gratuito. O resto da formação aparece com cadeado."}
+          : "O Comece por aqui está liberado no gratuito. PRO e Elite abrem o resto da formação — nicho, prospecção, abordagem e fechamento."}
       </p>
 
       {catalog.length === 0 ? (
