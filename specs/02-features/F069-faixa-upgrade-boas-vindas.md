@@ -1,7 +1,7 @@
 # F069 — Faixa de upgrade na tela de Boas-vindas
 
 ## Status
-Rascunho — 2026-08-29
+Em implementação — 2026-08-29
 
 ## Contexto
 
@@ -131,13 +131,14 @@ manter sem problema para resolver.
 
 ## Critérios
 
-- [ ] Spec antes do código
-- [ ] Free vê a faixa em Boas-vindas, abaixo da trilha
-- [ ] Pago, admin e instructor não veem
-- [ ] Título e preço vêm de `checkout.ts` (sem string duplicada)
-- [ ] CTA leva a `/planos?motivo=boas-vindas`
-- [ ] `/planos` com esse motivo mostra a copy de continuidade
-- [ ] `motivo=boas-vindas` não abre modal em lugar nenhum
-- [ ] Trilha continua sem pitch (F063)
-- [ ] Layout empilha no mobile
-- [ ] Validado em local com conta free real; Preview antes de prod
+- [x] Spec antes do código
+- [x] Free vê a faixa em Boas-vindas, abaixo da trilha
+- [x] Pago, admin e instructor não veem
+- [x] Título e preço vêm de `checkout.ts` (sem string duplicada)
+- [x] CTA leva a `/planos?motivo=boas-vindas`
+- [x] `/planos` com esse motivo mostra a copy de continuidade
+- [x] `motivo=boas-vindas` não abre modal em lugar nenhum
+- [x] Trilha continua sem pitch (F063)
+- [x] Layout empilha no mobile
+- [x] Validado em local: free vê (4 passos + faixa), admin não vê (3 passos)
+- [ ] Preview / HML antes de produção

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { WelcomeTutorialPlayer } from "@/components/welcome-tutorial-player";
+import { WelcomeUpgradeBanner } from "@/components/welcome-upgrade-banner";
 
 type Step = {
   n: string;
@@ -173,6 +174,9 @@ export function WelcomeSpaceView({
           </ol>
         </section>
       </div>
+
+      {/* F069 — a oferta fecha a página, fora da trilha. Só para o free. */}
+      {isPaid ? null : <WelcomeUpgradeBanner />}
     </div>
   );
 }
