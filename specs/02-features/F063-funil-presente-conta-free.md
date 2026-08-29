@@ -253,12 +253,12 @@ de homologação e qual e-mail recebe admin no bootstrap, e este repositório é
       dizer "sem juros" continua valendo.
 - [ ] **Faixa de upgrade na tela de Boas-vindas** para quem é free — separada da
       trilha, que é onboarding.
-- [ ] **Copy dos modais de upgrade.** Avaliada como "70% boa": diz o que a
-      pessoa não pode mais do que o que ela ganha.
-- [ ] **Texto de contexto antes do formulário** na página do presente — o que é
-      o Club e por que criar conta, hoje ausente.
-- [ ] **E-mail do código OTP sem contexto** — chega só com o código, sem dizer
-      por que entrar na comunidade.
+- [x] **Copy dos modais de upgrade.** Reescrita pelo ganho em
+      [F067](F067-copy-do-ganho-free.md) (28/08/2026).
+- [x] **Texto de contexto antes do formulário** na página do presente —
+      entregue como o bloco da decisão 1 em [F067](F067-copy-do-ganho-free.md).
+- [x] **E-mail do código OTP sem contexto** — resolvido em
+      [F067](F067-copy-do-ganho-free.md).
 - [x] **Playlist de aulas gratuitas** para o free — [F065](F065-aulas-fase-1-free.md)
       (só o Comece por aqui; catálogo com cadeado no restante).
 - [ ] **Regravar o vídeo de boas-vindas do free** — roteiro no doc local (ver
@@ -288,11 +288,12 @@ de homologação e qual e-mail recebe admin no bootstrap, e este repositório é
 ## Critérios de aceitação
 
 - [ ] Spec antes do código
-- [ ] `/presentes/saga` mostra a promessa dos 90 dias e o que é o Club, depois
-      do conteúdo e antes do formulário
-- [ ] Cadastro na página do presente é oferecido pela prova social, não por
-      "mais presentes" (formulário e modal de volta da aba)
-- [ ] Bloco tem três variantes: anônima, logada free, logada paga
+- [x] `/presentes/saga` mostra a promessa dos 90 dias e o que é o Club, depois
+      do conteúdo e antes do formulário — [F067](F067-copy-do-ganho-free.md)
+- [x] Cadastro na página do presente é oferecido pela prova social, não por
+      "mais presentes" — só o formulário; o modal de volta da aba morreu com o
+      `GiftOpenCard` e segue sem gatilho
+- [x] Bloco tem três variantes: anônima, logada free, logada paga
 - [x] `/planos` abre deslogada, sem redirecionar para login
 - [x] `/planos` deslogada mostra a nota "Compre com o e-mail que você vai usar
       para entrar" — **sob a grade**, não sob cada CTA (são dois cards lado a

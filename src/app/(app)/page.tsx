@@ -117,8 +117,14 @@ export default async function HomePage({ searchParams }: Props) {
               </>
             ) : (
               <>
-                Plano gratuito: leitura do feed liberada. Comentar, reagir e os
-                spaces da comunidade são do PRO e do Elite.{" "}
+                {/* F067 — o feed é o ganho do gratuito: descreve o que tem
+                    aqui e o que o free faz de fato. Não é só leitura: ele
+                    assiste o Comece por aqui (F065) e publica no Desafio
+                    Projetos (F065). */}
+                Aqui a comunidade posta o que está dando resultado: IA,
+                automações e freela — cliente fechado, preço praticado e o que
+                travou no caminho. No gratuito você lê tudo, assiste as
+                primeiras aulas e posta o seu no Desafio Projetos.{" "}
                 <Link
                   href={hrefPlanos()}
                   className="font-medium text-accent hover:underline"

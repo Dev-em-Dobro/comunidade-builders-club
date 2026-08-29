@@ -9,9 +9,14 @@ import { PostMedia } from "@/components/post-media";
 import { previewFromBody } from "@/lib/posts/title";
 import { getOptionalUser } from "@/lib/auth/require-user";
 import { prisma } from "@/lib/db";
+import { isPaidMembership } from "@/lib/membership/capabilities";
 import { getPublicGift, recordGiftVisit } from "@/lib/gifts";
 import { giftLinkView } from "@/lib/gifts/link";
 import { GIFT_UTM_DEFAULTS, sanitizeUtmValue } from "@/lib/gifts/origem";
+import { PresentePromessa } from "@/app/presentes/presente-promessa";
+
+/** Âncora do CTA "Criar conta grátis" do bloco de promessa (F063). */
+const FORM_ANCHOR_ID = "criar-conta";
 
 export type GiftUtm = {
   source: string | null;
@@ -77,6 +82,17 @@ export async function PresentePublico({
         select: { welcomeSeenAt: true, displayName: true },
       })
     : null;
+  /**
+   * F063 — o bloco da promessa tem três variantes por sessão. Quem já é
+   * pago não vê oferta nenhuma; para isso é preciso o tier, não só o user.
+   */
+  const membership = user
+    ? await prisma.membership.findUnique({
+        where: { userId: user.id },
+        select: { tier: true, role: true, status: true },
+      })
+    : null;
+  const isPaid = membership ? isPaidMembership(membership) : false;
 
   const link = giftLinkView({
     title: gift.title,
@@ -163,8 +179,19 @@ export async function PresentePublico({
           />
         </article>
 
+        {/*
+         * F063 — a promessa fecha a leitura e abre a oferta. Depois do
+         * <article>, antes do formulário; some para quem já é pago.
+         */}
+        {!isPaid ? (
+          <PresentePromessa
+            variante={user ? "free" : "anonima"}
+            formAnchorId={FORM_ANCHOR_ID}
+          />
+        ) : null}
+
         {!user ? (
-          <div className="mx-auto mt-12 w-full max-w-xl">
+          <div id={FORM_ANCHOR_ID} className="mx-auto mt-8 w-full max-w-xl">
             <GiftSignupForm />
           </div>
         ) : null}
