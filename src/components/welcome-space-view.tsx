@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { WelcomeTutorialPlayer } from "@/components/welcome-tutorial-player";
 
 type Step = {
   n: string;
@@ -85,11 +86,11 @@ export function WelcomeSpaceView({
     <div className="feed-wrap-wide">
       <div>
         <h1 className="page-title">{spaceName}</h1>
+        {/* F067 — "passo a passo" cobre as duas trilhas (3 no pago, 4 no
+            free) e não quebra quando a lista muda de tamanho. */}
         <p className="mt-1.5 max-w-2xl text-sm text-muted">
           {spaceDescription?.trim() ||
-            (isPaid
-              ? "Assista o tutorial e siga os três passos. Um caminho só — o suficiente para o primeiro dia."
-              : "Assista o tutorial e siga os quatro passos. Um caminho só — o suficiente para o primeiro dia.")}
+            "Assista o tutorial e siga o passo a passo. Um caminho só — o suficiente para o primeiro dia."}
         </p>
       </div>
 
@@ -110,18 +111,12 @@ export function WelcomeSpaceView({
       <div className="mt-4 grid items-start gap-4 lg:grid-cols-3">
         {tutorialEmbedUrl ? (
           <div className="overflow-hidden rounded-2xl border border-border bg-black shadow-sm lg:col-span-2">
-            <div className="relative aspect-video w-full">
-              <iframe
-                id={tutorialVideoId ? `panda-${tutorialVideoId}` : undefined}
-                src={tutorialEmbedUrl}
-                title={tutorialTitle ?? "Tutorial da comunidade"}
-                className="absolute inset-0 h-full w-full"
-                style={{ border: "none" }}
-                allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
-                allowFullScreen
-                referrerPolicy="origin"
-              />
-            </div>
+            {/* F068 — capa com play; o iframe só monta no clique. */}
+            <WelcomeTutorialPlayer
+              embedUrl={tutorialEmbedUrl}
+              videoId={tutorialVideoId}
+              title={tutorialTitle ?? "Tutorial da comunidade"}
+            />
           </div>
         ) : (
           <p className="text-sm text-muted lg:col-span-2">

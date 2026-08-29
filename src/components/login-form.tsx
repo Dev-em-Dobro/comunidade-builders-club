@@ -91,9 +91,11 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
         <p className="font-[family-name:var(--font-outfit)] text-4xl font-bold tracking-tight text-foreground md:text-5xl">
           {NOME_PRODUTO}
         </p>
+        {/* F067 — a tela de entrada diz o que o Club faz antes de pedir
+            o e-mail. */}
         <p className="mt-3 max-w-sm text-base leading-relaxed text-muted">
-          A comunidade dos builders da Dev em Dobro — conversas, dúvidas e
-          conquistas em um só lugar.
+          A comunidade de quem está montando a própria operação de IA e
+          automação: aulas, skills prontas e gente fechando cliente junto.
         </p>
 
         <div className="mt-8 rounded-2xl border border-border/80 bg-card p-7 shadow-[0_12px_40px_rgba(15,23,42,0.06)]">
@@ -179,6 +181,11 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
                 >
                   Criar conta grátis
                 </Link>
+              </p>
+              {/* F067 — o que a conta gratuita já entrega, sem pedágio. */}
+              <p className="text-center text-xs text-muted">
+                No gratuito você já assiste as primeiras aulas, lê o feed da
+                comunidade e pega os presentes.
               </p>
             </div>
           )}

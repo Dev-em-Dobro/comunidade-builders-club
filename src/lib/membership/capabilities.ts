@@ -2,6 +2,7 @@
 
 import type { Membership, MembershipTier } from "@prisma/client";
 import { AULA_THREADS_SPACE_SLUG } from "@/lib/spaces/constants";
+import { PROMESSA_PRIMEIRO_CLIENTE } from "@/lib/membership/checkout";
 
 /**
  * Spaces cuja *página* é liberada para free (sidebar sem cadeado).
@@ -116,41 +117,46 @@ export const UPGRADE_REASON_COPY: Record<
   UpgradeReason,
   { title: string; body: string }
 > = {
+  /**
+   * F067 — copy pelo ganho. Free é um tier, não a ausência de um: nenhum
+   * título usa "para membros" para separar free de pago. O separador é o
+   * nome do plano.
+   */
   space: {
-    title: "Space exclusivo para membros",
-    body: "Entre no PRO ou no Elite para abrir este space e participar das conversas da comunidade.",
+    title: "Este space entra no PRO",
+    body: "É onde os builders trocam indicação de freela e bastidor de atendimento. PRO e Elite abrem todos os spaces da comunidade.",
   },
   materiais: {
-    title: "Skills e templates para membros",
-    body: "Arsenal, prompts, contratos e kits ficam liberados no PRO. O Elite ainda soma mais material.",
+    title: "Skills e templates prontos",
+    body: "Prompts, contratos, propostas e kits de entrega para usar já no próximo cliente. Liberados no PRO; o Elite soma a biblioteca ampliada.",
   },
   aulas: {
-    title: "O resto da formação é para membros",
-    body: "O Comece por aqui está no gratuito. PRO e Elite abrem o resto da formação, materiais e o acompanhamento completo.",
+    title: "Continue a formação",
+    body: "Você já tem o Comece por aqui. O PRO abre nicho, prospecção, abordagem e fechamento — o caminho inteiro até o primeiro cliente.",
   },
   busca: {
-    title: "Busca para membros",
-    body: "Pesquisar posts e membros faz parte do acesso PRO e Elite.",
+    title: "Ache quem já resolveu isso",
+    body: "A busca varre posts e membros para você chegar direto em quem passou pelo mesmo problema. Entra no PRO.",
   },
   publicar: {
-    title: "Publicar é para membros",
-    body: "Para criar publicações e participar da comunidade, escolha o PRO ou o Elite.",
+    title: "Publique na comunidade inteira",
+    body: "No gratuito você posta no Desafio Projetos. PRO e Elite abrem os outros spaces para mostrar trabalho, pedir ajuda e aparecer para quem contrata.",
   },
   comentar: {
-    title: "Comentar é para membros",
-    body: "Comentários e respostas ficam liberados no PRO e no Elite.",
+    title: "Entre na conversa",
+    body: "Comentar e responder é como você aparece para quem já está fechando cliente. Liberado no PRO e no Elite.",
   },
   reagir: {
-    title: "Reagir é para membros",
-    body: "Reações fazem parte do acesso PRO e Elite.",
+    title: "Reagir entra no PRO",
+    body: "Reações vêm junto com comentar e publicar na comunidade inteira, no PRO e no Elite.",
   },
   orion: {
     title: "Orion entra no PRO",
-    body: "O plano PRO libera o Orion no teto Free. O Elite soma reunião semanal e Orion com limites de Pro.",
+    body: "O motor de prospecção para achar e priorizar cliente local. O PRO libera no teto Free; o Elite roda com limites de Pro por 90 dias.",
   },
   geral: {
-    title: "Desbloqueie o Builders Club",
-    body: "Dois planos, o mesmo objetivo: fechar o primeiro cliente em 90 dias. Escolha o nível de acesso da formação e da comunidade.",
+    title: PROMESSA_PRIMEIRO_CLIENTE,
+    body: "Dois planos, o mesmo objetivo. Formação completa, skills, templates e a comunidade que já está fechando cliente.",
   },
 };
 

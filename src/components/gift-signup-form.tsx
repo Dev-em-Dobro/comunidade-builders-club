@@ -17,8 +17,12 @@ type Props = {
 };
 
 export function GiftSignupForm({
-  headline = "Crie sua conta e pegue os outros presentes",
-  subhead = "Conta gratuita. Você recebe um código no e-mail e continua nesta tela.",
+  /**
+   * F063 — a razão do cadastro é a prova social, não "mais presentes":
+   * o que converte é ver quem está fechando cliente.
+   */
+  headline = "Crie sua conta e veja quem está fechando cliente",
+  subhead = "Conta gratuita. Você entra e lê as conquistas reais da comunidade: quem fechou, por quanto e como foi.",
   alreadyMemberHref,
 }: Props) {
   const router = useRouter();

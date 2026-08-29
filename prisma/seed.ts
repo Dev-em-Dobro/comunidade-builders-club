@@ -15,7 +15,9 @@ const SPACES = [
   {
     slug: "boas-vindas",
     name: "Boas-vindas",
-    description: "Tutorial e os três passos do primeiro dia",
+    // F067 — "passo a passo" serve para as duas trilhas (3 passos no pago,
+    // 4 no free). "três passos" aparecia acima de uma lista de quatro.
+    description: "Tutorial e o passo a passo do primeiro dia",
     sortOrder: 0,
   },
   { slug: "avisos", name: "Avisos", description: "Comunicados oficiais", sortOrder: 1 },
@@ -23,7 +25,8 @@ const SPACES = [
   { slug: "geral", name: "Geral", description: "Conversa aberta", sortOrder: 3 },
   { slug: "duvidas", name: "Dúvidas", description: "Perguntas e respostas", sortOrder: 4 },
   { slug: "freelas", name: "Indicação Freela", description: "Se tiver um freela pra indicar pra um colega, poste aqui", sortOrder: 5 },
-  { slug: "conquistas", name: "Conquistas", description: "Poste suas conquistas aqui, cliente fechado, proposta aceita, ou primeiro pagamento. Conte como foi o processo pra fechar a venda, isso ajuda a comunidade a crescer", sortOrder: 6 },
+  // F067 — descrição que serve para quem lê (free) e para quem posta (PRO+).
+  { slug: "conquistas", name: "Conquistas", description: "Cliente fechado, proposta aceita, primeiro pagamento — e como foi o processo pra fechar. Leia o que já deu certo e, quando for a sua vez, poste a sua.", sortOrder: 6 },
   { slug: "projetos", name: "Desafio Projetos", description: "Poste aqui o projeto que você desenvolveu no desafio dos 7 dias. Pode ser só um site de amostra por enquanto, o importante é dar o primeiro passo, a venda vem depois", sortOrder: 7 },
 ] as const;
 

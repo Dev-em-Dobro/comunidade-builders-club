@@ -102,6 +102,11 @@ export async function sendMagicLinkEmail(opts: {
 
 export async function sendOtpEmail(opts: { to: string; otp: string }): Promise<void> {
   const subject = `Seu código de acesso — ${NOME_PRODUTO}`;
+  /**
+   * F067 — sai a instrução de olhar spam (a pessoa está lendo o e-mail) e
+   * entra o que espera do outro lado do código. Serve para free e para
+   * quem já é pago, que tem isso e mais.
+   */
   const text = [
     `Olá,`,
     ``,
@@ -109,7 +114,11 @@ export async function sendOtpEmail(opts: { to: string; otp: string }): Promise<v
     ``,
     opts.otp,
     ``,
-    `O código vale por 10 minutos. Se não achar este e-mail, olhe em spam e em promoções.`,
+    `O código vale por 10 minutos.`,
+    ``,
+    `Do outro lado dele: as primeiras aulas da formação, o feed com o que a`,
+    `comunidade está fechando — cliente, preço e como foi — e os presentes`,
+    `liberados.`,
     ``,
     `Se você não pediu este acesso, ignore este e-mail.`,
     ``,
@@ -119,7 +128,7 @@ export async function sendOtpEmail(opts: { to: string; otp: string }): Promise<v
     "Seu código de acesso",
     `<p style="color:#64748b;font-size:15px;line-height:1.5;">Digite o código na tela em que você parou. Vale por 10 minutos.</p>
     <p style="margin:24px 0;font-size:32px;letter-spacing:0.28em;font-weight:700;color:#0f172a;text-align:center;">${escapeHtml(opts.otp)}</p>
-    <p style="color:#64748b;font-size:13px;line-height:1.5;">Não achou? Olhe em spam e em promoções.</p>`,
+    <p style="color:#64748b;font-size:14px;line-height:1.6;">Do outro lado dele: as primeiras aulas da formação, o feed com o que a comunidade está fechando — cliente, preço e como foi — e os presentes liberados.</p>`,
   );
   await sendMail({ to: opts.to, subject, text, html });
 }
