@@ -92,6 +92,8 @@ export type UpgradeReason =
   | "comentar"
   | "reagir"
   | "orion"
+  /** F069 — origem: faixa da tela de Boas-vindas. Nunca abre modal. */
+  | "boas-vindas"
   | "geral";
 
 const UPGRADE_REASONS: readonly UpgradeReason[] = [
@@ -103,6 +105,7 @@ const UPGRADE_REASONS: readonly UpgradeReason[] = [
   "comentar",
   "reagir",
   "orion",
+  "boas-vindas",
   "geral",
 ];
 
@@ -153,6 +156,17 @@ export const UPGRADE_REASON_COPY: Record<
   orion: {
     title: "Orion entra no PRO",
     body: "O motor de prospecção para achar e priorizar cliente local. O PRO libera no teto Free; o Elite roda com limites de Pro por 90 dias.",
+  },
+  /**
+   * F069 — continuidade da faixa de Boas-vindas: quem clicou lá cai numa
+   * página que continua a frase, não numa genérica.
+   *
+   * A `/planos` usa só o `body`; o `title` existe porque o tipo pede e
+   * fica sem uso aqui — este motivo nunca abre modal (a faixa é link).
+   */
+  "boas-vindas": {
+    title: "Do primeiro dia ao primeiro cliente",
+    body: "Você já tem o Comece por aqui, o feed e os presentes. PRO e Elite abrem a formação até o fechamento, as skills, os templates e a comunidade inteira.",
   },
   geral: {
     title: PROMESSA_PRIMEIRO_CLIENTE,

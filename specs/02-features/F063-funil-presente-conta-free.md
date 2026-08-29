@@ -251,8 +251,9 @@ de homologação e qual e-mail recebe admin no bootstrap, e este repositório é
       [F053](F053-ofertas-pro-elite.md). 12 × 30,18 = R$ 362,16 — se o à vista
       seguir R$ 297, o acréscimo sobe de 11,5% para 22%, e a regra de **não**
       dizer "sem juros" continua valendo.
-- [ ] **Faixa de upgrade na tela de Boas-vindas** para quem é free — separada da
-      trilha, que é onboarding.
+- [~] **Faixa de upgrade na tela de Boas-vindas** para quem é free — separada da
+      trilha, que é onboarding. Especificada em
+      [F069](F069-faixa-upgrade-boas-vindas.md) (29/08/2026), ainda sem código.
 - [x] **Copy dos modais de upgrade.** Reescrita pelo ganho em
       [F067](F067-copy-do-ganho-free.md) (28/08/2026).
 - [x] **Texto de contexto antes do formulário** na página do presente —
