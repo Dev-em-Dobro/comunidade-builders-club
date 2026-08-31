@@ -77,8 +77,10 @@ const CATALOG: ModuleSeed[] = [
           {
             slug: "tutorial-intro-comunidade",
             title: "Como usar a comunidade",
+            // O M01 é aberto no gratuito (F065), então a descrição precisa
+            // dizer de qual plano é a plataforma que o tour mostra.
             description:
-              "Tutorial da plataforma: Feed, Spaces, Aulas e como circular na comunidade. Mesmo vídeo da tela de Boas-vindas no plano pago (F058/F060).",
+              "Tour completo da plataforma: o Feed, os Spaces, as Aulas e como circular na comunidade. É o tutorial do Club completo — tudo o que aparece aqui está aberto nos planos PRO e Elite.",
             pandaVideoExternalId: WELCOME_TUTORIAL_VIDEO.paidVideoExternalId,
             sortOrder: 1,
           },
