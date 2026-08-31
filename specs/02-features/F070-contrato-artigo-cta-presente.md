@@ -1,7 +1,7 @@
 # F070 — Contrato do Presente: o Dobro escreve o artigo, o Club escreve o CTA
 
 ## Status
-Rascunho — 2026-08-31
+Em implementação — 2026-08-31
 
 Depende de: [F059](F059-presentes-publicos-atribuicao.md) (Presente público),
 [F063](F063-funil-presente-conta-free.md) (bloco da promessa),
@@ -87,18 +87,24 @@ Continua sendo trabalho do Dobro — e não muda:
 
 ### 2. O que o corpo não contém
 
-Lista fechada, para o texto não precisar de julgamento a cada Presente:
+Lista fechada e **verificável por máquina** — o texto não depende de
+julgamento a cada Presente, e a regra não depende de alguém lembrar dela:
 
-- pedido de cadastro ou login — "crie sua conta", "cadastre-se",
-  "entre no Club"
-- link para `/cadastro`, `/login`, `/planos` ou para checkout
-  (Hubla, `pay.tmb.com.br`)
-- preço, parcelas ou nome de plano (PRO, Elite)
-- a promessa do produto escrita à mão — ela é
-  `PROMESSA_PRIMEIRO_CLIENTE`, de `src/lib/membership/checkout.ts`
+| Regra | O que casa | Por que não pega demais |
+|---|---|---|
+| `link-conversao` | link para `/planos`, `/cadastro` ou `/login` — caminho relativo ou no domínio do Club | o mesmo caminho em **outro** host não casa: um tutorial pode citar o `/login` de outra ferramenta |
+| `checkout` | qualquer URL em `pay.hub.la` ou `pay.tmb.com.br` | são hosts de checkout; não há uso legítimo dentro de um artigo |
+| `preco-do-produto` | os preços de `ofertaPro()` e `ofertaElite()` — hoje `R$ 30,18`, `R$ 297`, `R$ 101,30`, `R$ 997`, `R$ 1.297` | casa o **preço do produto**, não "R$" em geral — o Presente fala de quanto cobrar do cliente o tempo todo |
+| `promessa-do-produto` | `PROMESSA_PRIMEIRO_CLIENTE` e a variante "cliente em 90 dias" | a promessa tem um dono só: `checkout.ts` |
+| `pedido-de-cadastro` | imperativo de 2ª pessoa dirigido à leitora — "crie sua conta", "cadastre-se", "faça seu cadastro", "assine o PRO", "entre no Club", "garanta sua vaga" | casa o pedido, não a menção |
+
+Preço e promessa são lidos de `src/lib/membership/checkout.ts` em tempo de
+execução. Mudou o preço lá, a detecção acompanha — sem lista paralela para
+esquecer de atualizar.
 
 Falar do Club **dentro do texto** continua permitido quando é assunto
-("a gente fez isso na comunidade") — o que sai é o **pedido**.
+("a gente fez isso na comunidade"), e citar PRO ou Elite pelo nome também.
+O que sai é o **pedido**.
 
 ### 3. O CTA é do app e varia por sessão
 
@@ -114,25 +120,37 @@ feature o transforma em **regra da fronteira**, não em código novo:
 O invariante que o corpo não pode quebrar: **pedido de cadastro só existe
 para quem está deslogado, e só uma vez na página.**
 
-### 4. Aviso no composer, não bloqueio
+### 4. O bloqueio é no servidor, em publicar **e** editar
 
-Único código desta feature. Uma função pura em `src/lib/gifts/` que recebe
-o corpo e devolve os trechos suspeitos (os padrões da decisão 2). O
-composer a usa **só** quando `showGiftSlug` é verdadeiro — o admin
-publicando no space Presentes, que já é a condição de `composer.tsx:47` —
-e mostra um aviso acima do botão de publicar.
+Uma função pura em `src/lib/gifts/cta-no-corpo.ts` recebe o corpo e devolve
+os achados da decisão 2. Ela é chamada em dois lugares, com pesos
+diferentes:
 
-Avisa, não impede. Duas razões:
+| Onde | Papel |
+|---|---|
+| `createPost` e `updatePost` (`src/lib/posts/index.ts`) | **a verdade** — achou, lança `CtaNoCorpoError` e nada é gravado |
+| `composer.tsx`, antes do submit (só com `showGiftSlug`: admin no space Presentes) | conveniência — a mesma função, para a admin ver o trecho apontado sem gastar um round-trip |
 
-1. **Falso positivo é real.** Um Presente sobre vender serviço pode citar
-   "crie sua conta" descrevendo o fluxo de outra ferramenta. Bloquear
-   obrigaria a contornar o gate, e gate contornado morre.
-2. **A autoria é de um time pequeno e identificado.** O custo de um aviso
-   ignorado é baixo; o de um publish travado em cima da hora, não.
+Três escolhas dentro dessa decisão:
 
-Alternativa considerada e recusada: **só editorial**, sem código. Uma regra
-que vive apenas numa spec não sobrevive ao terceiro Presente escrito com
-pressa — e o erro só aparece depois, na página pública, para a leitora.
+1. **No `src/lib/`, não na action.** As Server Actions são finas por
+   convenção do projeto; a regra é de domínio e vale para qualquer caminho
+   que grave um Presente.
+2. **Editar também passa pelo gate.** Sem isso o corpo entra limpo e ganha
+   o CTA no primeiro `updatePost` — que é exatamente como uma regra "de
+   publicação" morre.
+3. **Vale para todo o space `presentes`, com ou sem slug.** O slug decide
+   se a página é pública, não se o texto é um Presente; e um post sem slug
+   pode ganhar um depois.
+
+**Bloqueia, não avisa.** O rascunho desta spec propunha aviso, com o
+argumento de que gate contornado morre. Está recusado: um aviso que a
+pessoa pode ignorar é a mesma regra editorial de antes, só que com mais
+código. O que não pode acontecer é o CTA errado chegar na página pública —
+e só o bloqueio garante isso.
+
+O custo assumido está em Riscos: falso positivo trava o publish, e a saída
+é reescrever a frase em terceira pessoa.
 
 ### 5. O entregável do Dobro
 
@@ -147,12 +165,31 @@ Promessa, oferta, preço, botão e formulário **não** são campos do
 entregável. Se um dia o CTA precisar variar por Presente, isso vira campo
 de sistema com spec própria — não texto solto no corpo.
 
-## O que esta feature não muda
+### 6. Auditoria do que já está publicado
 
-- O comportamento da página: as três variantes já estão no ar desde a F067
+`npm run audit:presentes` — script read-only
+(`scripts/audit-cta-presentes.mts`) que roda a mesma função sobre todos os
+posts do space `presentes` e imprime slug, regra e trecho.
+
+Existe porque o bloqueio só vale para gravações novas: sem a lista, ninguém
+sabe quais Presentes no ar já carregam CTA no corpo. Ele não corrige nada —
+a limpeza é editorial, post a post. Também é o jeito de descobrir, **antes**
+do deploy, se algum Presente vivo vai travar na próxima edição.
+
+## O que muda e o que não muda
+
+**Muda** um caminho só: gravar um post no space `presentes` passa a recusar
+corpo com CTA (decisão 4). É comportamento novo de **publicação**, visível
+apenas para admin — a única pessoa que publica ali
+(`ADMIN_ONLY_PUBLISH_SLUGS`).
+
+**Não muda:**
+
+- O que a leitora vê: as três variantes já estão no ar desde a F067
 - A copy do `PresentePromessa` e do `GiftSignupForm`
 - O funil, a atribuição por post (F059) ou o cadastro inline
 - Qualquer gate de tier
+- Publicar em qualquer outro space
 
 ## Fora de escopo
 
@@ -169,25 +206,38 @@ de sistema com spec própria — não texto solto no corpo.
 - **Artigo que termina seco.** Sem a ponte temática da decisão 1, o texto
   acaba e o bloco do app entra sem transição. A ponte não é opcional — é o
   que faz o CTA do Club parecer continuação, e não anúncio colado.
-- **Aviso virar ruído.** Se a detecção pegar demais, o admin aprende a
-  ignorar. A lista da decisão 2 é fechada de propósito.
-- **Presentes antigos.** A regra vale a partir de agora; os já publicados
-  precisam de uma passada manual, ou a página segue com dois fechamentos
-  para quem já tem conta.
+- **Falso positivo trava o publish.** É o custo assumido do bloqueio. O
+  caso real é `pedido-de-cadastro` num tutorial sobre outra ferramenta
+  ("cadastre-se no n8n"). A saída é reescrever em terceira pessoa — "o
+  cadastro no n8n é gratuito" — e o erro diz qual trecho casou. As outras
+  quatro regras são de host, preço exato e string exata: não têm como pegar
+  prosa por engano.
+- **Editar Presente antigo trava.** Um Presente publicado antes desta regra
+  só volta a ser editável depois de limpar o corpo. É intencional — mas a
+  auditoria da decisão 6 precisa rodar **antes** do deploy, para ninguém
+  descobrir isso no meio de uma correção urgente.
+- **A regra virar cerca burra.** Se um dia a lista da decisão 2 crescer a
+  ponto de bloquear texto legítimo, o caminho é mudar a spec — não
+  contornar com escape hatch no código.
 
 ## Critérios de aceitação
 
-- [ ] Spec antes do código
-- [ ] Corpo de Presente novo termina no assunto, sem pedido de cadastro,
-      link de plano/checkout, preço ou promessa escrita à mão
-- [ ] Composer avisa o admin quando o corpo de um Presente casa com um dos
-      padrões da decisão 2
-- [ ] O aviso não impede publicar
-- [ ] O aviso não aparece fora do space Presentes nem para não-admin
-- [ ] A detecção é função pura em `src/lib/gifts/`, com teste
-- [ ] Página do Presente continua com as três variantes da decisão 3
+- [x] Spec antes do código
+- [x] A detecção é função pura em `src/lib/gifts/cta-no-corpo.ts`, sem
+      dependência de Next, com teste
+- [x] Preço e promessa vêm de `checkout.ts` — sem string duplicada
+- [x] `createPost` recusa Presente cujo corpo casa com a decisão 2
+- [x] `updatePost` recusa a mesma coisa — publicar e editar têm o mesmo gate
+- [x] A regra vale para todo o space `presentes`, com ou sem slug
+- [x] Post fora de Presentes não passa pela regra
+- [x] O erro nomeia a regra e mostra o trecho que casou
+- [x] Composer roda a mesma função antes do submit e mostra os achados
+- [x] `/planos` em outro host (ex.: `exemplo.com/planos`) não bloqueia
+- [x] Preço do cliente no texto (ex.: `R$ 2.000`) não bloqueia
+- [x] `npm run audit:presentes` lista os Presentes publicados com achados
+- [x] Página do Presente continua com as três variantes da decisão 3
       (deslogada, free, paga) — sem mudança de comportamento
-- [ ] Leitora logada não vê nenhum pedido de cadastro na página
-- [ ] Leitora paga não vê oferta nenhuma
-- [ ] Presentes já publicados auditados: CTA removido do corpo
-- [ ] Preview only (sem migration nesta feature)
+- [ ] Auditoria rodada em staging **antes** do deploy
+- [ ] Presentes já publicados limpos (editorial, post a post)
+- [x] Sem migration nesta feature
+- [ ] Preview / HML antes de produção

@@ -5,6 +5,7 @@ import { resolveMentionedUserIds } from "@/lib/mentions";
 import { titleFromBody } from "@/lib/posts/title";
 import { optionalHttpsUrl, optionalMediaUrl } from "@/lib/security/urls";
 import { isAdminOnlyPublishSpace, isFreePublishSpace, PRESENTES_SPACE_SLUG } from "@/lib/spaces/constants";
+import { assertSemCtaNoCorpo } from "@/lib/gifts/cta-no-corpo";
 import { ForbiddenError } from "@/lib/auth/errors";
 import { UPGRADE_REQUIRED } from "@/lib/membership/errors";
 import { Prisma } from "@prisma/client";
@@ -226,6 +227,15 @@ export async function createPost(
 ) {
   const data = createPostSchema.parse(raw);
   const space = await assertCanPostToSpace(data.spaceId, opts);
+  /**
+   * F070 — o corpo do Presente termina no assunto. O CTA final é do app e
+   * varia por sessão; escrito no markdown ele não varia. Vale para todo o
+   * space, com ou sem slug: o slug decide se a página é pública, não se o
+   * texto é um Presente.
+   */
+  if (space.slug === PRESENTES_SPACE_SLUG) {
+    assertSemCtaNoCorpo(data.body);
+  }
   let slug: string | null = null;
   if (data.slug) {
     if (!opts.isAdmin || space.slug !== PRESENTES_SPACE_SLUG) {
@@ -287,6 +297,14 @@ export async function updatePost(
     throw new ForbiddenError(UPGRADE_REQUIRED);
   }
   const data = updatePostSchema.parse(raw);
+  /**
+   * F070 — editar passa pelo mesmo gate de publicar. Sem isto o corpo entra
+   * limpo e ganha o CTA no primeiro update, que é como uma regra "de
+   * publicação" morre.
+   */
+  if (existing.space.slug === PRESENTES_SPACE_SLUG) {
+    assertSemCtaNoCorpo(data.body);
+  }
   const title = titleFromBody(data.body);
   return prisma.post.update({
     where: { id },

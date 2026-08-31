@@ -5,6 +5,7 @@ import { useRef, useState, useTransition } from "react";
 import { createPostAction } from "@/actions/posts";
 import { MentionTextarea } from "@/components/mention-textarea";
 import { PRESENTES_SPACE_SLUG } from "@/lib/spaces/constants";
+import { detectarCtaNoCorpo, type AchadoCta } from "@/lib/gifts/cta-no-corpo";
 
 const MEDIA_ACCEPT =
   "image/jpeg,image/png,image/gif,video/mp4,.jpg,.jpeg,.png,.gif,.mp4";
@@ -42,6 +43,8 @@ export function Composer({
   const [linkUrl, setLinkUrl] = useState("");
   const [uploading, setUploading] = useState(false);
   const [spaceId, setSpaceId] = useState(defaultSpaceId ?? spaces[0]?.id ?? "");
+  /** F070 — CTA achado no corpo do Presente, antes de gastar um round-trip. */
+  const [ctaAchados, setCtaAchados] = useState<AchadoCta[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const selected = spaces.find((s) => s.id === spaceId);
   const showGiftSlug = isAdmin && selected?.slug === PRESENTES_SPACE_SLUG;
@@ -71,6 +74,19 @@ export function Composer({
       className="post-card"
       action={(fd) => {
         setError(null);
+        setCtaAchados([]);
+        /**
+         * F070 — mesma função pura que o servidor usa em createPost. Aqui é
+         * só conveniência: mostra o trecho apontado sem ida ao servidor. O
+         * gate que vale está em `src/lib/posts`.
+         */
+        if (showGiftSlug) {
+          const achados = detectarCtaNoCorpo(String(fd.get("body") ?? ""));
+          if (achados.length) {
+            setCtaAchados(achados);
+            return;
+          }
+        }
         start(async () => {
           try {
             if (imageUrl) fd.set("imageUrl", imageUrl);
@@ -213,8 +229,34 @@ export function Composer({
           </label>
         </div>
       ) : null}
+      {ctaAchados.length ? (
+        <div
+          className="mt-3 rounded-xl border border-red-500/40 bg-red-500/5 px-3 py-2.5"
+          role="alert"
+        >
+          <p className="text-sm font-semibold text-red-600">
+            O corpo do Presente não leva o CTA final.
+          </p>
+          <p className="mt-1 text-xs text-muted">
+            O bloco de promessa e o cadastro são do app e mudam conforme a
+            leitora esteja deslogada, free ou paga. O artigo termina no
+            assunto.
+          </p>
+          <ul className="mt-2 space-y-1.5">
+            {ctaAchados.map((a, i) => (
+              <li key={`${a.regra}-${i}`} className="text-xs">
+                <span className="font-mono text-red-600">{a.regra}</span>
+                <span className="text-muted"> — {a.motivo}</span>
+                <span className="mt-0.5 block break-words text-muted/80">
+                  “{a.trecho}”
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
       {error ? (
-        <p className="mt-3 text-sm text-red-600" role="alert">
+        <p className="mt-3 whitespace-pre-line text-sm text-red-600" role="alert">
           {error}
         </p>
       ) : null}
