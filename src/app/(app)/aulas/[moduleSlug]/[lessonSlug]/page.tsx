@@ -116,12 +116,14 @@ export default async function LessonPage({ params }: Props) {
                 </div>
               ) : (
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-card px-6 text-center">
+                  {/* F067 — abre pelo que vem depois, não pela tranca. */}
                   <p className="font-[family-name:var(--font-outfit)] text-lg font-semibold">
-                    Esta aula é do plano pago
+                    Continue a formação
                   </p>
                   <p className="mt-2 max-w-sm text-sm text-muted">
-                    A Fase 1 começa no gratuito com o Comece por aqui.
-                    O resto da formação entra no PRO e no Elite.
+                    Você já tem o Comece por aqui. O PRO abre nicho,
+                    prospecção, abordagem e fechamento — o caminho inteiro até
+                    o primeiro cliente.
                   </p>
                   <Link
                     href={hrefPlanos({ motivo: "aulas" })}

@@ -26,9 +26,12 @@ export default async function CadastroPage() {
           {NOME_PRODUTO}
         </p>
         <h1 className="page-title mt-4">Crie sua conta no Builders Club</h1>
+        {/* F067 — o ganho antes do mecanismo: primeiro o que ela leva,
+            depois o código de 6 dígitos. */}
         <p className="mt-2 text-sm leading-relaxed text-muted">
-          Conta gratuita. Sem senha — enviamos um código de 6 dígitos para o
-          seu e-mail.
+          Grátis: as primeiras aulas da formação, o feed com o que a
+          comunidade está fechando e os presentes liberados. Sem senha —
+          enviamos um código de 6 dígitos para o seu e-mail.
         </p>
         <div className="mt-8">
           <GiftSignupForm
