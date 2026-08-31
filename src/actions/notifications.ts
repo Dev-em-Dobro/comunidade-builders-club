@@ -22,7 +22,7 @@ export async function markAllReadAction() {
   revalidatePath("/", "layout");
 }
 
-/** F072 — liga/desliga e-mail agrupado de respostas. */
+/** F073 — liga/desliga e-mail agrupado de respostas. */
 export async function updateNotifyRepliesEmailAction(formData: FormData) {
   const { user } = await requireActiveMember();
   const enabled = formData.get("notifyRepliesEmail") === "1";

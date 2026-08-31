@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { optOutRepliesEmailByToken } from "@/lib/notifications/enviar-resposta";
 
-/** F072 — one-click List-Unsubscribe (RFC 8058). */
+/** F073 — one-click List-Unsubscribe (RFC 8058). */
 export async function POST(request: Request) {
   const t = new URL(request.url).searchParams.get("t") ?? "";
   const result = await optOutRepliesEmailByToken(t);

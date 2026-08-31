@@ -141,7 +141,7 @@ export async function sendOtpEmail(opts: { to: string; otp: string }): Promise<v
   await sendMail({ to: opts.to, subject, text, html });
 }
 
-/** F072 — aviso agrupado de resposta (não é newsletter). */
+/** F073 — aviso agrupado de resposta (não é newsletter). */
 export async function sendReplyDigestEmail(opts: {
   to: string;
   subject: string;

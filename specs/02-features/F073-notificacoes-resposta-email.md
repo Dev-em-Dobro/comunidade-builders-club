@@ -1,7 +1,11 @@
-# F072 — Resposta: in-app no fio + e-mail agrupado
+# F073 — Resposta: in-app no fio + e-mail agrupado
 
 ## Status
 Implementado no código — 2026-08-31 (migration no Preview via `db:migrate:staging`)
+
+> ID original no código era F072; renomeado para F073 porque
+> `feature/F072-cadeado-thumb-bloqueada` já existia em paralelo.
+> A pasta Prisma já aplicada em HML permanece `20260831200000_f072_reply_email`.
 
 Depende de: [F006](F006-comentarios-reacoes.md), [F009](F009-notificacoes.md),
 [F017](F017-notificacoes-ricas.md), [ADR-004](../04-decisions/ADR-004-email-transacional.md).

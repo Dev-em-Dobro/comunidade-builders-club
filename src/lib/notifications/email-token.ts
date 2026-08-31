@@ -1,7 +1,7 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { requireAuthEnv } from "@/lib/auth/env";
 
-const PREFIX = "f072-unsub:";
+const PREFIX = "f073-unsub:";
 
 export function signEmailUnsubToken(userId: string): string {
   const sig = createHmac("sha256", requireAuthEnv("BETTER_AUTH_SECRET"))

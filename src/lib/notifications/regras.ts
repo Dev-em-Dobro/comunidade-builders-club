@@ -1,6 +1,6 @@
 import type { NotificationType } from "@prisma/client";
 
-/** F072 — tipos que podem sair por e-mail. Reação fica só in-app. */
+/** F073 — tipos que podem sair por e-mail. Reação fica só in-app. */
 export const EMAIL_SIGNAL_TYPES: NotificationType[] = [
   "comment_on_post",
   "reply_on_comment",

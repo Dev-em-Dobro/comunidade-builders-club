@@ -8,7 +8,7 @@ import {
   shouldSendGroupedEmail,
 } from "./regras";
 
-describe("planCommentNotifications — F072 A", () => {
+describe("planCommentNotifications — F073 A", () => {
   it("comentário raiz notifica o autor do post", () => {
     assert.deepEqual(
       planCommentNotifications({
@@ -77,7 +77,7 @@ describe("planCommentNotifications — F072 A", () => {
   });
 });
 
-describe("shouldSendGroupedEmail — F072 B", () => {
+describe("shouldSendGroupedEmail — F073 B", () => {
   const now = new Date("2026-08-31T18:00:00Z");
 
   it("envia se nunca enviou", () => {
@@ -111,7 +111,7 @@ describe("shouldSendGroupedEmail — F072 B", () => {
   });
 });
 
-describe("tipos de e-mail — F072 B", () => {
+describe("tipos de e-mail — F073 B", () => {
   it("reação não é sinal de e-mail", () => {
     assert.equal(isEmailSignalType("reaction_on_post"), false);
     assert.equal(isEmailSignalType("comment_on_post"), true);

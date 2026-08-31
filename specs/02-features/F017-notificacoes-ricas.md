@@ -17,5 +17,5 @@ Bell e lista de notificações mais úteis antes do lançamento.
 - Push (F029 cobre notificação do navegador com a aba visível)
 - WebSocket / polling realtime (pode ser Fase 3)
 
-E-mail de resposta: [F072](F072-notificacoes-resposta-email.md) (agrupado;
+E-mail de resposta: [F073](F073-notificacoes-resposta-email.md) (agrupado;
 não é um e-mail por evento).

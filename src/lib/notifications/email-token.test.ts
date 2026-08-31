@@ -2,10 +2,10 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { signEmailUnsubToken, verifyEmailUnsubToken } from "./email-token";
 
-describe("email unsub token — F072", () => {
+describe("email unsub token — F073", () => {
   it("assina e verifica", () => {
     const prev = process.env.BETTER_AUTH_SECRET;
-    process.env.BETTER_AUTH_SECRET = "test-secret-f072";
+    process.env.BETTER_AUTH_SECRET = "test-secret-f073";
     try {
       const token = signEmailUnsubToken("user_abc");
       assert.equal(verifyEmailUnsubToken(token), "user_abc");
