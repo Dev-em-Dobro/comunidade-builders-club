@@ -111,7 +111,7 @@ Receber notificações quando:
 
 In-app no MVP (persistidas e lidas no request). Sem push/tempo real.
 
-E-mail de resposta (F072): agrupado, no máximo um envio por post a cada
+E-mail de resposta (F073): agrupado, no máximo um envio por post a cada
 2 horas, só para comentário / resposta / menção. Reação não gera e-mail.
 
 ## 8. Administração

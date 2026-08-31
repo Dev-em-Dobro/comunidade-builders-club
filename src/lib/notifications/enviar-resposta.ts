@@ -16,7 +16,7 @@ function appBaseUrl(): string {
 
 /**
  * Tenta e-mail agrupado para cada destinatário de sinal alto.
- * Falha não sobe: o comentário já foi gravado (F072).
+ * Falha não sobe: o comentário já foi gravado (F073).
  */
 export async function maybeSendGroupedReplyEmails(opts: {
   recipientIds: string[];
@@ -48,7 +48,7 @@ export async function maybeSendGroupedReplyEmails(opts: {
       ),
     );
   } catch (err) {
-    console.error("[F072] falha ao enviar e-mail de resposta", err);
+    console.error("[F073] falha ao enviar e-mail de resposta", err);
   }
 }
 
@@ -135,7 +135,7 @@ async function sendOne(
       },
     });
   } catch (err) {
-    console.error("[F072] falha ao enviar e-mail de resposta", err);
+    console.error("[F073] falha ao enviar e-mail de resposta", err);
   }
 }
 

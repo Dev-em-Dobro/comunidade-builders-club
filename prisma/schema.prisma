@@ -133,7 +133,7 @@ model Profile {
   avatarUrl      String?
   /// F048 — null = ainda não viu Boas-vindas (redirect no 1º acesso ao feed).
   welcomeSeenAt  DateTime? @map("welcome_seen_at")
-  /// F072 — e-mail agrupado de resposta (opt-out). Reação nunca entra.
+  /// F073 — e-mail agrupado de resposta (opt-out). Reação nunca entra.
   notifyRepliesEmail Boolean @default(true) @map("notify_replies_email")
   joinedAt       DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
@@ -351,7 +351,7 @@ model Notification {
   @@map("notification")
 }
 
-/// F072 — último envio de e-mail agrupado por (destinatário, post).
+/// F073 — último envio de e-mail agrupado por (destinatário, post).
 model NotificationEmailSend {
   id          String   @id @default(cuid())
   recipientId String
