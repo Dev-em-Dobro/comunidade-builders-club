@@ -305,20 +305,35 @@ function ModuleBranch({
   );
 }
 
-function Cover({ src, title }: { src: string | null; title: string }) {
+function Cover({
+  src,
+  title,
+  locked = false,
+}: {
+  src: string | null;
+  title: string;
+  locked?: boolean;
+}) {
+  /**
+   * F072 — capa cinza é o que faz o estado ser lido pela imagem, de longe:
+   * colorida abre, cinza não. O cadeado confirma; não é a única pista.
+   */
+  const bloqueada = locked ? " grayscale opacity-75" : "";
   if (src) {
     return (
       <Image
         src={src}
         alt=""
         fill
-        className="h-full w-full object-cover"
+        className={`h-full w-full object-cover${bloqueada}`}
         sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
       />
     );
   }
   return (
-    <div className="flex h-full w-full items-end bg-gradient-to-br from-accent/80 to-accent-hover p-4">
+    <div
+      className={`flex h-full w-full items-end bg-gradient-to-br from-accent/80 to-accent-hover p-4${bloqueada}`}
+    >
       <span className="font-[family-name:var(--font-outfit)] text-lg font-semibold text-accent-foreground">
         {title}
       </span>
@@ -351,11 +366,17 @@ export function AulasCatalog({
               className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-colors hover:border-accent/40 hover:shadow-md"
             >
               <div className="relative aspect-video w-full overflow-hidden bg-surface">
-                <Cover src={coverOf(mod)} title={mod.title} />
+                <Cover src={coverOf(mod)} title={mod.title} locked={locked} />
+                {/*
+                 * F072 — só o cadeado, maior. "Pago" nomeava a tranca; a
+                 * F067 fixou que o separador entre tiers é o nome do plano,
+                 * não a ausência de um. O sr-only mantém o sentido para
+                 * quem não vê a imagem.
+                 */}
                 {locked ? (
-                  <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-background/90 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-foreground shadow-sm">
-                    <LockMark className="h-3 w-3" />
-                    Pago
+                  <span className="absolute right-3 top-3 inline-flex items-center justify-center rounded-full bg-background/90 p-2 text-foreground shadow-sm">
+                    <LockMark className="h-5 w-5" />
+                    <span className="sr-only">Plano pago</span>
                   </span>
                 ) : null}
               </div>
