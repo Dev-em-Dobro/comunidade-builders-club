@@ -13,10 +13,31 @@ validação de IDs de F011/F021 (`pandaEmbedUrl`).
 ## Comportamento
 | Plano | Vídeo Panda (`externalId`) |
 |-------|----------------------------|
-| `free` | `79a1c579-1870-48bb-8bf7-5f16f0c1ec91` |
-| `paid` (e admin/instructor) | `d3b5019d-49b8-479e-a150-7ea654dc7cf6` |
+| `free` | `4b3178aa-9fb0-46df-b988-8f3c76e6ab40` |
+| `paid` (e admin/instructor) | `c8ec857d-4d78-4516-921a-2fee9c35b590` |
 
 Library (pullzone, sem prefixo `vz-`): `77c52f03-dc6`.
+
+Os **dois** vídeos foram regravados em 31/08/2026 (pendência aberta na
+[F063](F063-funil-presente-conta-free.md)). IDs anteriores, para rastreio:
+`79a1c579-1870-48bb-8bf7-5f16f0c1ec91` (free) e
+`d3b5019d-49b8-479e-a150-7ea654dc7cf6` (pago). A capa da F068 não muda: ela
+é a mesma para os dois planos.
+
+O vídeo pago também alimenta a aula **Como usar a comunidade** do M01
+([F060](F060-aula-desafio-quick-win.md)). A tela de Boas-vindas pega o ID
+novo no deploy, porque lê a constante a cada render; **na aula o ID está
+gravado no banco** e só muda rodando, por ambiente:
+
+```
+npx tsx scripts/fix-video-tutorial-f058.mts --target=hml
+npx tsx scripts/fix-video-tutorial-f058.mts --target=prod --confirm
+```
+
+Não use `db:seed:aulas-panda` para isso: aquele seed reescreve título,
+descrição e thumbnail de todo o catálogo, e o admin edita esses textos pela
+UI. Mesmo raciocínio do script cirúrgico da
+[F067](F067-copy-do-ganho-free.md).
 
 Regra de plano: a mesma de F041 (`isPaidMembership`). Admin e instructor
 veem o vídeo pago mesmo com `tier=free`.

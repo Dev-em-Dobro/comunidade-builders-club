@@ -8,10 +8,10 @@ export const PROJETOS_SPACE_SLUG = "projetos" as const;
 export const WELCOME_TUTORIAL_VIDEO = {
   pandaLibraryId: "77c52f03-dc6",
   title: "Como usar a comunidade",
-  /** Plano gratuito. */
-  freeVideoExternalId: "79a1c579-1870-48bb-8bf7-5f16f0c1ec91",
-  /** Plano pago (e admin/instructor). */
-  paidVideoExternalId: "d3b5019d-49b8-479e-a150-7ea654dc7cf6",
+  /** Plano gratuito — regravado na F063 (31/08/2026). */
+  freeVideoExternalId: "4b3178aa-9fb0-46df-b988-8f3c76e6ab40",
+  /** Plano pago (e admin/instructor) — regravado na F063 (31/08/2026). */
+  paidVideoExternalId: "c8ec857d-4d78-4516-921a-2fee9c35b590",
 } as const;
 
 export function welcomeTutorialVideoId(isPaid: boolean): string {
