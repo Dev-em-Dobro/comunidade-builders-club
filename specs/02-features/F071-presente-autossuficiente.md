@@ -1,7 +1,7 @@
 # F071 — O presente se explica sozinho
 
 ## Status
-Em implementação — 2026-08-31
+Aplicado em produção — 2026-08-31
 
 Depende de: [F059](F059-presentes-publicos-atribuicao.md) (presente público),
 [F063](F063-funil-presente-conta-free.md) (funil), [F067](F067-copy-do-ganho-free.md) (voz).
@@ -129,8 +129,10 @@ grava, para a prévia não divergir do que vai ao ar.
 ## Critérios
 
 - [x] Spec antes do código
-- [ ] Nenhum presente cita post, slides ou carrossel como origem do leitor
-- [ ] A palavra "régua" não aparece em nenhum presente
-- [ ] A lista do que o kit entrega continua inteira em cada fecho
-- [ ] Menções legítimas dentro do conteúdo ficam de pé
-- [ ] Script idempotente, com `--dry` e varredura final do que sobrou
+- [x] Nenhum presente cita post, slides ou carrossel como origem do leitor
+- [x] A palavra "régua" não aparece em nenhum presente
+- [x] A lista do que o kit entrega continua inteira em cada fecho
+- [x] Menções legítimas dentro do conteúdo ficam de pé
+- [x] Script idempotente, com `--dry` e varredura final do que sobrou
+- [x] Aplicado em produção nos 14 presentes (31/08/2026); busca independente
+      por "régua" e pelos termos de origem voltou vazia
