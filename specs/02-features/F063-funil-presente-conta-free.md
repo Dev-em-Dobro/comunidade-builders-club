@@ -262,9 +262,9 @@ de homologação e qual e-mail recebe admin no bootstrap, e este repositório é
       [F067](F067-copy-do-ganho-free.md).
 - [x] **Playlist de aulas gratuitas** para o free — [F065](F065-aulas-fase-1-free.md)
       (só o Comece por aqui; catálogo com cadeado no restante).
-- [x] **Regravar o vídeo de boas-vindas do free** (31/08/2026) — novo vídeo no
-      Panda, `WELCOME_TUTORIAL_VIDEO.freeVideoExternalId` apontando para
-      `4b3178aa-9fb0-46df-b988-8f3c76e6ab40`. Tabela em
+- [x] **Regravar o vídeo de boas-vindas do free** (31/08/2026) — regravados os
+      dois: free `4b3178aa-9fb0-46df-b988-8f3c76e6ab40` e pago
+      `c8ec857d-4d78-4516-921a-2fee9c35b590`. Tabela em
       [F058](F058-boas-vindas-video-por-tier.md).
 
 ## Fora de escopo

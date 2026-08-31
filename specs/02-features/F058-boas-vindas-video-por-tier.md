@@ -14,14 +14,21 @@ validação de IDs de F011/F021 (`pandaEmbedUrl`).
 | Plano | Vídeo Panda (`externalId`) |
 |-------|----------------------------|
 | `free` | `4b3178aa-9fb0-46df-b988-8f3c76e6ab40` |
-| `paid` (e admin/instructor) | `d3b5019d-49b8-479e-a150-7ea654dc7cf6` |
+| `paid` (e admin/instructor) | `c8ec857d-4d78-4516-921a-2fee9c35b590` |
 
 Library (pullzone, sem prefixo `vz-`): `77c52f03-dc6`.
 
-O vídeo do free foi regravado em 31/08/2026 (pendência da
-[F063](F063-funil-presente-conta-free.md)); o anterior era
-`79a1c579-1870-48bb-8bf7-5f16f0c1ec91`. A capa da F068 não muda: ela é a
-mesma para os dois planos.
+Os **dois** vídeos foram regravados em 31/08/2026 (pendência aberta na
+[F063](F063-funil-presente-conta-free.md)). IDs anteriores, para rastreio:
+`79a1c579-1870-48bb-8bf7-5f16f0c1ec91` (free) e
+`d3b5019d-49b8-479e-a150-7ea654dc7cf6` (pago). A capa da F068 não muda: ela
+é a mesma para os dois planos.
+
+O vídeo pago também alimenta a aula **Como usar a comunidade** do M01
+([F060](F060-aula-desafio-quick-win.md)): o seed lê
+`WELCOME_TUTORIAL_VIDEO.paidVideoExternalId`. A tela de Boas-vindas pega o
+ID novo no deploy; **a aula só muda depois de rodar `seed-aulas-panda` no
+ambiente**, porque lá o ID está gravado no banco.
 
 Regra de plano: a mesma de F041 (`isPaidMembership`). Admin e instructor
 veem o vídeo pago mesmo com `tier=free`.
