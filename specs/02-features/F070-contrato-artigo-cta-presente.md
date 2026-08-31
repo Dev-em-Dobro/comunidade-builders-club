@@ -176,6 +176,27 @@ sabe quais Presentes no ar já carregam CTA no corpo. Ele não corrige nada —
 a limpeza é editorial, post a post. Também é o jeito de descobrir, **antes**
 do deploy, se algum Presente vivo vai travar na próxima edição.
 
+#### O que a auditoria achou em produção (31/08/2026)
+
+Rodada antes do merge, contra os 14 Presentes no ar: **um** achado.
+
+```
+/presentes/fluxo
+  • [pedido-de-cadastro] "Abre [n8n.io](https://n8n.io) e cria sua conta."
+```
+
+Falso positivo quanto à intenção — o cadastro é **do n8n**, não do Club —
+e exatamente o custo que a decisão 4 assume: a regra casa imperativo de 2ª
+pessoa sem saber de que produto a frase fala. A saída prevista é reescrever,
+e foi o que se fez: `e cria sua conta` → `e faz o cadastro`, que mantém a voz
+imperativa do passo a passo e não casa nenhum dos `PEDIDOS`
+(o padrão de cadastro é `faca\s+(?:o\s+)?seu\s+cadastro`).
+
+Aplicado por `scripts/fix-cta-fluxo-f070.mts`, que confere o resultado com a
+própria `detectarCtaNoCorpo` depois de gravar. Nova auditoria: **14
+Presentes, nenhum com CTA no corpo.** Staging tem só um Presente e ele já
+passava limpo.
+
 ## O que muda e o que não muda
 
 **Muda** um caminho só: gravar um post no space `presentes` passa a recusar
@@ -237,7 +258,9 @@ apenas para admin — a única pessoa que publica ali
 - [x] `npm run audit:presentes` lista os Presentes publicados com achados
 - [x] Página do Presente continua com as três variantes da decisão 3
       (deslogada, free, paga) — sem mudança de comportamento
-- [ ] Auditoria rodada em staging **antes** do deploy
-- [ ] Presentes já publicados limpos (editorial, post a post)
+- [x] Auditoria rodada **antes** do merge — contra produção, que é onde os 14
+      Presentes vivem (staging tem um, e já passava limpo)
+- [x] Presentes já publicados limpos: 1 achado em `/presentes/fluxo`,
+      reescrito; nova auditoria acusa 0 de 14
 - [x] Sem migration nesta feature
 - [ ] Preview / HML antes de produção
