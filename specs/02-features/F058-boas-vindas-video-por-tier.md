@@ -25,10 +25,19 @@ Os **dois** vídeos foram regravados em 31/08/2026 (pendência aberta na
 é a mesma para os dois planos.
 
 O vídeo pago também alimenta a aula **Como usar a comunidade** do M01
-([F060](F060-aula-desafio-quick-win.md)): o seed lê
-`WELCOME_TUTORIAL_VIDEO.paidVideoExternalId`. A tela de Boas-vindas pega o
-ID novo no deploy; **a aula só muda depois de rodar `seed-aulas-panda` no
-ambiente**, porque lá o ID está gravado no banco.
+([F060](F060-aula-desafio-quick-win.md)). A tela de Boas-vindas pega o ID
+novo no deploy, porque lê a constante a cada render; **na aula o ID está
+gravado no banco** e só muda rodando, por ambiente:
+
+```
+npx tsx scripts/fix-video-tutorial-f058.mts --target=hml
+npx tsx scripts/fix-video-tutorial-f058.mts --target=prod --confirm
+```
+
+Não use `db:seed:aulas-panda` para isso: aquele seed reescreve título,
+descrição e thumbnail de todo o catálogo, e o admin edita esses textos pela
+UI. Mesmo raciocínio do script cirúrgico da
+[F067](F067-copy-do-ganho-free.md).
 
 Regra de plano: a mesma de F041 (`isPaidMembership`). Admin e instructor
 veem o vídeo pago mesmo com `tier=free`.
