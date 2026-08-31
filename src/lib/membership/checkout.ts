@@ -53,6 +53,24 @@ export const CHECKOUT_ELITE_BOLETO_URLS = [
   "https://pay.tmb.com.br/DevemDobro/3XB272209KV",
 ] as const;
 
+/**
+ * Preços como constantes puras: a detecção de CTA no corpo do Presente
+ * (F070) precisa deles sem acionar `process.env` — ela roda no cliente e
+ * no script de auditoria.
+ */
+export const PRICING_PRO: OfferPricing = {
+  installments: 12,
+  installmentPrice: "R$ 30,18",
+  fullPrice: "R$ 297",
+};
+
+export const PRICING_ELITE: OfferPricing = {
+  installments: 12,
+  installmentPrice: "R$ 101,30",
+  fullPrice: "R$ 997",
+  boletoPrice: "R$ 1.297",
+};
+
 function envUrl(name: string): string | null {
   const v = process.env[name]?.trim();
   return v || null;
@@ -75,11 +93,7 @@ export function ofertaPro(): ClubOffer {
   return {
     id: "pro",
     name: "PRO",
-    pricing: {
-      installments: 12,
-      installmentPrice: "R$ 30,18",
-      fullPrice: "R$ 297",
-    },
+    pricing: PRICING_PRO,
     paymentHint: "Pagamento em cartão ou Pix",
     promise: PROMESSA_PRIMEIRO_CLIENTE,
     highlights: [
@@ -116,12 +130,7 @@ export function ofertaElite(): ClubOffer {
   return {
     id: "elite",
     name: "Elite",
-    pricing: {
-      installments: 12,
-      installmentPrice: "R$ 101,30",
-      fullPrice: "R$ 997",
-      boletoPrice: "R$ 1.297",
-    },
+    pricing: PRICING_ELITE,
     promise: PROMESSA_PRIMEIRO_CLIENTE,
     highlights: [
       {

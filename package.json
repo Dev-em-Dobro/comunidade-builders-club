@@ -20,6 +20,8 @@
     "db:seed:devquest": "npx tsx scripts/seed-devquest-allowed.mts",
     "db:import-allowed": "npx tsx scripts/import-allowed-emails.mts",
     "db:studio": "prisma studio",
+    "audit:presentes": "npx tsx scripts/audit-cta-presentes.mts",
+    "test": "npx tsx --test src/lib/**/*.test.ts",
     "mailpit": "docker compose up -d mailpit",
     "perf:lighthouse": "npx tsx scripts/perf-lighthouse.mts",
     "postinstall": "prisma generate"
