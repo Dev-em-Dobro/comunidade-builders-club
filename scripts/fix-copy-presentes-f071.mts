@@ -33,14 +33,31 @@ type Target = "local" | "hml" | "prod";
  */
 const FECHO: Array<{ de: RegExp; para: string; nome: string }> = [
   {
-    nome: "título do fecho",
-    de: /^## Você acabou de ver a diferença$/m,
+    nome: "título",
+    de: /^## Você acabou de ver a diferença\r?$/m,
     para: "## O que você tem aqui",
   },
   {
-    nome: "abertura do fecho",
+    nome: "abertura",
     de: /O post te mostrou [^.]{1,120} em oito slides\. Aqui você recebeu /,
     para: "Aqui você tem ",
+  },
+  {
+    /* "Régua" saiu: metáfora que o leitor tem de decifrar. E a frase falava
+       do que a marca posta "lá fora" — de novo a origem. O que fica é o que
+       a comunidade faz com o assunto. */
+    nome: "frase do Club",
+    de: /Essa é a régua do \*\*Builders Club\*\*: a gente não larga conteúdo pra você salvar e nunca mais abrir\. O que a gente posta lá fora tem, aqui dentro, a parte que falta pra sair do papel\./,
+    para:
+      "Assunto como esse a gente aprofunda no **Builders Club**, com quem " +
+      "está fazendo junto. É onde a dúvida vira resposta e o projeto sai do papel.",
+  },
+  {
+    /* A lista de outros kits abria com "mais gente aqui do lado" e listava
+       kit, não gente. Sai inteira: o presente termina no que ele entrega. */
+    nome: "lista de outros kits",
+    de: /E tem mais gente aqui do lado, na mesma régua:\r?\n[\s\S]*?(?=Bom proveito)/,
+    para: "",
   },
 ];
 
@@ -76,11 +93,42 @@ const AVULSOS: Array<{ slug: string; de: string; para: string }> = [
     de: "O post citou três blocos mortos. Aqui está o detalhe de cada um",
     para: "Foram três blocos mortos. Aqui está o detalhe de cada um",
   },
+
+  /* "Régua" no miolo dos kits — mesma palavra, mesmo motivo: troca por
+     ritmo, teste, limite ou critério, conforme o que a frase quer dizer. */
+  {
+    slug: "vaga",
+    de: "e a régua de ritmo que evita o LinkedIn restringir a sua conta",
+    para: "e o ritmo que evita o LinkedIn restringir a sua conta",
+  },
+  {
+    slug: "vaga",
+    de: "**A régua que salva a sua entrevista:**",
+    para: "**O teste que salva a sua entrevista:**",
+  },
+  {
+    slug: "vaga",
+    de: "## 4. A régua: o que o LinkedIn não deixa",
+    para: "## 4. O limite: o que o LinkedIn não deixa",
+  },
+  {
+    slug: "limpa",
+    de: "A régua dele está na documentação oficial, e é a mesma que a gente usou aqui",
+    para: "O critério dele está na documentação oficial, e é o mesmo que a gente usou aqui",
+  },
+  {
+    slug: "limpa",
+    de: "Essa mesma régua vale pras suas skills e pros seus hooks.",
+    para: "O mesmo critério vale pras suas skills e pros seus hooks.",
+  },
 ];
 
-/** Só a origem — não pega "perfil do GitHub" nem ".srt de legenda". */
+/**
+ * Varredura final: origem que a tabela não previu, e "régua" solta.
+ * Não pega "perfil do GitHub" nem ".srt de legenda" — esses são conteúdo.
+ */
 const SOBROU =
-  /(O post te mostrou|O post citou|o post não mostrou|o post de onde|dos slides|em oito slides|carross?el|acabou de ver a diferença)/i;
+  /(O post te mostrou|O post citou|o post não mostrou|o post de onde|dos slides|em oito slides|carross?el|acabou de ver a diferença|r[ée]gua)/i;
 
 function resolveUrl(target: Target): string {
   const map: Record<Target, string | undefined> = {
@@ -108,6 +156,10 @@ async function main() {
     throw new Error(`Target inválido: ${target}`);
   }
   const dry = argv.includes("--dry");
+  /** `--mostrar=<slug>` imprime o fecho já transformado desse presente. */
+  const mostrar = argv
+    .find((a) => a.startsWith("--mostrar="))
+    ?.slice("--mostrar=".length);
   if (target === "prod" && !dry && !argv.includes("--confirm")) {
     throw new Error("Produção exige --confirm.");
   }
@@ -142,6 +194,15 @@ async function main() {
         if (!body.includes(t.de)) continue;
         body = body.split(t.de).join(t.para);
         feitos.push(`avulso: ${t.de.slice(0, 40)}…`);
+      }
+
+      if (mostrar === slug) {
+        /* Prévia pelo mesmo caminho que grava — sem risco de divergir. */
+        const fecho = body.split("\n");
+        const i = fecho.findIndex((l) => /^## O que você tem aqui/.test(l));
+        console.log(
+          `\n--- ${slug}, do fecho ao fim ---\n${fecho.slice(i).join("\n")}\n---\n`,
+        );
       }
 
       if (feitos.length) {

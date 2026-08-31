@@ -31,10 +31,14 @@ Não é um erro de detalhe. É o texto pressupondo um leitor que pode não exist
 visto outra peça: sem "post", sem "slides", sem "carrossel", sem "lá no meu
 perfil", sem "você acabou de ver".
 
-O que continua valendo: falar do Builders Club, do que o kit entrega, e da
-régua da marca ("o que a gente posta lá fora tem, aqui dentro, a parte que
-falta"). Essa frase descreve a marca, não obriga o leitor a ter vindo de lugar
-nenhum.
+Continua valendo falar do Builders Club — o que muda é o ângulo. Em vez de
+comparar o que a marca posta "lá fora" com o que entrega aqui (comparação que
+só fecha para quem veio de lá), a frase diz o que a **comunidade** faz com o
+assunto: é onde dá para aprofundar, perguntar e o projeto sair do papel.
+
+**Sem "régua".** A palavra era o bordão do fecho e aparecia mais cinco vezes no
+miolo dos kits. É metáfora que o leitor tem de decifrar; troca por ritmo,
+teste, limite ou critério, conforme o que a frase quer dizer.
 
 Vale para presente novo também: quem escreve o próximo kit escreve já assim.
 
@@ -47,7 +51,17 @@ O bloco de fecho é idêntico em todos:
 
 O post te mostrou <X> em oito slides. Aqui você recebeu <lista>.
 
-Essa é a régua do **Builders Club**: …
+Essa é a régua do **Builders Club**: a gente não larga conteúdo pra você
+salvar e nunca mais abrir. O que a gente posta lá fora tem, aqui dentro, a
+parte que falta pra sair do papel.
+
+E tem mais gente aqui do lado, na mesma régua:
+
+- **O kit X.** …
+- **O kit Y.** …
+- **O kit Z.** …
+
+Bom proveito. Abraço.
 ```
 
 Vira:
@@ -57,11 +71,21 @@ Vira:
 
 Aqui você tem <lista>.
 
-Essa é a régua do **Builders Club**: …
+Assunto como esse a gente aprofunda no **Builders Club**, com quem está
+fazendo junto. É onde a dúvida vira resposta e o projeto sai do papel.
+
+Bom proveito. Abraço.
 ```
 
 A lista do que o kit entrega é o miolo da frase e não se perde — some só a
-comparação com o carrossel. Além do fecho, seis trechos avulsos:
+comparação com o carrossel.
+
+A lista de outros kits sai inteira. Ela abria com "E tem mais **gente** aqui
+do lado" e o que vinha depois era kit, não gente; e cada presente já é uma
+porta de entrada por conta própria, não precisa mandar o leitor para as
+outras. O presente termina no que ele entrega.
+
+Além do fecho, os trechos avulsos:
 
 | Presente | De | Para |
 |---|---|---|
@@ -71,6 +95,11 @@ comparação com o carrossel. Além do fecho, seis trechos avulsos:
 | `grana` | `…já te põe na faixa que o carrossel mostrou.` | `…já te põe nessa faixa.` |
 | `limpa` | `## O comando que o post não mostrou` | `## O comando da varredura` |
 | `limpa` | `O post citou três blocos mortos. Aqui está o detalhe…` | `Foram três blocos mortos. Aqui está o detalhe…` |
+| `vaga` | `a régua de ritmo que evita o LinkedIn restringir…` | `o ritmo que evita o LinkedIn restringir…` |
+| `vaga` | `**A régua que salva a sua entrevista:**` | `**O teste que salva a sua entrevista:**` |
+| `vaga` | `## 4. A régua: o que o LinkedIn não deixa` | `## 4. O limite: o que o LinkedIn não deixa` |
+| `limpa` | `A régua dele está na documentação oficial…` | `O critério dele está na documentação oficial…` |
+| `limpa` | `Essa mesma régua vale pras suas skills…` | `O mesmo critério vale pras suas skills…` |
 
 ## Como aplica
 
@@ -86,16 +115,22 @@ parte variável em cada um.
 ## Fora de escopo
 
 - Reescrever o miolo dos kits (o conteúdo está certo; o que sai é a moldura)
-- A frase da régua do Club ("o que a gente posta lá fora…")
 - Menções legítimas de "post", "perfil" ou "legenda" dentro do conteúdo —
   `.srt` de legenda no kit do Whisper, perfil do GitHub no do Bitburner
 - A página pública `/presentes/<slug>` e o bloco de promessa (F063/F067)
+
+## Ensaio
+
+HML tem **um** presente, e ele não cita a origem — não dá para ensaiar em
+staging com dado real. O `--dry` contra produção é o ensaio, e
+`--mostrar=<slug>` imprime o fecho já transformado pelo mesmo caminho que
+grava, para a prévia não divergir do que vai ao ar.
 
 ## Critérios
 
 - [x] Spec antes do código
 - [ ] Nenhum presente cita post, slides ou carrossel como origem do leitor
+- [ ] A palavra "régua" não aparece em nenhum presente
 - [ ] A lista do que o kit entrega continua inteira em cada fecho
 - [ ] Menções legítimas dentro do conteúdo ficam de pé
-- [ ] Script idempotente e com `--dry`
-- [ ] HML antes de produção
+- [ ] Script idempotente, com `--dry` e varredura final do que sobrou
