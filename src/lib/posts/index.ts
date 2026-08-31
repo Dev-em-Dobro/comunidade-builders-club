@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { notifyMany } from "@/lib/notifications";
+import { maybeSendGroupedReplyEmails } from "@/lib/notifications/enviar-resposta";
 import { resolveMentionedUserIds } from "@/lib/mentions";
 import { titleFromBody } from "@/lib/posts/title";
 import { optionalHttpsUrl, optionalMediaUrl } from "@/lib/security/urls";
@@ -268,6 +269,15 @@ export async function createPost(
       postId: post.id,
       snippet: data.body,
     });
+    if (mentioned.length > 0) {
+      await maybeSendGroupedReplyEmails({
+        recipientIds: mentioned,
+        actorId: authorId,
+        actorName: post.author.profile?.displayName ?? "Alguém",
+        postId: post.id,
+        snippet: data.body,
+      });
+    }
 
     return post;
   } catch (e) {

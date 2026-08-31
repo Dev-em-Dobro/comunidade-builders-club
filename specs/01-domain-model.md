@@ -25,7 +25,7 @@ Diagnóstico, Outreach, Entregável — este último só na Fase 2 de migração
 | **Presente** | Post do space `presentes` com `slug` preenchido. Leitura **pública** em `/presentes/[slug]`; lista logada em `/spaces/presentes` (F059). |
 | **Comentário** | Resposta a um Post (1 nível no MVP). |
 | **Reação** | Curtida/reação a Post ou Comentário. |
-| **Notificação** | Aviso in-app (comentário, reação, resposta). |
+| **Notificação** | Aviso in-app (comentário, reação, resposta, menção). E-mail agrupado de resposta: F072. |
 | **Entrada (CS)** | Relógio da reunião de CS (F057): compra (allowlist Hubla/TMB/Orion) para pagante; primeiro login para Free. Recorte ≥ 2026-08-24. |
 | **Ativação pagante** | Post com link público no Desafio Projetos (`projetos`) em até 7 dias da entrada (F057). |
 | **Ativação Free** | Primeira busca (coleta de Lead) no Orion em até 3 dias da entrada (F057). |

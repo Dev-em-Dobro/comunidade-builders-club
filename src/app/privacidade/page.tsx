@@ -88,6 +88,12 @@ export default function PrivacidadePage() {
           <li>
             operar a comunidade (feed, notificações, materiais e aulas);
           </li>
+          <li>
+            avisar por e-mail quando alguém responde seu post, seu
+            comentário ou te menciona (no máximo um e-mail a cada 2 horas
+            por post; reações não geram e-mail). Você desliga em
+            Configurações ou no link do próprio e-mail;
+          </li>
           <li>gerenciar quem tem acesso (allowlist / Hubla / admin);</li>
           <li>segurança, prevenção a abuso e suporte;</li>
           <li>cumprir obrigações legais quando aplicável.</li>

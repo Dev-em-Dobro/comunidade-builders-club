@@ -19,10 +19,12 @@ feature/<id-ou-descricao>  →  PR →  feature/preview  →  PR →  main
 
 ## Regras
 
+- **Sempre** criar `feature/FXXX-…` a partir de `feature/preview`. Não desenvolver em `feature/preview` nem em `main`.
+- Ao concluir: commit → PR para `feature/preview` → **merge do PR** → `npm run db:migrate:staging` (só HML).
 - Não abrir PR direto de `feature/*` para `main` como caminho padrão.
 - Commits e PRs referenciam o ID da feature (`F00X`) quando houver.
 - Preview usa envs de Preview (Neon HML, `BETTER_AUTH_URL` de staging).
-- Produção só via merge em `main`.
+- Produção (`main` + `db:migrate:prod -- --confirm`) **só com pedido explícito** do usuário.
 
 ## Migrations
 
