@@ -13,10 +13,15 @@ validação de IDs de F011/F021 (`pandaEmbedUrl`).
 ## Comportamento
 | Plano | Vídeo Panda (`externalId`) |
 |-------|----------------------------|
-| `free` | `79a1c579-1870-48bb-8bf7-5f16f0c1ec91` |
+| `free` | `4b3178aa-9fb0-46df-b988-8f3c76e6ab40` |
 | `paid` (e admin/instructor) | `d3b5019d-49b8-479e-a150-7ea654dc7cf6` |
 
 Library (pullzone, sem prefixo `vz-`): `77c52f03-dc6`.
+
+O vídeo do free foi regravado em 31/08/2026 (pendência da
+[F063](F063-funil-presente-conta-free.md)); o anterior era
+`79a1c579-1870-48bb-8bf7-5f16f0c1ec91`. A capa da F068 não muda: ela é a
+mesma para os dois planos.
 
 Regra de plano: a mesma de F041 (`isPaidMembership`). Admin e instructor
 veem o vídeo pago mesmo com `tier=free`.
