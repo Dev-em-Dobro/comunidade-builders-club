@@ -40,8 +40,27 @@ Aula **publicada** se o M01 já estiver publicado.
 ## Tutorial da comunidade
 
 Substitui o vídeo antigo (`38608c40-…`) pelo mesmo embed da tela
-Boas-vindas no plano **pago** (alunos de `/aulas` são pagantes).
-Free continua vendo o vídeo free só em `/spaces/boas-vindas` (F058).
+Boas-vindas no plano **pago**. Free continua vendo o vídeo free em
+`/spaces/boas-vindas` (F058).
+
+### Descrição da aula (31/08/2026)
+
+Quando esta seção foi escrita, valia que "alunos de `/aulas` são
+pagantes". A [F065](F065-aulas-fase-1-free.md) abriu o M01 para o
+gratuito, e a premissa caiu: **o free abre esta aula e assiste ao tour do
+Club inteiro**, com funcionalidade que o plano dele não tem. Sem aviso, a
+pessoa sai procurando no menu o que viu no vídeo.
+
+A descrição resolve dizendo de qual plano é a plataforma do tour, pelo
+ganho e não pela tranca ([F067](F067-copy-do-ganho-free.md)):
+
+> Tour completo da plataforma: o Feed, os Spaces, as Aulas e como circular
+> na comunidade. É o tutorial do Club completo — tudo o que aparece aqui
+> está aberto nos planos PRO e Elite.
+
+Vive no banco. Aplicar por ambiente com
+`scripts/fix-video-tutorial-f058.mts`, que também troca o vídeo e avalia
+os dois campos em separado.
 
 ## Seed
 
