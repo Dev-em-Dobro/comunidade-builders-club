@@ -98,7 +98,10 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
           automação: aulas, skills prontas e gente fechando cliente junto.
         </p>
 
-        <div className="mt-8 rounded-2xl border border-border/80 bg-card p-7 shadow-[0_12px_40px_rgba(15,23,42,0.06)]">
+        <div
+          className="mt-8 rounded-2xl border border-border/80 bg-card p-7 shadow-[0_12px_40px_rgba(15,23,42,0.06)]"
+          data-clarity-mask="true"
+        >
           {sent ? (
             <div>
               <p className="text-sm font-semibold text-foreground">
@@ -129,7 +132,11 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
                 <p className="text-center text-xs text-muted">ou use e-mail</p>
               ) : null}
 
-              <form onSubmit={onMagicLink} className="flex flex-col gap-3">
+              <form
+                onSubmit={onMagicLink}
+                className="flex flex-col gap-3"
+                data-clarity-mask="true"
+              >
                 <label className="text-xs font-medium text-muted">
                   E-mail
                   <input

@@ -3,6 +3,7 @@ import { DM_Sans, Outfit } from "next/font/google";
 import { NOME_PRODUTO } from "@/lib/produto";
 import { THEME_BOOTSTRAP_SCRIPT } from "@/lib/theme";
 import { CookieConsent } from "@/components/cookie-consent";
+import { ClarityInit } from "@/components/clarity-init";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -39,6 +40,7 @@ export default function RootLayout({
       <body className={`${dmSans.variable} ${outfit.variable} font-sans`}>
         {children}
         <CookieConsent />
+        <ClarityInit projectId={process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID} />
       </body>
     </html>
   );

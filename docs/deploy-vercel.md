@@ -49,6 +49,7 @@ mostram indisponível (não zero).
 | `BETTER_AUTH_SECRET`    | secret forte (único)                   | secret forte (**outro** do prod)               | gerado local            |
 | `BETTER_AUTH_URL`       | `https://builders-club.devemdobro.com` | `https://staging.builders-club.devemdobro.com` | `http://localhost:3000` |
 | `EMAIL_PROVIDER`        | `resend`                               | `resend` (ou mailpit só local)                 | `mailpit`               |
+| `NEXT_PUBLIC_CLARITY_PROJECT_ID` | Project ID prod (F074, projeto Clarity próprio) | Project ID **staging** (outro projeto) | vazio = desligado |
 | `BOOTSTRAP_ADMIN_EMAIL` | seu e-mail admin                       | mesmo ou de teste                              | seu e-mail              |
 | `HUBLA_WEBHOOK_TOKEN`   | token do webhook Hubla                 | mesmo ou dedicado de staging                   | obrigatório p/ webhook  |
 | `HUBLA_PRODUCT_ID`      | Produto Club (allowlist `product.id`) | mesmo | obrigatório p/ webhook se os dois abaixo vazios |

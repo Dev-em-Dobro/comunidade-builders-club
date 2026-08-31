@@ -131,9 +131,10 @@ export default function PrivacidadePage() {
             <strong className="font-medium text-foreground">
               Medição (opcional):
             </strong>{" "}
-            só com o seu aceite no aviso de cookies. Enquanto você não aceitar,
-            nenhum script de medição é carregado. Recusar não afeta o acesso à
-            comunidade.
+            só com o seu aceite no aviso de cookies. Aí carregamos o
+            Microsoft Clarity (mapa de calor e gravação de sessão, inputs
+            mascarados). Enquanto você não aceitar, esse script não entra.
+            Recusar não afeta o acesso à comunidade.
           </li>
         </ul>
         <p>
@@ -151,7 +152,8 @@ export default function PrivacidadePage() {
           Compartilhamos dados com subprocessadores necessários ao serviço,
           por exemplo: hospedagem (ex.: Vercel), banco (ex.: Neon), e-mail
           transacional (magic link e código OTP, ex.: Resend), provedor de
-          vídeo das aulas (ex.: Panda Video) e, quando aplicável, a Hubla
+          vídeo das aulas (ex.: Panda Video), Microsoft Clarity (mapa de calor
+          e sessão, só com aceite de medição) e, quando aplicável, a Hubla
           para sincronizar elegibilidade de acesso. Conteúdo que você publica
           na comunidade fica visível aos demais membros ativos. Não vendemos
           dados pessoais.

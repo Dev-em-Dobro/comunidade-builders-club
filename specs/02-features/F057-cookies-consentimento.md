@@ -44,9 +44,11 @@ O caminho errado — subir o pixel primeiro e o banner depois — dispara tracki
 sem consentimento no intervalo. Por isso o portão vem antes.
 
 ## Não faz parte
-- Instalar analytics/pixel (feature própria, entra atrás do portão)
 - Consentimento granular por categoria: com um cookie necessário e um grupo
   opcional, duas opções bastam
+
+Pixel / mapa de calor: [F074](F074-clarity-mapa-calor.md) (Microsoft Clarity,
+atrás deste portão).
 
 ## Critérios
 - [ ] Política tem seção de cookies com o que é usado hoje
