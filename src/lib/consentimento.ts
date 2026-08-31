@@ -51,3 +51,16 @@ export function consentiuAnalytics(valor: string | undefined | null): boolean {
 export function precisaDecidir(valor: string | undefined | null): boolean {
   return lerConsentimento(valor) === null;
 }
+
+/** CookieConsent dispara depois do aceite para o Clarity ligar sem reload. */
+export const CONSENTIMENTO_ANALYTICS_EVENT = "bc-consent-analytics";
+
+/** F074 — portão único: tem Project ID e o membro aceitou medição. */
+export function shouldLoadClarity(opts: {
+  projectId: string | undefined | null;
+  consentCookie: string | undefined | null;
+}): boolean {
+  const id = opts.projectId?.trim();
+  if (!id) return false;
+  return consentiuAnalytics(opts.consentCookie);
+}
