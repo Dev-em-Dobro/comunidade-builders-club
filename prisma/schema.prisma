@@ -33,6 +33,7 @@ model User {
   lessonProgress  LessonProgress[]
   postViews       PostView[]
   legalAcceptances LegalAcceptance[]
+  notificationEmailSends NotificationEmailSend[]
 
   @@unique([email])
   @@map("user")
@@ -132,6 +133,8 @@ model Profile {
   avatarUrl      String?
   /// F048 — null = ainda não viu Boas-vindas (redirect no 1º acesso ao feed).
   welcomeSeenAt  DateTime? @map("welcome_seen_at")
+  /// F072 — e-mail agrupado de resposta (opt-out). Reação nunca entra.
+  notifyRepliesEmail Boolean @default(true) @map("notify_replies_email")
   joinedAt       DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
@@ -251,6 +254,7 @@ model Post {
   comments  Comment[]
   reactions Reaction[]
   views     PostView[]
+  emailSends NotificationEmailSend[]
 
   @@index([spaceId, pinnedAt, createdAt])
   @@index([authorId])
@@ -345,6 +349,20 @@ model Notification {
 
   @@index([recipientId, readAt, createdAt])
   @@map("notification")
+}
+
+/// F072 — último envio de e-mail agrupado por (destinatário, post).
+model NotificationEmailSend {
+  id          String   @id @default(cuid())
+  recipientId String
+  recipient   User     @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  postId      String
+  post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  sentAt      DateTime @default(now())
+  eventCount  Int      @default(1) @map("event_count")
+
+  @@index([recipientId, postId, sentAt])
+  @@map("notification_email_send")
 }
 
 // ---------------------------------------------------------------------------

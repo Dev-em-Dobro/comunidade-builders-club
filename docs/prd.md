@@ -101,7 +101,7 @@ Administradores podem fixar uma publicação no topo de cada categoria
 
 Pesquisar por postagens, usuários e categorias (spaces).
 
-## 7. Notificações (in-app)
+## 7. Notificações (in-app + e-mail agrupado)
 
 Receber notificações quando:
 
@@ -109,7 +109,10 @@ Receber notificações quando:
 - Alguém reagir à postagem
 - Alguém responder um comentário
 
-Sem push/tempo real no MVP (persistidas e lidas no request).
+In-app no MVP (persistidas e lidas no request). Sem push/tempo real.
+
+E-mail de resposta (F072): agrupado, no máximo um envio por post a cada
+2 horas, só para comentário / resposta / menção. Reação não gera e-mail.
 
 ## 8. Administração
 

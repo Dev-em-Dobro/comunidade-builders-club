@@ -8,6 +8,7 @@ import { PlanBadge } from "@/components/plan-badge";
 import { ExcluirConta } from "@/components/excluir-conta";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { EMAIL_SUPORTE, emailSuporteUrl, whatsappSuporteUrl } from "@/lib/suporte";
+import { updateNotifyRepliesEmailAction } from "@/actions/notifications";
 
 export const metadata = { title: "Configurações" };
 
@@ -139,6 +140,36 @@ export default async function ConfiguracoesPage() {
 
       <Secao titulo="Aparência" descricao="Vale só neste navegador.">
         <ThemeToggle />
+      </Secao>
+
+      <Secao
+        titulo="E-mail de respostas"
+        descricao="Aviso fora do app quando alguém responde você. O sininho continua independente disto."
+      >
+        <form action={updateNotifyRepliesEmailAction}>
+          <label className="flex cursor-pointer items-start gap-3 text-sm">
+            <input
+              type="checkbox"
+              name="notifyRepliesEmail"
+              value="1"
+              defaultChecked={profile.notifyRepliesEmail}
+              className="mt-1 h-4 w-4 accent-[var(--accent)]"
+            />
+            <span>
+              <span className="font-medium text-foreground">
+                Avisar por e-mail quando responderem
+              </span>
+              <span className="mt-1 block text-muted">
+                Comentário no seu post, resposta no seu comentário ou menção.
+                No máximo um e-mail a cada 2 horas por post. Reações não
+                entram.
+              </span>
+            </span>
+          </label>
+          <button type="submit" className="btn-primary mt-4">
+            Salvar
+          </button>
+        </form>
       </Secao>
 
       <ExcluirConta />

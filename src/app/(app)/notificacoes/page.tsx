@@ -25,6 +25,13 @@ export default async function NotificacoesPage() {
           </form>
         ) : null}
       </div>
+      <p className="mt-1 text-sm text-muted">
+        E-mail quando responderem:{" "}
+        <Link href="/configuracoes" className="text-accent hover:underline">
+          Configurações
+        </Link>
+        .
+      </p>
 
       {items.length === 0 ? (
         <div className="mt-8">

@@ -1,7 +1,9 @@
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { ForbiddenError } from "@/lib/auth/errors";
-import { createNotification, notifyMany } from "@/lib/notifications";
+import { createNotification } from "@/lib/notifications";
+import { maybeSendGroupedReplyEmails } from "@/lib/notifications/enviar-resposta";
+import { planCommentNotifications } from "@/lib/notifications/regras";
 import { resolveMentionedUserIds } from "@/lib/mentions";
 import { isCommentsDisabledSpace, isFreeCommentSpace } from "@/lib/spaces/constants";
 import { UPGRADE_REQUIRED } from "@/lib/membership/errors";
@@ -70,46 +72,32 @@ export async function createComment(
     return c;
   });
 
-  if (
-    threadParentId &&
-    replyTargetAuthorId &&
-    replyTargetAuthorId !== authorId
-  ) {
+  const mentioned = await resolveMentionedUserIds(data.body, authorId);
+  const plans = planCommentNotifications({
+    actorId: authorId,
+    postAuthorId: post.authorId,
+    replyTargetAuthorId,
+    mentionedIds: mentioned,
+  });
+
+  for (const plan of plans) {
     await createNotification({
-      recipientId: replyTargetAuthorId,
+      recipientId: plan.recipientId,
       actorId: authorId,
-      type: "reply_on_comment",
-      postId: post.id,
-      commentId: comment.id,
-      snippet: data.body,
-    });
-  } else if (post.authorId !== authorId) {
-    await createNotification({
-      recipientId: post.authorId,
-      actorId: authorId,
-      type: "comment_on_post",
+      type: plan.type,
       postId: post.id,
       commentId: comment.id,
       snippet: data.body,
     });
   }
 
-  const mentioned = await resolveMentionedUserIds(data.body, authorId);
-  const skip = new Set(
-    [authorId, post.authorId, replyTargetAuthorId].filter(
-      Boolean,
-    ) as string[],
-  );
-  await notifyMany(
-    mentioned.filter((id) => !skip.has(id)),
-    {
-      actorId: authorId,
-      type: "mention_in_comment",
-      postId: post.id,
-      commentId: comment.id,
-      snippet: data.body,
-    },
-  );
+  await maybeSendGroupedReplyEmails({
+    recipientIds: plans.map((p) => p.recipientId),
+    actorId: authorId,
+    actorName: comment.author.profile?.displayName ?? "Alguém",
+    postId: post.id,
+    snippet: data.body,
+  });
 
   return comment;
 }

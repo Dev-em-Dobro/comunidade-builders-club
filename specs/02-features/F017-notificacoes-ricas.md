@@ -14,5 +14,8 @@ Bell e lista de notificações mais úteis antes do lançamento.
 - [x] Empty state e “marcar todas”
 
 ## Fora de escopo
-- Push / e-mail de notificação
+- Push (F029 cobre notificação do navegador com a aba visível)
 - WebSocket / polling realtime (pode ser Fase 3)
+
+E-mail de resposta: [F072](F072-notificacoes-resposta-email.md) (agrupado;
+não é um e-mail por evento).

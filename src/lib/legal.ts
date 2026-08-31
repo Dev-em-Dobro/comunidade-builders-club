@@ -18,7 +18,7 @@ export const OPERADOR_LEGAL = {
  * O texto legal mora no código, então o histórico do git prova o que cada
  * versão dizia — não é preciso guardar cópia do texto para comprovar o aceite.
  */
-export const VERSAO_LEGAL = "2026-08-26";
+export const VERSAO_LEGAL = "2026-08-31";
 
 const MESES = [
   "janeiro",
