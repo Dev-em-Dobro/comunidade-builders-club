@@ -1,5 +1,10 @@
 import type { ReactNode } from "react";
-import { isSafeHref, isSafeHttpUrl } from "@/lib/markdown/text";
+import { OptimizedMediaImage } from "@/components/optimized-media-image";
+import {
+  isSafeHref,
+  isSafeHttpUrl,
+  parseImagemBloco,
+} from "@/lib/markdown/text";
 
 export { escapeHtml, snippetFromBody, isSafeHttpUrl, isSafeHref } from "@/lib/markdown/text";
 
@@ -9,8 +14,14 @@ export { escapeHtml, snippetFromBody, isSafeHttpUrl, isSafeHref } from "@/lib/ma
  */
 export function renderInlineMarkdown(text: string): ReactNode[] {
   const nodes: ReactNode[] = [];
+  /**
+   * F076 — o `!?` antes do colchete existe para imagem escrita no meio de um
+   * parágrafo. Imagem é bloco (ver `MarkdownBody`), e sem isso o `![x](y)`
+   * inline saía como um `!` solto seguido de link, porque só o `[x](y)` casava.
+   * Aqui ele vira um link normal, que é a degradação previsível.
+   */
   const re =
-    /(`[^`]+`)|(\*\*[^*]+\*\*)|(\*[^*]+\*)|(\[([^\]]+)\]\((https?:\/\/[^)\s]+|\/[^)\s]+)\))|(https?:\/\/[^\s<]+[^\s<.,;:!?'")\]])|(@[\p{L}\p{N}_.\-]{2,64})/gu;
+    /(`[^`]+`)|(\*\*[^*]+\*\*)|(\*[^*]+\*)|(!?\[([^\]]+)\]\((https?:\/\/[^)\s]+|\/[^)\s]+)\))|(https?:\/\/[^\s<]+[^\s<.,;:!?'")\]])|(@[\p{L}\p{N}_.\-]{2,64})/gu;
 
   let last = 0;
   let key = 0;
@@ -85,7 +96,16 @@ export type MarkdownVariant = "default" | "reading";
 
 const SCALE: Record<
   MarkdownVariant,
-  { root: string; h2: string; h3: string; ul: string; pre: string; gap: string }
+  {
+    root: string;
+    h2: string;
+    h3: string;
+    ul: string;
+    pre: string;
+    gap: string;
+    figure: string;
+    caption: string;
+  }
 > = {
   default: {
     root: "space-y-1 text-base leading-relaxed text-foreground/90 [&_p]:my-0",
@@ -94,6 +114,8 @@ const SCALE: Record<
     ul: "my-2 list-disc space-y-1 pl-5",
     pre: "my-3 overflow-x-auto rounded-xl border border-border bg-surface p-3 font-mono text-[13px] leading-relaxed",
     gap: "h-3",
+    figure: "my-3",
+    caption: "mt-1.5 text-xs text-muted",
   },
   reading: {
     root: "space-y-1 text-[1.0625rem] leading-[1.7] text-foreground/90 [&_p]:my-0 md:text-[1.1875rem]",
@@ -102,10 +124,12 @@ const SCALE: Record<
     ul: "my-4 list-disc space-y-2 pl-6 marker:text-muted",
     pre: "my-6 overflow-x-auto rounded-xl border border-border bg-surface p-4 font-mono text-[0.9375rem] leading-relaxed",
     gap: "h-5",
+    figure: "my-8",
+    caption: "mt-2 text-sm leading-snug text-muted",
   },
 };
 
-/** Blocos: parágrafos, listas `- ` / `* `, linhas. */
+/** Blocos: parágrafos, listas `- ` / `* `, imagem, linhas. */
 export function MarkdownBody({
   body,
   className,
@@ -136,6 +160,24 @@ export function MarkdownBody({
           <code>{codeLines.join("\n")}</code>
         </pre>,
       );
+      continue;
+    }
+    const imagem = parseImagemBloco(line);
+    if (imagem) {
+      blocks.push(
+        <figure key={key++} className={scale.figure}>
+          <OptimizedMediaImage
+            src={imagem.url}
+            alt={imagem.legenda}
+            variant="detail"
+            className="w-full rounded-xl border border-border/60 bg-surface/60 object-contain"
+          />
+          {imagem.legenda ? (
+            <figcaption className={scale.caption}>{imagem.legenda}</figcaption>
+          ) : null}
+        </figure>,
+      );
+      i += 1;
       continue;
     }
     if (/^###\s+/.test(line)) {
@@ -192,6 +234,7 @@ export function MarkdownBody({
       !/^\s*[-*]\s+/.test(lines[i]!) &&
       !/^##\s+/.test(lines[i]!) &&
       !/^###\s+/.test(lines[i]!) &&
+      !parseImagemBloco(lines[i]!) &&
       !lines[i]!.trim().startsWith("```")
     ) {
       para.push(lines[i]!);
