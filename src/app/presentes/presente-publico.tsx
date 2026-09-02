@@ -6,6 +6,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { GiftSignupForm } from "@/components/gift-signup-form";
 import { MarkdownBody } from "@/lib/markdown";
 import { PostMedia } from "@/components/post-media";
+import { OptimizedMediaImage } from "@/components/optimized-media-image";
 import { previewFromBody } from "@/lib/posts/title";
 import { getOptionalUser } from "@/lib/auth/require-user";
 import { prisma } from "@/lib/db";
@@ -150,6 +151,22 @@ export async function PresentePublico({
         ) : null}
 
         <article className="mt-8">
+          {/*
+           * F076 — a capa abre o artigo. Antes, `imageUrl` só saía no PostMedia
+           * lá embaixo, depois do texto: o que era para ser capa chegava como
+           * rodapé, e a página abria sempre com um bloco de texto puro.
+           */}
+          {gift.imageUrl ? (
+            <div className="mb-6 overflow-hidden rounded-2xl bg-surface/60">
+              <OptimizedMediaImage
+                src={gift.imageUrl}
+                alt=""
+                variant="detail"
+                priority
+                className="max-h-[22rem] w-full object-cover"
+              />
+            </div>
+          ) : null}
           <h1 className="reading-title">{title}</h1>
           <p className="mt-4 text-sm text-muted">
             {authorName} ·{" "}
@@ -171,12 +188,8 @@ export async function PresentePublico({
            * card suprimia — sem isso, presentes cujo `linkUrl` não aparece no
            * corpo (whisper-local, hermes, os de teste) ficariam sem link.
            */}
-          <PostMedia
-            imageUrl={gift.imageUrl}
-            videoUrl={gift.videoUrl}
-            linkUrl={gift.linkUrl}
-            priority
-          />
+          {/* F076 — sem `imageUrl` aqui: ela virou a capa acima do título. */}
+          <PostMedia videoUrl={gift.videoUrl} linkUrl={gift.linkUrl} />
         </article>
 
         {/*
