@@ -15,6 +15,7 @@ import { getPublicGift, recordGiftVisit } from "@/lib/gifts";
 import { giftLinkView } from "@/lib/gifts/link";
 import { GIFT_UTM_DEFAULTS, sanitizeUtmValue } from "@/lib/gifts/origem";
 import { PresentePromessa } from "@/app/presentes/presente-promessa";
+import { PresenteImersaoCta } from "@/app/presentes/presente-imersao-cta";
 
 /** Âncora do CTA "Criar conta grátis" do bloco de promessa (F063). */
 const FORM_ANCHOR_ID = "criar-conta";
@@ -149,6 +150,13 @@ export async function PresentePublico({
             </Link>
           </div>
         ) : null}
+
+        {/*
+         * F077 — a faixa da imersão é a única coisa acima do artigo, e some
+         * sozinha em 24/09/2026. A oferta do Club continua embaixo, no
+         * PresentePromessa: nada de plano, preço ou cadastro sobe daqui.
+         */}
+        <PresenteImersaoCta utmContent={utm.content} />
 
         <article className="mt-8">
           {/*
