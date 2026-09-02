@@ -7,17 +7,12 @@ export const LAST_SEEN_THROTTLE_MS = 15 * 60 * 1000;
 /** Teto por execução do cron — Resend em série, sem fila. */
 export const MAX_ENVIOS_POR_RUN = 80;
 
-const TIERS_PAGOS = new Set(["paid", "pro", "elite"]);
-
-/** Pagante `member` ativo. Staff e free ficam de fora. */
-export function isElegivelPaganteMember(m: {
+/** `member` ativo (free ou pago). Staff fica de fora. */
+export function isElegivelReguaMember(m: {
   status: string;
   role: string;
-  tier: string;
 }): boolean {
-  if (m.status !== "active") return false;
-  if (m.role !== "member") return false;
-  return TIERS_PAGOS.has(m.tier);
+  return m.status === "active" && m.role === "member";
 }
 
 export function shouldSendSemAcesso48h(opts: {

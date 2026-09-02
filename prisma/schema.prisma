@@ -136,7 +136,7 @@ model Profile {
   welcomeSeenAt  DateTime? @map("welcome_seen_at")
   /// F073 — e-mail agrupado de resposta (opt-out). Reação nunca entra.
   notifyRepliesEmail Boolean @default(true) @map("notify_replies_email")
-  /// F075 — e-mail da régua (48h sem acesso). Default ligado.
+  /// F075 — coluna legado. O cron não lê: régua dispara sem opt-out.
   notifyReguaEmail Boolean @default(true) @map("notify_regua_email")
   /// F075 — último heartbeat logado (poll). Null = relógio ainda não armou.
   lastSeenAt     DateTime? @map("last_seen_at")

@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/db";
 import { requireAuthEnv } from "@/lib/auth/env";
 import { sendRegua48hEmail } from "@/lib/email";
-import { signReguaUnsubToken } from "./email-token";
 import {
   MAX_ENVIOS_POR_RUN,
   shouldSendSemAcesso48h,
@@ -28,10 +27,8 @@ export async function dispararReguaSemAcesso48h(
       membership: {
         status: "active",
         role: "member",
-        tier: { in: ["paid", "pro", "elite"] },
       },
       profile: {
-        notifyReguaEmail: true,
         lastSeenAt: { lte: cutoff },
       },
     },
@@ -67,17 +64,11 @@ export async function dispararReguaSemAcesso48h(
       continue;
     }
 
-    const token = signReguaUnsubToken(user.id);
-    const unsubPage = `${base}/email/regua?t=${encodeURIComponent(token)}`;
-    const unsubApi = `${base}/api/email/regua/unsub?t=${encodeURIComponent(token)}`;
-
     try {
       await sendRegua48hEmail({
         to: user.email,
         displayName: user.profile?.displayName ?? "Builder",
         clubUrl: base,
-        unsubUrl: unsubPage,
-        unsubApiUrl: unsubApi,
       });
       await prisma.reguaEmailSend.create({
         data: {

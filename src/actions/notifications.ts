@@ -7,7 +7,6 @@ import {
   markNotificationRead,
 } from "@/lib/notifications";
 import { setNotifyRepliesEmail } from "@/lib/notifications/enviar-resposta";
-import { setNotifyReguaEmail } from "@/lib/regua";
 
 export async function markReadAction(id: string) {
   const { user } = await requireActiveMember();
@@ -28,13 +27,5 @@ export async function updateNotifyRepliesEmailAction(formData: FormData) {
   const { user } = await requireActiveMember();
   const enabled = formData.get("notifyRepliesEmail") === "1";
   await setNotifyRepliesEmail(user.id, enabled);
-  revalidatePath("/configuracoes");
-}
-
-/** F075 — liga/desliga e-mail da régua (48h sem acesso). */
-export async function updateNotifyReguaEmailAction(formData: FormData) {
-  const { user } = await requireActiveMember();
-  const enabled = formData.get("notifyReguaEmail") === "1";
-  await setNotifyReguaEmail(user.id, enabled);
   revalidatePath("/configuracoes");
 }

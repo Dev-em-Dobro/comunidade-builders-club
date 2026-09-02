@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
-  isElegivelPaganteMember,
+  isElegivelReguaMember,
   lastSeenNeedsTouch,
   LAST_SEEN_THROTTLE_MS,
   MS_48H,
@@ -70,37 +70,21 @@ describe("shouldSendSemAcesso48h — F075", () => {
   });
 });
 
-describe("isElegivelPaganteMember — F075", () => {
-  it("aceita pagante member ativo", () => {
+describe("isElegivelReguaMember — F075", () => {
+  it("aceita member ativo, free ou pago", () => {
     assert.equal(
-      isElegivelPaganteMember({ status: "active", role: "member", tier: "pro" }),
-      true,
-    );
-    assert.equal(
-      isElegivelPaganteMember({
-        status: "active",
-        role: "member",
-        tier: "elite",
-      }),
+      isElegivelReguaMember({ status: "active", role: "member" }),
       true,
     );
   });
 
-  it("rejeita free, staff e membership inativa", () => {
+  it("rejeita staff e membership inativa", () => {
     assert.equal(
-      isElegivelPaganteMember({ status: "active", role: "member", tier: "free" }),
+      isElegivelReguaMember({ status: "active", role: "admin" }),
       false,
     );
     assert.equal(
-      isElegivelPaganteMember({ status: "active", role: "admin", tier: "elite" }),
-      false,
-    );
-    assert.equal(
-      isElegivelPaganteMember({
-        status: "revoked",
-        role: "member",
-        tier: "pro",
-      }),
+      isElegivelReguaMember({ status: "revoked", role: "member" }),
       false,
     );
   });

@@ -6,9 +6,10 @@ Em implementação — 2026-09-02
 ## Objetivo
 
 CS não vê quem sumiu até o card de 14 dias (F057). Quem some no segundo
-dia já perdeu o ritmo. Um e-mail transacional quando o **pagante** não
-abre o Club há 48h. WhatsApp automático fica de fora (sem telefone, sem
-API, sem ADR).
+dia já perdeu o ritmo. Um e-mail transacional **automático** quando o
+membro (free ou pago) não abre o Club há 48h. Serve para o CS
+identificar e reativar quem parou de acessar. WhatsApp automático fica
+de fora (sem telefone, sem API, sem ADR).
 
 Os outros três gatilhos (7d sem amostra, 14d sem atividade, 30d sem
 proposta no Orion) **não** disparam nesta entrega. A tabela de envio já
@@ -16,11 +17,13 @@ nasce com `trigger` para eles entrarem depois sem migração de modelo.
 
 ## Quem recebe
 
-Membership `active`, papel `member`, tier `pro` | `elite` | `paid`.
-Staff (admin / instructor) e **free** não entram.
+Membership `active`, papel `member` — **free, pro, elite e `paid`**.
+Staff (admin / instructor) não entra.
 
-Opt-in: `Profile.notifyReguaEmail` default `true`. Descadastra no
-e-mail (List-Unsubscribe + página) e em Configurações. Religa lá.
+**Sem opt-out.** Não há checkbox em Configurações nem link de
+descadastro. Quem desmarcou a flag antiga `notifyReguaEmail` continua
+recebendo: o cron **não** lê essa coluna. É e-mail da operação (CS),
+não preferência do aluno.
 
 ## Relógio
 
@@ -54,21 +57,23 @@ aborta o lote. Envios em série (Resend).
 ## Copy
 
 Tom de acompanhamento, não de cobrança. CTA: abrir o Club
-(`BETTER_AUTH_URL`). Link para parar estes e-mails.
+(`BETTER_AUTH_URL`). Sem link para parar estes e-mails.
 
 ## Fora de escopo
 
 - WhatsApp / SMS / push
-- Free
+- Staff
+- Opt-out / preferência do aluno
 - Amostra, 14d, proposta
-- Tela nova no admin (CS continua com Progresso F057)
+- Tela nova no admin (CS continua com Progresso F057; o log
+  `regua_email_send` é a prova de quem foi tocado)
 - Migration de produção (só após preview + confirmação)
 
 ## Critérios
 
 - [x] Spec antes do código
 - [x] `lastSeenAt` no poll (throttle 15 min)
-- [x] Cron 48h só pagante `member` active, opt-in, um por episódio
-- [x] Opt-out no e-mail e em Configurações
+- [x] Cron 48h só `member` active (free e pago), automático, um por episódio
+- [x] Sem opt-out (Configurações e List-Unsubscribe)
 - [x] Testes da regra de disparo
 - [ ] Preview / HML; produção só com confirmação
