@@ -84,10 +84,32 @@ Blob continua sendo o destino de quem sobe imagem pelo app (`/api/upload`, 1 MB,
 convertido para WebP a 1600px), e é a referência de peso recomendada para quem
 hospeda por fora: **WebP, no máximo 1600px de lado.**
 
+## 5. A capa precisa ser uma imagem horizontal
+
+Achado na verificação visual, e é a única surpresa desta feature.
+
+`object-cover` numa faixa de 22rem funciona para arte horizontal e **corta arte
+vertical**. A primeira capa testada foi um slide de carrossel do Instagram (4:5),
+e o corte comeu a terceira linha do título: a página abriu com "O Whisper é de
+graça. O cliente paga" e um "R$ 225 a hora" partido ao meio na borda de baixo.
+
+Não é bug do CSS, é incompatibilidade de formato: 4:5 não cabe em 2:1 sem perder
+metade. `object-contain` resolveria o corte e criaria outro problema, uma tira
+estreita no meio de duas faixas vazias. Então a regra é de conteúdo, não de
+código: **capa de artigo é imagem horizontal (16:9 ou 2:1). Slide de carrossel
+não serve como capa.** Presente sem arte horizontal fica sem capa, que continua
+sendo um estado válido: o `imageUrl` é opcional e a página abre no título.
+
 ## Verificação
 
 - `npx tsc --noEmit`: limpo.
-- `npx tsx --test src/lib/**/*.test.ts`: 59 testes, 59 passando.
+- `npx tsx --test src/lib/**/*.test.ts`: 59 testes na branch da feature, 83 na
+  `feature/preview` depois do merge. Todos passando.
 - `npm run build`: compila, `/presentes/[slug]` em 125 kB de First Load JS.
-- Falta: conferir em homologação um presente com capa e um print no meio do
-  texto, no claro e no escuro, no celular e no desktop.
+- Render conferido com o presente `f076-teste` (só em homologação), apontando o
+  app local para o banco de HML: 2 `<figure>`, legenda presente na primeira e
+  ausente na segunda, capa antes do `<h1>`, no tema claro e no escuro. As
+  imagens vêm de fora e passam pelo otimizador: um PNG de 600 KB chegou ao
+  navegador como WebP de 15 KB.
+- Falta: conferir no celular de verdade e apagar o `f076-teste` de HML quando a
+  feature entrar na main.
