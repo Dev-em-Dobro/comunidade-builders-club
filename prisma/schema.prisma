@@ -34,6 +34,7 @@ model User {
   postViews       PostView[]
   legalAcceptances LegalAcceptance[]
   notificationEmailSends NotificationEmailSend[]
+  reguaEmailSends ReguaEmailSend[]
 
   @@unique([email])
   @@map("user")
@@ -135,9 +136,14 @@ model Profile {
   welcomeSeenAt  DateTime? @map("welcome_seen_at")
   /// F073 — e-mail agrupado de resposta (opt-out). Reação nunca entra.
   notifyRepliesEmail Boolean @default(true) @map("notify_replies_email")
+  /// F075 — e-mail da régua (48h sem acesso). Default ligado.
+  notifyReguaEmail Boolean @default(true) @map("notify_regua_email")
+  /// F075 — último heartbeat logado (poll). Null = relógio ainda não armou.
+  lastSeenAt     DateTime? @map("last_seen_at")
   joinedAt       DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
+  @@index([lastSeenAt])
   @@map("profile")
 }
 
@@ -363,6 +369,18 @@ model NotificationEmailSend {
 
   @@index([recipientId, postId, sentAt])
   @@map("notification_email_send")
+}
+
+/// F075 — um envio por episódio de ausência (trigger + sentAt).
+model ReguaEmailSend {
+  id      String   @id @default(cuid())
+  userId  String
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trigger String
+  sentAt  DateTime @default(now())
+
+  @@index([userId, trigger, sentAt])
+  @@map("regua_email_send")
 }
 
 // ---------------------------------------------------------------------------
