@@ -8,10 +8,7 @@ import { PlanBadge } from "@/components/plan-badge";
 import { ExcluirConta } from "@/components/excluir-conta";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { EMAIL_SUPORTE, emailSuporteUrl, whatsappSuporteUrl } from "@/lib/suporte";
-import {
-  updateNotifyRepliesEmailAction,
-  updateNotifyReguaEmailAction,
-} from "@/actions/notifications";
+import { updateNotifyRepliesEmailAction } from "@/actions/notifications";
 
 export const metadata = { title: "Configurações" };
 
@@ -166,36 +163,6 @@ export default async function ConfiguracoesPage() {
                 Comentário no seu post, resposta no seu comentário ou menção.
                 No máximo um e-mail a cada 2 horas por post. Reações não
                 entram.
-              </span>
-            </span>
-          </label>
-          <button type="submit" className="btn-primary mt-4">
-            Salvar
-          </button>
-        </form>
-      </Secao>
-
-      <Secao
-        titulo="Lembrete se você sumir"
-        descricao="E-mail transacional se o Club não te vê há dois dias. Só para quem é PRO ou Elite. Não é cobrança."
-      >
-        <form action={updateNotifyReguaEmailAction}>
-          <label className="flex cursor-pointer items-start gap-3 text-sm">
-            <input
-              type="checkbox"
-              name="notifyReguaEmail"
-              value="1"
-              defaultChecked={profile.notifyReguaEmail}
-              className="mt-1 h-4 w-4 accent-[var(--accent)]"
-            />
-            <span>
-              <span className="font-medium text-foreground">
-                Receber um toque por e-mail depois de 48h sem abrir o Club
-              </span>
-              <span className="mt-1 block text-muted">
-                Um e-mail por vez que você some. Voltou e sumiu de novo: pode
-                chegar outro. Dá para desligar também pelo link no próprio
-                e-mail.
               </span>
             </span>
           </label>
