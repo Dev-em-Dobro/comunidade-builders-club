@@ -6,6 +6,7 @@ import {
   listUnreadPreview,
   NOTIFICATION_LABELS,
 } from "@/lib/notifications";
+import { touchLastSeen } from "@/lib/regua";
 
 export async function GET() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -17,6 +18,7 @@ export async function GET() {
   const [unread, preview] = await Promise.all([
     countUnread(userId),
     listUnreadPreview(userId, 8),
+    touchLastSeen(userId),
   ]);
 
   return NextResponse.json({

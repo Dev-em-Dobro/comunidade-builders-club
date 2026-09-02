@@ -172,3 +172,49 @@ export async function sendReplyDigestEmail(opts: {
     },
   });
 }
+
+function primeiroNome(displayName: string): string {
+  const parte = displayName.trim().split(/\s+/)[0];
+  return parte || "Builder";
+}
+
+/** F075 — toque de CS aos 48h sem abrir o Club. Não é pitch. */
+export async function sendRegua48hEmail(opts: {
+  to: string;
+  displayName: string;
+  clubUrl: string;
+  unsubUrl: string;
+  unsubApiUrl: string;
+}): Promise<void> {
+  const nome = primeiroNome(opts.displayName);
+  const subject = `Faz dois dias que você não aparece no ${NOME_PRODUTO}`;
+  const text = [
+    `Olá, ${nome},`,
+    ``,
+    `Faz uns dois dias que o ${NOME_PRODUTO} não te vê por aqui. Sem cobrança — só um toque para você não perder o ritmo da comunidade.`,
+    ``,
+    `Quando puder, entra de novo:`,
+    opts.clubUrl,
+    ``,
+    `Se não quiser mais estes lembretes:`,
+    opts.unsubUrl,
+    ``,
+    `— ${NOME_PRODUTO}`,
+  ].join("\n");
+  const html = wrapHtml(
+    `Sentimos sua falta`,
+    `<p style="color:#64748b;font-size:15px;line-height:1.5;">Olá, ${escapeHtml(nome)}. Faz uns dois dias que você não abre o ${escapeHtml(NOME_PRODUTO)}. Sem cobrança — só um toque para você não perder o ritmo.</p>
+    <p style="margin:24px 0;"><a href="${escapeHtml(opts.clubUrl)}" style="display:inline-block;background:#0d9488;color:#fff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:600;">Abrir o ${escapeHtml(NOME_PRODUTO)}</a></p>
+    <p style="color:#94a3b8;font-size:12px;line-height:1.5;"><a href="${escapeHtml(opts.unsubUrl)}" style="color:#94a3b8;">Não quero mais estes lembretes</a></p>`,
+  );
+  await sendMail({
+    to: opts.to,
+    subject,
+    text,
+    html,
+    headers: {
+      "List-Unsubscribe": `<${opts.unsubApiUrl}>`,
+      "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+    },
+  });
+}

@@ -63,6 +63,7 @@ mostram indisponível (não zero).
 | `ORION_DATABASE_URL`    | Neon Orion **prod** (F057) | Neon Orion **staging** | opcional (HML) |
 | `TMB_WEBHOOK_TOKEN`     | Valor do webhook TMB (Mentoria)        | mesmo ou dedicado de staging                   | obrigatório p/ webhook TMB |
 | `TMB_WEBHOOK_HEADER`    | Chave do header (default `x-tmb-token`)| mesmo                                          | opcional                |
+| `CRON_SECRET`           | secret forte (F075 régua 48h)          | mesmo ou dedicado; cron da Vercel **não** roda no Preview | local p/ bater o endpoint |
 
 
 ### Hubla (F014)
@@ -102,6 +103,22 @@ DevQuest continua via seed sazonal (não passa neste webhook).
 
 
 Domínio de envio precisa estar verificado no Resend (SPF/DKIM).
+
+### Cron (F075 — régua 48h)
+
+Vercel Cron (só **Production**) chama `GET /api/cron/regua` todos os dias às
+12:00 UTC (9h em Brasília) com `Authorization: Bearer CRON_SECRET`. Sem a
+env, o endpoint responde 503.
+
+Preview / HML: o cron da Vercel **não** roda. QA:
+
+```
+curl -sS -H "Authorization: Bearer $CRON_SECRET" \
+  https://<preview>.vercel.app/api/cron/regua
+```
+
+O disparo não envia para quem ainda tem `lastSeenAt` null (evita blast no
+dia do migrate). Primeiro heartbeat é o poll do sininho.
 
 ### Google OAuth (opcional)
 
