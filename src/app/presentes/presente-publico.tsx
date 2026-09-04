@@ -16,6 +16,8 @@ import { giftLinkView } from "@/lib/gifts/link";
 import { GIFT_UTM_DEFAULTS, sanitizeUtmValue } from "@/lib/gifts/origem";
 import { PresentePromessa } from "@/app/presentes/presente-promessa";
 import { PresenteImersaoCta } from "@/app/presentes/presente-imersao-cta";
+import { PresenteAulaPopup } from "@/app/presentes/presente-aula-popup";
+import { contarAulasGratuitas } from "@/lib/aulas";
 
 /** Âncora do CTA "Criar conta grátis" do bloco de promessa (F063). */
 const FORM_ANCHOR_ID = "criar-conta";
@@ -95,6 +97,13 @@ export async function PresentePublico({
       })
     : null;
   const isPaid = membership ? isPaidMembership(membership) : false;
+
+  /**
+   * F078 — a pop-up promete "as N primeiras aulas" e o N é contado, não
+   * escrito. Só consulta para sessão anônima: quem já tem conta não vê a modal,
+   * e a página do Presente é o caminho mais quente do funil.
+   */
+  const aulasGratuitas = user ? 0 : await contarAulasGratuitas();
 
   const link = giftLinkView({
     title: gift.title,
@@ -217,6 +226,13 @@ export async function PresentePublico({
           </div>
         ) : null}
       </main>
+
+      {/*
+       * F078 — a modal da aula, 60s depois de abrir. Só para quem não tem
+       * conta: quem já é membro não ganha nada com um convite para se
+       * cadastrar, e a interrupção só atrapalharia a leitura.
+       */}
+      {!user ? <PresenteAulaPopup totalAulas={aulasGratuitas} /> : null}
     </div>
   );
 }

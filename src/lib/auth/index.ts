@@ -6,6 +6,7 @@ import { prisma } from "@/lib/db";
 import { sendMagicLinkEmail, sendOtpEmail } from "@/lib/email";
 import { NOME_PRODUTO } from "@/lib/produto";
 import { ensureMemberBootstrap } from "@/lib/membership/bootstrap";
+import { contextoAceiteDeHeaders } from "@/lib/membership/aceite-legal";
 import { recordDeniedLoginIfUnauthorized } from "@/lib/admin/denied-logins";
 import { loadAuthEnv } from "./env";
 
@@ -49,12 +50,19 @@ export const auth = betterAuth({
   databaseHooks: {
     user: {
       create: {
-        after: async (user) => {
+        /**
+         * F058 — `ctx` traz os headers da request que criou a conta, e é aqui
+         * que o aceite do **primeiro** acesso é gravado. Sem repassar isso, a
+         * linha nascia sem IP e sem user-agent, e o `requireActiveMember`
+         * seguinte já encontrava `termosVersao` em dia e não corrigia.
+         */
+        after: async (user, ctx) => {
           await ensureMemberBootstrap(
             user.id,
             user.name,
             user.image,
             user.email,
+            contextoAceiteDeHeaders(ctx?.headers),
           );
           await recordDeniedLoginIfUnauthorized(user.email);
         },

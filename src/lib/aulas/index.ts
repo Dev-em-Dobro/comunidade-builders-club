@@ -2,11 +2,40 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { ForbiddenError } from "@/lib/auth/errors";
 import { UPGRADE_REQUIRED } from "@/lib/membership/errors";
-import { canWatchLesson } from "./access";
+import { canWatchLesson, FASE_1_M01_SLUG } from "./access";
 
 export { canWatchLesson, moduleAllowsFree, FASE_1_M01_SLUG } from "./access";
 export type { ModuleAccessNode } from "./access";
 export { listPublishedModules } from "./published-modules";
+
+/**
+ * F078 — quantas aulas o membro grátis assiste hoje.
+ *
+ * A pop-up do Presente promete "as N primeiras aulas". Escrever o N na copy
+ * envelhece na primeira aula que o admin publicar, então ele é contado.
+ *
+ * Espelha `moduleAllowsFree`: o módulo livre, o M01 por slug, e um nível de
+ * herança para os submódulos da F050. Conta só o que está publicado nos dois
+ * níveis — prometer rascunho é prometer o que ninguém assiste.
+ *
+ * Nunca lança: falha de banco vira 0, e a copy cai na forma sem número.
+ */
+export async function contarAulasGratuitas(): Promise<number> {
+  const moduloLivre = [{ freeAccess: true }, { slug: FASE_1_M01_SLUG }];
+  try {
+    return await prisma.lesson.count({
+      where: {
+        published: true,
+        module: {
+          published: true,
+          OR: [...moduloLivre, { parent: { OR: moduloLivre } }],
+        },
+      },
+    });
+  } catch {
+    return 0;
+  }
+}
 
 /** Só alfanumérico / hífen / underscore — evita host injection no embed. */
 const PANDA_ID_RE = /^[a-zA-Z0-9_-]+$/;

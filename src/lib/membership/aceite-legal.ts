@@ -14,6 +14,28 @@ export type ContextoAceite = {
 };
 
 /**
+ * F058 — extração única para os dois caminhos que registram aceite.
+ *
+ * Existem dois, e é isso que criava o buraco: o hook `user.create.after` do
+ * Better Auth grava o aceite na **criação da conta**, antes de qualquer request
+ * passar por `requireActiveMember`. Como o hook não passava contexto, a linha
+ * nascia com `ip`/`userAgent` nulos — e o `requireActiveMember`, logo depois,
+ * via `termosVersao` já em dia e não regravava. Resultado: todo cadastro novo
+ * ficava sem prova de origem, que é exatamente o que a F058 existe para ter.
+ *
+ * Sem `next/headers` de propósito: recebe o `Headers` de quem tem acesso a ele.
+ */
+export function contextoAceiteDeHeaders(
+  h: Headers | null | undefined,
+): ContextoAceite {
+  if (!h) return {};
+  return {
+    ip: h.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null,
+    userAgent: h.get("user-agent"),
+  };
+}
+
+/**
  * Grava o aceite da versão atual, se ainda não houver.
  *
  * Idempotente por `@@unique([userId, documento, versao])`: dois requests

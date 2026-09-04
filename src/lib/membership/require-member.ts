@@ -6,7 +6,7 @@ import type { AuthUser } from "@/lib/auth";
 import { requireUser } from "@/lib/auth/require-user";
 import { AuthError, ForbiddenError } from "@/lib/auth/errors";
 import { ensureMemberBootstrap } from "./bootstrap";
-import type { ContextoAceite } from "./aceite-legal";
+import { contextoAceiteDeHeaders, type ContextoAceite } from "./aceite-legal";
 import { hrefPlanos, isPaidMembership } from "./capabilities";
 import { UPGRADE_REQUIRED } from "./errors";
 
@@ -21,11 +21,7 @@ export type ActiveMember = {
  * sem depender de Next; os headers já estão no request por causa da sessão.
  */
 async function contextoAceite(): Promise<ContextoAceite> {
-  const h = await headers();
-  return {
-    ip: h.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null,
-    userAgent: h.get("user-agent"),
-  };
+  return contextoAceiteDeHeaders(await headers());
 }
 
 export { UPGRADE_REQUIRED } from "./errors";
