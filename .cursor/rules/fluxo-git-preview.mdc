@@ -41,7 +41,10 @@ Espelham o fluxo de branch:
 
 ## Domínios
 
-- Produção: `https://builders-club.devemdobro.com`
-- Homologação: `https://staging.builders-club.devemdobro.com`
+- Produção: `https://comunidade-builders-club.devemdobro.com`
+- Homologação: `https://hml-comunidade-builders-club.devemdobro.com`
+
+`builders-club.devemdobro.com` (sem o `comunidade-`) é outra coisa: landing
+estática, 404 em toda rota deste app. Não usar em link, env ou webhook.
 
 Detalhes de envs Vercel: `docs/deploy-vercel.md`

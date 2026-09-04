@@ -24,11 +24,11 @@ SDK no `package.json`: snippet oficial via `next/script`. Alternativas
    conta Microsoft **Ferramentas**.
 2. **Add new project**:
    - Nome: `Builders Club staging`
-   - URL: `https://staging.builders-club.devemdobro.com`
+   - URL: `https://hml-comunidade-builders-club.devemdobro.com`
 3. Copiar o **Project ID** (Settings → Overview). É público (vai no
    browser). Não é senha.
 4. Colar na Vercel → Preview: `NEXT_PUBLIC_CLARITY_PROJECT_ID`.
-5. **Produção:** projeto separado (`builders-club.devemdobro.com`) e o
+5. **Produção:** projeto separado (`comunidade-builders-club.devemdobro.com`) e o
    ID só no Environment Production — **depois** do merge em `main`. Não
    misturar heatmap de HML com o de alunos reais.
 6. No projeto: Advanced settings → **mask** no padrão (inputs, e-mail e
