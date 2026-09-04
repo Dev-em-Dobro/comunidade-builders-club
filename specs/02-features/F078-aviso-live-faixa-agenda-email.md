@@ -97,23 +97,15 @@ pro relógio da live (não pro `lastSeenAt`):
   do F075. CTA: abrir o Club.
 - Falha de um destinatário não aborta o lote (mesmo padrão do F075).
 
-## Risco em aberto: granularidade do cron
+## Granularidade do cron — resolvido
 
-O único cron hoje (`/api/cron/regua`, F075) roda **1x por dia**
-(`0 12 * * *` no `vercel.json`). Isso cobre bem o `vespera`, mas **não**
-cobre `pouco_antes` (~1h antes de um horário fixo) com precisão — depende
-do plano Vercel permitir cron mais frequente.
-
-Duas saídas, sem lib nova:
-
-1. Confirmar que o plano Vercel do projeto aceita cron a cada
-   15–30 min, ou
-2. Um serviço externo gratuito (ex.: cron-job.org) chamando
-   `GET /api/cron/live-lembrete` com o `CRON_SECRET` a cada 15 min —
-   mesmo endpoint, sem custo extra, sem worker/fila no nosso lado.
-
-**Decisão fica pra antes do código**, não trava a spec: a rota já nasce
-recebendo os dois triggers; o time decide o mecanismo de agendamento.
+Projeto está no plano Vercel Pro, que aceita cron mais frequente que
+1x/dia. `GET /api/cron/live-lembrete` roda a cada 15 min
+(`*/15 * * * *` no `vercel.json`) — uma rota só, cobrindo os dois
+triggers: a janela de 24–32h (`vespera`) e a de até 1h (`pouco_antes`)
+antes do horário calculado por `proximaLive()`. Dedupe por
+`(userId, trigger, liveAt)` garante que rodar a cada 15 min não duplica
+envio.
 
 ## Admin
 
@@ -141,6 +133,6 @@ vigente.
 - [ ] Faixa fixa no topo do Club, visível a todo membro `active` (inclusive staff), não dispensável
 - [ ] Botão "Marcar na agenda" abre Google Calendar com data/hora/duração corretas
 - [ ] Cron véspera: 1 e-mail por ocorrência, elegibilidade igual ao F075 (free+pago, staff fora)
-- [ ] Cron pouco-antes: 1 e-mail por ocorrência — mecanismo de agendamento confirmado antes de codar
+- [x] Cron pouco-antes: 1 e-mail por ocorrência — mecanismo de agendamento confirmado (Vercel Pro, `*/15 * * * *`)
 - [ ] Testes da regra de `proximaLive()` e da elegibilidade de envio (dedupe por `liveAt`)
 - [ ] Preview / HML antes de produção

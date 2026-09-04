@@ -17,7 +17,9 @@ import {
   removeAllowedEmailAction,
   setMemberRoleAction,
   setMemberStatusAction,
+  updateLiveScheduleAction,
 } from "@/actions/admin";
+import { obterRegraLiveSchedule, proximaLive } from "@/lib/live";
 import { AdminBulkAllowlist } from "@/components/admin-bulk-allowlist";
 import { AdminAulasPanel } from "@/components/admin-aulas-panel";
 import { AdminGiftLinks } from "@/components/admin-gift-links";
@@ -49,6 +51,43 @@ const STATUSES: Array<MembershipStatus | "all"> = [
   "revoked",
 ];
 
+const DIAS_SEMANA = [
+  "Domingo",
+  "Segunda",
+  "Terça",
+  "Quarta",
+  "Quinta",
+  "Sexta",
+  "Sábado",
+];
+
+function formatarBR(d: Date): string {
+  return new Intl.DateTimeFormat("pt-BR", {
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "America/Sao_Paulo",
+  }).format(d);
+}
+
+/** Valor pro <input type="datetime-local">, em horário de Brasília. */
+function paraDatetimeLocalBRT(d: Date): string {
+  const partes = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Sao_Paulo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(d);
+  const get = (t: string) => partes.find((p) => p.type === t)?.value ?? "00";
+  return `${get("year")}-${get("month")}-${get("day")}T${get("hour")}:${get("minute")}`;
+}
+
 export default async function AdminPage({ searchParams }: Props) {
   await requireAdminOrRedirect();
   const sp = await searchParams;
@@ -60,7 +99,7 @@ export default async function AdminPage({ searchParams }: Props) {
       : undefined;
   const q = sp.q?.trim() || undefined;
 
-  const [spaces, memberships, counts, allowed, modules, deniedGroups, purchasesWithoutLogin, utmMetrics, giftPosts] = await Promise.all([
+  const [spaces, memberships, counts, allowed, modules, deniedGroups, purchasesWithoutLogin, utmMetrics, giftPosts, liveRegra] = await Promise.all([
     tab === "spaces" ? listSpaces() : Promise.resolve([]),
     tab === "membros"
       ? listMemberships({ status: statusFilter, q })
@@ -74,6 +113,7 @@ export default async function AdminPage({ searchParams }: Props) {
     tab === "tentativas" ? listAllowlistWithoutUser() : Promise.resolve([]),
     tab === "presentes" ? listUtmPostMetrics() : Promise.resolve([]),
     tab === "presentes" ? listGiftPostsAdmin() : Promise.resolve([]),
+    tab === "live" ? obterRegraLiveSchedule() : Promise.resolve(null),
   ]);
 
   return (
@@ -352,6 +392,86 @@ export default async function AdminPage({ searchParams }: Props) {
             />
             <button type="submit" className="btn-primary">
               Criar
+            </button>
+          </form>
+        </section>
+      ) : null}
+
+      {tab === "live" && liveRegra ? (
+        <section className="mt-8 max-w-xl">
+          <h2 className="text-lg font-semibold">Live semanal</h2>
+          <p className="mt-1 text-sm text-muted">
+            Regra padrão (dia/horário que se repete toda semana) e uma
+            exceção pontual pra quando o horário muda numa semana
+            específica. Horários em Brasília. A faixa no Club e os
+            lembretes por e-mail usam o que estiver aqui.
+          </p>
+          <p className="mt-3 rounded-lg border border-border bg-card px-3 py-2 text-sm">
+            Próxima live calculada agora:{" "}
+            <strong>{formatarBR(proximaLive(liveRegra, new Date()))}</strong>
+          </p>
+
+          <form
+            action={updateLiveScheduleAction}
+            className="post-card mt-4 space-y-3"
+          >
+            <div>
+              <p className="text-sm font-medium">Regra padrão</p>
+              <div className="mt-1 flex flex-wrap gap-2">
+                <select
+                  name="weekday"
+                  className="input max-w-[160px]"
+                  defaultValue={liveRegra.weekday}
+                >
+                  {DIAS_SEMANA.map((label, i) => (
+                    <option key={label} value={i}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  name="hour"
+                  type="number"
+                  min={0}
+                  max={23}
+                  className="input max-w-[90px]"
+                  defaultValue={liveRegra.hour}
+                  aria-label="Hora (Brasília)"
+                />
+                <input
+                  name="minute"
+                  type="number"
+                  min={0}
+                  max={59}
+                  className="input max-w-[90px]"
+                  defaultValue={liveRegra.minute}
+                  aria-label="Minuto"
+                />
+              </div>
+            </div>
+
+            <div>
+              <p className="text-sm font-medium">
+                Exceção pontual (opcional)
+              </p>
+              <p className="text-xs text-muted">
+                Some sozinha depois que passa — só preenche quando a live
+                dessa semana foge da regra padrão.
+              </p>
+              <input
+                name="nextOverrideAt"
+                type="datetime-local"
+                className="input mt-1 max-w-xs"
+                defaultValue={
+                  liveRegra.nextOverrideAt
+                    ? paraDatetimeLocalBRT(liveRegra.nextOverrideAt)
+                    : ""
+                }
+              />
+            </div>
+
+            <button type="submit" className="btn-primary">
+              Salvar
             </button>
           </form>
         </section>

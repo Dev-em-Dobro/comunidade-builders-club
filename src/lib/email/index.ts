@@ -208,3 +208,55 @@ export async function sendRegua48hEmail(opts: {
     html,
   });
 }
+
+function formatarDataHoraBR(d: Date): string {
+  return new Intl.DateTimeFormat("pt-BR", {
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "America/Sao_Paulo",
+  }).format(d);
+}
+
+/** F078 — lembrete de live: véspera e pouco antes. Sem opt-out (mesma regra do F075). */
+export async function sendLiveLembreteEmail(opts: {
+  to: string;
+  displayName: string;
+  clubUrl: string;
+  liveAt: Date;
+  trigger: "vespera" | "pouco_antes";
+}): Promise<void> {
+  const nome = primeiroNome(opts.displayName);
+  const quando = formatarDataHoraBR(opts.liveAt);
+  const subject =
+    opts.trigger === "vespera"
+      ? `Amanhã tem live no ${NOME_PRODUTO}`
+      : `Começa em instantes: live no ${NOME_PRODUTO}`;
+  const chamada =
+    opts.trigger === "vespera"
+      ? `Só um lembrete: amanhã, ${quando}, tem live.`
+      : `A live começa daqui a pouco, ${quando}.`;
+  const text = [
+    `Olá, ${nome},`,
+    ``,
+    chamada,
+    ``,
+    `Entra no Club no horário:`,
+    opts.clubUrl,
+    ``,
+    `— ${NOME_PRODUTO}`,
+  ].join("\n");
+  const html = wrapHtml(
+    "Tem live",
+    `<p style="color:#64748b;font-size:15px;line-height:1.5;">Olá, ${escapeHtml(nome)}. ${escapeHtml(chamada)}</p>
+    <p style="margin:24px 0;"><a href="${escapeHtml(opts.clubUrl)}" style="display:inline-block;background:#0d9488;color:#fff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:600;">Abrir o ${escapeHtml(NOME_PRODUTO)}</a></p>`,
+  );
+  await sendMail({
+    to: opts.to,
+    subject,
+    text,
+    html,
+  });
+}
