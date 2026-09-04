@@ -24,7 +24,8 @@
     "test": "npx tsx --test src/lib/**/*.test.ts",
     "mailpit": "docker compose up -d mailpit",
     "perf:lighthouse": "npx tsx scripts/perf-lighthouse.mts",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "funil": "npx tsx scripts/funil-presentes.mts"
   },
   "dependencies": {
     "@prisma/client": "^6.1.0",
