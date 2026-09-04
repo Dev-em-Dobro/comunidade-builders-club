@@ -8,7 +8,7 @@ import {
   shouldSendVespera,
 } from "./regras";
 
-describe("proximaLive — F078", () => {
+describe("proximaLive — F079", () => {
   // hour/minute são BRT (UTC-3, sem horário de verão desde 2019) — terça
   // 20h BRT vira 23h UTC no resultado, sempre que não houver virada de dia.
   const regraTercaAs20h = { weekday: 2, hour: 20, minute: 0, nextOverrideAt: null };
@@ -54,7 +54,7 @@ describe("proximaLive — F078", () => {
   });
 });
 
-describe("shouldSendVespera — F078", () => {
+describe("shouldSendVespera — F079", () => {
   const liveAt = new Date("2026-09-08T20:00:00.000Z");
 
   it("não dispara fora da janela de 24-32h antes", () => {
@@ -99,7 +99,7 @@ describe("shouldSendVespera — F078", () => {
   });
 });
 
-describe("shouldSendPoucoAntes — F078", () => {
+describe("shouldSendPoucoAntes — F079", () => {
   const liveAt = new Date("2026-09-08T20:00:00.000Z");
 
   it("dispara dentro de 1h antes", () => {
@@ -136,7 +136,7 @@ describe("shouldSendPoucoAntes — F078", () => {
   });
 });
 
-describe("isElegivelLembreteLive — F078", () => {
+describe("isElegivelLembreteLive — F079", () => {
   it("aceita member ativo, free ou pago", () => {
     assert.equal(
       isElegivelLembreteLive({ status: "active", role: "member" }),

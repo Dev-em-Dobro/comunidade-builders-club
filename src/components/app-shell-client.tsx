@@ -51,7 +51,7 @@ function OrionIcon() {
 }
 
 type SpaceLink = { id: string; slug: string; name: string };
-/** F078 — resolvido em /api/nav, mesmo request que hidrata os spaces. */
+/** F079 — resolvido em /api/nav, mesmo request que hidrata os spaces. */
 type LiveInfo = { liveAt: string; calendarUrl: string };
 
 function LockIcon({ className }: { className?: string }) {

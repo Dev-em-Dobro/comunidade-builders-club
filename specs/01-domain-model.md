@@ -30,7 +30,7 @@ Diagnóstico, Outreach, Entregável — este último só na Fase 2 de migração
 | **Ativação pagante** | Post com link público no Desafio Projetos (`projetos`) em até 7 dias da entrada (F057). |
 | **Ativação Free** | Primeira busca (coleta de Lead) no Orion em até 3 dias da entrada (F057). |
 | **Régua de contato** | E-mail transacional quando o membro some (F075: 48h sem abrir o Club). |
-| **Live** | Encontro semanal ao vivo (regra padrão: terça 20h, com exceção pontual). Aviso automático: faixa fixa no Club + lembrete por e-mail na véspera e pouco antes (F078). |
+| **Live** | Encontro semanal ao vivo (regra padrão: terça 20h, com exceção pontual). Aviso automático: faixa fixa no Club + lembrete por e-mail na véspera e pouco antes (F079). |
 
 ## Spaces iniciais (seed)
 

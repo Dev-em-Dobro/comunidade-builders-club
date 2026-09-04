@@ -1,4 +1,4 @@
-/** F078 — regra padrão + exceção pontual do horário da live. */
+/** F079 — regra padrão + exceção pontual do horário da live. */
 
 export const TRIGGER_VESPERA = "vespera";
 export const TRIGGER_POUCO_ANTES = "pouco_antes";

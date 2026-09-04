@@ -1,4 +1,4 @@
-/** F078 — link do Google Calendar pro botão "Marcar na agenda". Sem lib nova. */
+/** F079 — link do Google Calendar pro botão "Marcar na agenda". Sem lib nova. */
 
 const DURACAO_PADRAO_MIN = 60;
 

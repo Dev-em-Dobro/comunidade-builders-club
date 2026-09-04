@@ -1,7 +1,33 @@
-# F078 — Aviso de live: faixa fixa + agenda + lembrete por e-mail
+# F079 — Aviso de live: faixa fixa + agenda + lembrete por e-mail
 
 ## Status
 Implementado no código — 2026-09-04. Falta validar em Preview/HML.
+
+> **Era F078 até 04/09/2026.** Duas features nasceram com o mesmo ID, com oito
+> minutos de diferença: esta (spec às 11h31) e a pop-up da aula no Presente
+> (código às 11h39, hoje em [F078](F078-popup-aula-presente.md)). Cada um leu
+> `specs/02-features/` antes de o outro publicar, viu F077 como último e pegou
+> F078. Renomeada esta porque a outra já estava em `main` e em produção —
+> critério de ordem de chegada, não de mérito. Mesmo tratamento do `bc330ef`,
+> que renomeou F072 para F073 pelo mesmo motivo.
+>
+> O desdobramento de WhatsApp, que esta spec reservava como F079, virou
+> **F080** — senão a renomeação recriaria a colisão dentro da própria feature.
+
+### As migrations mantêm `f078` no nome
+
+```
+prisma/migrations/20260904143309_f078_live_schedule/
+prisma/migrations/20260904150418_f078_live_schedule_zoom_url/
+```
+
+**É intencional, não esquecimento.** As duas já foram aplicadas em HML, e o
+Prisma identifica migration pelo nome gravado em `_prisma_migrations`: renomear
+a pasta faria ele ver uma migration nova pendente e a antiga como sumida, o que
+quebra o `migrate deploy` — inclusive o de produção, que ainda não rodou.
+
+O ID no nome do arquivo não corresponde à spec. É uma cicatriz barata; consertar
+custaria um `migrate resolve` manual em cada ambiente.
 
 ## Objetivo
 
@@ -13,7 +39,7 @@ esquecimento com três peças que reforçam o mesmo horário:
 2. **Botão de agenda** na faixa, pra marcar sem digitar nada.
 3. **Lembrete por e-mail**, na véspera e pouco antes do horário.
 
-WhatsApp fica de fora **desta** entrega — vira [F079](F079-aviso-live-whatsapp.md)
+WhatsApp fica de fora **desta** entrega — vira [F080](F080-aviso-live-whatsapp.md)
 (a criar), porque exige telefone do aluno (campo novo + LGPD), escolha de
 provedor e ADR próprio. Decisão registrada em conversa com o time em
 2026-09-04.
@@ -125,7 +151,7 @@ de "histórico de lives" — só o horário vigente.
 
 ## Fora de escopo
 
-- WhatsApp automático (F079, com ADR)
+- WhatsApp automático (F080, com ADR)
 - Rastreio de presença real (quem entrou de fato)
 - .ics / Outlook / outras plataformas de calendário
 - Opt-out do lembrete

@@ -19,7 +19,7 @@ export async function GET() {
   const liveAt = proximaLive(liveRegra, new Date());
 
   const clubUrl = process.env.BETTER_AUTH_URL?.trim()?.replace(/\/$/, "") ?? "";
-  /** F078 — local do evento é o Zoom quando configurado, senão cai pro Club. */
+  /** F079 — local do evento é o Zoom quando configurado, senão cai pro Club. */
   const localEvento = liveRegra.zoomUrl?.trim() || clubUrl || undefined;
   const live = {
     liveAt: liveAt.toISOString(),

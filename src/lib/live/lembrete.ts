@@ -24,7 +24,7 @@ export type ResultadoCronLive = {
 };
 
 /**
- * F078 — dois disparos por ocorrência da live: véspera e pouco antes.
+ * F079 — dois disparos por ocorrência da live: véspera e pouco antes.
  * Elegibilidade e dedupe seguem o mesmo padrão do F075
  * (`dispararReguaSemAcesso48h`), trocando o relógio: aqui é a distância
  * até `liveAt`, não o `lastSeenAt`.
@@ -91,7 +91,7 @@ export async function dispararLembretesLive(
       resultado.sent += 1;
     } catch (err) {
       resultado.errors += 1;
-      console.error("[F078] falha ao enviar lembrete de live", user.id, err);
+      console.error("[F079] falha ao enviar lembrete de live", user.id, err);
     }
   }
 

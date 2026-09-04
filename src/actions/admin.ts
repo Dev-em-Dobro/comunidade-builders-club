@@ -290,7 +290,7 @@ export async function resolveDeniedLoginAction(formData: FormData) {
   revalidatePath("/admin");
 }
 
-/** F078 — regra padrão da live + exceção pontual (nextOverrideAt). */
+/** F079 — regra padrão da live + exceção pontual (nextOverrideAt). */
 export async function updateLiveScheduleAction(formData: FormData) {
   await requireAdmin();
 
