@@ -14,7 +14,7 @@ export function AdminGiftMetrics({ rows }: { rows: UtmPostMetric[] }) {
   if (rows.length === 0) {
     return (
       <p className="mt-4 text-sm text-muted">
-        Ainda não há visitas nem cadastros com origem de post. Quando a Jaque
+        Ainda não há acessos nem cadastros com origem de post. Quando a Jaque
         mandar o primeiro link, os números aparecem aqui.
       </p>
     );
@@ -31,7 +31,7 @@ export function AdminGiftMetrics({ rows }: { rows: UtmPostMetric[] }) {
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <p className="font-mono text-sm font-semibold">{r.label}</p>
               <p className="text-xs text-muted">
-                {r.visitas} {r.visitas === 1 ? "visita" : "visitas"} ·{" "}
+                {r.acessos} {r.acessos === 1 ? "acesso" : "acessos"} ·{" "}
                 {r.cadastros} {r.cadastros === 1 ? "cadastro" : "cadastros"} ·{" "}
                 {r.assinaramPlano}{" "}
                 {r.assinaramPlano === 1 ? "assinou plano" : "assinaram plano"}
@@ -42,7 +42,7 @@ export function AdminGiftMetrics({ rows }: { rows: UtmPostMetric[] }) {
           <div className="mt-3 overflow-x-auto">
             {r.pessoas.length === 0 ? (
               <p className="text-sm text-muted">
-                Só visitas — ninguém se cadastrou por este post ainda.
+                Só acessos — ninguém se cadastrou por este post ainda.
               </p>
             ) : (
               <table className="w-full text-left text-sm">

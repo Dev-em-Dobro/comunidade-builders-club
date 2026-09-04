@@ -12,29 +12,30 @@ datasource db {
 // ---------------------------------------------------------------------------
 
 model User {
-  id            String    @id
+  id            String   @id
   name          String
   email         String
-  emailVerified Boolean   @default(false)
+  emailVerified Boolean  @default(false)
   image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   sessions Session[]
   accounts Account[]
 
-  profile         Profile?
-  membership      Membership?
-  posts           Post[]
-  comments        Comment[]
-  reactions       Reaction[]
-  notifications   Notification[] @relation("NotificationRecipient")
-  actorNotifs     Notification[] @relation("NotificationActor")
-  lessonProgress  LessonProgress[]
-  postViews       PostView[]
-  legalAcceptances LegalAcceptance[]
+  profile                Profile?
+  membership             Membership?
+  posts                  Post[]
+  comments               Comment[]
+  reactions              Reaction[]
+  notifications          Notification[]          @relation("NotificationRecipient")
+  actorNotifs            Notification[]          @relation("NotificationActor")
+  lessonProgress         LessonProgress[]
+  postViews              PostView[]
+  legalAcceptances       LegalAcceptance[]
   notificationEmailSends NotificationEmailSend[]
-  reguaEmailSends ReguaEmailSend[]
+  reguaEmailSends        ReguaEmailSend[]
+  liveReminderSends      LiveReminderSend[]
 
   @@unique([email])
   @@map("user")
@@ -126,44 +127,44 @@ enum NotificationType {
 }
 
 model Profile {
-  id             String    @id @default(cuid())
-  userId         String    @unique
-  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  displayName    String
-  bio            String?
-  avatarUrl      String?
+  id                 String    @id @default(cuid())
+  userId             String    @unique
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  displayName        String
+  bio                String?
+  avatarUrl          String?
   /// F048 — null = ainda não viu Boas-vindas (redirect no 1º acesso ao feed).
-  welcomeSeenAt  DateTime? @map("welcome_seen_at")
+  welcomeSeenAt      DateTime? @map("welcome_seen_at")
   /// F073 — e-mail agrupado de resposta (opt-out). Reação nunca entra.
-  notifyRepliesEmail Boolean @default(true) @map("notify_replies_email")
+  notifyRepliesEmail Boolean   @default(true) @map("notify_replies_email")
   /// F075 — coluna legado. O cron não lê: régua dispara sem opt-out.
-  notifyReguaEmail Boolean @default(true) @map("notify_regua_email")
+  notifyReguaEmail   Boolean   @default(true) @map("notify_regua_email")
   /// F075 — último heartbeat logado (poll). Null = relógio ainda não armou.
-  lastSeenAt     DateTime? @map("last_seen_at")
-  joinedAt       DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  lastSeenAt         DateTime? @map("last_seen_at")
+  joinedAt           DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
   @@index([lastSeenAt])
   @@map("profile")
 }
 
 model Membership {
-  id        String           @id @default(cuid())
-  userId    String           @unique
-  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  status    MembershipStatus @default(pending)
+  id               String           @id @default(cuid())
+  userId           String           @unique
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status           MembershipStatus @default(pending)
   /// F041/F053 — free | pro | elite (`paid` legado = pro).
-  tier      MembershipTier   @default(free)
-  role      Role             @default(member)
+  tier             MembershipTier   @default(free)
+  role             Role             @default(member)
   /// F059 — origem do cadastro. Gravado SÓ na criação, nunca em update.
-  originUtmContent String?   @map("origin_utm_content")
-  originGiftSlug   String?   @map("origin_gift_slug")
-  originAt         DateTime? @map("origin_at")
+  originUtmContent String?          @map("origin_utm_content")
+  originGiftSlug   String?          @map("origin_gift_slug")
+  originAt         DateTime?        @map("origin_at")
   /// F058 — cache da última versão legal aceita. Fonte da verdade é
   /// `legal_acceptance`; aqui só para o hot path do bootstrap não custar query.
-  termosVersao String?       @map("termos_versao")
-  createdAt DateTime         @default(now())
-  updatedAt DateTime         @updatedAt
+  termosVersao     String?          @map("termos_versao")
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
 
   @@index([status])
   @@index([tier])
@@ -236,30 +237,30 @@ model Space {
 }
 
 model Post {
-  id             String    @id @default(cuid())
-  spaceId        String
-  space          Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  authorId       String
-  author         User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  id            String    @id @default(cuid())
+  spaceId       String
+  space         Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  authorId      String
+  author        User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   /// F018 — título gerado automaticamente a partir do body.
-  title          String    @default("")
-  body           String
+  title         String    @default("")
+  body          String
   /// F059 — presente publicável: slug preenchido = leitura pública liberada.
-  slug           String?   @unique
-  imageUrl       String?
-  linkUrl        String?
-  videoUrl       String?
-  pinnedAt       DateTime?
-  commentCount   Int       @default(0)
-  reactionCount  Int       @default(0)
+  slug          String?   @unique
+  imageUrl      String?
+  linkUrl       String?
+  videoUrl      String?
+  pinnedAt      DateTime?
+  commentCount  Int       @default(0)
+  reactionCount Int       @default(0)
   /// F018 — denormalizado: contagem de PostView (leitores únicos).
-  viewCount      Int       @default(0)
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  viewCount     Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
-  comments  Comment[]
-  reactions Reaction[]
-  views     PostView[]
+  comments   Comment[]
+  reactions  Reaction[]
+  views      PostView[]
   emailSends NotificationEmailSend[]
 
   @@index([spaceId, pinnedAt, createdAt])
@@ -299,19 +300,19 @@ model GiftVisit {
 }
 
 model Comment {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   postId        String
-  post          Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  post          Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
   authorId      String
-  author        User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  author        User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   /// F015 — reply sob comentário raiz (1 nível).
   parentId      String?
   parent        Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
   replies       Comment[] @relation("CommentReplies")
   body          String
-  reactionCount Int      @default(0)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  reactionCount Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   reactions Reaction[]
 
@@ -381,6 +382,38 @@ model ReguaEmailSend {
 
   @@index([userId, trigger, sentAt])
   @@map("regua_email_send")
+}
+
+/// F079 — horário da próxima live. Linha única (config, não catálogo).
+/// Regra padrão (weekday/hour/minute) + exceção pontual (nextOverrideAt),
+/// que some sozinha da conta assim que fica no passado.
+model LiveSchedule {
+  id             String    @id @default(cuid())
+  /// 0=domingo … 6=sábado. Default terça.
+  weekday        Int       @default(2)
+  hour           Int       @default(20)
+  minute         Int       @default(0)
+  nextOverrideAt DateTime? @map("next_override_at")
+  /// Link da sala (Zoom). CTA do e-mail e da faixa; null cai pro Club.
+  zoomUrl        String?   @map("zoom_url")
+  updatedAt      DateTime  @updatedAt
+
+  @@map("live_schedule")
+}
+
+/// F079 — um envio por (destinatário, trigger, ocorrência da live).
+model LiveReminderSend {
+  id      String   @id @default(cuid())
+  userId  String
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// "vespera" | "pouco_antes"
+  trigger String
+  /// startsAt exato da ocorrência avisada — dedupe por ocorrência, não por dia.
+  liveAt  DateTime @map("live_at")
+  sentAt  DateTime @default(now())
+
+  @@index([userId, trigger, liveAt])
+  @@map("live_reminder_send")
 }
 
 // ---------------------------------------------------------------------------

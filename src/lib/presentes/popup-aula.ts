@@ -18,16 +18,21 @@ import { PROMESSA_PRIMEIRO_CLIENTE } from "@/lib/membership/checkout";
 export const AULA_ABERTURA_HREF = `/aulas/${FASE_1_M01_SLUG}/aula-introducao-builders-club`;
 
 /**
- * Um minuto de leitura antes de interromper (decisão 1).
+ * Zero: a modal abre assim que a página hidrata (decisão 1).
  *
- * Não é número escolhido no olho: é o que sustenta a exceção à regra da F063
- * de não colocar oferta antes do conteúdo. Quem baixar isso está mudando a
- * decisão de produto, não ajustando um parâmetro — a modal deixa de chegar
- * depois da leitura e passa a chegar durante.
+ * Era 60.000 até 04/09/2026, e aquele minuto de leitura era o único argumento
+ * que sustentava a exceção à regra da F063 de não pôr oferta antes do conteúdo.
+ * Com zero, a oferta chega antes de qualquer leitura — decisão do dono do
+ * produto, tomada com o número do funil na mesa.
  *
- * Esteve em 10s entre 04/09/2026 e o mesmo dia, só para o QA em HML.
+ * O `<article>` ainda pinta antes: isto é client component e o efeito só roda
+ * depois da hidratação. Não é gate de servidor — quem fecha lê o Presente
+ * inteiro.
+ *
+ * Se a leitura do Presente cair, ou se chegar reclamação de tráfego frio, este
+ * é o número que volta.
  */
-export const POPUP_DELAY_MS = 60_000;
+export const POPUP_DELAY_MS = 0;
 
 export const POPUP_AULA = {
   eyebrow: "Aulas liberadas",
