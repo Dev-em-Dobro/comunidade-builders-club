@@ -28,6 +28,15 @@ type Props = {
    * que aparecer no DOM.
    */
   formId?: string;
+  /**
+   * F078 — a pop-up pede só o e-mail. Um campo em vez de três é a alavanca
+   * mais barata que existe no topo do funil; o `displayName` cai no fallback
+   * do bootstrap (o trecho antes do `@`) até a pessoa completar o perfil.
+   *
+   * O formulário do rodapé mantém `true`: ali a pessoa já leu o Presente
+   * inteiro e o atrito de dois campos custa menos.
+   */
+  pedirNome?: boolean;
 };
 
 export function GiftSignupForm({
@@ -40,6 +49,7 @@ export function GiftSignupForm({
   alreadyMemberHref,
   redirectTo,
   formId = "cadastro-presente",
+  pedirNome = true,
 }: Props) {
   const router = useRouter();
   const [step, setStep] = useState<Step>("form");
@@ -78,10 +88,15 @@ export function GiftSignupForm({
     setError(null);
     try {
       const name = `${firstName} ${lastName}`.replace(/\s+/g, " ").trim();
+      /**
+       * F078 — sem nome, o campo não vai. Mandar string vazia faria o Better
+       * Auth criar o usuário com `name: ""`, e aí o fallback do bootstrap
+       * (`name || email.split("@")[0]`) perderia a chance de agir.
+       */
       const { error: err } = await authClient.signIn.emailOtp({
         email,
         otp,
-        name,
+        ...(name ? { name } : {}),
       });
       if (err) {
         setError(
@@ -95,10 +110,9 @@ export function GiftSignupForm({
         );
         return;
       }
-      const result = await completarCadastroPresenteAction({
-        firstName,
-        lastName,
-      });
+      const result = await completarCadastroPresenteAction(
+        pedirNome ? { firstName, lastName } : {},
+      );
       if (result.alreadyHadAccount) {
         setAlreadyHadAccount(true);
         window.setTimeout(() => router.refresh(), 2200);
@@ -207,30 +221,32 @@ export function GiftSignupForm({
       <p className="mt-2 text-sm leading-relaxed text-muted">
         {subhead}
       </p>
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        <label className="text-xs font-medium text-muted">
-          Nome
-          <input
-            className="input mt-1.5"
-            required
-            maxLength={60}
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            autoComplete="given-name"
-          />
-        </label>
-        <label className="text-xs font-medium text-muted">
-          Sobrenome
-          <input
-            className="input mt-1.5"
-            required
-            maxLength={60}
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            autoComplete="family-name"
-          />
-        </label>
-      </div>
+      {pedirNome ? (
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <label className="text-xs font-medium text-muted">
+            Nome
+            <input
+              className="input mt-1.5"
+              required
+              maxLength={60}
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              autoComplete="given-name"
+            />
+          </label>
+          <label className="text-xs font-medium text-muted">
+            Sobrenome
+            <input
+              className="input mt-1.5"
+              required
+              maxLength={60}
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              autoComplete="family-name"
+            />
+          </label>
+        </div>
+      ) : null}
       <label className="mt-3 block text-xs font-medium text-muted">
         E-mail
         <input

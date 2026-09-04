@@ -81,10 +81,32 @@ Um formulário paralelo na modal teria que reimplementar isso e erraria a origem
 silêncio, que é exatamente o modo de falha que a F059 passou uma spec inteira
 evitando.
 
-Nome e sobrenome continuam obrigatórios: `completarCadastroPresenteAction` os exige
-(`z.string().trim().min(1)`) e o `displayName` sai deles. Reduzir para só e-mail
-é uma mudança de fluxo de cadastro, não de pop-up — fica para uma feature própria,
-onde dê para medir o efeito isolado.
+### 2.1. A modal pede só o e-mail
+
+Decidido em 04/09/2026, revertendo o rascunho desta spec, que mantinha nome e
+sobrenome obrigatórios. Um campo em vez de três é a alavanca mais barata que
+existe no topo do funil, e é lá que o número dói.
+
+`completarCadastroPresenteAction` passa a aceitar nome opcional. Quem não manda
+não fica sem identidade: `ensureMemberBootstrap` já resolvia
+`displayName: name || email.split("@")[0] || "Membro"` — a pessoa entra como o
+trecho antes do `@`.
+
+Dois cuidados que o código precisa ter, e tem:
+
+- **Não mandar `name: ""` para o Better Auth.** String vazia criaria o usuário
+  com nome vazio e o fallback do bootstrap perderia a vez. O campo é omitido.
+- **Não sobrescrever com vazio na action.** Sem `displayName` montado, ela
+  retorna sem escrever, em vez de apagar o que o bootstrap acabou de gravar.
+
+O formulário do **rodapé** continua pedindo nome e sobrenome (`pedirNome`
+default `true`): ali a pessoa já leu o Presente inteiro e o atrito de dois
+campos custa menos.
+
+Custo assumido: até completar o perfil, a pessoa aparece como `joao.silva` no
+feed e nas Conquistas. "Completar o perfil" é o passo 1 da trilha de
+Boas-vindas ([F063](F063-funil-presente-conta-free.md#4-trilha-de-boas-vindas-por-tier)),
+que é justamente onde ela cai depois de assistir a aula.
 
 ### 3. Cadastrou pela modal, vai para a aula — não para Boas-vindas
 
@@ -182,7 +204,8 @@ timer, não o formulário.
 | `src/lib/presentes/popup-aula.ts` | novo — copy, href e delay |
 | `src/lib/presentes/popup-aula.test.ts` | novo — copy por número de aulas e destino |
 | `src/app/presentes/presente-aula-popup.tsx` | novo — a modal |
-| `src/components/gift-signup-form.tsx` | ganha `redirectTo` (default: Boas-vindas) |
+| `src/components/gift-signup-form.tsx` | ganha `redirectTo`, `formId` e `pedirNome` |
+| `src/actions/gifts.ts` | nome vira opcional; sem nome, não sobrescreve o fallback |
 | `src/app/presentes/presente-publico.tsx` | conta as aulas e monta a modal só para sessão anônima |
 
 Sem migration. Sem env nova. Sem mudança no `GiftVisit` nem na atribuição.
@@ -230,6 +253,10 @@ depende de navegador fica aberto até a validação em Preview.
 - [x] A feature não persiste nada no navegador
 - [x] E-mail capturado dentro da modal, pelo `GiftSignupForm`
 - [x] Um `GiftSignupForm` por vez no DOM tem id único (`formId`)
+- [x] A modal pede **só o e-mail**; o rodapé segue pedindo nome e sobrenome
+- [x] Cadastro sem nome não grava `displayName` vazio (fallback do bootstrap)
+- [x] Termos e Política aparecem na modal — vêm com o `GiftSignupForm`
+- [ ] Cadastro pela modal cria conta com `displayName` = trecho antes do `@`
 - [x] Cadastro pelo formulário do rodapé continua caindo em Boas-vindas
 - [x] Quem já tinha conta vê a mensagem de sempre, sem redirecionar
 - [x] `npx tsc --noEmit` limpo
