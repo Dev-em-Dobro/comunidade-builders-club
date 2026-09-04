@@ -2,27 +2,40 @@
 
 ## Domínios (Cloudflare → Vercel)
 
-
-| Ambiente    | Domínio                                | Branch Vercel     |
-| ----------- | -------------------------------------- | ----------------- |
-| Produção    | `builders-club.devemdobro.com`         | `main`            |
-| Homologação | `staging.builders-club.devemdobro.com` | `feature/preview` |
+Projeto Vercel: `dev-em-dobros-projects/comunidade-builders-club`.
 
 
-Sugestão alinhada ao Orion (`staging.orion-lead-hunter…`). Alternativas: `hml.builders-club…` ou `preview.builders-club…`.
+| Ambiente    | Domínio                                       | Branch Vercel     |
+| ----------- | --------------------------------------------- | ----------------- |
+| Produção    | `comunidade-builders-club.devemdobro.com`     | `main`            |
+| Homologação | `hml-comunidade-builders-club.devemdobro.com` | `feature/preview` |
+
+
+> ⚠️ **`builders-club.devemdobro.com` não é este app.** É uma landing page
+> estática, de outro projeto Vercel. Ela responde 404 em `/login`, `/planos`,
+> `/presentes/<slug>` e nos webhooks. Link publicado nesse host — em DM,
+> automação ou anúncio — não abre o Presente, não grava `GiftVisit` e não cria
+> cookie de origem (F059). Até 04/09/2026 este doc afirmava que ela era a
+> produção; era o engano que esta tabela corrige.
+
+> **HML está atrás do Vercel Deployment Protection (SSO).** Request deslogado é
+> redirecionado para `vercel.com/sso-api`. Para abrir, esteja logado na Vercel
+> com acesso ao time `Dev em Dobro's projects` — aba anônima não passa. O SSO é
+> da Vercel, não do app: para testar a jornada anônima do Presente, deslogue do
+> **Club**, não da Vercel.
 
 ### Cloudflare (DNS)
 
-Para cada hostname (prod e staging):
+Para cada hostname (prod e HML):
 
-1. Tipo **CNAME**, nome `builders-club` ou `staging.builders-club`
+1. Tipo **CNAME**, nome `comunidade-builders-club` ou `hml-comunidade-builders-club`
 2. Alvo: `cname.vercel-dns.com` (ou o valor que a Vercel mostrar ao adicionar o domínio)
 3. Proxy Cloudflare: **DNS only** (cinza) na 1ª propagação; depois pode ligar proxy se quiser
 
 Na Vercel → Project → Settings → Domains:
 
-- `builders-club.devemdobro.com` → Production
-- `staging.builders-club.devemdobro.com` → Preview / branch `feature/preview`
+- `comunidade-builders-club.devemdobro.com` → Production
+- `hml-comunidade-builders-club.devemdobro.com` → Preview / branch `feature/preview`
 
 ---
 
@@ -47,7 +60,7 @@ mostram indisponível (não zero).
 | ----------------------- | -------------------------------------- | ---------------------------------------------- | ----------------------- |
 | `DATABASE_URL`          | Neon **prod**                          | Neon **HML**                                   | Docker `127.0.0.1:5433` |
 | `BETTER_AUTH_SECRET`    | secret forte (único)                   | secret forte (**outro** do prod)               | gerado local            |
-| `BETTER_AUTH_URL`       | `https://builders-club.devemdobro.com` | `https://staging.builders-club.devemdobro.com` | `http://localhost:3000` |
+| `BETTER_AUTH_URL`       | `https://comunidade-builders-club.devemdobro.com` | `https://hml-comunidade-builders-club.devemdobro.com` | `http://localhost:3000` |
 | `EMAIL_PROVIDER`        | `resend`                               | `resend` (ou mailpit só local)                 | `mailpit`               |
 | `NEXT_PUBLIC_CLARITY_PROJECT_ID` | Project ID prod (F074, projeto Clarity próprio) | Project ID **staging** (outro projeto) | vazio = desligado |
 | `BOOTSTRAP_ADMIN_EMAIL` | seu e-mail admin                       | mesmo ou de teste                              | seu e-mail              |
@@ -71,7 +84,9 @@ mostram indisponível (não zero).
 Na Hubla, configure o webhook apontando para:
 
 - Prod: `https://comunidade-builders-club.devemdobro.com/api/webhooks/hubla`
-- Staging: `https://staging.…/api/webhooks/hubla` (se existir)
+- HML: `https://hml-comunidade-builders-club.devemdobro.com/api/webhooks/hubla`
+  (o SSO da Vercel barra chamada de fora; para a Hubla alcançar o HML é preciso
+  liberar Protection Bypass no projeto)
 
 Header esperado: `x-hubla-token` = valor de `HUBLA_WEBHOOK_TOKEN`.
 
@@ -114,8 +129,11 @@ Preview / HML: o cron da Vercel **não** roda. QA:
 
 ```
 curl -sS -H "Authorization: Bearer $CRON_SECRET" \
-  https://<preview>.vercel.app/api/cron/regua
+  https://hml-comunidade-builders-club.devemdobro.com/api/cron/regua
 ```
+
+O SSO da Vercel responde antes do app: sem bypass, este `curl` devolve 302 para
+`vercel.com/sso-api`, não o JSON do endpoint.
 
 O disparo não envia para quem ainda tem `lastSeenAt` null (evita blast no
 dia do migrate). Primeiro heartbeat é o poll do sininho.
@@ -131,8 +149,8 @@ dia do migrate). Primeiro heartbeat é o poll do sininho.
 
 No Google Cloud Console → Authorized redirect URIs (Better Auth):
 
-- `https://builders-club.devemdobro.com/api/auth/callback/google`
-- `https://staging.builders-club.devemdobro.com/api/auth/callback/google`
+- `https://comunidade-builders-club.devemdobro.com/api/auth/callback/google`
+- `https://hml-comunidade-builders-club.devemdobro.com/api/auth/callback/google`
 - `http://localhost:3000/api/auth/callback/google`
 
 Authorized JavaScript origins: os três hosts acima (sem path).
@@ -187,7 +205,7 @@ Só liberar alunos quando **tudo** abaixo estiver ok:
 
 1. [ ] Branch `feature/preview` com F013–F017 + F011 (aulas) deployada na Vercel Preview
 2. [ ] Envs Preview + Production preenchidas (matriz acima, incl. `HUBLA_*`)
-3. [ ] Domínios staging + prod apontados (Cloudflare → Vercel)
+3. [x] Domínios HML + prod apontados (Cloudflare → Vercel)
 4. [x] `npm run db:migrate:staging` (HML)
 5. [ ] Seed spaces + allowlist nos Neons (repetir se Neon novo)
 6. [ ] Webhook Hubla apontando staging (teste compra/cancelamento) e depois prod
@@ -195,4 +213,22 @@ Só liberar alunos quando **tudo** abaixo estiver ok:
 8. [ ] PR `feature/preview` → `main` após QA
 9. [ ] `npm run db:migrate:prod -- --confirm` após merge em `main`
 10. [ ] Comunicação aos alunos / liberação pública
+
+---
+
+## Verificação dos domínios — 04/09/2026
+
+Os hosts desta página foram conferidos contra o que está no ar, não contra a
+intenção de quem escreveu. Repetir antes de publicar link novo em automação:
+
+| Host | `/login` | `/presentes/saga` | `POST /api/webhooks/hubla` | O que é |
+|---|---|---|---|---|
+| `comunidade-builders-club.devemdobro.com` | 200 | 200 | 401 | **o app** |
+| `builders-club.devemdobro.com` | 404 | 404 | 404 | landing estática, outro projeto |
+| `hml-comunidade-builders-club.devemdobro.com` | 302 SSO | 302 SSO | 302 SSO | HML atrás do Deployment Protection |
+| `staging.builders-club.devemdobro.com` | — | — | — | **NXDOMAIN**, nunca existiu |
+
+O alias de HML saiu de `vercel inspect` no deploy de `feature/preview`. O 401 no
+webhook é a resposta certa: rota existe e recusou a chamada sem token. 404 é
+rota inexistente — o sinal de que o host está errado.
 

@@ -344,14 +344,24 @@ Não há data da compra Hubla na tela — só o plano de agora.
 | **F020** | cookie de atribuição e `GiftVisit` entram na política de privacidade |
 | **01-domain-model** | termo novo: **Presente** |
 
-## Bloqueio externo
+## Bloqueio externo — ✅ resolvido em 04/09/2026
 
-**Confirmar o domínio de produção na Vercel antes de qualquer link ir ao ar.**
-O repositório tem dois e eles discordam: `README.md:10` e
-`docs/deploy-vercel.md:8` dizem `builders-club.devemdobro.com` (e é para lá que
-apontam `BETTER_AUTH_URL` e o callback do Google), enquanto os webhooks
-(`deploy-vercel.md:69`) e `scripts/perf-lighthouse.mts:23` usam
-`comunidade-builders-club.devemdobro.com`.
+**O host de produção é `comunidade-builders-club.devemdobro.com`.** Quem estava
+certo eram os webhooks e o `scripts/perf-lighthouse.mts:23`.
+
+O `builders-club.devemdobro.com` do `README.md` e do `docs/deploy-vercel.md` não
+é este app: é uma landing estática, de outro projeto Vercel, que responde **404**
+em `/login`, `/planos`, `/presentes/<slug>` e no webhook da Hubla. Os dois docs
+foram corrigidos; a tabela de evidência está em
+[`docs/deploy-vercel.md`](../../docs/deploy-vercel.md#verificação-dos-domínios--04092026).
+
+O texto original do bloqueio, para memória do que motivou a checagem:
+
+> O repositório tem dois e eles discordam: `README.md:10` e
+> `docs/deploy-vercel.md:8` dizem `builders-club.devemdobro.com` (e é para lá que
+> apontam `BETTER_AUTH_URL` e o callback do Google), enquanto os webhooks
+> (`deploy-vercel.md:69`) e `scripts/perf-lighthouse.mts:23` usam
+> `comunidade-builders-club.devemdobro.com`.
 
 O cookie de origem é setado no host que a pessoa acessa. Se ela chega em um host
 e o cadastro roda no outro, **o cookie fica no host errado e a origem morre em

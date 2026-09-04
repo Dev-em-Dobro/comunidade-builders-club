@@ -121,7 +121,7 @@ flowchart TD
 Link que a automação passa a usar (um `utm_content` **por post**):
 
 ```
-https://builders-club.devemdobro.com/presentes/agent-reach
+https://comunidade-builders-club.devemdobro.com/presentes/agent-reach
   ?utm_source=instagram
   &utm_medium=dm
   &utm_campaign=presentes
@@ -247,8 +247,14 @@ Comentários no space Presentes ficam desligados (conteúdo, não conversa).
 - Atribuir upgrade free → pago ao post (a origem já está no membro)
 - OTP na tela `/login` (Google e magic link permanecem lá)
 - Teste ponta a ponta **dentro do Instagram** — isso é Preview/staging, não
-  produção. Confirmar o domínio do link (`builders-club.devemdobro.com`)
-  antes de a automação divulgar: cookie no host errado mata a origem.
+  produção.
+
+> ✅ **Domínio confirmado em 04/09/2026.** O host do app é
+> `comunidade-builders-club.devemdobro.com`. O `builders-club.devemdobro.com`
+> que este doc trazia antes é uma landing estática de outro projeto e dá 404 em
+> `/presentes/<slug>` — link do DM apontando para lá não abre o Presente, não
+> grava `GiftVisit` e não cria cookie de origem. Evidência em
+> [`docs/deploy-vercel.md`](deploy-vercel.md#verificação-dos-domínios--04092026).
 
 ---
 
