@@ -13,6 +13,7 @@ import { UpgradeProvider, useUpgrade } from "@/components/upgrade-modal";
 import { UserMenu } from "@/components/user-menu";
 import { isFreeSpaceSlug } from "@/lib/membership/capabilities";
 import { isFreePublishSpace } from "@/lib/spaces/constants";
+import { LiveBanner } from "@/components/live-banner";
 import {
   ICON_ADMIN,
   ICON_AULAS,
@@ -50,6 +51,8 @@ function OrionIcon() {
 }
 
 type SpaceLink = { id: string; slug: string; name: string };
+/** F078 — resolvido em /api/nav, mesmo request que hidrata os spaces. */
+type LiveInfo = { liveAt: string; calendarUrl: string };
 
 function LockIcon({ className }: { className?: string }) {
   return (
@@ -408,6 +411,7 @@ function ShellInner({
   spaces,
   avatarUrl,
   notifPreview,
+  live,
 }: {
   children: React.ReactNode;
   displayName: string;
@@ -420,6 +424,7 @@ function ShellInner({
   spaces: SpaceLink[];
   avatarUrl?: string | null;
   notifPreview: NotifPreview[];
+  live: LiveInfo | null;
 }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const pathname = usePathname();
@@ -522,6 +527,9 @@ function ShellInner({
       ) : null}
 
       <div className="relative flex min-w-0 flex-1 flex-col">
+        {live ? (
+          <LiveBanner liveAt={live.liveAt} calendarUrl={live.calendarUrl} />
+        ) : null}
         <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-border/80 bg-background/85 px-4 py-3 backdrop-blur-md md:hidden">
           <button
             type="button"
@@ -596,6 +604,7 @@ export function AppShellClient({
   const search = useSearchParams();
   const autoOpen = search.get("upgrade") === "1";
   const [spaces, setSpaces] = useState(initialSpaces);
+  const [live, setLive] = useState<LiveInfo | null>(null);
 
   useEffect(() => {
     if (initialSpaces.length > 0) {
@@ -610,13 +619,19 @@ export function AppShellClient({
       try {
         const res = await fetch("/api/nav", { cache: "no-store" });
         if (!res.ok || cancelled) return;
-        const data = (await res.json()) as { spaces?: SpaceLink[] };
+        const data = (await res.json()) as {
+          spaces?: SpaceLink[];
+          live?: LiveInfo;
+        };
         if (
           !cancelled &&
           Array.isArray(data.spaces) &&
           data.spaces.length > 0
         ) {
           setSpaces(data.spaces);
+        }
+        if (!cancelled && data.live) {
+          setLive(data.live);
         }
       } catch {
         /* ignore */
@@ -642,6 +657,7 @@ export function AppShellClient({
         orionUrl={orionUrl}
         unread={unread}
         spaces={spaces}
+        live={live}
         avatarUrl={avatarUrl}
         notifPreview={notifPreview}
       >
