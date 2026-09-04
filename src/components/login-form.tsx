@@ -169,13 +169,28 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
                 </p>
               ) : null}
 
+              {/*
+               * F078 — mesma razão do `gift-signup-form`: em aba nova, ler os
+               * Termos não custa o e-mail digitado nem o código de 6 dígitos
+               * que acabou de chegar (o OTP expira em 10 min).
+               */}
               <p className="pt-2 text-center text-xs text-muted">
                 Ao continuar, você concorda com os{" "}
-                <a href="/termos" className="text-accent hover:underline">
+                <a
+                  href="/termos"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-accent hover:underline"
+                >
                   Termos de Uso
                 </a>{" "}
                 e a{" "}
-                <a href="/privacidade" className="text-accent hover:underline">
+                <a
+                  href="/privacidade"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-accent hover:underline"
+                >
                   Política de Privacidade
                 </a>
                 .

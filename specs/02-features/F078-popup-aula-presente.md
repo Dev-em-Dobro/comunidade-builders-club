@@ -3,12 +3,6 @@
 ## Status
 Rascunho — 2026-09-04
 
-> ⚠️ **Dívida aberta em HML: `POPUP_DELAY_MS` está em 10s, não em 60s.**
-> Baixado em 04/09/2026 para encurtar o ciclo de QA — cada tentativa em HML
-> custava um minuto parado. **Voltar para `60_000` antes do merge em `main`.**
-> Dez segundos interrompem quase na abertura do artigo, e o minuto de leitura
-> antes é justamente o que sustenta a exceção à F063 na seção abaixo.
-
 Depende de: [F059](F059-presentes-publicos-atribuicao.md) (Presente público, OTP e
 atribuição por `utm_content`), [F063](F063-funil-presente-conta-free.md) (bloco da
 promessa e razão do cadastro), [F065](F065-aulas-fase-1-free.md) (o módulo
@@ -204,7 +198,8 @@ timer, não o formulário.
 | `src/lib/presentes/popup-aula.ts` | novo — copy, href e delay |
 | `src/lib/presentes/popup-aula.test.ts` | novo — copy por número de aulas e destino |
 | `src/app/presentes/presente-aula-popup.tsx` | novo — a modal |
-| `src/components/gift-signup-form.tsx` | ganha `redirectTo`, `formId` e `pedirNome` |
+| `src/components/gift-signup-form.tsx` | ganha `redirectTo`, `formId` e `pedirNome`; links legais em aba nova |
+| `src/components/login-form.tsx` | links legais em aba nova (mesmo motivo) |
 | `src/actions/gifts.ts` | nome vira opcional; sem nome, não sobrescreve o fallback |
 | `src/app/presentes/presente-publico.tsx` | conta as aulas e monta a modal só para sessão anônima |
 
@@ -269,8 +264,9 @@ depende de navegador fica aberto até a validação em Preview.
 - [ ] Fechar e recarregar a página faz a modal voltar
 - [ ] Foco entra na modal e volta ao fechar; scroll do fundo trava e destrava
 - [ ] Conferido no tema claro e escuro, mobile (390px) e desktop (1280px)
+- [x] `POPUP_DELAY_MS` em `60_000` (esteve em 10s durante o QA de 04/09/2026)
+- [x] Termos e Política abrem em aba nova, sem custar o e-mail digitado
 - [ ] Preview / HML antes de produção
-- [ ] **`POPUP_DELAY_MS` de volta em `60_000`** — está em 10s para o QA em HML
 
 ## Verificação
 

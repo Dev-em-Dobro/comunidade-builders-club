@@ -44,9 +44,12 @@ describe("destino do cadastro pela modal (F078)", () => {
 });
 
 describe("delay da modal (F078)", () => {
-  it("é positivo e não dispara na abertura da página", () => {
-    // Guarda contra alguém zerar o delay: modal instantânea é o pedágio que a
-    // F063 proíbe, sem nenhuma leitura antes para justificá-lo.
-    assert.ok(POPUP_DELAY_MS >= 10_000, `delay curto demais: ${POPUP_DELAY_MS}`);
+  it("é o minuto de leitura da decisão 1, não um valor de QA", () => {
+    // Este teste existe porque o valor já foi para 10s durante o QA em HML e
+    // quase seguiu assim. Baixar o delay não é ajuste de parâmetro: é mudar a
+    // decisão de produto que sustenta a exceção à F063 — a modal deixa de vir
+    // depois da leitura e passa a vir durante. Se for para mudar, muda a spec
+    // e este teste junto, de propósito.
+    assert.equal(POPUP_DELAY_MS, 60_000);
   });
 });

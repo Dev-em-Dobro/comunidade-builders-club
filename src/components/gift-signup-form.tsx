@@ -267,13 +267,28 @@ export function GiftSignupForm({
       <button type="submit" className="btn-primary mt-4 w-full" disabled={loading}>
         {loading ? "Enviando…" : "Receber código"}
       </button>
+      {/*
+       * F078 — aba nova, obrigatoriamente. Na mesma aba, ler os Termos custa o
+       * e-mail já digitado (e, na pop-up, a modal inteira). Ninguém volta para
+       * recomeçar um cadastro: a leitura do documento legal viraria desistência.
+       */}
       <p className="mt-3 text-center text-xs text-muted">
         Ao continuar, você concorda com os{" "}
-        <a href="/termos" className="text-accent hover:underline">
+        <a
+          href="/termos"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-accent hover:underline"
+        >
           Termos de Uso
         </a>{" "}
         e a{" "}
-        <a href="/privacidade" className="text-accent hover:underline">
+        <a
+          href="/privacidade"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-accent hover:underline"
+        >
           Política de Privacidade
         </a>
         .
