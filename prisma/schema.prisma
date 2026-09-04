@@ -33,6 +33,8 @@ model User {
   lessonProgress  LessonProgress[]
   postViews       PostView[]
   legalAcceptances LegalAcceptance[]
+  notificationEmailSends NotificationEmailSend[]
+  reguaEmailSends ReguaEmailSend[]
 
   @@unique([email])
   @@map("user")
@@ -132,9 +134,16 @@ model Profile {
   avatarUrl      String?
   /// F048 — null = ainda não viu Boas-vindas (redirect no 1º acesso ao feed).
   welcomeSeenAt  DateTime? @map("welcome_seen_at")
+  /// F073 — e-mail agrupado de resposta (opt-out). Reação nunca entra.
+  notifyRepliesEmail Boolean @default(true) @map("notify_replies_email")
+  /// F075 — coluna legado. O cron não lê: régua dispara sem opt-out.
+  notifyReguaEmail Boolean @default(true) @map("notify_regua_email")
+  /// F075 — último heartbeat logado (poll). Null = relógio ainda não armou.
+  lastSeenAt     DateTime? @map("last_seen_at")
   joinedAt       DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
+  @@index([lastSeenAt])
   @@map("profile")
 }
 
@@ -251,6 +260,7 @@ model Post {
   comments  Comment[]
   reactions Reaction[]
   views     PostView[]
+  emailSends NotificationEmailSend[]
 
   @@index([spaceId, pinnedAt, createdAt])
   @@index([authorId])
@@ -345,6 +355,32 @@ model Notification {
 
   @@index([recipientId, readAt, createdAt])
   @@map("notification")
+}
+
+/// F073 — último envio de e-mail agrupado por (destinatário, post).
+model NotificationEmailSend {
+  id          String   @id @default(cuid())
+  recipientId String
+  recipient   User     @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  postId      String
+  post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  sentAt      DateTime @default(now())
+  eventCount  Int      @default(1) @map("event_count")
+
+  @@index([recipientId, postId, sentAt])
+  @@map("notification_email_send")
+}
+
+/// F075 — um envio por episódio de ausência (trigger + sentAt).
+model ReguaEmailSend {
+  id      String   @id @default(cuid())
+  userId  String
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trigger String
+  sentAt  DateTime @default(now())
+
+  @@index([userId, trigger, sentAt])
+  @@map("regua_email_send")
 }
 
 // ---------------------------------------------------------------------------

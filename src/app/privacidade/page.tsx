@@ -88,6 +88,12 @@ export default function PrivacidadePage() {
           <li>
             operar a comunidade (feed, notificações, materiais e aulas);
           </li>
+          <li>
+            avisar por e-mail quando alguém responde seu post, seu
+            comentário ou te menciona (no máximo um e-mail a cada 2 horas
+            por post; reações não geram e-mail). Você desliga em
+            Configurações ou no link do próprio e-mail;
+          </li>
           <li>gerenciar quem tem acesso (allowlist / Hubla / admin);</li>
           <li>segurança, prevenção a abuso e suporte;</li>
           <li>cumprir obrigações legais quando aplicável.</li>
@@ -125,9 +131,10 @@ export default function PrivacidadePage() {
             <strong className="font-medium text-foreground">
               Medição (opcional):
             </strong>{" "}
-            só com o seu aceite no aviso de cookies. Enquanto você não aceitar,
-            nenhum script de medição é carregado. Recusar não afeta o acesso à
-            comunidade.
+            só com o seu aceite no aviso de cookies. Aí carregamos o
+            Microsoft Clarity (mapa de calor e gravação de sessão, inputs
+            mascarados). Enquanto você não aceitar, esse script não entra.
+            Recusar não afeta o acesso à comunidade.
           </li>
         </ul>
         <p>
@@ -145,7 +152,8 @@ export default function PrivacidadePage() {
           Compartilhamos dados com subprocessadores necessários ao serviço,
           por exemplo: hospedagem (ex.: Vercel), banco (ex.: Neon), e-mail
           transacional (magic link e código OTP, ex.: Resend), provedor de
-          vídeo das aulas (ex.: Panda Video) e, quando aplicável, a Hubla
+          vídeo das aulas (ex.: Panda Video), Microsoft Clarity (mapa de calor
+          e sessão, só com aceite de medição) e, quando aplicável, a Hubla
           para sincronizar elegibilidade de acesso. Conteúdo que você publica
           na comunidade fica visível aos demais membros ativos. Não vendemos
           dados pessoais.

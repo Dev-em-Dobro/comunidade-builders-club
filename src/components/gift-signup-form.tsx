@@ -121,6 +121,7 @@ export function GiftSignupForm({
         id="cadastro-presente"
         onSubmit={onVerify}
         className="rounded-2xl border border-border/80 bg-card p-6"
+        data-clarity-mask="true"
       >
         <p className="text-sm font-semibold text-foreground">
           Digite o código
@@ -179,6 +180,7 @@ export function GiftSignupForm({
       id="cadastro-presente"
       onSubmit={onSend}
       className="rounded-2xl border border-border/80 bg-card p-6"
+      data-clarity-mask="true"
     >
       <p className="text-sm font-semibold text-foreground">
         {headline}

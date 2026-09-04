@@ -10,6 +10,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
+  CONSENTIMENTO_ANALYTICS_EVENT,
   CONSENTIMENTO_MAX_AGE,
   COOKIE_CONSENTIMENTO,
   precisaDecidir,
@@ -46,6 +47,9 @@ export function CookieConsent() {
   function decidir(decisao: Decisao) {
     gravarDecisao(decisao);
     setVisivel(false);
+    if (decisao === "aceito") {
+      window.dispatchEvent(new Event(CONSENTIMENTO_ANALYTICS_EVENT));
+    }
   }
 
   return (

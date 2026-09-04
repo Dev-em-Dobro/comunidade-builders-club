@@ -6,6 +6,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { GiftSignupForm } from "@/components/gift-signup-form";
 import { MarkdownBody } from "@/lib/markdown";
 import { PostMedia } from "@/components/post-media";
+import { OptimizedMediaImage } from "@/components/optimized-media-image";
 import { previewFromBody } from "@/lib/posts/title";
 import { getOptionalUser } from "@/lib/auth/require-user";
 import { prisma } from "@/lib/db";
@@ -14,6 +15,7 @@ import { getPublicGift, recordGiftVisit } from "@/lib/gifts";
 import { giftLinkView } from "@/lib/gifts/link";
 import { GIFT_UTM_DEFAULTS, sanitizeUtmValue } from "@/lib/gifts/origem";
 import { PresentePromessa } from "@/app/presentes/presente-promessa";
+import { PresenteImersaoCta } from "@/app/presentes/presente-imersao-cta";
 
 /** Âncora do CTA "Criar conta grátis" do bloco de promessa (F063). */
 const FORM_ANCHOR_ID = "criar-conta";
@@ -149,7 +151,30 @@ export async function PresentePublico({
           </div>
         ) : null}
 
+        {/*
+         * F077 — a faixa da imersão é a única coisa acima do artigo, e some
+         * sozinha em 24/09/2026. A oferta do Club continua embaixo, no
+         * PresentePromessa: nada de plano, preço ou cadastro sobe daqui.
+         */}
+        <PresenteImersaoCta utmContent={utm.content} />
+
         <article className="mt-8">
+          {/*
+           * F076 — a capa abre o artigo. Antes, `imageUrl` só saía no PostMedia
+           * lá embaixo, depois do texto: o que era para ser capa chegava como
+           * rodapé, e a página abria sempre com um bloco de texto puro.
+           */}
+          {gift.imageUrl ? (
+            <div className="mb-6 overflow-hidden rounded-2xl bg-surface/60">
+              <OptimizedMediaImage
+                src={gift.imageUrl}
+                alt=""
+                variant="detail"
+                priority
+                className="max-h-[22rem] w-full object-cover"
+              />
+            </div>
+          ) : null}
           <h1 className="reading-title">{title}</h1>
           <p className="mt-4 text-sm text-muted">
             {authorName} ·{" "}
@@ -171,12 +196,8 @@ export async function PresentePublico({
            * card suprimia — sem isso, presentes cujo `linkUrl` não aparece no
            * corpo (whisper-local, hermes, os de teste) ficariam sem link.
            */}
-          <PostMedia
-            imageUrl={gift.imageUrl}
-            videoUrl={gift.videoUrl}
-            linkUrl={gift.linkUrl}
-            priority
-          />
+          {/* F076 — sem `imageUrl` aqui: ela virou a capa acima do título. */}
+          <PostMedia videoUrl={gift.videoUrl} linkUrl={gift.linkUrl} />
         </article>
 
         {/*

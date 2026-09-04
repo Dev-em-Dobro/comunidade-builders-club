@@ -18,6 +18,7 @@ function isProtectedPath(pathname: string): boolean {
     pathname.startsWith("/spaces") ||
     pathname.startsWith("/posts") ||
     pathname.startsWith("/perfil") ||
+    pathname.startsWith("/configuracoes") ||
     pathname.startsWith("/busca") ||
     pathname.startsWith("/notificacoes") ||
     pathname.startsWith("/aulas") ||
