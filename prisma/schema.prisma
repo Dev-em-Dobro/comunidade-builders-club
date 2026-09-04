@@ -384,7 +384,7 @@ model ReguaEmailSend {
   @@map("regua_email_send")
 }
 
-/// F078 — horário da próxima live. Linha única (config, não catálogo).
+/// F079 — horário da próxima live. Linha única (config, não catálogo).
 /// Regra padrão (weekday/hour/minute) + exceção pontual (nextOverrideAt),
 /// que some sozinha da conta assim que fica no passado.
 model LiveSchedule {
@@ -401,7 +401,7 @@ model LiveSchedule {
   @@map("live_schedule")
 }
 
-/// F078 — um envio por (destinatário, trigger, ocorrência da live).
+/// F079 — um envio por (destinatário, trigger, ocorrência da live).
 model LiveReminderSend {
   id      String   @id @default(cuid())
   userId  String

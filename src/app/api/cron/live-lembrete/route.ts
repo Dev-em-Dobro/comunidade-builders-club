@@ -19,7 +19,7 @@ function cronAutorizado(request: Request): boolean {
 }
 
 /**
- * F078 — véspera + pouco antes da live. Mesmo padrão de auth do F075
+ * F079 — véspera + pouco antes da live. Mesmo padrão de auth do F075
  * (`/api/cron/regua`). Granularidade do agendamento (véspera cobre bem com
  * 1x/dia; pouco-antes precisa de disparo mais frequente) é decisão de
  * infra, documentada na spec — a rota já aceita ser chamada com qualquer

@@ -6,7 +6,7 @@ export type LiveScheduleConfig = RegraLiveSchedule & {
   zoomUrl: string | null;
 };
 
-/** Terça 20h — mesmo default documentado na spec (F078). */
+/** Terça 20h — mesmo default documentado na spec (F079). */
 const REGRA_PADRAO: Omit<LiveScheduleConfig, "nextOverrideAt" | "zoomUrl"> = {
   weekday: 2,
   hour: 20,

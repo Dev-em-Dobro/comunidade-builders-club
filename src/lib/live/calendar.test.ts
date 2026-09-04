@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { googleCalendarUrl } from "./calendar";
 
-describe("googleCalendarUrl — F078", () => {
+describe("googleCalendarUrl — F079", () => {
   it("monta início/fim com 60 min de duração em UTC básico", () => {
     const url = googleCalendarUrl({
       liveAt: new Date("2026-09-08T20:00:00.000Z"),

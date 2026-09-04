@@ -1,4 +1,4 @@
-/** F078 — faixa fixa com a próxima live + botão de agenda. Não dispensável. */
+/** F079 — faixa fixa com a próxima live + botão de agenda. Não dispensável. */
 
 function formatarProximaLive(liveAtISO: string): string {
   const d = new Date(liveAtISO);

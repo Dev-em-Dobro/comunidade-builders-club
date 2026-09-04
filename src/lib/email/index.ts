@@ -302,7 +302,7 @@ function wrapLiveHtml(opts: {
 </html>`;
 }
 
-/** F078 — lembrete de live: véspera e pouco antes. Sem opt-out (mesma regra do F075). */
+/** F079 — lembrete de live: véspera e pouco antes. Sem opt-out (mesma regra do F075). */
 export async function sendLiveLembreteEmail(opts: {
   to: string;
   displayName: string;
