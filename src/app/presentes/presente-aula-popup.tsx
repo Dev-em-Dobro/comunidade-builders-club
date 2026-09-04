@@ -126,6 +126,7 @@ export function PresenteAulaPopup({ totalAulas }: { totalAulas: number }) {
             headline={POPUP_AULA.cta}
             subhead="Seu e-mail recebe um código de 6 dígitos. Você digita aqui mesmo e cai direto na primeira aula."
             redirectTo={AULA_ABERTURA_HREF}
+            formId="cadastro-presente-popup"
           />
         </div>
 

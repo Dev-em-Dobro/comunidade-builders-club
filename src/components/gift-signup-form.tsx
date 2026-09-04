@@ -21,6 +21,13 @@ type Props = {
    * mensagem de sempre, sem sair da página.
    */
   redirectTo?: string;
+  /**
+   * F078 — a pop-up monta um segundo `GiftSignupForm` na mesma página. Sem
+   * isto os dois nasceriam com `id="cadastro-presente"`, e id duplicado é
+   * HTML inválido: âncora e leitor de tela passam a apontar para o primeiro
+   * que aparecer no DOM.
+   */
+  formId?: string;
 };
 
 export function GiftSignupForm({
@@ -32,6 +39,7 @@ export function GiftSignupForm({
   subhead = "Conta gratuita. Você entra e lê as conquistas reais da comunidade: quem fechou, por quanto e como foi.",
   alreadyMemberHref,
   redirectTo,
+  formId = "cadastro-presente",
 }: Props) {
   const router = useRouter();
   const [step, setStep] = useState<Step>("form");
@@ -114,7 +122,7 @@ export function GiftSignupForm({
 
   if (alreadyHadAccount) {
     return (
-      <div id="cadastro-presente" className="rounded-2xl border border-border/80 bg-card p-6">
+      <div id={formId} className="rounded-2xl border border-border/80 bg-card p-6">
         <p className="text-sm font-semibold text-foreground">
           Você já tem conta, entramos com ela
         </p>
@@ -129,7 +137,7 @@ export function GiftSignupForm({
   if (step === "otp") {
     return (
       <form
-        id="cadastro-presente"
+        id={formId}
         onSubmit={onVerify}
         className="rounded-2xl border border-border/80 bg-card p-6"
         data-clarity-mask="true"
@@ -188,7 +196,7 @@ export function GiftSignupForm({
 
   return (
     <form
-      id="cadastro-presente"
+      id={formId}
       onSubmit={onSend}
       className="rounded-2xl border border-border/80 bg-card p-6"
       data-clarity-mask="true"
