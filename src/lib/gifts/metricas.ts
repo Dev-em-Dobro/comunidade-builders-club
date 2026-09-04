@@ -16,7 +16,18 @@ export type UtmPostPerson = {
 export type UtmPostMetric = {
   key: string;
   label: string;
-  visitas: number;
+  /**
+   * **Aberturas de página, não pessoas.** `recordGiftVisit` insere uma linha
+   * por request: recarga, botão "voltar" e reabrir o link do DM contam de
+   * novo. Não há identificador em `gift_visit` para agrupar, nem forma de
+   * desinflar o histórico depois.
+   *
+   * Chamava-se `visitas` até 04/09/2026. Renomeado porque "visita", em
+   * analytics, é lido como pessoa única — e a conversão calculada sobre esta
+   * base sai menor do que a real. Contar pessoas exige identificador
+   * pseudônimo no `gift_visit`, que é feature própria.
+   */
+  acessos: number;
   cadastros: number;
   assinaramPlano: number;
   pessoas: UtmPostPerson[];
@@ -92,7 +103,7 @@ export async function listUtmPostMetrics(): Promise<UtmPostMetric[]> {
       r = {
         key,
         label: metricLabel(utmContent, giftSlug),
-        visitas: 0,
+        acessos: 0,
         cadastros: 0,
         assinaramPlano: 0,
         pessoas: [],
@@ -104,12 +115,12 @@ export async function listUtmPostMetrics(): Promise<UtmPostMetric[]> {
 
   for (const g of visitsWithUtm) {
     const r = row(g.utmContent, null);
-    if (r) r.visitas += g._count._all;
+    if (r) r.acessos += g._count._all;
   }
 
   for (const g of visitsGiftOnly) {
     const r = row(null, g.giftSlug);
-    if (r) r.visitas += g._count._all;
+    if (r) r.acessos += g._count._all;
   }
 
   for (const m of memberships) {
@@ -133,7 +144,7 @@ export async function listUtmPostMetrics(): Promise<UtmPostMetric[]> {
     (a, b) =>
       b.cadastros - a.cadastros ||
       b.assinaramPlano - a.assinaramPlano ||
-      b.visitas - a.visitas ||
+      b.acessos - a.acessos ||
       a.label.localeCompare(b.label),
   );
 }

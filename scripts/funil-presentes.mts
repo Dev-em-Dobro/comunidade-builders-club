@@ -1,5 +1,5 @@
 /**
- * Funil dos Presentes: visitas → cadastros, por post de origem (F059).
+ * Funil dos Presentes: acessos → cadastros, por post de origem (F059).
  *
  *   npm run funil                      # prod, desde sempre
  *   npm run funil -- --target=hml
@@ -25,7 +25,7 @@ type Target = "local" | "hml" | "prod";
 
 /**
  * Subida da F078 (pop-up da aula) em produção. É a fronteira do
- * `--antes-depois`: visitas antes disso viram o "controle".
+ * `--antes-depois`: acessos antes disso viram o "controle".
  */
 const POPUP_NO_AR = new Date("2026-09-04T13:30:00-03:00");
 
@@ -53,14 +53,14 @@ function pct(parte: number, total: number): string {
   return `${((parte / total) * 100).toFixed(1)}%`;
 }
 
-type Linha = { post: string; visitas: number; cadastros: number };
+type Linha = { post: string; acessos: number; cadastros: number };
 
 async function funil(
   prisma: PrismaClient,
   de: Date | null,
   ate: Date | null,
 ): Promise<Linha[]> {
-  const visitas = await prisma.giftVisit.groupBy({
+  const acessos = await prisma.giftVisit.groupBy({
     by: ["utmContent"],
     _count: { _all: true },
     where: {
@@ -84,38 +84,38 @@ async function funil(
   const mapa = new Map<string, Linha>();
   const chave = (v: string | null) => v ?? "(sem utm)";
 
-  for (const v of visitas) {
+  for (const v of acessos) {
     const post = chave(v.utmContent);
-    mapa.set(post, { post, visitas: v._count._all, cadastros: 0 });
+    mapa.set(post, { post, acessos: v._count._all, cadastros: 0 });
   }
   for (const c of cadastros) {
     const post = chave(c.originUtmContent);
-    const atual = mapa.get(post) ?? { post, visitas: 0, cadastros: 0 };
+    const atual = mapa.get(post) ?? { post, acessos: 0, cadastros: 0 };
     atual.cadastros = c._count._all;
     mapa.set(post, atual);
   }
-  return [...mapa.values()].sort((a, b) => b.visitas - a.visitas);
+  return [...mapa.values()].sort((a, b) => b.acessos - a.acessos);
 }
 
 function imprimir(titulo: string, linhas: Linha[]): void {
-  const visitas = linhas.reduce((s, l) => s + l.visitas, 0);
+  const acessos = linhas.reduce((s, l) => s + l.acessos, 0);
   const cadastros = linhas.reduce((s, l) => s + l.cadastros, 0);
 
   console.log(`\n${titulo}`);
   if (linhas.length === 0) {
-    console.log("  (sem visitas no período)");
+    console.log("  (sem acessos no período)");
     return;
   }
   console.table(
     linhas.map((l) => ({
       post: l.post,
-      visitas: l.visitas,
+      acessos: l.acessos,
       cadastros: l.cadastros,
-      conversao: pct(l.cadastros, l.visitas),
+      conversao: pct(l.cadastros, l.acessos),
     })),
   );
   console.log(
-    `  TOTAL: ${visitas} visitas → ${cadastros} cadastros = ${pct(cadastros, visitas)}`,
+    `  TOTAL: ${acessos} acessos → ${cadastros} cadastros = ${pct(cadastros, acessos)}`,
   );
 }
 
@@ -129,6 +129,11 @@ async function main() {
   });
 
   console.log(`Funil dos Presentes — ambiente: ${target.toUpperCase()}`);
+  console.log(
+    "Acesso é abertura de página, não pessoa: a mesma pessoa recarregando ou\n" +
+      "reabrindo o link do DM conta de novo. A conversão real é melhor que a\n" +
+      "que sai daqui. Mesma conta e mesma palavra da aba Presentes na Admin.",
+  );
 
   try {
     if (antesDepois) {

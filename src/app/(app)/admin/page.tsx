@@ -344,8 +344,13 @@ export default async function AdminPage({ searchParams }: Props) {
 
           <h3 className="mt-10 text-base font-semibold">Desempenho por post</h3>
           <p className="mt-1 text-sm text-muted">
-            Visitas no link, cadastros e quem depois assinou plano pago
+            Acessos ao link, cadastros e quem depois assinou plano pago
             (PRO/Elite) com origem naquela postagem.
+          </p>
+          <p className="mt-1 text-xs text-muted">
+            <strong>Acesso é abertura de página, não pessoa.</strong> A mesma
+            pessoa recarregando ou reabrindo o link do DM conta de novo, então a
+            conversão real é melhor do que a que sai desta conta.
           </p>
           <AdminGiftMetrics rows={utmMetrics} />
         </section>
