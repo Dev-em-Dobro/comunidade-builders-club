@@ -77,6 +77,8 @@ mais em lugar nenhum. Só cadastro novo nasce com prova completa.
 ## Critérios
 - [ ] `legal_acceptance` criada com userId, documento, versão, data, IP, UA
 - [x] **Cadastro novo grava IP e user-agent** (corrigido em 04/09/2026)
+- [x] Confirmado em runtime: cadastro em HML de 04/09/2026 gravou `ip` e
+      `user_agent` reais nas duas linhas (`termos` e `privacidade`)
 - [x] `contextoAceiteDeHeaders` com teste: cadeia de proxy, espaço, ausência de
       header e ausência de `Headers` (não lança)
 - [ ] Primeiro login grava aceite de `termos` e `privacidade`

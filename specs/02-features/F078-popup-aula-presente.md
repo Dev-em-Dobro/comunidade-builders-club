@@ -251,22 +251,25 @@ depende de navegador fica aberto até a validação em Preview.
 - [x] A modal pede **só o e-mail**; o rodapé segue pedindo nome e sobrenome
 - [x] Cadastro sem nome não grava `displayName` vazio (fallback do bootstrap)
 - [x] Termos e Política aparecem na modal — vêm com o `GiftSignupForm`
-- [ ] Cadastro pela modal cria conta com `displayName` = trecho antes do `@`
+- [x] Cadastro pela modal cria conta com `displayName` = trecho antes do `@`
 - [x] Cadastro pelo formulário do rodapé continua caindo em Boas-vindas
 - [x] Quem já tinha conta vê a mensagem de sempre, sem redirecionar
 - [x] `npx tsc --noEmit` limpo
 - [x] `npm test` verde — 103 testes, 10 desta feature
 - [x] `npm run build` compila
-- [ ] Modal abre 60s depois de abrir o Presente
-- [ ] Cadastro novo pela modal cai em `/aulas/fase-1-m01-comece-por-aqui/aula-introducao-builders-club`
-- [ ] `Membership.origin_utm_content` gravado igual ao do rodapé
+- [x] Modal abre depois do delay e captura o e-mail
+- [x] OTP chega no e-mail informado dentro da modal
+- [x] Cadastro novo pela modal cai em `/aulas/fase-1-m01-comece-por-aqui/aula-introducao-builders-club`
+- [x] Origem do Presente (`origin_gift_slug`) gravada pelo cadastro da modal
+- [x] `POPUP_DELAY_MS` em `60_000` (esteve em 10s durante o QA de 04/09/2026)
+- [x] Termos e Política abrem em aba nova, sem custar o e-mail digitado
+- [x] Preview / HML antes de produção
 - [ ] Fecha com Esc, X, clique no fundo e "Agora não"
 - [ ] Fechar e recarregar a página faz a modal voltar
 - [ ] Foco entra na modal e volta ao fechar; scroll do fundo trava e destrava
 - [ ] Conferido no tema claro e escuro, mobile (390px) e desktop (1280px)
-- [x] `POPUP_DELAY_MS` em `60_000` (esteve em 10s durante o QA de 04/09/2026)
-- [x] Termos e Política abrem em aba nova, sem custar o e-mail digitado
-- [ ] Preview / HML antes de produção
+- [ ] `origin_utm_content` por link **com** UTM no path — o teste de 04/09 usou
+      `/presentes/eu-quero-26-08-2026` sem o segmento, então gravou só o slug
 
 ## Verificação
 
@@ -290,6 +293,28 @@ depende de navegador fica aberto até a validação em Preview.
   O seed (`scripts/seed-aulas-panda.mts`) tem só 3 — está defasado em relação à
   produção. A contagem em runtime existe justamente para não depender disso.
 
-- **Falta:** tudo que só o navegador responde — o timer de 60s, o Esc, o foco, o
-  scroll travado, os dois temas, e o cadastro ponta a ponta caindo na aula com a
-  origem gravada. Nada disso foi observado rodando; a validação é em Preview.
+### Cadastro ponta a ponta em HML — 04/09/2026
+
+Percorrido pelo dono do produto: modal → e-mail → código no e-mail → caiu na
+aula. O que o banco de HML mostra desse cadastro:
+
+| Campo | Valor | O que prova |
+|---|---|---|
+| `user.name` | *(vazio)* | o campo não foi mandado ao Better Auth (decisão 2.1) |
+| `profile.displayName` | `cadu.hd+teste12` | o fallback do bootstrap agiu |
+| `membership.tier` | `free` | F041 |
+| `origin_gift_slug` | `eu-quero-26-08-2026` | a atribuição da F059 sobreviveu à modal |
+| `legal_acceptance.ip` | `177.94.46.68` | **a correção da F058 funciona** |
+| `legal_acceptance.user_agent` | UA real | idem |
+
+As duas últimas linhas são a prova em runtime da correção registrada na
+[F058](F058-registro-aceite-legal.md#correção--04092026-aceite-nascia-sem-ip-e-sem-user-agent):
+antes de 04/09 esse mesmo cadastro gravaria `NULL` nos dois campos.
+
+`origin_utm_content` saiu `null`, e está correto: o teste abriu
+`/presentes/eu-quero-26-08-2026`, sem o segmento de `utm_content` no path. O
+slug foi capturado; o `utm_content` só existe quando o link traz um, como nos
+DMs do Instagram.
+
+- **Falta:** o que só o navegador responde e não estava no caminho do teste —
+  Esc, X, clique no fundo, foco, scroll travado, os dois temas e o mobile.
