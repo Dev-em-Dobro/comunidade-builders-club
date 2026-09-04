@@ -14,8 +14,16 @@ import { PROMESSA_PRIMEIRO_CLIENTE } from "@/lib/membership/checkout";
 /** Aula que abre o módulo gratuito — destino de quem se cadastra pela modal. */
 export const AULA_ABERTURA_HREF = `/aulas/${FASE_1_M01_SLUG}/aula-introducao-builders-club`;
 
-/** Um minuto de leitura antes de interromper (decisão 1). */
-export const POPUP_DELAY_MS = 60_000;
+/**
+ * ⚠️ **VALOR DE TESTE — 10s.** O valor da spec (decisão 1) é `60_000`: um
+ * minuto de leitura antes de interromper. Baixado em 04/09/2026 só para
+ * encurtar o ciclo de QA em HML, onde cada tentativa custava um minuto parado.
+ *
+ * **Voltar para `60_000` antes do merge em `main`.** Dez segundos interrompem
+ * a leitura quase na abertura do artigo — é exatamente o pedágio que a F063
+ * proíbe e que a F078 aceitou só porque havia um minuto de leitura antes.
+ */
+export const POPUP_DELAY_MS = 10_000;
 
 /**
  * Fechou, não volta por 30 dias — e a dispensa é global, não por Presente:

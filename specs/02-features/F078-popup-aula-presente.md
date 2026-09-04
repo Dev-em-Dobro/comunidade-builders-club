@@ -3,6 +3,12 @@
 ## Status
 Rascunho — 2026-09-04
 
+> ⚠️ **Dívida aberta em HML: `POPUP_DELAY_MS` está em 10s, não em 60s.**
+> Baixado em 04/09/2026 para encurtar o ciclo de QA — cada tentativa em HML
+> custava um minuto parado. **Voltar para `60_000` antes do merge em `main`.**
+> Dez segundos interrompem quase na abertura do artigo, e o minuto de leitura
+> antes é justamente o que sustenta a exceção à F063 na seção abaixo.
+
 Depende de: [F059](F059-presentes-publicos-atribuicao.md) (Presente público, OTP e
 atribuição por `utm_content`), [F063](F063-funil-presente-conta-free.md) (bloco da
 promessa e razão do cadastro), [F065](F065-aulas-fase-1-free.md) (o módulo
@@ -229,6 +235,7 @@ depende de navegador fica aberto até a validação em Preview.
 - [ ] Foco entra na modal e volta ao fechar; scroll do fundo trava e destrava
 - [ ] Conferido no tema claro e escuro, mobile (390px) e desktop (1280px)
 - [ ] Preview / HML antes de produção
+- [ ] **`POPUP_DELAY_MS` de volta em `60_000`** — está em 10s para o QA em HML
 
 ## Verificação
 
