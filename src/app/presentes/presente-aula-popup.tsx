@@ -6,8 +6,6 @@ import {
   AULA_ABERTURA_HREF,
   POPUP_AULA,
   POPUP_DELAY_MS,
-  POPUP_DISPENSA_KEY,
-  dispensaAtiva,
   subheadPopup,
   tituloPopup,
 } from "@/lib/presentes/popup-aula";
@@ -15,42 +13,33 @@ import {
 /**
  * F078 — pop-up da aula no Presente.
  *
- * Abre 60s depois que a página monta, só para quem não tem conta. O e-mail é
- * capturado aqui dentro pelo mesmo `GiftSignupForm` do rodapé — é ele que fecha
- * a atribuição da F059 (cookie `bc_origem` + OTP na mesma aba). Um formulário
- * paralelo erraria a origem em silêncio.
+ * Abre `POPUP_DELAY_MS` depois que a página monta, só para quem não tem conta.
+ * O e-mail é capturado aqui dentro pelo mesmo `GiftSignupForm` do rodapé — é ele
+ * que fecha a atribuição da F059 (cookie `bc_origem` + OTP na mesma aba). Um
+ * formulário paralelo erraria a origem em silêncio.
  *
  * A F063 diz que a oferta não vem antes do conteúdo. Esta modal interrompe, e
  * isso foi decidido com o número de conversão na mesa (spec, "O conflito com a
  * F063"). O que a mantém honesta: ela **dá** em vez de vender, e fechar custa
  * um Esc — o artigo continua inteiro atrás.
+ *
+ * Fechar não é lembrado (decisão 5): cada visita ao Presente é uma chance nova.
  */
 export function PresenteAulaPopup({ totalAulas }: { totalAulas: number }) {
   const [aberta, setAberta] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
 
-  const fechar = useCallback((lembrar: boolean) => {
-    setAberta(false);
-    if (!lembrar) return;
-    try {
-      window.localStorage.setItem(POPUP_DISPENSA_KEY, String(Date.now()));
-    } catch {
-      /* modo restrito: sem memória de dispensa, mas a página não quebra */
-    }
-  }, []);
+  /**
+   * Fechar vale só para esta visita (decisão 5). Nada é gravado no navegador:
+   * abrir o Presente de novo é uma chance nova.
+   */
+  const fechar = useCallback(() => setAberta(false), []);
 
+  /**
+   * O timer roda uma vez, na montagem — fechar não reagenda. Navegar de um
+   * Presente para outro remonta o componente, e isso conta como visita nova.
+   */
   useEffect(() => {
-    let dispensada = false;
-    try {
-      dispensada = dispensaAtiva(
-        window.localStorage.getItem(POPUP_DISPENSA_KEY),
-        Date.now(),
-      );
-    } catch {
-      /* localStorage indisponível conta como "nunca dispensou" */
-    }
-    if (dispensada) return;
-
     const t = window.setTimeout(() => setAberta(true), POPUP_DELAY_MS);
     return () => window.clearTimeout(t);
   }, []);
@@ -68,7 +57,7 @@ export function PresenteAulaPopup({ totalAulas }: { totalAulas: number }) {
     dialogRef.current?.focus();
 
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") fechar(true);
+      if (e.key === "Escape") fechar();
     }
     document.addEventListener("keydown", onKey);
 
@@ -85,7 +74,7 @@ export function PresenteAulaPopup({ totalAulas }: { totalAulas: number }) {
     <div
       className="fixed inset-0 z-50 flex items-end justify-center overflow-y-auto bg-black/60 p-4 backdrop-blur-sm sm:items-center"
       onClick={(e) => {
-        if (e.target === e.currentTarget) fechar(true);
+        if (e.target === e.currentTarget) fechar();
       }}
     >
       <div
@@ -98,7 +87,7 @@ export function PresenteAulaPopup({ totalAulas }: { totalAulas: number }) {
       >
         <button
           type="button"
-          onClick={() => fechar(true)}
+          onClick={() => fechar()}
           aria-label={POPUP_AULA.fechar}
           className="absolute right-3 top-3 rounded-lg px-2 py-1 text-lg leading-none text-muted transition hover:bg-surface hover:text-foreground"
         >
@@ -132,7 +121,7 @@ export function PresenteAulaPopup({ totalAulas }: { totalAulas: number }) {
 
         <button
           type="button"
-          onClick={() => fechar(true)}
+          onClick={() => fechar()}
           className="btn-ghost mt-3 w-full text-xs"
         >
           {POPUP_AULA.dispensar}

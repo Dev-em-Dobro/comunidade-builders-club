@@ -51,8 +51,7 @@ O que separa este caso e mantém a regra da F063 de pé:
 | O que oferece | PRO/Elite (pago) | evento pago, de fora | **aula grátis, dentro do app** |
 | Onde | depois do `</article>` | acima do `<article>` | modal, sobre a página |
 | Interrompe? | não | não | **sim** |
-| Custo para a leitora | — | — | um `Esc` |
-| Fecha sozinho? | — | em 24/09/2026 | dispensa lembrada 30 dias |
+| Custo para a leitora | — | — | um `Esc`, a cada visita |
 
 A diferença que justifica: as outras duas **vendem**; esta **dá**. A modal não
 cobra pedágio para continuar lendo — o artigo segue inteiro atrás dela, e fechar
@@ -138,18 +137,27 @@ Copy em `src/lib/presentes/popup-aula.ts`, com o número como parâmetro. Trocar
 texto ou destino é mudar um objeto, num arquivo — mesma escolha da
 [F077](F077-cta-imersao-no-presente.md#3-a-copy-do-evento-mora-em-srclibeventos-não-no-tsx).
 
-### 5. Dispensou, não volta por 30 dias
+### 5. A dispensa não é lembrada — cada visita é uma chance nova
 
-`localStorage["bc_popup_aula_v1"]` guarda o timestamp da dispensa;
-`POPUP_DISPENSA_MS` (30 dias) define quando pode voltar. Global, não por Presente:
-quem fechou não quer ver de novo no próximo link do DM.
+Fechar a modal vale para **aquela** visita. Abriu o Presente de novo, a modal volta
+a aparecer depois do delay.
 
-É armazenamento **funcional** — uma preferência de "não me mostre isso de novo",
-sem dado pessoal e sem rastreamento. Não entra no gate de consentimento da
-[F057](F057-cookies-consentimento.md), que existe para o Clarity.
+O rascunho desta spec guardava a dispensa em `localStorage` por 30 dias. Foi
+**retirado por decisão do dono do produto em 04/09/2026**, e o raciocínio é o
+funil: 142 visitas geraram 3 cadastros. Quem fecha a modal na primeira leitura e
+volta uma semana depois é justamente quem está considerando — silenciar a oferta
+por 30 dias desperdiça a segunda visita, que costuma ser a que converte.
 
-O `v1` no nome é para poder recomeçar do zero se a oferta mudar, sem carregar a
-dispensa da campanha anterior.
+O que se perde: quem já decidiu que não quer vai fechar de novo a cada visita. É
+um `Esc` por visita, e o conteúdo do Presente continua inteiro atrás.
+
+Consequência técnica boa: some o `localStorage` da feature. Não há mais estado
+persistido no navegador, nada a discutir com o gate de consentimento da
+[F057](F057-cookies-consentimento.md), e nada a versionar quando a oferta mudar.
+
+Dentro de uma mesma visita o timer roda **uma vez**, na montagem: fechar não
+reagenda. Navegação client-side de um Presente para outro remonta o componente e,
+por isso, conta como visita nova — que é exatamente a regra pedida.
 
 ### 6. Modal acessível, e fechável de quatro jeitos
 
@@ -171,8 +179,8 @@ timer, não o formulário.
 
 | Arquivo | Mudança |
 |---|---|
-| `src/lib/presentes/popup-aula.ts` | novo — copy, href, delay, dispensa e `contarAulasGratuitas` |
-| `src/lib/presentes/popup-aula.test.ts` | novo — dispensa válida/expirada/corrompida e copy por número |
+| `src/lib/presentes/popup-aula.ts` | novo — copy, href e delay |
+| `src/lib/presentes/popup-aula.test.ts` | novo — copy por número de aulas e destino |
 | `src/app/presentes/presente-aula-popup.tsx` | novo — a modal |
 | `src/components/gift-signup-form.tsx` | ganha `redirectTo` (default: Boas-vindas) |
 | `src/app/presentes/presente-publico.tsx` | conta as aulas e monta a modal só para sessão anônima |
@@ -219,10 +227,9 @@ depende de navegador fica aberto até a validação em Preview.
 - [x] Número de aulas contado no banco, não escrito na copy
 - [x] Contagem zero ou falha cai na copy sem número, sem quebrar
 - [x] Não abre para sessão logada (free ou paga) — `!user` em `presente-publico.tsx`
-- [x] Não abre se dispensada há menos de 30 dias
-- [x] Volta a abrir depois de 30 dias
-- [x] `localStorage` indisponível não quebra a página
+- [x] A feature não persiste nada no navegador
 - [x] E-mail capturado dentro da modal, pelo `GiftSignupForm`
+- [x] Um `GiftSignupForm` por vez no DOM tem id único (`formId`)
 - [x] Cadastro pelo formulário do rodapé continua caindo em Boas-vindas
 - [x] Quem já tinha conta vê a mensagem de sempre, sem redirecionar
 - [x] `npx tsc --noEmit` limpo
@@ -232,6 +239,7 @@ depende de navegador fica aberto até a validação em Preview.
 - [ ] Cadastro novo pela modal cai em `/aulas/fase-1-m01-comece-por-aqui/aula-introducao-builders-club`
 - [ ] `Membership.origin_utm_content` gravado igual ao do rodapé
 - [ ] Fecha com Esc, X, clique no fundo e "Agora não"
+- [ ] Fechar e recarregar a página faz a modal voltar
 - [ ] Foco entra na modal e volta ao fechar; scroll do fundo trava e destrava
 - [ ] Conferido no tema claro e escuro, mobile (390px) e desktop (1280px)
 - [ ] Preview / HML antes de produção
