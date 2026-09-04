@@ -14,6 +14,13 @@ type Props = {
   subhead?: string;
   /** F066 — link de volta ao login (cadastro genérico). */
   alreadyMemberHref?: string;
+  /**
+   * F078 — para onde vai quem acabou de criar conta. Default é Boas-vindas
+   * (F063); a pop-up da aula passa a aula, porque foi ela que foi prometida.
+   * Só vale para cadastro **novo** — quem já tinha conta segue vendo a
+   * mensagem de sempre, sem sair da página.
+   */
+  redirectTo?: string;
 };
 
 export function GiftSignupForm({
@@ -24,6 +31,7 @@ export function GiftSignupForm({
   headline = "Crie sua conta e veja quem está fechando cliente",
   subhead = "Conta gratuita. Você entra e lê as conquistas reais da comunidade: quem fechou, por quanto e como foi.",
   alreadyMemberHref,
+  redirectTo,
 }: Props) {
   const router = useRouter();
   const [step, setStep] = useState<Step>("form");
@@ -92,8 +100,11 @@ export function GiftSignupForm({
        * Cadastro novo vai direto para Boas-vindas. Antes era `router.refresh()`:
        * a pessoa continuava no rodapé da página do presente, sem scroll para a
        * mensagem de sucesso, sem saber que já estava dentro.
+       *
+       * F078 — quem entrou pela pop-up da aula vai para a aula: entregar
+       * Boas-vindas seria trocar o prêmio no meio do caminho.
        */
-      router.push(`/spaces/${WELCOME_SPACE_SLUG}`);
+      router.push(redirectTo ?? `/spaces/${WELCOME_SPACE_SLUG}`);
     } catch {
       setError("Não foi possível entrar.");
     } finally {
