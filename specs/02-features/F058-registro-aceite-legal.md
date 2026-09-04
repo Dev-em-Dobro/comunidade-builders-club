@@ -42,8 +42,43 @@ implícito e a nova linha registra sob qual versão a pessoa entrou.
 - Checkbox obrigatório / tela de aceite (decisão de produto: fricção no free)
 - Tela de admin para consultar aceites — a consulta é via banco por enquanto
 
+## Correção — 04/09/2026: aceite nascia sem IP e sem user-agent
+
+Achado ao revisar a LGPD da pop-up do Presente ([F078](F078-popup-aula-presente.md)).
+Conferido no banco de **produção**:
+
+| documento | versão | linhas | com IP | com UA |
+|---|---|---|---|---|
+| privacidade | 2026-08-26 | 46 | 24 | 24 |
+| termos | 2026-08-26 | 46 | 24 | 24 |
+| privacidade | 2026-08-31 | 2 | 1 | 1 |
+
+**23 de 53 aceites por documento sem origem registrada.**
+
+A causa é a ordem dos dois caminhos que gravam aceite:
+
+1. `databaseHooks.user.create.after` (Better Auth) chamava
+   `ensureMemberBootstrap` **sem** o 5º parâmetro `contexto`. É este hook que
+   roda na criação da conta — antes de qualquer request passar por
+   `requireActiveMember`.
+2. `requireActiveMember` passa `contexto` corretamente. Só que ele roda
+   **depois**, encontra `termosVersao` já igual a `VERSAO_LEGAL`, e
+   `precisaRegistrarAceite` devolve `false`. A linha sem IP fica.
+
+Por isso os 24 com IP são membros **anteriores** à F058, preenchidos no login
+seguinte; os 22 sem IP são cadastros **novos**, gravados pelo hook.
+
+A extração virou função única, `contextoAceiteDeHeaders`, usada pelos dois
+caminhos, e o hook passou a repassar `ctx?.headers`.
+
+**As 23 linhas antigas não são recuperáveis** — o IP daquele request não existe
+mais em lugar nenhum. Só cadastro novo nasce com prova completa.
+
 ## Critérios
 - [ ] `legal_acceptance` criada com userId, documento, versão, data, IP, UA
+- [x] **Cadastro novo grava IP e user-agent** (corrigido em 04/09/2026)
+- [x] `contextoAceiteDeHeaders` com teste: cadeia de proxy, espaço, ausência de
+      header e ausência de `Headers` (não lança)
 - [ ] Primeiro login grava aceite de `termos` e `privacidade`
 - [ ] Segundo login **não** duplica linha da mesma versão
 - [ ] Mudar `VERSAO_LEGAL` faz o próximo login gravar linha nova, sem apagar a
