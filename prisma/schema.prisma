@@ -394,6 +394,8 @@ model LiveSchedule {
   hour           Int       @default(20)
   minute         Int       @default(0)
   nextOverrideAt DateTime? @map("next_override_at")
+  /// Link da sala (Zoom). CTA do e-mail e da faixa; null cai pro Club.
+  zoomUrl        String?   @map("zoom_url")
   updatedAt      DateTime  @updatedAt
 
   @@map("live_schedule")

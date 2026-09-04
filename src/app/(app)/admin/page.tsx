@@ -470,6 +470,21 @@ export default async function AdminPage({ searchParams }: Props) {
               />
             </div>
 
+            <div>
+              <p className="text-sm font-medium">Link da live (Zoom)</p>
+              <p className="text-xs text-muted">
+                Pra onde a faixa e o e-mail de lembrete levam. Vazio cai pro
+                Club.
+              </p>
+              <input
+                name="zoomUrl"
+                type="url"
+                className="input mt-1 max-w-md"
+                placeholder="https://zoom.us/j/..."
+                defaultValue={liveRegra.zoomUrl ?? ""}
+              />
+            </div>
+
             <button type="submit" className="btn-primary">
               Salvar
             </button>

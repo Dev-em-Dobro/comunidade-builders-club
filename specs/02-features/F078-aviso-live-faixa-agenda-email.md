@@ -94,7 +94,13 @@ pro relógio da live (não pro `lastSeenAt`):
 - Template novo em `src/lib/email/index.ts`
   (`sendLiveLembreteEmail`), reaproveitando `ADR-004` (Resend/Mailpit,
   sem lib nova). Tom de lembrete de agenda, não de cobrança — mesmo tom
-  do F075. CTA: abrir o Club.
+  do F075. **CTA: entra direto no Zoom** (`LiveSchedule.zoomUrl`) — cai
+  pro Club só se o link do Zoom ainda não estiver configurado. HTML
+  próprio (cartão com badge, data/hora e botão), tabela pra render
+  estável em cliente de e-mail (Gmail/Outlook não confiam em
+  flex/grid) — não reaproveita o `wrapHtml` genérico dos outros
+  e-mails. Acento muda de cor por urgência: teal na véspera, laranja
+  no pouco-antes.
 - Falha de um destinatário não aborta o lote (mesmo padrão do F075).
 
 ## Granularidade do cron — resolvido
@@ -110,10 +116,12 @@ envio.
 ## Admin
 
 Nova seção na aba Admin (mesma navegação por abas do F035): editar
-`weekday`/`hour`/`minute` (regra padrão) e `nextOverrideAt` (exceção da
-próxima ocorrência). Validação: `nextOverrideAt`, se preenchido, precisa
-estar no futuro. Sem tela nova de "histórico de lives" — só o horário
-vigente.
+`weekday`/`hour`/`minute` (regra padrão), `nextOverrideAt` (exceção da
+próxima ocorrência) e `zoomUrl` (link da sala — mesmo campo controla o
+CTA do e-mail e o local/detalhes do evento no Google Calendar).
+Validação: `nextOverrideAt`, se preenchido, precisa estar no futuro;
+`zoomUrl`, se preenchido, precisa começar com `https://`. Sem tela nova
+de "histórico de lives" — só o horário vigente.
 
 ## Fora de escopo
 

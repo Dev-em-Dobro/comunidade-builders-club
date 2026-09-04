@@ -1,8 +1,13 @@
 import { prisma } from "@/lib/db";
 import { proximaLive, type RegraLiveSchedule } from "./regras";
 
+/** Linha completa do `LiveSchedule` — regra de cálculo + config de envio. */
+export type LiveScheduleConfig = RegraLiveSchedule & {
+  zoomUrl: string | null;
+};
+
 /** Terça 20h — mesmo default documentado na spec (F078). */
-const REGRA_PADRAO: Omit<RegraLiveSchedule, "nextOverrideAt"> = {
+const REGRA_PADRAO: Omit<LiveScheduleConfig, "nextOverrideAt" | "zoomUrl"> = {
   weekday: 2,
   hour: 20,
   minute: 0,
@@ -12,7 +17,7 @@ const REGRA_PADRAO: Omit<RegraLiveSchedule, "nextOverrideAt"> = {
  * `LiveSchedule` é linha única (config). Cria com o default na primeira
  * leitura em vez de depender de seed — mesma lógica de "sem toque manual".
  */
-export async function obterRegraLiveSchedule(): Promise<RegraLiveSchedule> {
+export async function obterRegraLiveSchedule(): Promise<LiveScheduleConfig> {
   const existente = await prisma.liveSchedule.findFirst();
   if (existente) return existente;
 
@@ -30,7 +35,8 @@ export async function atualizarLiveSchedule(input: {
   hour: number;
   minute: number;
   nextOverrideAt: Date | null;
-}): Promise<RegraLiveSchedule> {
+  zoomUrl: string | null;
+}): Promise<LiveScheduleConfig> {
   const existente = await prisma.liveSchedule.findFirst();
   if (existente) {
     return prisma.liveSchedule.update({

@@ -316,7 +316,16 @@ export async function updateLiveScheduleAction(formData: FormData) {
     }
   }
 
-  await atualizarLiveSchedule({ weekday, hour, minute, nextOverrideAt });
+  const zoomUrlRaw = String(formData.get("zoomUrl") ?? "").trim();
+  let zoomUrl: string | null = null;
+  if (zoomUrlRaw) {
+    if (!/^https:\/\//.test(zoomUrlRaw)) {
+      throw new Error("Link do Zoom precisa começar com https://.");
+    }
+    zoomUrl = zoomUrlRaw;
+  }
+
+  await atualizarLiveSchedule({ weekday, hour, minute, nextOverrideAt, zoomUrl });
   revalidatePath("/admin");
   revalidatePath("/");
 }

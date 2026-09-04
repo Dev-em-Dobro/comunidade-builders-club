@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/db";
 import { requireAuthEnv } from "@/lib/auth/env";
 import { sendLiveLembreteEmail } from "@/lib/email";
-import { obterProximaLive } from "./schedule";
+import { obterRegraLiveSchedule } from "./schedule";
+import { proximaLive } from "./regras";
 import {
   MAX_ENVIOS_POR_RUN,
   shouldSendPoucoAntes,
@@ -31,7 +32,10 @@ export type ResultadoCronLive = {
 export async function dispararLembretesLive(
   now = new Date(),
 ): Promise<ResultadoCronLive> {
-  const liveAt = await obterProximaLive(now);
+  const regra = await obterRegraLiveSchedule();
+  const liveAt = proximaLive(regra, now);
+  /** CTA do e-mail: Zoom quando configurado, senão cai pro Club. */
+  const ctaUrl = regra.zoomUrl?.trim() || appBaseUrl();
 
   const candidatos = await prisma.user.findMany({
     where: {
@@ -57,8 +61,6 @@ export async function dispararLembretesLive(
     errors: 0,
   };
 
-  const base = appBaseUrl();
-
   for (const user of candidatos) {
     if (resultado.sent >= MAX_ENVIOS_POR_RUN) break;
 
@@ -79,7 +81,7 @@ export async function dispararLembretesLive(
       await sendLiveLembreteEmail({
         to: user.email,
         displayName: user.profile?.displayName ?? "Builder",
-        clubUrl: base,
+        ctaUrl,
         liveAt,
         trigger,
       });
