@@ -1,7 +1,7 @@
 # F078 — Aviso de live: faixa fixa + agenda + lembrete por e-mail
 
 ## Status
-Em especificação — 2026-09-04
+Implementado no código — 2026-09-04. Falta validar em Preview/HML.
 
 ## Objetivo
 
@@ -127,12 +127,12 @@ vigente.
 
 ## Critérios
 
-- [ ] Spec revisada antes do código
-- [ ] `LiveSchedule` + `proximaLive()` (regra padrão + override pontual, testado)
-- [ ] Admin edita regra padrão e override
-- [ ] Faixa fixa no topo do Club, visível a todo membro `active` (inclusive staff), não dispensável
-- [ ] Botão "Marcar na agenda" abre Google Calendar com data/hora/duração corretas
-- [ ] Cron véspera: 1 e-mail por ocorrência, elegibilidade igual ao F075 (free+pago, staff fora)
+- [x] Spec revisada antes do código
+- [x] `LiveSchedule` + `proximaLive()` (regra padrão + override pontual, testado)
+- [x] Admin edita regra padrão e override
+- [x] Faixa fixa no topo do Club, visível a todo membro `active` (inclusive staff), não dispensável
+- [x] Botão "Marcar na agenda" abre Google Calendar com data/hora/duração corretas
+- [x] Cron véspera: 1 e-mail por ocorrência, elegibilidade igual ao F075 (free+pago, staff fora)
 - [x] Cron pouco-antes: 1 e-mail por ocorrência — mecanismo de agendamento confirmado (Vercel Pro, `*/15 * * * *`)
-- [ ] Testes da regra de `proximaLive()` e da elegibilidade de envio (dedupe por `liveAt`)
+- [x] Testes da regra de `proximaLive()` e da elegibilidade de envio (dedupe por `liveAt`)
 - [ ] Preview / HML antes de produção
