@@ -31,37 +31,66 @@ abertura do Club, que a F065 já liberou para conta grátis.
 
 A [F063](F063-funil-presente-conta-free.md) diz que a oferta **nunca** aparece
 antes do conteúdo, "para não cobrar pedágio por algo anunciado como presente".
-Uma modal aos 60 segundos interrompe a leitura no meio — no Presente do Saga
-(~8.900 caracteres, 6-7 min de leitura) isso cai por volta de 15% do artigo.
 
-É pedágio, e é o segundo consecutivo: a [F077](F077-cta-imersao-no-presente.md) já
-colocou uma faixa de venda acima do artigo. A decisão foi do dono do produto em
-04/09/2026, com o número de conversão na mesa.
-
-O que separa este caso e mantém a regra da F063 de pé:
+Com `POPUP_DELAY_MS = 0`, esta feature passa por cima dessa regra de frente. Não
+adianta suavizar: a modal chega **antes** de qualquer leitura. É o terceiro
+avanço consecutivo sobre a mesma fronteira — a [F077](F077-cta-imersao-no-presente.md)
+pôs uma faixa de venda acima do artigo, esta pôs uma modal aos 60s, e agora a
+modal veio para a abertura. Todas decididas pelo dono do produto, com o número de
+conversão na mesa (142 acessos → 3 cadastros no `gandalf-2026-08-31`).
 
 | | Bloco da promessa (F063) | Faixa da imersão (F077) | Pop-up (F078) |
 |---|---|---|---|
 | O que oferece | PRO/Elite (pago) | evento pago, de fora | **aula grátis, dentro do app** |
 | Onde | depois do `</article>` | acima do `<article>` | modal, sobre a página |
-| Interrompe? | não | não | **sim** |
+| Quando | depois da leitura | antes do título | **antes de tudo** |
 | Custo para a leitora | — | — | um `Esc`, a cada visita |
 
-A diferença que justifica: as outras duas **vendem**; esta **dá**. A modal não
-cobra pedágio para continuar lendo — o artigo segue inteiro atrás dela, e fechar
-custa uma tecla. O que ela pede é o e-mail em troca de uma aula que a pessoa
-poderia não descobrir que existe.
+O que **ainda** separa esta oferta das outras duas: as outras **vendem**, esta
+**dá**. E ela não é gate — o `<article>` vem inteiro do servidor, a modal é
+client-side, e fechar custa uma tecla. Quem fecha lê tudo.
+
+O que **não** dá mais para dizer: que a modal respeita a ordem "entrega primeiro,
+pedido depois". Não respeita. Essa era a defesa enquanto havia um minuto de
+leitura antes, e ela caiu junto com o delay.
+
+**A regra da F063 segue valendo para a oferta paga do Club:** nada de PRO, Elite
+ou preço de plano antes do artigo. O que sobe aqui é um convite gratuito. Se
+isso também for adiante, é spec nova — e aí a F063 precisa ser reescrita em vez
+de contornada mais uma vez.
 
 ## Decisões
 
-### 1. Dispara aos 60 segundos, e só para quem não tem conta
+### 1. Dispara na abertura da página, e só para quem não tem conta
 
-`setTimeout` de `POPUP_DELAY_MS` (60.000) na montagem. Não aparece para sessão
-logada — free ou paga. Quem já é membro não tem o que ganhar com um convite para
-criar conta, e a modal só atrapalharia a leitura.
+`POPUP_DELAY_MS = 0`: a modal aparece assim que a página hidrata. Não aparece
+para sessão logada — free ou paga. Quem já é membro não tem o que ganhar com um
+convite para criar conta, e a modal só atrapalharia a leitura.
 
-Sem gatilho de rolagem e sem exit-intent nesta versão: um gatilho só é mais fácil
-de medir. Se 60s se mostrar cedo ou tarde, é uma constante.
+Sem gatilho de rolagem e sem exit-intent: um gatilho só é mais fácil de medir.
+
+**Mudado em 04/09/2026, por decisão do dono do produto.** O valor era 60.000 — um
+minuto de leitura antes de interromper — e essa espera era o **único** argumento
+que sustentava a exceção à F063 (ver a seção seguinte). Com zero, o argumento
+deixa de existir: a oferta chega antes do conteúdo, e isso passa a ser a decisão,
+não uma consequência.
+
+O que se troca, explicitamente:
+
+- **Ganha-se** exposição — 100% de quem abre vê o convite, inclusive quem sairia
+  em dez segundos. Com 60s, só via quem já tinha ficado.
+- **Perde-se** a ordem "entrega primeiro, pedido depois". A pessoa foi convidada
+  por um presente e encontra um pedido de e-mail na frente dele. É o pedágio que
+  a F059 e a F063 nomearam e recusaram.
+
+O risco não é hipotético: o Presente é a peça que constrói confiança com tráfego
+frio de Instagram, e é o ativo mais caro desta página. Se a leitura do Presente
+cair — ou se chegar reclamação —, o número volta. É uma constante, num arquivo.
+
+Ponto técnico: mesmo com zero, o `<article>` **pinta antes**. A modal é client
+component e o `useEffect` só roda depois da hidratação, então a pessoa vê o
+conteúdo por um instante antes de a modal cobrir. Não é gate de servidor: quem
+fecha continua com o Presente inteiro.
 
 ### 2. O e-mail é capturado dentro da modal, no fluxo que já existe
 
@@ -225,8 +254,10 @@ Sem migration. Sem env nova. Sem mudança no `GiftVisit` nem na atribuição.
 ## Riscos
 
 - **Pedágio percebido.** O risco que a F063 nomeia, agora numa modal. Mitigação é
-  de forma: 60s de leitura antes, `Esc` fecha, o artigo continua inteiro atrás.
-  Se a leitura do Presente cair, o gatilho sobe de 60s ou a feature sai.
+  de forma: `Esc` fecha e o artigo continua inteiro atrás. **Com delay 0 a
+  mitigação por tempo desapareceu** — não há mais leitura antes da interrupção.
+  Se a leitura do Presente cair ou chegar reclamação, o gatilho volta a subir
+  (60s era o valor anterior) ou a feature sai.
 - **Promessa maior que a aula.** Endereçado na decisão 4, mas volta a existir na
   primeira vez que alguém reescrever a copy sem assistir a aula.
 - **Duas ofertas na mesma tela.** Até 24/09 convivem a faixa da imersão (paga, de
@@ -261,7 +292,8 @@ depende de navegador fica aberto até a validação em Preview.
 - [x] OTP chega no e-mail informado dentro da modal
 - [x] Cadastro novo pela modal cai em `/aulas/fase-1-m01-comece-por-aqui/aula-introducao-builders-club`
 - [x] Origem do Presente (`origin_gift_slug`) gravada pelo cadastro da modal
-- [x] `POPUP_DELAY_MS` em `60_000` (esteve em 10s durante o QA de 04/09/2026)
+- [x] `POPUP_DELAY_MS` em `0` — abre na hidratação (era 60.000; 10.000 no QA)
+- [ ] Conferir se a modal não aparece antes de o `<article>` pintar
 - [x] Termos e Política abrem em aba nova, sem custar o e-mail digitado
 - [x] Preview / HML antes de produção
 - [ ] Fecha com Esc, X, clique no fundo e "Agora não"

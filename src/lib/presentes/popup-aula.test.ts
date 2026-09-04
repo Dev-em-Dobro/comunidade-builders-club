@@ -44,12 +44,12 @@ describe("destino do cadastro pela modal (F078)", () => {
 });
 
 describe("delay da modal (F078)", () => {
-  it("é o minuto de leitura da decisão 1, não um valor de QA", () => {
-    // Este teste existe porque o valor já foi para 10s durante o QA em HML e
-    // quase seguiu assim. Baixar o delay não é ajuste de parâmetro: é mudar a
-    // decisão de produto que sustenta a exceção à F063 — a modal deixa de vir
-    // depois da leitura e passa a vir durante. Se for para mudar, muda a spec
-    // e este teste junto, de propósito.
-    assert.equal(POPUP_DELAY_MS, 60_000);
+  it("é o valor da decisão 1 da spec, não um valor de QA esquecido", () => {
+    // Este teste é um trinco, não uma verificação: o valor já foi 60.000 (spec
+    // original), já esteve em 10.000 por engano durante o QA em HML, e hoje é 0
+    // por decisão do dono do produto. Mudar o delay muda a relação da feature
+    // com a regra da F063 — não é ajuste de parâmetro. Se este teste falhar,
+    // atualize a decisão 1 da spec junto, de propósito.
+    assert.equal(POPUP_DELAY_MS, 0);
   });
 });
