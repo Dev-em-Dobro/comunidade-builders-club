@@ -33,6 +33,7 @@ import {
   moveModule,
   setModuleFreeAccess,
 } from "@/lib/aulas";
+import { atualizarLiveSchedule } from "@/lib/live";
 
 function bustSpacesCache() {
   revalidateTag("spaces");
@@ -287,4 +288,44 @@ export async function resolveDeniedLoginAction(formData: FormData) {
   const email = String(formData.get("email") ?? "");
   await markDeniedLoginsResolved(email);
   revalidatePath("/admin");
+}
+
+/** F079 — regra padrão da live + exceção pontual (nextOverrideAt). */
+export async function updateLiveScheduleAction(formData: FormData) {
+  await requireAdmin();
+
+  const weekday = Number(formData.get("weekday") ?? 2);
+  const hour = Number(formData.get("hour") ?? 20);
+  const minute = Number(formData.get("minute") ?? 0);
+  if (weekday < 0 || weekday > 6) throw new Error("Dia da semana inválido.");
+  if (hour < 0 || hour > 23) throw new Error("Hora inválida.");
+  if (minute < 0 || minute > 59) throw new Error("Minuto inválido.");
+
+  // <input type="datetime-local"> não carrega timezone — o admin digita em
+  // horário de Brasília, então fixamos o offset -03:00 na hora de converter
+  // (mesmo racional do BRT_OFFSET_MS em lib/live/regras.ts).
+  const overrideRaw = String(formData.get("nextOverrideAt") ?? "").trim();
+  let nextOverrideAt: Date | null = null;
+  if (overrideRaw) {
+    nextOverrideAt = new Date(`${overrideRaw}:00-03:00`);
+    if (Number.isNaN(nextOverrideAt.getTime())) {
+      throw new Error("Data/hora da exceção inválida.");
+    }
+    if (nextOverrideAt.getTime() <= Date.now()) {
+      throw new Error("A exceção precisa estar no futuro.");
+    }
+  }
+
+  const zoomUrlRaw = String(formData.get("zoomUrl") ?? "").trim();
+  let zoomUrl: string | null = null;
+  if (zoomUrlRaw) {
+    if (!/^https:\/\//.test(zoomUrlRaw)) {
+      throw new Error("Link do Zoom precisa começar com https://.");
+    }
+    zoomUrl = zoomUrlRaw;
+  }
+
+  await atualizarLiveSchedule({ weekday, hour, minute, nextOverrideAt, zoomUrl });
+  revalidatePath("/admin");
+  revalidatePath("/");
 }

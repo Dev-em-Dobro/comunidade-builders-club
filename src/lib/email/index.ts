@@ -208,3 +208,153 @@ export async function sendRegua48hEmail(opts: {
     html,
   });
 }
+
+function formatarDataHoraBR(d: Date): string {
+  return new Intl.DateTimeFormat("pt-BR", {
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "America/Sao_Paulo",
+  }).format(d);
+}
+
+function formatarLivePartes(d: Date): { data: string; hora: string } {
+  const partes = new Intl.DateTimeFormat("pt-BR", {
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "America/Sao_Paulo",
+  }).formatToParts(d);
+  const get = (t: Intl.DateTimeFormatPartTypes) =>
+    partes.find((p) => p.type === t)?.value ?? "";
+  const diaSemana = get("weekday").replace(/-feira$/, "");
+  const diaCapitalizado = diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1);
+  return {
+    data: `${diaCapitalizado}, ${get("day")}/${get("month")}`,
+    hora: `${get("hour")}:${get("minute")}`,
+  };
+}
+
+/**
+ * Cartão de evento — tabela pra render consistente em cliente de e-mail
+ * (Gmail/Outlook não confiam em flex/grid). `urgente` muda o acento de
+ * teal (véspera) pra laranja (pouco antes), sem depender de gradiente.
+ */
+function wrapLiveHtml(opts: {
+  badge: string;
+  headline: string;
+  copy: string;
+  data: string;
+  hora: string;
+  ctaUrl: string;
+  ctaLabel: string;
+  nome: string;
+  urgente: boolean;
+}): string {
+  const acento = opts.urgente ? "#f97316" : "#0d9488";
+  const badgeBg = opts.urgente ? "#ffedd5" : "#ccfbf1";
+  const badgeFg = opts.urgente ? "#c2410c" : "#0f766e";
+  const fontStack =
+    "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<body style="margin:0;padding:0;background:#f4f7f6;font-family:${fontStack};">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f7f6;padding:32px 16px;">
+    <tr><td align="center">
+      <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;max-width:560px;background:#ffffff;border-radius:16px;border:1px solid #e2e8e6;overflow:hidden;">
+        <tr><td style="height:6px;line-height:6px;font-size:0;background:${acento};">&nbsp;</td></tr>
+        <tr><td style="padding:32px 32px 0;">
+          <span style="display:inline-block;background:${badgeBg};color:${badgeFg};font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:6px 12px;border-radius:999px;">${escapeHtml(opts.badge)}</span>
+        </td></tr>
+        <tr><td style="padding:16px 32px 0;">
+          <h1 style="margin:0;font-size:22px;line-height:1.3;color:#0f172a;font-family:${fontStack};">${escapeHtml(opts.headline)}</h1>
+        </td></tr>
+        <tr><td style="padding:10px 32px 0;">
+          <p style="margin:0;color:#475569;font-size:15px;line-height:1.6;">${escapeHtml(opts.copy)}</p>
+        </td></tr>
+        <tr><td style="padding:24px 32px 0;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;border:1px solid #e2e8e6;border-radius:12px;">
+            <tr><td style="padding:16px 20px;">
+              <p style="margin:0 0 2px;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:${acento};font-weight:700;">Próxima live</p>
+              <p style="margin:0;font-size:18px;font-weight:700;color:#0f172a;">${escapeHtml(opts.data)}</p>
+              <p style="margin:2px 0 0;font-size:15px;color:#475569;">${escapeHtml(opts.hora)} · horário de Brasília</p>
+            </td></tr>
+          </table>
+        </td></tr>
+        <tr><td style="padding:28px 32px 4px;" align="center">
+          <a href="${escapeHtml(opts.ctaUrl)}" style="display:inline-block;background:${acento};color:#ffffff;text-decoration:none;font-weight:700;font-size:16px;padding:14px 30px;border-radius:10px;">${escapeHtml(opts.ctaLabel)}</a>
+        </td></tr>
+        <tr><td style="padding:16px 32px 4px;">
+          <p style="margin:0;color:#94a3b8;font-size:13px;line-height:1.5;">Olá, ${escapeHtml(opts.nome)}. Lembrete automático — nada pra responder aqui.</p>
+        </td></tr>
+        <tr><td style="padding:20px 32px 28px;border-top:1px solid #eef2f1;">
+          <p style="margin:16px 0 0;color:#0d9488;font-weight:700;font-size:12px;letter-spacing:.04em;text-transform:uppercase;">${escapeHtml(NOME_PRODUTO)}</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+}
+
+/** F079 — lembrete de live: véspera e pouco antes. Sem opt-out (mesma regra do F075). */
+export async function sendLiveLembreteEmail(opts: {
+  to: string;
+  displayName: string;
+  /** Link do Zoom (config no admin) ou o Club, quando não houver Zoom cadastrado. */
+  ctaUrl: string;
+  liveAt: Date;
+  trigger: "vespera" | "pouco_antes";
+}): Promise<void> {
+  const nome = primeiroNome(opts.displayName);
+  const quando = formatarDataHoraBR(opts.liveAt);
+  const { data, hora } = formatarLivePartes(opts.liveAt);
+  const urgente = opts.trigger === "pouco_antes";
+
+  const subject = urgente
+    ? `Começa em instantes: live no ${NOME_PRODUTO}`
+    : `Amanhã tem live no ${NOME_PRODUTO}`;
+  const badge = urgente ? "Começa em breve" : "Amanhã tem live";
+  const headline = urgente ? "A live já vai começar" : "Tem live amanhã";
+  const copy = urgente
+    ? "Ela começa daqui a pouco. Entra agora pra não perder o começo."
+    : "Só um lembrete pra você não perder o horário e garantir a vaga na conversa.";
+  const chamada = urgente
+    ? `A live começa daqui a pouco, ${quando}.`
+    : `Só um lembrete: amanhã, ${quando}, tem live.`;
+
+  const text = [
+    `Olá, ${nome},`,
+    ``,
+    chamada,
+    ``,
+    `Entra na live:`,
+    opts.ctaUrl,
+    ``,
+    `— ${NOME_PRODUTO}`,
+  ].join("\n");
+
+  const html = wrapLiveHtml({
+    badge,
+    headline,
+    copy,
+    data,
+    hora,
+    ctaUrl: opts.ctaUrl,
+    ctaLabel: "Entrar na live",
+    nome,
+    urgente,
+  });
+
+  await sendMail({
+    to: opts.to,
+    subject,
+    text,
+    html,
+  });
+}
