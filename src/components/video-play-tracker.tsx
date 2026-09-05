@@ -14,17 +14,37 @@ import { useEffect, useRef } from "react";
  * a gente se apoia). O play não precisa de evento próprio: o primeiro
  * `timeupdate` já prova que o vídeo rodou.
  *
- * QUANTO FALA. Um POST a cada 30 segundos de vídeo assistido, não a cada
- * evento — o `timeupdate` dispara várias vezes por segundo e derrubaria a API
- * à toa. E um último no fechamento da aba, via `sendBeacon`, que é o único
- * caminho que sobrevive ao unload.
+ * QUANTO FALA. Só ao cruzar um MARCO, e os marcos são espaçados de propósito
+ * (30s, 1, 2, 5, 10, 20, 30, 45, 60 min). A pergunta da casa é "assistiu?",
+ * não "em que segundo está" — e a diferença de custo é grande: um vídeo de dez
+ * minutos gera 5 requisições em vez de 22, cada uma com UMA query em vez de
+ * três. Com o volume de hoje, isso é a diferença entre ~40 mil e ~10 mil
+ * requisições por mês, sem perder nenhuma resposta.
+ *
+ * Mais um envio no fechamento da aba, via `sendBeacon`: é o único caminho que
+ * sobrevive ao unload, e é ele que registra quem parou no meio de um marco.
  *
  * O QUE MANDA. O ponto MAIS LONGE alcançado, não o atual: quem volta o vídeo
  * para rever um trecho não deve perder audiência já registrada.
  */
 
-const INTERVALO_SEGUNDOS = 30;
+/**
+ * Os degraus que a gente reporta. Vão ficando mais largos porque a informação
+ * também: saber que alguém passou de 30s para 1 minuto muda a leitura; saber
+ * que foi de 42 para 43 minutos não muda nada.
+ */
+const MARCOS = [30, 60, 120, 300, 600, 1200, 1800, 2700, 3600];
 const SCRIPT_PANDA = "https://player.pandavideo.com.br/api.v2.js";
+
+/** O maior marco já cruzado por `segundos`, ou 0 antes do primeiro. */
+function marcoDe(segundos: number): number {
+  let ultimo = 0;
+  for (const m of MARCOS) {
+    if (segundos >= m) ultimo = m;
+    else break;
+  }
+  return ultimo;
+}
 
 type PandaEvento = { message?: string; currentTime?: number };
 type PandaPlayerCtor = new (
@@ -59,9 +79,12 @@ export function VideoPlayTracker({
 
     const enviar = (beacon = false) => {
       const s = Math.floor(maior.current);
-      // Só fala quando andou pelo menos um intervalo desde o último aviso.
-      if (s < enviado.current + INTERVALO_SEGUNDOS && !(beacon && s > enviado.current)) return;
-      enviado.current = s;
+      // Fala ao cruzar um marco. No beacon fala de qualquer jeito, se houve
+      // avanço: é a última chance de registrar quem parou no meio do caminho.
+      const marco = marcoDe(s);
+      if (!beacon && marco <= enviado.current) return;
+      if (beacon && s <= enviado.current) return;
+      enviado.current = beacon ? s : marco;
       const corpo = JSON.stringify({ fonte, videoId, lessonId: lessonId ?? null, segundos: s });
 
       if (beacon && typeof navigator.sendBeacon === "function") {

@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 
 /**
@@ -7,12 +9,17 @@ import { prisma } from "@/lib/db";
  * progresso de aula (`lesson_progress`) só nascia do clique em "marcar como
  * concluída", então "abriu e não completou" e "nunca abriu" eram a mesma linha
  * — e o vídeo de boas-vindas, que nem aula é, não deixava nada.
+ *
+ * CUSTO. Este caminho roda a cada marco de vídeo assistido, de toda pessoa, em
+ * todo vídeo: é o endpoint mais chamado da casa. Por isso ele é UMA query
+ * (duas quando é aula), com o `GREATEST` resolvendo dentro do banco o "só
+ * sobe" que em código custaria um SELECT antes de cada escrita.
  */
 
 export const FONTES = ["boas-vindas", "aula"] as const;
 export type FonteVideo = (typeof FONTES)[number];
 
-/** Vídeo de uma hora dá 3600; acima disso é relógio maluco ou clique em barra. */
+/** Vídeo de seis horas não existe aqui; acima disso é relógio maluco. */
 const TETO_SEGUNDOS = 6 * 60 * 60;
 
 export function fonteValida(v: unknown): v is FonteVideo {
@@ -27,66 +34,47 @@ export type EntradaPlay = {
   segundos?: number | null;
 };
 
+export function normalizarSegundos(v: unknown): number {
+  const n = Math.floor(Number(v ?? 0));
+  if (!Number.isFinite(n) || n < 0) return 0;
+  return Math.min(TETO_SEGUNDOS, n);
+}
+
 /**
  * Grava (ou avança) a audiência. O `segundos` só SOBE: quem assistiu 8 minutos
  * e reabre no começo continua com 8 — o que interessa é o ponto mais longe
  * alcançado, não onde o cursor está agora.
  *
  * Quando é aula, espelha em `lesson_progress.seconds`, a coluna que existia no
- * banco desde o começo e nunca teve ninguém para escrevê-la. Espelhar em vez de
+ * banco desde o começo e nunca teve ninguém para escrevê-la. Espelha em vez de
  * substituir: o `completedAt` continua sendo do botão, e as duas informações
  * passam a conviver — "assistiu 12 min" e "marcou como concluída" são coisas
- * diferentes, e é justamente a diferença entre elas que a casa quer ver.
+ * diferentes, e é a diferença entre elas que a casa quer enxergar.
  */
 export async function registrarPlay(e: EntradaPlay): Promise<{ segundos: number }> {
-  const segundos = Math.min(
-    TETO_SEGUNDOS,
-    Math.max(0, Math.floor(Number(e.segundos ?? 0) || 0)),
-  );
+  const segundos = normalizarSegundos(e.segundos);
+  const lessonId = e.fonte === "aula" && e.lessonId ? e.lessonId : null;
 
-  const registro = await prisma.videoPlay.upsert({
-    where: { userId_videoId: { userId: e.userId, videoId: e.videoId } },
-    create: {
-      userId: e.userId,
-      fonte: e.fonte,
-      videoId: e.videoId,
-      lessonId: e.lessonId ?? null,
-      segundos,
-    },
-    update: {},
-  });
+  const [linha] = await prisma.$queryRaw<{ segundos: number }[]>(Prisma.sql`
+    INSERT INTO video_play ("id", "userId", "fonte", "lessonId", "videoId", "segundos", "createdAt", "updatedAt")
+    VALUES (${randomUUID()}, ${e.userId}, ${e.fonte}, ${lessonId}, ${e.videoId}, ${segundos}, now(), now())
+    ON CONFLICT ("userId", "videoId") DO UPDATE
+      SET "segundos" = GREATEST(video_play."segundos", EXCLUDED."segundos"),
+          "updatedAt" = now()
+    RETURNING "segundos"
+  `);
 
-  if (segundos > registro.segundos) {
-    const atualizado = await prisma.videoPlay.update({
-      where: { id: registro.id },
-      data: { segundos },
-    });
-    await espelharNaAula(e, segundos);
-    return { segundos: atualizado.segundos };
+  if (lessonId) {
+    // O progresso nasce SEM completedAt: dar play não é concluir, e essa
+    // distinção é o motivo de tudo isto existir.
+    await prisma.$executeRaw(Prisma.sql`
+      INSERT INTO lesson_progress ("id", "userId", "lessonId", "seconds", "createdAt", "updatedAt")
+      VALUES (${randomUUID()}, ${e.userId}, ${lessonId}, ${segundos}, now(), now())
+      ON CONFLICT ("userId", "lessonId") DO UPDATE
+        SET "seconds" = GREATEST(lesson_progress."seconds", EXCLUDED."seconds"),
+            "updatedAt" = now()
+    `);
   }
 
-  await espelharNaAula(e, segundos);
-  return { segundos: registro.segundos };
-}
-
-async function espelharNaAula(e: EntradaPlay, segundos: number): Promise<void> {
-  if (e.fonte !== "aula" || !e.lessonId) return;
-  const atual = await prisma.lessonProgress.findUnique({
-    where: { userId_lessonId: { userId: e.userId, lessonId: e.lessonId } },
-    select: { id: true, seconds: true },
-  });
-  if (!atual) {
-    // Nasce SEM completedAt: dar play não é concluir. Essa distinção é o
-    // motivo de tudo isto existir.
-    await prisma.lessonProgress.create({
-      data: { userId: e.userId, lessonId: e.lessonId, seconds: segundos },
-    });
-    return;
-  }
-  if (segundos > atual.seconds) {
-    await prisma.lessonProgress.update({
-      where: { id: atual.id },
-      data: { seconds: segundos },
-    });
-  }
+  return { segundos: linha?.segundos ?? segundos };
 }
