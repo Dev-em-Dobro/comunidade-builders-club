@@ -41,9 +41,11 @@ export function normalizarSegundos(v: unknown): number {
 }
 
 /**
- * Grava (ou avança) a audiência. O `segundos` só SOBE: quem assistiu 8 minutos
- * e reabre no começo continua com 8 — o que interessa é o ponto mais longe
- * alcançado, não onde o cursor está agora.
+ * Grava (ou avança) a audiência. O `segundos` só SOBE, e aqui isso significa
+ * outra coisa desde 05/09/2026: é tempo ASSISTIDO acumulado na sessão (ver
+ * `lib/video/tempo.ts`), não o ponto mais longe alcançado. Só sobe porque
+ * quem volta ao vídeo noutro dia recomeça a contagem do zero no navegador, e
+ * a audiência de ontem não pode ser apagada por isso.
  *
  * Quando é aula, espelha em `lesson_progress.seconds`, a coluna que existia no
  * banco desde o começo e nunca teve ninguém para escrevê-la. Espelha em vez de

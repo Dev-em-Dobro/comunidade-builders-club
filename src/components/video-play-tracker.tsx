@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { acumular, estadoInicial, type EstadoTempo } from "@/lib/video/tempo";
 
 /**
  * F080 — o rastreador de audiência.
@@ -24,8 +25,11 @@ import { useEffect, useRef } from "react";
  * Mais um envio no fechamento da aba, via `sendBeacon`: é o único caminho que
  * sobrevive ao unload, e é ele que registra quem parou no meio de um marco.
  *
- * O QUE MANDA. O ponto MAIS LONGE alcançado, não o atual: quem volta o vídeo
- * para rever um trecho não deve perder audiência já registrada.
+ * O QUE MANDA. Tempo ASSISTIDO, somado entre eventos consecutivos — não o
+ * ponto mais longe alcançado, que era a primeira versão. O teste em
+ * homologação derrubou aquela: arrastar a barra para o minuto 4 registrava
+ * "224 segundos assistidos" em dois segundos de relógio, e arrastar é
+ * justamente o que faz quem não está assistindo. Ver `lib/video/tempo.ts`.
  */
 
 /**
@@ -71,14 +75,14 @@ export function VideoPlayTracker({
   /** O id do <iframe>, que o Panda usa para achar o player. Default: panda-<videoId>. */
   iframeId?: string;
 }) {
-  const maior = useRef(0);
+  const tempo = useRef<EstadoTempo>(estadoInicial());
   const enviado = useRef(-1);
 
   useEffect(() => {
     const alvo = iframeId ?? `panda-${videoId}`;
 
     const enviar = (beacon = false) => {
-      const s = Math.floor(maior.current);
+      const s = Math.floor(tempo.current.assistido);
       // Fala ao cruzar um marco. No beacon fala de qualquer jeito, se houve
       // avanço: é a última chance de registrar quem parou no meio do caminho.
       const marco = marcoDe(s);
@@ -107,9 +111,7 @@ export function VideoPlayTracker({
         onReady: () => {
           player.onEvent((e) => {
             if (e.message !== "panda_timeupdate") return;
-            const t = Number(e.currentTime ?? 0);
-            if (!Number.isFinite(t)) return;
-            if (t > maior.current) maior.current = t;
+            tempo.current = acumular(tempo.current, Number(e.currentTime ?? 0));
             enviar();
           });
         },
@@ -118,7 +120,7 @@ export function VideoPlayTracker({
 
     // O primeiro POST marca o play, mesmo que a pessoa saia antes de 30s.
     enviado.current = -1;
-    maior.current = 0;
+    tempo.current = estadoInicial();
     enviar();
 
     if (window.PandaPlayer) {
