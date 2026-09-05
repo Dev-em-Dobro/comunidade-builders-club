@@ -35,6 +35,7 @@ model User {
   legalAcceptances       LegalAcceptance[]
   notificationEmailSends NotificationEmailSend[]
   reguaEmailSends        ReguaEmailSend[]
+  videoPlays             VideoPlay[]
   liveReminderSends      LiveReminderSend[]
 
   @@unique([email])
@@ -477,4 +478,34 @@ model LessonProgress {
   @@unique([userId, lessonId])
   @@index([lessonId])
   @@map("lesson_progress")
+}
+
+/// F080 — audiência de vídeo: quem deu play e até onde assistiu.
+///
+/// Uma linha por (pessoa, vídeo), não uma por evento: a pergunta que a casa
+/// precisa responder é "o Free assiste?", e para isso basta o MAIOR ponto
+/// alcançado. Tabela de evento cresceria sem teto e responderia a mesma coisa.
+///
+/// `segundos` é tempo assistido, não percentual: a duração do vídeo não existe
+/// no banco (Lesson só guarda os IDs do Panda). Quando existir, o percentual
+/// sai daqui sem migration.
+model VideoPlay {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// 'boas-vindas' (o embed do space, que não é aula) | 'aula'
+  fonte     String
+  /// Preenchido só quando fonte = 'aula'. Sem FK: a aula pode ser apagada e o
+  /// registro de audiência continua valendo como histórico.
+  lessonId  String?
+  /// ID do vídeo no Panda — é o que identifica o vídeo nos dois casos.
+  videoId   String
+  /// Maior ponto alcançado, em segundos. 0 = deu play e não avançou.
+  segundos  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, videoId])
+  @@index([fonte, createdAt])
+  @@map("video_play")
 }

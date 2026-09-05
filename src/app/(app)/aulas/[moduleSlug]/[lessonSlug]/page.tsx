@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { VideoPlayTracker } from "@/components/video-play-tracker";
 import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
 import {
   hrefPlanos,
@@ -97,13 +98,26 @@ export default async function LessonPage({ params }: Props) {
           <div className="overflow-hidden rounded-2xl border border-border bg-black shadow-sm">
             <div className="relative aspect-video w-full">
               {canWatch && embed ? (
-                <iframe
-                  src={embed}
-                  title={lesson.title}
-                  className="absolute inset-0 h-full w-full"
-                  allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
-                  allowFullScreen
-                />
+                <>
+                  {/*
+                   * F080 — o `id` não é decoração: é por ele que o SDK do Panda
+                   * acha o player para assinar os eventos. Sem ele, o
+                   * rastreador monta e nunca recebe nada.
+                   */}
+                  <iframe
+                    id={`panda-${lesson.pandaVideoExternalId}`}
+                    src={embed}
+                    title={lesson.title}
+                    className="absolute inset-0 h-full w-full"
+                    allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+                    allowFullScreen
+                  />
+                  <VideoPlayTracker
+                    videoId={lesson.pandaVideoExternalId!}
+                    fonte="aula"
+                    lessonId={lesson.id}
+                  />
+                </>
               ) : canWatch ? (
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-card px-6 text-center">
                   <p className="font-[family-name:var(--font-outfit)] text-lg font-semibold">
