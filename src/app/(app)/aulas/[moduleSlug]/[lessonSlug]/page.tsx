@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { VideoPlayTracker } from "@/components/video-play-tracker";
+import { moduloMedido } from "@/lib/video/escopo";
 import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
 import {
   hrefPlanos,
@@ -112,11 +113,19 @@ export default async function LessonPage({ params }: Props) {
                     allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
                     allowFullScreen
                   />
-                  <VideoPlayTracker
-                    videoId={lesson.pandaVideoExternalId!}
-                    fonte="aula"
-                    lessonId={lesson.id}
-                  />
+                  {/*
+                   * Por ora só a Fase 1 é medida — é o destino do cadastro
+                   * vindo da pop-up, e é a pergunta que está de pé. O resto do
+                   * catálogo entra depois: o `id` do iframe acima já está em
+                   * todas as aulas, então ampliar é mudar `moduloMedido`.
+                   */}
+                  {moduloMedido(moduleSlug) ? (
+                    <VideoPlayTracker
+                      videoId={lesson.pandaVideoExternalId!}
+                      fonte="aula"
+                      lessonId={lesson.id}
+                    />
+                  ) : null}
                 </>
               ) : canWatch ? (
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-card px-6 text-center">
