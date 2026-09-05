@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { requireAuthEnv } from "@/lib/auth/env";
 import { sendLiveLembreteEmail } from "@/lib/email";
+import { PAID_TIERS } from "@/lib/membership/capabilities";
 import { obterRegraLiveSchedule } from "./schedule";
 import { proximaLive } from "./regras";
 import {
@@ -37,9 +38,18 @@ export async function dispararLembretesLive(
   /** CTA do e-mail: Zoom quando configurado, senão cai pro Club. */
   const ctaUrl = regra.zoomUrl?.trim() || appBaseUrl();
 
+  /**
+   * Espelha `isElegivelLembreteLive`: `member` ativo em tier pago. O tier
+   * entrou no filtro no hotfix de 05/09 — o CTA daqui é o link do Zoom e a
+   * live é entrega de aluno pagante.
+   */
   const candidatos = await prisma.user.findMany({
     where: {
-      membership: { status: "active", role: "member" },
+      membership: {
+        status: "active",
+        role: "member",
+        tier: { in: [...PAID_TIERS] },
+      },
     },
     select: {
       id: true,

@@ -2,6 +2,8 @@
 
 ## Status
 Implementado no código — 2026-09-04. Falta validar em Preview/HML.
+Hotfix 2026-09-05: faixa e e-mail restritos a tier pago (ver
+[Quem vê / quem recebe](#quem-vê--quem-recebe)).
 
 > **Era F078 até 04/09/2026.** Duas features nasceram com o mesmo ID, com oito
 > minutos de diferença: esta (spec às 11h31) e a pop-up da aula no Presente
@@ -50,14 +52,26 @@ presença.
 
 ## Quem vê / quem recebe
 
-- **Faixa**: todo membro com `membership.status = active`, qualquer papel
-  — inclusive staff (admin/instructor também precisam lembrar da própria
-  live).
-- **E-mail de lembrete**: `membership.status = active`, `role = member`
-  — free, pro, elite e `paid`. Staff fica de fora, mesma regra do
-  [F075](F075-regua-email-48h.md).
+> **Corrigido em 2026-09-05 (hotfix).** A regra original era `status =
+> active` em qualquer tier: a faixa aparecia pro free e o e-mail — cujo
+> CTA é o link do Zoom — caía no inbox dele. A live é entrega de aluno
+> pagante; free não vê nem recebe. Regra: `isPaidMembership()`, a mesma
+> dos outros gates do produto.
+
+- **Faixa**: `membership.status = active` **e** tier pago (`paid`, `pro`,
+  `elite`), mais staff (admin/instructor também precisam lembrar da
+  própria live). **Free não vê.** O gate é no servidor, em `/api/nav`:
+  `liveAt` e `calendarUrl` nem chegam ao browser do free — o
+  `calendarUrl` carrega o `zoomUrl` no local/detalhes do evento.
+- **E-mail de lembrete**: `status = active`, `role = member` **e** tier
+  pago. Staff fica de fora (mesma regra do
+  [F075](F075-regua-email-48h.md)); free também, porque o CTA é a sala
+  do Zoom.
 - **Sem opt-out.** Mesmo racional do F075: é aviso operacional de um
   compromisso da comunidade, não preferência do aluno.
+- Free que faz upgrade passa a ver a faixa no próximo carregamento e
+  entra no lembrete do próximo disparo do cron — sem backfill do que já
+  passou.
 
 ## Modelo: horário da próxima live
 
@@ -88,7 +102,8 @@ da regra.
 ## Faixa fixa
 
 - **Onde**: `AppShell`, acima do conteúdo, em todo o Club (decisão do
-  time — máxima visibilidade pra métrica de presença).
+  time — máxima visibilidade pra métrica de presença), para quem é
+  pagante ou staff.
 - **Não dispensável.** "Faixa fixa" é o pedido; sem estado de
   fechar/lembrar depois (mesmo racional do F069: manter estado por
   aluno é problema a mais pra resolver por um empurrão que deve ser
@@ -164,9 +179,10 @@ de "histórico de lives" — só o horário vigente.
 - [x] Spec revisada antes do código
 - [x] `LiveSchedule` + `proximaLive()` (regra padrão + override pontual, testado)
 - [x] Admin edita regra padrão e override
-- [x] Faixa fixa no topo do Club, visível a todo membro `active` (inclusive staff), não dispensável
+- [x] Faixa fixa no topo do Club, visível a membro pago `active` e staff, não dispensável
+- [x] Free não vê a faixa e não recebe `liveAt`/`calendarUrl` em `/api/nav` (hotfix 05/09)
 - [x] Botão "Marcar na agenda" abre Google Calendar com data/hora/duração corretas
-- [x] Cron véspera: 1 e-mail por ocorrência, elegibilidade igual ao F075 (free+pago, staff fora)
+- [x] Cron véspera: 1 e-mail por ocorrência, só para `role = member` em tier pago (staff e free fora)
 - [x] Cron pouco-antes: 1 e-mail por ocorrência — mecanismo de agendamento confirmado (Vercel Pro, `*/15 * * * *`)
 - [x] Testes da regra de `proximaLive()` e da elegibilidade de envio (dedupe por `liveAt`)
 - [ ] Preview / HML antes de produção

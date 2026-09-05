@@ -1,8 +1,10 @@
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/db";
 import { listSpaces } from "@/lib/spaces";
 import { googleCalendarUrl, obterRegraLiveSchedule, proximaLive } from "@/lib/live";
+import { isPaidMembership } from "@/lib/membership/capabilities";
 import { NOME_PRODUTO } from "@/lib/produto";
 
 /** Nav leve para hidratar a sidebar sem bloquear o SSR do feed. */
@@ -12,16 +14,36 @@ export async function GET() {
     return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
   }
 
-  const [spaces, liveRegra] = await Promise.all([
+  const [spaces, membership, liveRegra] = await Promise.all([
     listSpaces(),
+    prisma.membership.findUnique({ where: { userId: session.user.id } }),
     obterRegraLiveSchedule(),
   ]);
+
+  /**
+   * F079 — a live é entrega de aluno pagante: o free não recebe nem o horário
+   * nem o `calendarUrl`, que leva o `zoomUrl` no local/detalhes do evento.
+   * Gate no servidor, não só no render: esta rota é pública para logado.
+   */
+  const live =
+    membership && isPaidMembership(membership) ? montarLive(liveRegra) : null;
+
+  return NextResponse.json({
+    spaces: spaces.map((s) => ({ id: s.id, slug: s.slug, name: s.name })),
+    live,
+  });
+}
+
+function montarLive(
+  liveRegra: Awaited<ReturnType<typeof obterRegraLiveSchedule>>,
+) {
   const liveAt = proximaLive(liveRegra, new Date());
 
   const clubUrl = process.env.BETTER_AUTH_URL?.trim()?.replace(/\/$/, "") ?? "";
   /** F079 — local do evento é o Zoom quando configurado, senão cai pro Club. */
   const localEvento = liveRegra.zoomUrl?.trim() || clubUrl || undefined;
-  const live = {
+
+  return {
     liveAt: liveAt.toISOString(),
     calendarUrl: googleCalendarUrl({
       liveAt,
@@ -30,9 +52,4 @@ export async function GET() {
       local: localEvento,
     }),
   };
-
-  return NextResponse.json({
-    spaces: spaces.map((s) => ({ id: s.id, slug: s.slug, name: s.name })),
-    live,
-  });
 }

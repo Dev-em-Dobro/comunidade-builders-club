@@ -137,20 +137,32 @@ describe("shouldSendPoucoAntes — F079", () => {
 });
 
 describe("isElegivelLembreteLive — F079", () => {
-  it("aceita member ativo, free ou pago", () => {
+  it("aceita member ativo em qualquer tier pago", () => {
+    for (const tier of ["paid", "pro", "elite"]) {
+      assert.equal(
+        isElegivelLembreteLive({ status: "active", role: "member", tier }),
+        true,
+        `tier ${tier} deveria receber o lembrete`,
+      );
+    }
+  });
+
+  // Hotfix 05/09: o CTA do e-mail é o link do Zoom — a live é entrega de
+  // aluno pagante, então free fica de fora.
+  it("rejeita free", () => {
     assert.equal(
-      isElegivelLembreteLive({ status: "active", role: "member" }),
-      true,
+      isElegivelLembreteLive({ status: "active", role: "member", tier: "free" }),
+      false,
     );
   });
 
   it("rejeita staff e membership inativa", () => {
     assert.equal(
-      isElegivelLembreteLive({ status: "active", role: "admin" }),
+      isElegivelLembreteLive({ status: "active", role: "admin", tier: "pro" }),
       false,
     );
     assert.equal(
-      isElegivelLembreteLive({ status: "revoked", role: "member" }),
+      isElegivelLembreteLive({ status: "revoked", role: "member", tier: "pro" }),
       false,
     );
   });

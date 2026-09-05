@@ -37,14 +37,24 @@ export function canFreeReadPost(spaceSlug: string): boolean {
   return spaceSlug !== AULA_THREADS_SPACE_SLUG;
 }
 
-const PAID_TIERS = new Set<MembershipTier>(["paid", "pro", "elite"]);
+/**
+ * Tiers pagos. Lista (e não só o Set) porque o Prisma precisa dela em
+ * `where: { tier: { in: PAID_TIERS } }` — F079.
+ */
+export const PAID_TIERS = [
+  "paid",
+  "pro",
+  "elite",
+] as const satisfies readonly MembershipTier[];
+
+const PAID_TIER_SET = new Set<MembershipTier>(PAID_TIERS);
 
 export function isPaidMembership(
   m: Pick<Membership, "tier" | "role" | "status">,
 ): boolean {
   if (m.status !== "active") return false;
   if (m.role === "admin" || m.role === "instructor") return true;
-  return PAID_TIERS.has(m.tier);
+  return PAID_TIER_SET.has(m.tier);
 }
 
 export function isEliteMembership(
