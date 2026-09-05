@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { VideoPlayTracker } from "@/components/video-play-tracker";
 
 /**
  * F068 — fachada do vídeo de boas-vindas.
@@ -30,6 +31,8 @@ export function WelcomeTutorialPlayer({
       : `${embedUrl}?autoplay=true`;
     return (
       <div className="relative aspect-video w-full">
+        {/* F080 — a partir daqui a casa sabe que este vídeo rodou, e até onde. */}
+        {videoId ? <VideoPlayTracker videoId={videoId} fonte="boas-vindas" /> : null}
         <iframe
           id={videoId ? `panda-${videoId}` : undefined}
           src={src}
