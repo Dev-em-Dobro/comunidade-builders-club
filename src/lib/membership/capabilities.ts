@@ -38,10 +38,10 @@ export function canFreeReadPost(spaceSlug: string): boolean {
 }
 
 /**
- * Tiers pagos. Lista (e não só o Set) porque o Prisma precisa dela em
- * `where: { tier: { in: PAID_TIERS } }` — F079.
+ * Tiers pagos. Deixou de ser exportada no hotfix de 07/09: o único consumidor
+ * de fora era o `where` do F079, que agora filtra por `tier: "elite"`.
  */
-export const PAID_TIERS = [
+const PAID_TIERS = [
   "paid",
   "pro",
   "elite",

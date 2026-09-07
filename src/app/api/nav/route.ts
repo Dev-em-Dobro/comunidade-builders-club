@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { listSpaces } from "@/lib/spaces";
 import { googleCalendarUrl, obterRegraLiveSchedule, proximaLive } from "@/lib/live";
-import { isPaidMembership } from "@/lib/membership/capabilities";
+import { isEliteMembership } from "@/lib/membership/capabilities";
 import { NOME_PRODUTO } from "@/lib/produto";
 
 /** Nav leve para hidratar a sidebar sem bloquear o SSR do feed. */
@@ -21,12 +21,13 @@ export async function GET() {
   ]);
 
   /**
-   * F079 — a live é entrega de aluno pagante: o free não recebe nem o horário
-   * nem o `calendarUrl`, que leva o `zoomUrl` no local/detalhes do evento.
-   * Gate no servidor, não só no render: esta rota é pública para logado.
+   * F079 — a reunião semanal é benefício da oferta Elite: quem não é Elite
+   * (nem staff) não recebe o horário nem o `calendarUrl`, que leva o `zoomUrl`
+   * no local/detalhes do evento. Gate no servidor, não só no render: esta rota
+   * é pública para logado.
    */
   const live =
-    membership && isPaidMembership(membership) ? montarLive(liveRegra) : null;
+    membership && isEliteMembership(membership) ? montarLive(liveRegra) : null;
 
   return NextResponse.json({
     spaces: spaces.map((s) => ({ id: s.id, slug: s.slug, name: s.name })),
