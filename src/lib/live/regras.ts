@@ -1,7 +1,5 @@
 /** F079 — regra padrão + exceção pontual do horário da live. */
 
-import { PAID_TIERS } from "@/lib/membership/capabilities";
-
 export const TRIGGER_VESPERA = "vespera";
 export const TRIGGER_POUCO_ANTES = "pouco_antes";
 
@@ -66,20 +64,16 @@ function proximaOcorrenciaDaRegra(
 }
 
 /**
- * `member` ativo **em tier pago**. Staff fica de fora (mesma regra do F075);
- * free também, desde o hotfix de 05/09 — a live é entrega de aluno pagante e
- * o CTA do e-mail é o link do Zoom.
+ * `member` ativo **em tier `elite`**. Staff fica de fora (mesma regra do F075).
+ * Free saiu no hotfix de 05/09 e o PRO no de 07/09: a reunião semanal só está
+ * na oferta Elite, e o CTA do e-mail é o link do Zoom.
  */
 export function isElegivelLembreteLive(m: {
   status: string;
   role: string;
   tier: string;
 }): boolean {
-  return (
-    m.status === "active" &&
-    m.role === "member" &&
-    (PAID_TIERS as readonly string[]).includes(m.tier)
-  );
+  return m.status === "active" && m.role === "member" && m.tier === "elite";
 }
 
 function dentroDaJanela(

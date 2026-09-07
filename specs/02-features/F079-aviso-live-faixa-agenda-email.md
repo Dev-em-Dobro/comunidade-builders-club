@@ -2,8 +2,9 @@
 
 ## Status
 Implementado no código — 2026-09-04. Falta validar em Preview/HML.
-Hotfix 2026-09-05: faixa e e-mail restritos a tier pago (ver
-[Quem vê / quem recebe](#quem-vê--quem-recebe)).
+Hotfix 2026-09-05: faixa e e-mail restritos a tier pago.
+Hotfix 2026-09-07: restritos de novo, agora só a **Elite** — o PRO não tem a
+reunião semanal na oferta (ver [Quem vê / quem recebe](#quem-vê--quem-recebe)).
 
 > **Era F078 até 04/09/2026.** Duas features nasceram com o mesmo ID, com oito
 > minutos de diferença: esta (spec às 11h31) e a pop-up da aula no Presente
@@ -52,24 +53,30 @@ presença.
 
 ## Quem vê / quem recebe
 
-> **Corrigido em 2026-09-05 (hotfix).** A regra original era `status =
-> active` em qualquer tier: a faixa aparecia pro free e o e-mail — cujo
-> CTA é o link do Zoom — caía no inbox dele. A live é entrega de aluno
-> pagante; free não vê nem recebe. Regra: `isPaidMembership()`, a mesma
-> dos outros gates do produto.
+> **Corrigido em 2026-09-07 (hotfix).** O gate de 05/09 parou no lugar
+> errado: trocou "qualquer tier" por `isPaidMembership()`, o que tirou o
+> free mas deixou o **PRO** vendo a faixa e recebendo o e-mail com o
+> link do Zoom. A reunião semanal em grupo é benefício da oferta
+> **Elite** (`ofertaElite()`, `src/lib/membership/checkout.ts`) — o PRO
+> nunca comprou acesso à live. Regra: `isEliteMembership()`.
+>
+> _Histórico: em 2026-09-05 a regra original (`status = active` em
+> qualquer tier) já tinha sido apertada para tier pago, porque a faixa
+> aparecia pro free._
 
-- **Faixa**: `membership.status = active` **e** tier pago (`paid`, `pro`,
-  `elite`), mais staff (admin/instructor também precisam lembrar da
-  própria live). **Free não vê.** O gate é no servidor, em `/api/nav`:
-  `liveAt` e `calendarUrl` nem chegam ao browser do free — o
+- **Faixa**: `membership.status = active` **e** tier `elite`, mais staff
+  (admin/instructor também precisam lembrar da própria live).
+  **Free e PRO não veem** — o legado `paid` conta como PRO (F053) e
+  também fica de fora. O gate é no servidor, em `/api/nav`: `liveAt` e
+  `calendarUrl` nem chegam ao browser de quem não é Elite — o
   `calendarUrl` carrega o `zoomUrl` no local/detalhes do evento.
 - **E-mail de lembrete**: `status = active`, `role = member` **e** tier
-  pago. Staff fica de fora (mesma regra do
-  [F075](F075-regua-email-48h.md)); free também, porque o CTA é a sala
-  do Zoom.
+  `elite`. Staff fica de fora (mesma regra do
+  [F075](F075-regua-email-48h.md)); free e PRO também, porque o CTA é a
+  sala do Zoom.
 - **Sem opt-out.** Mesmo racional do F075: é aviso operacional de um
   compromisso da comunidade, não preferência do aluno.
-- Free que faz upgrade passa a ver a faixa no próximo carregamento e
+- Quem sobe para o Elite passa a ver a faixa no próximo carregamento e
   entra no lembrete do próximo disparo do cron — sem backfill do que já
   passou.
 
@@ -103,7 +110,7 @@ da regra.
 
 - **Onde**: `AppShell`, acima do conteúdo, em todo o Club (decisão do
   time — máxima visibilidade pra métrica de presença), para quem é
-  pagante ou staff.
+  Elite ou staff.
 - **Não dispensável.** "Faixa fixa" é o pedido; sem estado de
   fechar/lembrar depois (mesmo racional do F069: manter estado por
   aluno é problema a mais pra resolver por um empurrão que deve ser
@@ -179,10 +186,10 @@ de "histórico de lives" — só o horário vigente.
 - [x] Spec revisada antes do código
 - [x] `LiveSchedule` + `proximaLive()` (regra padrão + override pontual, testado)
 - [x] Admin edita regra padrão e override
-- [x] Faixa fixa no topo do Club, visível a membro pago `active` e staff, não dispensável
-- [x] Free não vê a faixa e não recebe `liveAt`/`calendarUrl` em `/api/nav` (hotfix 05/09)
+- [x] Faixa fixa no topo do Club, visível a membro `elite` `active` e staff, não dispensável
+- [x] Free e PRO não veem a faixa e não recebem `liveAt`/`calendarUrl` em `/api/nav` (hotfix 05/09 tirou o free, 07/09 tirou o PRO)
 - [x] Botão "Marcar na agenda" abre Google Calendar com data/hora/duração corretas
-- [x] Cron véspera: 1 e-mail por ocorrência, só para `role = member` em tier pago (staff e free fora)
+- [x] Cron véspera: 1 e-mail por ocorrência, só para `role = member` em tier `elite` (staff, free e PRO fora)
 - [x] Cron pouco-antes: 1 e-mail por ocorrência — mecanismo de agendamento confirmado (Vercel Pro, `*/15 * * * *`)
 - [x] Testes da regra de `proximaLive()` e da elegibilidade de envio (dedupe por `liveAt`)
 - [ ] Preview / HML antes de produção

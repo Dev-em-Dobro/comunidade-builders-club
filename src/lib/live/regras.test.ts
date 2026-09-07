@@ -137,32 +137,41 @@ describe("shouldSendPoucoAntes — F079", () => {
 });
 
 describe("isElegivelLembreteLive — F079", () => {
-  it("aceita member ativo em qualquer tier pago", () => {
-    for (const tier of ["paid", "pro", "elite"]) {
+  it("aceita member ativo no Elite", () => {
+    assert.equal(
+      isElegivelLembreteLive({
+        status: "active",
+        role: "member",
+        tier: "elite",
+      }),
+      true,
+    );
+  });
+
+  // Hotfix 05/09 tirou o free; 07/09 tirou o PRO (e o legado `paid`, que é
+  // PRO pela F053). A reunião semanal só está na oferta Elite e o CTA do
+  // e-mail é o link do Zoom.
+  it("rejeita free, PRO e o legado paid", () => {
+    for (const tier of ["free", "pro", "paid"]) {
       assert.equal(
         isElegivelLembreteLive({ status: "active", role: "member", tier }),
-        true,
-        `tier ${tier} deveria receber o lembrete`,
+        false,
+        `tier ${tier} não deveria receber o lembrete`,
       );
     }
   });
 
-  // Hotfix 05/09: o CTA do e-mail é o link do Zoom — a live é entrega de
-  // aluno pagante, então free fica de fora.
-  it("rejeita free", () => {
-    assert.equal(
-      isElegivelLembreteLive({ status: "active", role: "member", tier: "free" }),
-      false,
-    );
-  });
-
   it("rejeita staff e membership inativa", () => {
     assert.equal(
-      isElegivelLembreteLive({ status: "active", role: "admin", tier: "pro" }),
+      isElegivelLembreteLive({ status: "active", role: "admin", tier: "elite" }),
       false,
     );
     assert.equal(
-      isElegivelLembreteLive({ status: "revoked", role: "member", tier: "pro" }),
+      isElegivelLembreteLive({
+        status: "revoked",
+        role: "member",
+        tier: "elite",
+      }),
       false,
     );
   });

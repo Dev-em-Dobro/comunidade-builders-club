@@ -527,8 +527,8 @@ function ShellInner({
       ) : null}
 
       <div className="relative flex min-w-0 flex-1 flex-col">
-        {/* F079 — faixa é só de pagante; `/api/nav` já não manda `live` pro free. */}
-        {isPaid && live ? (
+        {/* F079 — faixa é só de Elite; `/api/nav` nem manda `live` pros outros. */}
+        {isElite && live ? (
           <LiveBanner liveAt={live.liveAt} calendarUrl={live.calendarUrl} />
         ) : null}
         <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-border/80 bg-background/85 px-4 py-3 backdrop-blur-md md:hidden">
