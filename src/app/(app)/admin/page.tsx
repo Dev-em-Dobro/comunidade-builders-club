@@ -24,12 +24,7 @@ import { AdminBulkAllowlist } from "@/components/admin-bulk-allowlist";
 import { AdminAulasPanel } from "@/components/admin-aulas-panel";
 import { AdminGiftLinks } from "@/components/admin-gift-links";
 import { AdminGiftMetrics } from "@/components/admin-gift-metrics";
-import { AdminDeniedLogins } from "@/components/admin-denied-logins";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
-import {
-  listAllowlistWithoutUser,
-  listDeniedLoginGroups,
-} from "@/lib/admin/denied-logins";
 import {
   AdminTabs,
 } from "@/components/admin-tabs";
@@ -99,7 +94,7 @@ export default async function AdminPage({ searchParams }: Props) {
       : undefined;
   const q = sp.q?.trim() || undefined;
 
-  const [spaces, memberships, counts, allowed, modules, deniedGroups, purchasesWithoutLogin, utmMetrics, giftPosts, liveRegra] = await Promise.all([
+  const [spaces, memberships, counts, allowed, modules, utmMetrics, giftPosts, liveRegra] = await Promise.all([
     tab === "spaces" ? listSpaces() : Promise.resolve([]),
     tab === "membros"
       ? listMemberships({ status: statusFilter, q })
@@ -109,8 +104,6 @@ export default async function AdminPage({ searchParams }: Props) {
       : Promise.resolve({ pending: 0, active: 0, revoked: 0 }),
     tab === "allowlist" ? listAllowedEmails() : Promise.resolve([]),
     tab === "aulas" ? listAllModulesAdmin() : Promise.resolve([]),
-    tab === "tentativas" ? listDeniedLoginGroups() : Promise.resolve([]),
-    tab === "tentativas" ? listAllowlistWithoutUser() : Promise.resolve([]),
     tab === "presentes" ? listUtmPostMetrics() : Promise.resolve([]),
     tab === "presentes" ? listGiftPostsAdmin() : Promise.resolve([]),
     tab === "live" ? obterRegraLiveSchedule() : Promise.resolve(null),
@@ -133,13 +126,6 @@ export default async function AdminPage({ searchParams }: Props) {
       <Suspense fallback={<div className="mt-6 h-11 animate-pulse rounded-xl bg-surface" />}>
         <AdminTabs active={tab} />
       </Suspense>
-
-      {tab === "tentativas" ? (
-        <AdminDeniedLogins
-          groups={deniedGroups}
-          purchasesWithoutLogin={purchasesWithoutLogin}
-        />
-      ) : null}
 
       {tab === "allowlist" ? (
         <section className="mt-8">
