@@ -164,6 +164,12 @@ model Membership {
   /// F058 — cache da última versão legal aceita. Fonte da verdade é
   /// `legal_acceptance`; aqui só para o hot path do bootstrap não custar query.
   termosVersao     String?          @map("termos_versao")
+  /// F081 — última cobrança Hubla (centavos). Nulo no legado / se payload sem valor.
+  valorCentavos    Int?             @map("valor_centavos")
+  /// F081 — plano da compra (`pro` \| `elite`), independente do tier atual.
+  planoPago        String?          @map("plano_pago")
+  moeda            String?
+  ultimaCobrancaEm DateTime?        @map("ultima_cobranca_em")
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
 
@@ -215,10 +221,12 @@ model LegalAcceptance {
   @@map("legal_acceptance")
 }
 
-/// F014 — idempotência do webhook Hubla.
+/// F014 / F081 — idempotência do webhook Hubla (+ payload bruto).
 model HublaWebhookDelivery {
   idempotencyKey String   @id @map("idempotency_key")
   eventType      String   @map("event_type")
+  /// F081 — JSON completo do POST (achar campos de valor; auditar cancelamentos).
+  payload        Json?
   processedAt    DateTime @default(now()) @map("processed_at")
 
   @@map("hubla_webhook_delivery")

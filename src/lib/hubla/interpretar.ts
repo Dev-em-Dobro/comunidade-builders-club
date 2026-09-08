@@ -1,4 +1,5 @@
 import { emailDoEvento, emailsDoEvento, offerIdsDoEvento, productIdDoEvento } from "./normalizar";
+import { extrairCobrancaHubla } from "./cobranca";
 import { planoDoEventoHubla, type PlanoPagoHubla } from "./produtos";
 import {
   EVENTOS_CONCEDER,
@@ -64,6 +65,8 @@ export function interpretarEventoHubla(
     return { acao: "ignorar", motivo: "email ausente" };
   }
 
+  const cobranca = extrairCobrancaHubla(payload);
+
   if (EVENTOS_CONCEDER.has(tipo)) {
     const subStatus = event.subscription?.status?.toLowerCase();
     if (subStatus && STATUS_ASSINATURA_BLOQUEADOS.has(subStatus)) {
@@ -79,11 +82,12 @@ export function interpretarEventoHubla(
       plan: plan ?? "pro",
       hublaUserId: event.user?.id,
       subscriptionId: event.subscription?.id,
+      cobranca,
     };
   }
 
   if (EVENTOS_REVOGAR.has(tipo)) {
-    return { acao: "revogar", email, productId };
+    return { acao: "revogar", email, productId, cobranca };
   }
 
   return { acao: "ignorar", motivo: `tipo não tratado: ${tipo}` };
