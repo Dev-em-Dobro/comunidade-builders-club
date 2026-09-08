@@ -15,8 +15,9 @@ type Props = {
   /** F066 — link de volta ao login (cadastro genérico). */
   alreadyMemberHref?: string;
   /**
-   * F078 — para onde vai quem acabou de criar conta. Default é Boas-vindas
-   * (F063); a pop-up da aula passa a aula, porque foi ela que foi prometida.
+   * F078 / F083 — para onde vai quem acabou de criar conta. Default é
+   * Boas-vindas (F063, cadastro genérico). No Presente, pop-up e rodapé
+   * passam a primeira aula do Comece por aqui.
    * Só vale para cadastro **novo** — quem já tinha conta segue vendo a
    * mensagem de sempre, sem sair da página.
    */
