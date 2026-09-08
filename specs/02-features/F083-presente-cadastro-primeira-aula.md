@@ -27,6 +27,12 @@ passar `redirectTo={AULA_ABERTURA_HREF}` — o mesmo href da pop-up
 `/cadastro` genérico continua com o default (Boas-vindas). Só o
 Presente público.
 
+A F048 redireciona quem nunca viu Boas-vindas se a sessão cair em `/`
+(o feed). O OTP sem `callbackURL` fazia isso: a conta nascia, o app
+abria o feed, e a pessoa via o tutorial em vez da aula. Por isso o
+cadastro do Presente passa `callbackURL` e navega com
+`window.location.assign` para a aula — pop-up e rodapé.
+
 ## Métrica
 
 Conta nova que volta num segundo dia. Hoje 2 de 54 (3,7%).
