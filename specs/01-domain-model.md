@@ -15,7 +15,7 @@ Diagnóstico, Outreach, Entregável — este último só na Fase 2 de migração
 | Termo | Significado |
 |-------|-------------|
 | **Membro** | Usuário com membership na comunidade. |
-| **Membership** | Estado de acesso: `pending` \| `active` \| `revoked` + papel + **tier** `free` \| `pro` \| `elite` (`paid` legado = PRO; F041/F053). |
+| **Membership** | Estado de acesso: `pending` \| `active` \| `revoked` + papel + **tier** `free` \| `pro` \| `elite` (`paid` legado = PRO; F041/F053). Dinheiro da compra Hubla (F081): `valor_centavos`, `plano_pago`, `moeda`, `ultima_cobranca_em` — nulos no legado. |
 | **Allowlist** | E-mails pré-aprovados (`AllowedEmail`); login → `active` (F012). |
 | **Tentativa recusada** | Pedido de entrada com e-mail **fora** da allowlist (`DeniedLoginAttempt`). Não bloqueia o login free (F041). Gravação histórica (F054); **sem** aba Admin desde 07/09. |
 | **Papel (Role)** | `member` \| `instructor` \| `admin`. |

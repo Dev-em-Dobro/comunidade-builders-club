@@ -1,16 +1,25 @@
-// F014 / F041 — persistência Hubla → AllowedEmail + Membership.tier.
+// F014 / F041 / F081 — persistência Hubla → AllowedEmail + Membership (+ dinheiro).
 
-import type { MembershipTier } from "@prisma/client";
+import type { MembershipTier, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { addAllowedEmail, findUserByEmail, removeAllowedEmail } from "@/lib/membership/allowlist";
 import { interpretarEventoHubla } from "./interpretar";
 import type { PlanoPagoHubla } from "./produtos";
-import type { AcaoAllowlist, HublaWebhookPayload } from "./tipos";
+import type { AcaoAllowlist, CobrancaHubla, HublaWebhookPayload } from "./tipos";
 
 function rankPago(tier: MembershipTier | PlanoPagoHubla): number {
   if (tier === "elite") return 3;
   if (tier === "pro" || tier === "paid") return 2;
   return 1;
+}
+
+function dadosCobrancaMembership(cobranca: CobrancaHubla, plan: PlanoPagoHubla) {
+  return {
+    valorCentavos: cobranca.valorCentavos,
+    planoPago: plan,
+    moeda: cobranca.moeda,
+    ultimaCobrancaEm: cobranca.cobradoEm ?? new Date(),
+  };
 }
 
 export async function jaProcessouIdempotency(key: string): Promise<boolean> {
@@ -23,11 +32,15 @@ export async function jaProcessouIdempotency(key: string): Promise<boolean> {
 export async function registrarEntrega(
   idempotencyKey: string,
   eventType: string,
+  payload?: unknown,
 ): Promise<void> {
   await prisma.hublaWebhookDelivery.create({
     data: {
       idempotencyKey,
       eventType,
+      ...(payload !== undefined
+        ? { payload: payload as Prisma.InputJsonValue }
+        : {}),
     },
   });
 }
@@ -35,9 +48,11 @@ export async function registrarEntrega(
 async function concederPago(
   emails: string[],
   plan: PlanoPagoHubla,
+  cobranca: CobrancaHubla,
 ): Promise<void> {
   const user = await findUserPorEmails(emails);
   if (!user) return;
+  const dinheiro = dadosCobrancaMembership(cobranca, plan);
   const m = await prisma.membership.findUnique({ where: { userId: user.id } });
   if (!m) {
     await prisma.membership.create({
@@ -46,6 +61,7 @@ async function concederPago(
         status: "active",
         tier: plan,
         role: "member",
+        ...dinheiro,
       },
     });
     return;
@@ -54,7 +70,7 @@ async function concederPago(
     rankPago(plan) >= rankPago(m.tier) ? plan : m.tier;
   await prisma.membership.update({
     where: { userId: user.id },
-    data: { status: "active", tier: nextTier },
+    data: { status: "active", tier: nextTier, ...dinheiro },
   });
 }
 
@@ -89,7 +105,11 @@ export async function aplicarAcaoAllowlist(acao: AcaoAllowlist): Promise<void> {
         ? `product:${acao.productId} offer:${acao.offerId}`
         : `product:${acao.productId}`,
     });
-    await concederPago(acao.emails.length > 0 ? acao.emails : [acao.email], acao.plan);
+    await concederPago(
+      acao.emails.length > 0 ? acao.emails : [acao.email],
+      acao.plan,
+      acao.cobranca,
+    );
     return;
   }
 
@@ -123,7 +143,7 @@ export async function processarWebhookHubla(
 
   if (acao.acao === "ignorar") {
     if (opts.idempotencyKey) {
-      await registrarEntrega(opts.idempotencyKey, opts.eventType);
+      await registrarEntrega(opts.idempotencyKey, opts.eventType, payload);
     }
     return { ignorado: true, motivo: acao.motivo };
   }
@@ -131,7 +151,7 @@ export async function processarWebhookHubla(
   await aplicarAcaoAllowlist(acao);
 
   if (opts.idempotencyKey) {
-    await registrarEntrega(opts.idempotencyKey, opts.eventType);
+    await registrarEntrega(opts.idempotencyKey, opts.eventType, payload);
   }
 
   return { ignorado: false };
