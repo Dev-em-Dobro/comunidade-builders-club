@@ -1,16 +1,31 @@
 # F054 — Tentativas de entrada com e-mail não autorizado
 
 ## Status
-Implementado — 2026-08-24
+**UI desligada** — 2026-09-07 (decisão do dono). Gravação opcional mantida
+para histórico; a aba Admin **Tentativas** e o card de atenção **não**
+voltam sem nova decisão.
 
-## Objetivo
+## Por quê desligar (07/09)
+A fila foi criada para achar aluno pago trancado do lado de fora. Em 04/09
+o cruzamento mostrou que ela mede outra coisa: a maioria das linhas nasce
+no **mesmo minuto** da conta — rastro do cadastro pelo presente, não aluno
+preso. Em 07/09 havia dezenas de linhas sem resolução → alarme falso na
+visão de admin. A métrica saiu do placar da reunião.
+
+A pergunta original já está respondida: allowlist sem conta **não** aparece
+em `denied_login_attempt` (ninguém tentou) e não há local-part cruzado com
+conta em outro domínio. Não é bug de login nem e-mail trocado.
+
+**Não** construir card substituto “comprou e não entrou”: decomposição por
+origem mostrou preferência (lotes DevQuest), não falha de entrega.
+
+## Objetivo (histórico)
 Quem **pagou** com um e-mail e tenta entrar com **outro** some do radar:
 não vira a conta da compra, não aparece em Membros pelo e-mail da Hubla/TMB,
 e o resgate de “N dias sem login” só vê quem já tem `User`.
 
 Esta feature **grava cada pedido de entrada** cujo e-mail **não** está na
-allowlist e mostra os últimos **14 dias** na Admin, para o aluno invisível
-virar uma linha que alguém olha.
+allowlist. A lista de 14 dias na Admin foi **retirada** (ver Status).
 
 ## Contexto (comportamento atual)
 
@@ -58,31 +73,9 @@ Não muda a copy da tela de login.
 
 ## Admin — aba Tentativas (`?tab=tentativas`)
 
-Janela: `createdAt >= agora − 14 dias`. Agrupa por e-mail: quantidade,
-primeira e última tentativa, se já existe `User` (e o tier), se já foi
-tratada.
-
-Lista de apoio na mesma aba: e-mails da **allowlist sem `User`** (compra
-que nunca entrou com o e-mail da loja) — mais recentes primeiro, até 100,
-sem filtro de 14 dias. É o lado da compra que o resgate por conta não vê.
-
-Cruzamento automático (só palpite, não é prova): mesmo **local-part**
-(`joao@` pessoal vs `joao@empresa`). Ops confirma na Hubla/TMB.
-
-## O que se faz com cada linha
-
-Não há correção automática de e-mail (falso positivo vira acesso pago na
-conta errada). Fluxo:
-
-1. Abrir a linha. Ver palpite + “compra sem login”.
-2. Confirmar na Hubla/TMB se é a mesma pessoa.
-3. **Adicionar o e-mail digitado à allowlist** (não apaga o da compra —
-   os dois passam a entrar). Se já existir `User` free, [F012](F012-allowlist-acesso.md)/[F053](F053-ofertas-pro-elite.md)
-   promove para `pro` (não rebaixa `elite`).
-4. **Avisar no e-mail da compra** (o da loja), fora do app — Hubla/TMB ou
-   e-mail da ops. O Club **não** dispara e-mail sozinho neste corte.
-5. **Marcar como tratada** (automático ao liberar o e-mail; ou manual se
-   for ruído / cadastro free sem compra).
+**Removida da UI (07/09).** O código de listagem/actions pode permanecer
+morto ou ser limpo depois; a decisão de produto é: **sem card pedindo
+atenção**.
 
 ## Critérios
 
@@ -90,9 +83,9 @@ conta errada). Fluxo:
 - [x] Criação de User (Google) fora da allowlist grava
 - [x] E-mail na allowlist **não** grava
 - [x] Login / envio do link **não** quebra se a gravação falhar
-- [x] Aba Admin **Tentativas** lista os últimos 14 dias (só admin)
-- [x] Ops pode adicionar o e-mail à allowlist e marcar a linha como tratada
 - [x] Cadastro free continua funcionando (F041)
+- [x] Aba Admin **Tentativas** **desligada** — sem lista/card na visão de admin
+- [ ] ~~Ops libera e-mail pela aba~~ — fluxo aposentado com a UI
 
 ## Fora de escopo
 
