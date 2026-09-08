@@ -209,6 +209,68 @@ export async function sendRegua48hEmail(opts: {
   });
 }
 
+/** F084 — 7 dias na comunidade sem publicar o desafio (amostra). */
+export async function sendRegua7dEmail(opts: {
+  to: string;
+  displayName: string;
+  projetosUrl: string;
+}): Promise<void> {
+  const nome = primeiroNome(opts.displayName);
+  const subject = `Seu desafio de 7 dias está te esperando no ${NOME_PRODUTO}`;
+  const text = [
+    `Olá, ${nome},`,
+    ``,
+    `Já faz uma semana que você entrou no ${NOME_PRODUTO} e o desafio do projeto ainda não apareceu na comunidade.`,
+    ``,
+    `Pode ser só um site de amostra — o importante é dar o primeiro passo. Publica no Desafio Projetos:`,
+    opts.projetosUrl,
+    ``,
+    `— ${NOME_PRODUTO}`,
+  ].join("\n");
+  const html = wrapHtml(
+    `Publica o seu desafio`,
+    `<p style="color:#64748b;font-size:15px;line-height:1.5;">Olá, ${escapeHtml(nome)}. Já faz uma semana no ${escapeHtml(NOME_PRODUTO)} e o desafio do projeto ainda não apareceu por aqui. Pode ser só um site de amostra — o importante é dar o primeiro passo.</p>
+    <p style="margin:24px 0;"><a href="${escapeHtml(opts.projetosUrl)}" style="display:inline-block;background:#0d9488;color:#fff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:600;">Abrir Desafio Projetos</a></p>`,
+  );
+  await sendMail({
+    to: opts.to,
+    subject,
+    text,
+    html,
+  });
+}
+
+/** F084 — 14 dias sem post, comentário, reação ou aula. */
+export async function sendRegua14dEmail(opts: {
+  to: string;
+  displayName: string;
+  clubUrl: string;
+}): Promise<void> {
+  const nome = primeiroNome(opts.displayName);
+  const subject = `Faz duas semanas que você não aparece no ${NOME_PRODUTO}`;
+  const text = [
+    `Olá, ${nome},`,
+    ``,
+    `Faz umas duas semanas que você não publica, comenta ou assiste aula no ${NOME_PRODUTO}. Sem cobrança — só um toque para você não perder o ritmo.`,
+    ``,
+    `Quando puder, entra de novo:`,
+    opts.clubUrl,
+    ``,
+    `— ${NOME_PRODUTO}`,
+  ].join("\n");
+  const html = wrapHtml(
+    `A comunidade sente sua falta`,
+    `<p style="color:#64748b;font-size:15px;line-height:1.5;">Olá, ${escapeHtml(nome)}. Faz umas duas semanas que você não publica, comenta ou assiste aula no ${escapeHtml(NOME_PRODUTO)}. Sem cobrança — só um toque para você não perder o ritmo.</p>
+    <p style="margin:24px 0;"><a href="${escapeHtml(opts.clubUrl)}" style="display:inline-block;background:#0d9488;color:#fff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:600;">Abrir o ${escapeHtml(NOME_PRODUTO)}</a></p>`,
+  );
+  await sendMail({
+    to: opts.to,
+    subject,
+    text,
+    html,
+  });
+}
+
 function formatarDataHoraBR(d: Date): string {
   return new Intl.DateTimeFormat("pt-BR", {
     weekday: "long",

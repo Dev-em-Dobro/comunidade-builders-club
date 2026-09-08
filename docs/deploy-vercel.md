@@ -120,24 +120,33 @@ DevQuest continua via seed sazonal (não passa neste webhook).
 
 Domínio de envio precisa estar verificado no Resend (SPF/DKIM).
 
-### Cron (F075 — régua 48h)
+### Cron (F075 / F084 — régua)
 
 Vercel Cron (só **Production**) chama `GET /api/cron/regua` todos os dias às
 12:00 UTC (9h em Brasília) com `Authorization: Bearer CRON_SECRET`. Sem a
-env, o endpoint responde 503.
+env, o endpoint responde 503. Dispara 48h sem acesso, 7d sem amostra e 14d
+sem atividade.
 
-Preview / HML: o cron da Vercel **não** roda. QA:
+Preview / HML: o cron da Vercel **não** roda. QA (filtre `email` e `trigger`
+senão o 7d manda para todo membro sem amostra há 7+ dias):
 
 ```
 curl -sS -H "Authorization: Bearer $CRON_SECRET" \
-  https://hml-comunidade-builders-club.devemdobro.com/api/cron/regua
+  "https://hml-comunidade-builders-club.devemdobro.com/api/cron/regua?trigger=sem_amostra_7d&email=voce@devemdobro.com"
+
+curl -sS -H "Authorization: Bearer $CRON_SECRET" \
+  "https://hml-comunidade-builders-club.devemdobro.com/api/cron/regua?trigger=sem_atividade_14d&email=voce@devemdobro.com"
 ```
+
+`trigger`: `sem_acesso_48h` | `sem_amostra_7d` | `sem_atividade_14d`.
+Omite = os três.
 
 O SSO da Vercel responde antes do app: sem bypass, este `curl` devolve 302 para
 `vercel.com/sso-api`, não o JSON do endpoint.
 
-O disparo não envia para quem ainda tem `lastSeenAt` null (evita blast no
-dia do migrate). Primeiro heartbeat é o poll do sininho.
+O 48h não envia para quem ainda tem `lastSeenAt` null (evita blast no
+dia do migrate). Primeiro heartbeat é o poll do sininho. 7d e 14d usam
+entrada / última atividade, não o lastSeen.
 
 ### Google OAuth (opcional)
 

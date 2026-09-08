@@ -29,7 +29,7 @@ Diagnóstico, Outreach, Entregável — este último só na Fase 2 de migração
 | **Entrada (CS)** | Relógio da reunião de CS (F057): compra (allowlist Hubla/TMB/Orion) para pagante; primeiro login para Free. Recorte ≥ 2026-08-24. |
 | **Ativação pagante** | Post com link público no Desafio Projetos (`projetos`) em até 7 dias da entrada (F057). |
 | **Ativação Free** | Primeira busca (coleta de Lead) no Orion em até 3 dias da entrada (F057). |
-| **Régua de contato** | E-mail transacional quando o membro some (F075: 48h sem abrir o Club). |
+| **Régua de contato** | E-mail transacional quando o membro some (F075: 48h sem abrir o Club; F084: 7d sem amostra no Desafio Projetos; 14d sem post/comentário/reação/aula). |
 | **Live** | Encontro semanal ao vivo (regra padrão: terça 20h, com exceção pontual). Aviso automático: faixa fixa no Club + lembrete por e-mail na véspera e pouco antes (F079). Convite ao grupo WhatsApp de avisos: FAB F082 (`NEXT_PUBLIC_WHATSAPP_AVISOS_LIVE_URL`). |
 
 ## Spaces iniciais (seed)
