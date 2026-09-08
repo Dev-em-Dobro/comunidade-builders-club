@@ -42,10 +42,9 @@ esquecimento com três peças que reforçam o mesmo horário:
 2. **Botão de agenda** na faixa, pra marcar sem digitar nada.
 3. **Lembrete por e-mail**, na véspera e pouco antes do horário.
 
-WhatsApp fica de fora **desta** entrega — vira [F080](F080-aviso-live-whatsapp.md)
-(a criar), porque exige telefone do aluno (campo novo + LGPD), escolha de
-provedor e ADR próprio. Decisão registrada em conversa com o time em
-2026-09-04.
+WhatsApp fica de fora **desta** entrega — o convite ao grupo de avisos é
+[F082](F082-whatsapp-avisos-live.md) (link via env, sem telefone no Club).
+Envio automatizado pelo app (provedor + LGPD) continua fora de escopo.
 
 Rastreio de quem **de fato** entrou na live (presença real, via
 Zoom/Meet/Panda) também fica fora — isto aqui é aviso, não medição de

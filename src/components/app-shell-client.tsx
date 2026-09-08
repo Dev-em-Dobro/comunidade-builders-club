@@ -14,6 +14,7 @@ import { UserMenu } from "@/components/user-menu";
 import { isFreeSpaceSlug } from "@/lib/membership/capabilities";
 import { isFreePublishSpace } from "@/lib/spaces/constants";
 import { LiveBanner } from "@/components/live-banner";
+import { WhatsappLiveFab } from "@/components/whatsapp-live-fab";
 import {
   ICON_ADMIN,
   ICON_AULAS,
@@ -362,7 +363,7 @@ function NovaPublicacaoFab({
       : "/nova";
 
   const className =
-    "fixed bottom-5 right-5 z-40 inline-flex h-14 cursor-pointer items-center gap-2 rounded-full bg-accent px-5 text-sm font-semibold text-white shadow-lg shadow-accent/30 transition hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent md:bottom-8 md:right-8";
+    "inline-flex h-14 cursor-pointer items-center gap-2 rounded-full bg-accent px-5 text-sm font-semibold text-white shadow-lg shadow-accent/30 transition hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
 
   if (!isPaid) {
     if (isFreePublishSpace(spaceSlug)) {
@@ -412,6 +413,7 @@ function ShellInner({
   avatarUrl,
   notifPreview,
   live,
+  whatsappAvisosLiveUrl,
 }: {
   children: React.ReactNode;
   displayName: string;
@@ -425,6 +427,8 @@ function ShellInner({
   avatarUrl?: string | null;
   notifPreview: NotifPreview[];
   live: LiveInfo | null;
+  /** F082 — null = env vazia, sem FAB. */
+  whatsappAvisosLiveUrl: string | null;
 }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const pathname = usePathname();
@@ -567,7 +571,17 @@ function ShellInner({
         <main className="flex-1 px-4 py-6 pb-24 md:px-8 md:py-10 md:pb-28">
           {children}
         </main>
-        <NovaPublicacaoFab isAdmin={isAdmin} isPaid={isPaid} />
+        {/* F082 — WhatsApp + Nova publicação empilhados no canto inferior direito. */}
+        <div className="pointer-events-none fixed bottom-5 right-5 z-40 flex flex-col-reverse items-end gap-3 md:bottom-8 md:right-8">
+          <div className="pointer-events-auto">
+            <NovaPublicacaoFab isAdmin={isAdmin} isPaid={isPaid} />
+          </div>
+          {whatsappAvisosLiveUrl ? (
+            <div className="pointer-events-auto">
+              <WhatsappLiveFab url={whatsappAvisosLiveUrl} />
+            </div>
+          ) : null}
+        </div>
       </div>
     </div>
   );
@@ -585,6 +599,7 @@ export function AppShellClient({
   spaces: initialSpaces,
   avatarUrl,
   notifPreview,
+  whatsappAvisosLiveUrl = null,
   hydrateNav = false,
 }: {
   children: React.ReactNode;
@@ -598,6 +613,8 @@ export function AppShellClient({
   spaces: SpaceLink[];
   avatarUrl?: string | null;
   notifPreview: NotifPreview[];
+  /** F082 — URL do grupo; null esconde o FAB. */
+  whatsappAvisosLiveUrl?: string | null;
   /** Busca spaces em /api/nav após o paint (não bloqueia o feed no SSR). */
   hydrateNav?: boolean;
 }) {
@@ -662,6 +679,7 @@ export function AppShellClient({
         live={live}
         avatarUrl={avatarUrl}
         notifPreview={notifPreview}
+        whatsappAvisosLiveUrl={whatsappAvisosLiveUrl}
       >
         {children}
       </ShellInner>
