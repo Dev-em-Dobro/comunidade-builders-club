@@ -6,6 +6,7 @@ import Link from "next/link";
 import { authClient } from "@/lib/auth/client";
 import { completarCadastroPresenteAction } from "@/actions/gifts";
 import { WELCOME_SPACE_SLUG } from "@/lib/spaces/constants";
+import { safeCallbackPath } from "@/lib/security/urls";
 
 type Step = "form" | "otp";
 
@@ -53,6 +54,9 @@ export function GiftSignupForm({
   pedirNome = true,
 }: Props) {
   const router = useRouter();
+  const destino = safeCallbackPath(
+    redirectTo ?? `/spaces/${WELCOME_SPACE_SLUG}`,
+  );
   const [step, setStep] = useState<Step>("form");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -97,6 +101,7 @@ export function GiftSignupForm({
       const { error: err } = await authClient.signIn.emailOtp({
         email,
         otp,
+        callbackURL: destino,
         ...(name ? { name } : {}),
       });
       if (err) {
@@ -120,14 +125,11 @@ export function GiftSignupForm({
         return;
       }
       /**
-       * Cadastro novo vai direto para Boas-vindas. Antes era `router.refresh()`:
-       * a pessoa continuava no rodapé da página do presente, sem scroll para a
-       * mensagem de sucesso, sem saber que já estava dentro.
-       *
-       * F078 — quem entrou pela pop-up da aula vai para a aula: entregar
-       * Boas-vindas seria trocar o prêmio no meio do caminho.
+       * F048 manda conta nova de `/` para Boas-vindas. Se o OTP cair no
+       * feed (callback default) antes do `push`, o prêmio da aula some.
+       * `callbackURL` + navegação cheia amarram o destino (F078 / F083).
        */
-      router.push(redirectTo ?? `/spaces/${WELCOME_SPACE_SLUG}`);
+      window.location.assign(destino);
     } catch {
       setError("Não foi possível entrar.");
     } finally {
