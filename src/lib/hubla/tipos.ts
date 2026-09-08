@@ -1,4 +1,4 @@
-// Tipos do webhook Hubla v2 (F014 / ADR-006).
+// Tipos do webhook Hubla v2 (F014 / ADR-006 / F081).
 
 import type { PlanoPagoHubla } from "./produtos";
 
@@ -6,12 +6,33 @@ export type HublaWebhookOffer = {
   id?: string;
   name?: string;
   isOrderBump?: boolean;
+  /** F081 — preço pode vir na oferta (centavos ou reais). */
+  price?: number;
+  amount?: number;
+  amountInCents?: number;
 };
 
 export type HublaWebhookProduct = {
   id?: string;
   name?: string;
   offers?: HublaWebhookOffer[];
+  price?: number;
+  amount?: number;
+};
+
+export type HublaCobrancaCampos = {
+  status?: string;
+  amount?: number;
+  amountInCents?: number;
+  total?: number;
+  totalAmount?: number;
+  value?: number;
+  price?: number;
+  currency?: string;
+  currencyCode?: string;
+  paidAt?: string;
+  createdAt?: string;
+  billingDate?: string;
 };
 
 export type HublaWebhookPayload = {
@@ -34,12 +55,20 @@ export type HublaWebhookEvent = {
     status?: string;
     type?: string;
     payer?: { email?: string; id?: string };
-  };
+  } & HublaCobrancaCampos;
   invoice?: {
-    status?: string;
     payer?: { email?: string };
     user?: { email?: string };
-  };
+  } & HublaCobrancaCampos;
+  /** F081 — alguns eventos trazem pagamento separado. */
+  payment?: HublaCobrancaCampos;
+};
+
+/** F081 — cobrança extraída do payload (nulls ok; nunca bloqueia acesso). */
+export type CobrancaHubla = {
+  valorCentavos: number | null;
+  moeda: string | null;
+  cobradoEm: Date | null;
 };
 
 export type AcaoAllowlist =
@@ -52,8 +81,9 @@ export type AcaoAllowlist =
       plan: PlanoPagoHubla;
       hublaUserId?: string;
       subscriptionId?: string;
+      cobranca: CobrancaHubla;
     }
-  | { acao: "revogar"; email: string; productId: string }
+  | { acao: "revogar"; email: string; productId: string; cobranca: CobrancaHubla }
   | { acao: "ignorar"; motivo: string };
 
 export const EVENTOS_CONCEDER = new Set([

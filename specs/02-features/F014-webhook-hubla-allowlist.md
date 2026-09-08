@@ -32,7 +32,8 @@ Filtro: produto Club + ofertas (F053). `HUBLA_PRODUCT_ID` (product.id),
 `HUBLA_OFFER_ID_PRO` / `HUBLA_OFFER_ID_ELITE` (offers[].id no mesmo produto),
 `HUBLA_PRODUCT_ID_PRO` / `HUBLA_PRODUCT_ID_ELITE` (produto separado, se
 existir). Sem nenhum product id e sem nenhum offer id → 503.
-Idempotência: `x-hubla-idempotency` → `HublaWebhookDelivery`.
+Idempotência: `x-hubla-idempotency` → `HublaWebhookDelivery` (F081: + `payload`
+jsonb). Valor/plano/moeda/data da cobrança no `membership`: F081.
 
 ## Critérios
 - [x] Token inválido / ausente → 401

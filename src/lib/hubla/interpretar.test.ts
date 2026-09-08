@@ -28,6 +28,26 @@ describe("interpretarEventoHubla — F014 / F059", () => {
     assert.equal(acao.email, "user@example.com");
     assert.deepEqual(acao.emails, ["user@example.com"]);
     assert.equal(acao.plan, "pro");
+    assert.equal(acao.cobranca.valorCentavos, null);
+  });
+
+  it("payment_succeeded com amount grava cobrança na ação", () => {
+    const acao = interpretarEventoHubla(
+      payload("invoice.payment_succeeded", {
+        invoice: { amountInCents: 19700, currency: "BRL" },
+      }),
+    );
+    assert.equal(acao.acao, "conceder");
+    if (acao.acao !== "conceder") return;
+    assert.equal(acao.cobranca.valorCentavos, 19700);
+    assert.equal(acao.cobranca.moeda, "BRL");
+  });
+
+  it("member_removed inclui cobrança extraída (pode ser null)", () => {
+    const acao = interpretarEventoHubla(payload("customer.member_removed"));
+    assert.equal(acao.acao, "revogar");
+    if (acao.acao !== "revogar") return;
+    assert.equal(acao.cobranca.valorCentavos, null);
   });
 
   it("subscription.activated concede plano", () => {
