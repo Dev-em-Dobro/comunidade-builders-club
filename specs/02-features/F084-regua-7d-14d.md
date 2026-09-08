@@ -65,8 +65,16 @@ recebe os dois (QA no Preview testa os dois num curl). Teto
 | `trigger` | `sem_acesso_48h` \| `sem_amostra_7d` \| `sem_atividade_14d` — omite = os três |
 | `email` | restringe a um destinatário (HML / QA) |
 
-Preview: cron da Vercel **não** roda. QA no HML com curl + filtro, senão
-o primeiro 7d espalha para todo free sem amostra há 7+ dias.
+Preview: cron da Vercel **não** roda. QA no HML: primeiro o seed das
+contas fantoche, depois curl com `email` + `trigger`.
+
+```
+npm run db:seed:regua -- --target=hml --email=voce@devemdobro.com
+```
+
+Cria `voce+regua7d@…` (8d sem amostra) e `voce+regua14d@…` (20d parado,
+amostra antiga). Sem `email` no curl o 7d espalha para todo free sem
+amostra há 7+ dias.
 
 ## Fora de escopo
 
