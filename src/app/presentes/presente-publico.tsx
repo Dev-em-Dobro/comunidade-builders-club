@@ -18,6 +18,7 @@ import { PresentePromessa } from "@/app/presentes/presente-promessa";
 import { PresenteImersaoCta } from "@/app/presentes/presente-imersao-cta";
 import { PresenteAulaPopup } from "@/app/presentes/presente-aula-popup";
 import { contarAulasGratuitas } from "@/lib/aulas";
+import { AULA_ABERTURA_HREF } from "@/lib/presentes/popup-aula";
 
 /** Âncora do CTA "Criar conta grátis" do bloco de promessa (F063). */
 const FORM_ANCHOR_ID = "criar-conta";
@@ -222,7 +223,8 @@ export async function PresentePublico({
 
         {!user ? (
           <div id={FORM_ANCHOR_ID} className="mx-auto mt-8 w-full max-w-xl">
-            <GiftSignupForm />
+            {/* F083 — mesmo destino da pop-up: primeira aula, não Boas-vindas. */}
+            <GiftSignupForm redirectTo={AULA_ABERTURA_HREF} />
           </div>
         ) : null}
       </main>
