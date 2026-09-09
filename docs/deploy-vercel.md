@@ -111,14 +111,16 @@ DevQuest continua via seed sazonal (não passa neste webhook).
 
 | Variável                 | Exemplo                                       |
 | ------------------------ | --------------------------------------------- |
+| `RESEND_API_KEY`         | `re_…` da app Comunidade (F085 envio + métricas) |
 | `RESEND_SMTP_FROM_EMAIL` | `Builders Club <noreply@mail.devemdobro.com>` |
-| `RESEND_SMTP_HOST`       | `smtp.resend.com`                             |
+| `RESEND_SMTP_PASS`       | fallback da mesma `re_…` se `RESEND_API_KEY` vazia |
+| `RESEND_SMTP_HOST`       | `smtp.resend.com` (legado; envio usa API)     |
 | `RESEND_SMTP_PORT`       | `465`                                         |
 | `RESEND_SMTP_USER`       | `resend`                                      |
-| `RESEND_SMTP_PASS`       | API key Resend                                |
 
 
-Domínio de envio precisa estar verificado no Resend (SPF/DKIM).
+Domínio de envio precisa estar verificado no Resend (SPF/DKIM). Tracking
+open/click no domínio (F085 Admin → E-mails).
 
 ### Cron (F075 / F084 — régua)
 
