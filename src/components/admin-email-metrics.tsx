@@ -1,21 +1,9 @@
-import Link from "next/link";
 import {
   EMAIL_CATEGORIA_LABEL,
   EMAIL_CATEGORIAS,
-  type EmailCategoria,
 } from "@/lib/email/categorias";
 import type { MetricasEmailAgregado } from "@/lib/email/metricas-resend";
-
-const STATUS_OPTS = [
-  { id: "all", label: "Todos" },
-  { id: "delivered", label: "Delivered" },
-  { id: "opened", label: "Opened" },
-  { id: "clicked", label: "Clicked" },
-  { id: "bounced", label: "Bounced" },
-  { id: "failed", label: "Failed" },
-] as const;
-
-const DIAS_OPTS = [7, 15, 30] as const;
+import { AdminEmailFilters } from "@/components/admin-email-filters";
 
 function pct(n: number | null): string {
   if (n === null) return "—";
@@ -59,44 +47,6 @@ function BarChart({
   );
 }
 
-function filtroHref(opts: {
-  dias: number;
-  status: string;
-  categoria: string;
-  patch?: Partial<{ dias: number; status: string; categoria: string }>;
-}): string {
-  const dias = opts.patch?.dias ?? opts.dias;
-  const status = opts.patch?.status ?? opts.status;
-  const categoria = opts.patch?.categoria ?? opts.categoria;
-  const q = new URLSearchParams({ tab: "emails", dias: String(dias) });
-  if (status !== "all") q.set("emailStatus", status);
-  if (categoria !== "all") q.set("categoria", categoria);
-  return `/admin?${q.toString()}`;
-}
-
-function Chip({
-  href,
-  active,
-  children,
-}: {
-  href: string;
-  active: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <Link
-      href={href}
-      className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-        active
-          ? "bg-accent text-white"
-          : "border border-border bg-background text-muted hover:text-foreground"
-      }`}
-    >
-      {children}
-    </Link>
-  );
-}
-
 export function AdminEmailMetrics({
   data,
   dias,
@@ -108,8 +58,6 @@ export function AdminEmailMetrics({
   status: string;
   categoria: string;
 }) {
-  const base = { dias, status, categoria };
-
   const statusRows = Object.entries(data.byStatus)
     .sort((a, b) => b[1] - a[1])
     .map(([label, value]) => ({
@@ -145,56 +93,7 @@ export function AdminEmailMetrics({
         </p>
       ) : null}
 
-      <div className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-medium uppercase tracking-wide text-muted">
-            Dias
-          </span>
-          {DIAS_OPTS.map((d) => (
-            <Chip
-              key={d}
-              href={filtroHref({ ...base, patch: { dias: d } })}
-              active={dias === d}
-            >
-              {d}d
-            </Chip>
-          ))}
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-medium uppercase tracking-wide text-muted">
-            Status
-          </span>
-          {STATUS_OPTS.map((s) => (
-            <Chip
-              key={s.id}
-              href={filtroHref({ ...base, patch: { status: s.id } })}
-              active={status === s.id}
-            >
-              {s.label}
-            </Chip>
-          ))}
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-medium uppercase tracking-wide text-muted">
-            Tipo
-          </span>
-          <Chip
-            href={filtroHref({ ...base, patch: { categoria: "all" } })}
-            active={categoria === "all"}
-          >
-            Todos
-          </Chip>
-          {EMAIL_CATEGORIAS.filter((c) => c !== "outro").map((c) => (
-            <Chip
-              key={c}
-              href={filtroHref({ ...base, patch: { categoria: c } })}
-              active={categoria === c}
-            >
-              {EMAIL_CATEGORIA_LABEL[c as EmailCategoria]}
-            </Chip>
-          ))}
-        </div>
-      </div>
+      <AdminEmailFilters dias={dias} status={status} categoria={categoria} />
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {[
