@@ -63,9 +63,7 @@ export function categoriaDoEmail(opts: {
   subject: string;
   tags?: Array<{ name: string; value: string }> | null;
 }): EmailCategoria {
-  const tag = opts.tags?.find(
-    (t) => t.name === RESEND_TAG_CATEGORY && isEmailCategoria(t.value),
-  );
-  if (tag) return tag.value;
+  const tag = opts.tags?.find((t) => t.name === RESEND_TAG_CATEGORY);
+  if (tag && isEmailCategoria(tag.value)) return tag.value;
   return categorizarPorAssunto(opts.subject);
 }
