@@ -35,6 +35,15 @@ type ListResponse = {
 
 export { resendApiKey } from "./resend-key";
 
+/** Destinatários de teste / ops que não entram nas métricas do Admin. */
+const DESTINATARIOS_EXCLUIDOS = new Set([
+  "suportedevquest@gmail.com",
+]);
+
+function destinatarioExcluido(to: string): boolean {
+  return DESTINATARIOS_EXCLUIDOS.has(to.trim().toLowerCase());
+}
+
 async function fetchResendJson<T>(
   path: string,
   init?: RequestInit,
@@ -163,17 +172,20 @@ export async function agregarMetricasEmail(
   const since = new Date(Date.now() - dias * 24 * 60 * 60 * 1000);
   const raw = await listarEmailsResendDesde({ since });
 
-  const classificados = raw.map((e) => {
-    const categoria = categoriaDoEmail({ subject: e.subject ?? "" });
-    return {
-      id: e.id,
-      to: Array.isArray(e.to) ? e.to[0] ?? "" : "",
-      subject: e.subject ?? "",
-      createdAt: e.created_at,
-      lastEvent: String(e.last_event ?? "sent"),
-      categoria,
-    };
-  });
+  const classificados = raw
+    .map((e) => {
+      const to = Array.isArray(e.to) ? e.to[0] ?? "" : "";
+      const categoria = categoriaDoEmail({ subject: e.subject ?? "" });
+      return {
+        id: e.id,
+        to,
+        subject: e.subject ?? "",
+        createdAt: e.created_at,
+        lastEvent: String(e.last_event ?? "sent"),
+        categoria,
+      };
+    })
+    .filter((e) => !destinatarioExcluido(e.to));
 
   const filtrados = classificados.filter((e) => {
     if (filtro.categoria && filtro.categoria !== "all") {
@@ -253,9 +265,10 @@ export async function csvMetricasEmail(
 
   const filtrados = raw
     .map((e) => {
+      const to = Array.isArray(e.to) ? e.to[0] ?? "" : "";
       const categoria = categoriaDoEmail({ subject: e.subject ?? "" });
       return {
-        to: Array.isArray(e.to) ? e.to[0] ?? "" : "",
+        to,
         subject: e.subject ?? "",
         createdAt: e.created_at,
         lastEvent: String(e.last_event ?? "sent"),
@@ -264,6 +277,7 @@ export async function csvMetricasEmail(
       };
     })
     .filter((e) => {
+      if (destinatarioExcluido(e.to)) return false;
       if (filtro.categoria && filtro.categoria !== "all") {
         if (e.categoria !== filtro.categoria) return false;
       }
