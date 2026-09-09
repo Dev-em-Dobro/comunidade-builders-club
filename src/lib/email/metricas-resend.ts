@@ -175,16 +175,20 @@ export async function agregarMetricasEmail(
   const classificados = raw
     .map((e) => {
       const to = Array.isArray(e.to) ? e.to[0] ?? "" : "";
-      const categoria = categoriaDoEmail({ subject: e.subject ?? "" });
+      const subject = e.subject ?? "";
+      const from = e.from ?? "";
+      const categoria = categoriaDoEmail({ subject, from });
+      if (!categoria) return null;
       return {
         id: e.id,
         to,
-        subject: e.subject ?? "",
+        subject,
         createdAt: e.created_at,
         lastEvent: String(e.last_event ?? "sent"),
         categoria,
       };
     })
+    .filter((e): e is NonNullable<typeof e> => e !== null)
     .filter((e) => !destinatarioExcluido(e.to));
 
   const filtrados = classificados.filter((e) => {
@@ -266,16 +270,20 @@ export async function csvMetricasEmail(
   const filtrados = raw
     .map((e) => {
       const to = Array.isArray(e.to) ? e.to[0] ?? "" : "";
-      const categoria = categoriaDoEmail({ subject: e.subject ?? "" });
+      const subject = e.subject ?? "";
+      const from = e.from ?? "";
+      const categoria = categoriaDoEmail({ subject, from });
+      if (!categoria) return null;
       return {
         to,
-        subject: e.subject ?? "",
+        subject,
         createdAt: e.created_at,
         lastEvent: String(e.last_event ?? "sent"),
         categoria,
         id: e.id,
       };
     })
+    .filter((e): e is NonNullable<typeof e> => e !== null)
     .filter((e) => {
       if (destinatarioExcluido(e.to)) return false;
       if (filtro.categoria && filtro.categoria !== "all") {

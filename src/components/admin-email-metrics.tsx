@@ -103,7 +103,8 @@ export function AdminEmailMetrics({
     <div className="mt-4 space-y-6">
       <p className="text-sm text-muted">
         Aberturas, cliques e envios do Club (login, lives, régua e respostas),
-        com filtro por período, status e tipo.
+        com filtro por período, status e tipo. Só entram e-mails com
+        &ldquo;Builders Club&rdquo; no assunto ou no remetente.
       </p>
 
       {data.aviso ? (
