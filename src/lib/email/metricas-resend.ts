@@ -214,3 +214,70 @@ export async function agregarMetricasEmail(
     })),
   };
 }
+
+function csvEscape(v: string): string {
+  if (/[",\n\r]/.test(v)) return `"${v.replace(/"/g, '""')}"`;
+  return v;
+}
+
+/** CSV com o mesmo filtro da aba Admin (e-mail completo — só admin). */
+export async function csvMetricasEmail(
+  filtro: MetricasEmailFiltro,
+): Promise<{ csv: string; filename: string } | { erro: string }> {
+  if (!resendApiKey()) {
+    return {
+      erro: "Configure RESEND_API_KEY (ou RESEND_SMTP_PASS) para exportar.",
+    };
+  }
+
+  const dias = Math.min(Math.max(filtro.dias || 15, 1), 90);
+  const since = new Date(Date.now() - dias * 24 * 60 * 60 * 1000);
+  const raw = await listarEmailsResendDesde({ since });
+
+  const filtrados = raw
+    .map((e) => {
+      const categoria = categoriaDoEmail({ subject: e.subject ?? "" });
+      return {
+        to: Array.isArray(e.to) ? e.to[0] ?? "" : "",
+        subject: e.subject ?? "",
+        createdAt: e.created_at,
+        lastEvent: String(e.last_event ?? "sent"),
+        categoria,
+        id: e.id,
+      };
+    })
+    .filter((e) => {
+      if (filtro.categoria && filtro.categoria !== "all") {
+        if (e.categoria !== filtro.categoria) return false;
+      }
+      if (filtro.status && filtro.status !== "all") {
+        if (e.lastEvent !== filtro.status) return false;
+      }
+      return true;
+    });
+
+  const header = ["id", "para", "assunto", "tipo", "status", "enviado_em"];
+  const lines = [
+    header.join(","),
+    ...filtrados.map((e) =>
+      [
+        csvEscape(e.id),
+        csvEscape(e.to),
+        csvEscape(e.subject),
+        csvEscape(e.categoria),
+        csvEscape(e.lastEvent),
+        csvEscape(e.createdAt),
+      ].join(","),
+    ),
+  ];
+
+  const stamp = new Date().toISOString().slice(0, 10);
+  const cat =
+    filtro.categoria && filtro.categoria !== "all" ? filtro.categoria : "todos";
+  const st =
+    filtro.status && filtro.status !== "all" ? filtro.status : "todos";
+  return {
+    csv: lines.join("\n") + "\n",
+    filename: `emails-resend-${dias}d-${cat}-${st}-${stamp}.csv`,
+  };
+}

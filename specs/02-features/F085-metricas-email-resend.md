@@ -72,3 +72,4 @@ servidor. Não persiste no Postgres nesta entrega.
 - [x] Aba Admin com filtros dias / status / categoria
 - [x] Gráficos de status e de categoria
 - [x] Sem `RESEND_API_KEY`/`RESEND_SMTP_PASS`: aviso amigável, sem 500
+- [x] Botão **Baixar CSV** com o mesmo filtro (dias / status / tipo)

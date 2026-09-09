@@ -99,6 +99,19 @@ export function AdminEmailFilters({
           ))}
         </select>
       </label>
+
+      <a
+        href={(() => {
+          const q = new URLSearchParams({ dias: String(dias) });
+          if (status !== "all") q.set("emailStatus", status);
+          if (categoria !== "all") q.set("categoria", categoria);
+          return `/api/admin/emails/csv?${q.toString()}`;
+        })()}
+        className="btn-ghost inline-flex h-10 items-center gap-1.5 px-3 text-sm font-medium"
+        download
+      >
+        Baixar CSV
+      </a>
     </div>
   );
 }
