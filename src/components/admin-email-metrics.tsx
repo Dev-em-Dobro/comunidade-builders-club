@@ -102,9 +102,8 @@ export function AdminEmailMetrics({
   return (
     <div className="mt-4 space-y-6">
       <p className="text-sm text-muted">
-        Métricas via Resend (última janela). Open/click exigem tracking no
-        domínio. E-mails novos levam tag <code className="text-xs">category</code>;
-        os antigos caem no assunto.
+        Aberturas, cliques e envios do Club (login, lives, régua e respostas),
+        com filtro por período, status e tipo.
       </p>
 
       {data.aviso ? (
