@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   EMAIL_CATEGORIA_LABEL,
   EMAIL_CATEGORIAS,
@@ -8,6 +9,22 @@ import { AdminEmailFilters } from "@/components/admin-email-filters";
 function pct(n: number | null): string {
   if (n === null) return "—";
   return `${Math.round(n * 100)}%`;
+}
+
+function pageHref(opts: {
+  dias: number;
+  status: string;
+  categoria: string;
+  page: number;
+}): string {
+  const q = new URLSearchParams({
+    tab: "emails",
+    dias: String(opts.dias),
+  });
+  if (opts.status !== "all") q.set("emailStatus", opts.status);
+  if (opts.categoria !== "all") q.set("categoria", opts.categoria);
+  if (opts.page > 1) q.set("page", String(opts.page));
+  return `/admin?${q.toString()}`;
 }
 
 function BarChart({
@@ -79,6 +96,9 @@ export function AdminEmailMetrics({
     tone: c === "live" ? "bg-orange-500" : c === "login" ? "bg-sky-500" : "bg-accent",
   }));
 
+  const from = data.total === 0 ? 0 : (data.page - 1) * data.pageSize + 1;
+  const to = Math.min(data.page * data.pageSize, data.total);
+
   return (
     <div className="mt-4 space-y-6">
       <p className="text-sm text-muted">
@@ -120,39 +140,86 @@ export function AdminEmailMetrics({
         <BarChart title="Por tipo de e-mail" rows={catRows} />
       </div>
 
-      {data.itens.length > 0 ? (
-        <div className="overflow-x-auto rounded-xl border border-border">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-border text-xs uppercase tracking-wide text-muted">
-              <tr>
-                <th className="px-3 py-2 font-medium">Para</th>
-                <th className="px-3 py-2 font-medium">Assunto</th>
-                <th className="px-3 py-2 font-medium">Tipo</th>
-                <th className="px-3 py-2 font-medium">Status</th>
-                <th className="px-3 py-2 font-medium">Quando</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.itens.map((row) => (
-                <tr key={row.id} className="border-t border-border">
-                  <td className="px-3 py-2 font-mono text-xs">{row.to}</td>
-                  <td className="max-w-[220px] truncate px-3 py-2">{row.subject}</td>
-                  <td className="px-3 py-2">
-                    {EMAIL_CATEGORIA_LABEL[row.categoria]}
-                  </td>
-                  <td className="px-3 py-2">{row.lastEvent}</td>
-                  <td className="px-3 py-2 text-xs text-muted">
-                    {new Intl.DateTimeFormat("pt-BR", {
-                      dateStyle: "short",
-                      timeStyle: "short",
-                      timeZone: "America/Sao_Paulo",
-                    }).format(new Date(row.createdAt))}
-                  </td>
+      {data.total > 0 ? (
+        <div className="space-y-3">
+          <div className="overflow-x-auto rounded-xl border border-border">
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-border text-xs uppercase tracking-wide text-muted">
+                <tr>
+                  <th className="px-3 py-2 font-medium">Para</th>
+                  <th className="px-3 py-2 font-medium">Assunto</th>
+                  <th className="px-3 py-2 font-medium">Tipo</th>
+                  <th className="px-3 py-2 font-medium">Status</th>
+                  <th className="px-3 py-2 font-medium">Quando</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {data.itens.map((row) => (
+                  <tr key={row.id} className="border-t border-border">
+                    <td className="px-3 py-2 font-mono text-xs">{row.to}</td>
+                    <td className="max-w-[220px] truncate px-3 py-2">
+                      {row.subject}
+                    </td>
+                    <td className="px-3 py-2">
+                      {EMAIL_CATEGORIA_LABEL[row.categoria]}
+                    </td>
+                    <td className="px-3 py-2">{row.lastEvent}</td>
+                    <td className="px-3 py-2 text-xs text-muted">
+                      {new Intl.DateTimeFormat("pt-BR", {
+                        dateStyle: "short",
+                        timeStyle: "short",
+                        timeZone: "America/Sao_Paulo",
+                      }).format(new Date(row.createdAt))}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
+            <p className="text-muted">
+              {from}–{to} de {data.total}
+            </p>
+            <div className="flex items-center gap-2">
+              {data.page > 1 ? (
+                <Link
+                  href={pageHref({
+                    dias,
+                    status,
+                    categoria,
+                    page: data.page - 1,
+                  })}
+                  className="btn-ghost px-3 py-1.5 text-sm"
+                >
+                  Anterior
+                </Link>
+              ) : (
+                <span className="px-3 py-1.5 text-sm text-muted/50">Anterior</span>
+              )}
+              <span className="tabular-nums text-muted">
+                Página {data.page} / {data.totalPages}
+              </span>
+              {data.page < data.totalPages ? (
+                <Link
+                  href={pageHref({
+                    dias,
+                    status,
+                    categoria,
+                    page: data.page + 1,
+                  })}
+                  className="btn-ghost px-3 py-1.5 text-sm"
+                >
+                  Próxima
+                </Link>
+              ) : (
+                <span className="px-3 py-1.5 text-sm text-muted/50">Próxima</span>
+              )}
+            </div>
+          </div>
         </div>
+      ) : !data.aviso ? (
+        <p className="text-sm text-muted">Nenhum e-mail neste filtro.</p>
       ) : null}
     </div>
   );

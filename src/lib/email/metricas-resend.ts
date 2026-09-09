@@ -93,6 +93,8 @@ export type MetricasEmailFiltro = {
   dias: number;
   status?: string | "all";
   categoria?: EmailCategoria | "all";
+  page?: number;
+  pageSize?: number;
 };
 
 export type MetricasEmailAgregado = {
@@ -104,6 +106,9 @@ export type MetricasEmailAgregado = {
   delivered: number;
   taxaOpen: number | null;
   taxaClick: number | null;
+  page: number;
+  pageSize: number;
+  totalPages: number;
   itens: Array<{
     id: string;
     to: string;
@@ -132,6 +137,9 @@ function emptyByCategoria(): Record<EmailCategoria, number> {
 export async function agregarMetricasEmail(
   filtro: MetricasEmailFiltro,
 ): Promise<MetricasEmailAgregado> {
+  const pageSize = Math.min(Math.max(filtro.pageSize ?? 20, 5), 50);
+  const pageRaw = Math.max(filtro.page ?? 1, 1);
+
   if (!resendApiKey()) {
     return {
       total: 0,
@@ -142,6 +150,9 @@ export async function agregarMetricasEmail(
       delivered: 0,
       taxaOpen: null,
       taxaClick: null,
+      page: 1,
+      pageSize,
+      totalPages: 1,
       itens: [],
       aviso:
         "Configure RESEND_API_KEY (ou RESEND_SMTP_PASS) na Vercel para carregar as métricas.",
@@ -195,6 +206,9 @@ export async function agregarMetricasEmail(
   }
 
   const total = filtrados.length;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const page = Math.min(pageRaw, totalPages);
+  const start = (page - 1) * pageSize;
   const engajaveis = filtrados.filter((e) =>
     ["delivered", "opened", "clicked"].includes(e.lastEvent),
   ).length;
@@ -208,7 +222,10 @@ export async function agregarMetricasEmail(
     delivered,
     taxaOpen: engajaveis > 0 ? (opened + clicked) / engajaveis : null,
     taxaClick: engajaveis > 0 ? clicked / engajaveis : null,
-    itens: filtrados.slice(0, 40).map((e) => ({
+    page,
+    pageSize,
+    totalPages,
+    itens: filtrados.slice(start, start + pageSize).map((e) => ({
       ...e,
       to: mascararEmail(e.to),
     })),

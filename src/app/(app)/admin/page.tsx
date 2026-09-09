@@ -48,6 +48,7 @@ type Props = {
     dias?: string;
     categoria?: string;
     emailStatus?: string;
+    page?: string;
   }>;
 };
 
@@ -122,6 +123,7 @@ export default async function AdminPage({ searchParams }: Props) {
       : "all";
   const emailCategoria: EmailCategoria | "all" =
     sp.categoria && isEmailCategoria(sp.categoria) ? sp.categoria : "all";
+  const emailPage = Math.max(1, Number(sp.page) || 1);
 
   const [spaces, memberships, counts, allowed, modules, utmMetrics, giftPosts, liveRegra, emailMetrics] =
     await Promise.all([
@@ -142,6 +144,8 @@ export default async function AdminPage({ searchParams }: Props) {
           dias: emailDias,
           status: emailStatus,
           categoria: emailCategoria,
+          page: emailPage,
+          pageSize: 20,
         }).catch((e) => ({
           total: 0,
           byStatus: {},
@@ -153,6 +157,9 @@ export default async function AdminPage({ searchParams }: Props) {
           delivered: 0,
           taxaOpen: null,
           taxaClick: null,
+          page: 1,
+          pageSize: 20,
+          totalPages: 1,
           itens: [],
           aviso: e instanceof Error ? e.message : "Falha ao consultar Resend.",
         }))
