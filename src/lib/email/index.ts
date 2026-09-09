@@ -1,6 +1,11 @@
 import nodemailer from "nodemailer";
 import { requireAuthEnv } from "@/lib/auth/env";
 import { NOME_PRODUTO } from "@/lib/produto";
+import {
+  RESEND_TAG_CATEGORY,
+  type EmailCategoria,
+} from "./categorias";
+import { resendApiKey } from "./resend-key";
 
 type EmailProvider = "mailpit" | "resend";
 
@@ -20,12 +25,57 @@ function escapeHtml(s: string): string {
     .replace(/"/g, "&quot;");
 }
 
+/** F085 — envio via HTTP API (tags). SMTP fica só como fallback se a API key falhar de config. */
+async function sendViaResendApi(opts: {
+  to: string;
+  subject: string;
+  text: string;
+  html: string;
+  headers?: Record<string, string>;
+  category?: EmailCategoria;
+}): Promise<void> {
+  const key = resendApiKey();
+  if (!key) {
+    throw new Error(
+      "[email] RESEND_API_KEY ou RESEND_SMTP_PASS obrigatório para EMAIL_PROVIDER=resend",
+    );
+  }
+  const from = requireAuthEnv("RESEND_SMTP_FROM_EMAIL");
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${key}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from,
+      to: [opts.to],
+      subject: opts.subject,
+      text: opts.text,
+      html: opts.html,
+      ...(opts.headers ? { headers: opts.headers } : {}),
+      ...(opts.category
+        ? {
+            tags: [{ name: RESEND_TAG_CATEGORY, value: opts.category }],
+          }
+        : {}),
+    }),
+  });
+  if (!res.ok) {
+    throw new Error(
+      `[email] Resend API falhou: ${res.status} ${await res.text()}`,
+    );
+  }
+}
+
 async function sendMail(opts: {
   to: string;
   subject: string;
   text: string;
   html: string;
   headers?: Record<string, string>;
+  /** F085 — tag Resend `category`. */
+  category?: EmailCategoria;
 }): Promise<void> {
   const provider = getProvider();
 
@@ -52,6 +102,13 @@ async function sendMail(opts: {
     if (!res.ok) {
       throw new Error(`[email] Mailpit falhou: ${res.status} ${await res.text()}`);
     }
+    return;
+  }
+
+  // Preferência: API (F085 tags). Fallback SMTP se HOST ainda for o caminho antigo
+  // e a API key existir — na prática sempre API quando há re_ key.
+  if (resendApiKey()) {
+    await sendViaResendApi(opts);
     return;
   }
 
@@ -105,7 +162,7 @@ export async function sendMagicLinkEmail(opts: {
     `<p style="color:#64748b;font-size:15px;line-height:1.5;">O link vale por poucos minutos.</p>
     <p style="margin:24px 0;"><a href="${escapeHtml(opts.url)}" style="display:inline-block;background:#0d9488;color:#fff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:600;">Entrar</a></p>`,
   );
-  await sendMail({ to: opts.to, subject, text, html });
+  await sendMail({ to: opts.to, subject, text, html, category: "login" });
 }
 
 export async function sendOtpEmail(opts: { to: string; otp: string }): Promise<void> {
@@ -138,7 +195,7 @@ export async function sendOtpEmail(opts: { to: string; otp: string }): Promise<v
     <p style="margin:24px 0;font-size:32px;letter-spacing:0.28em;font-weight:700;color:#0f172a;text-align:center;">${escapeHtml(opts.otp)}</p>
     <p style="color:#64748b;font-size:14px;line-height:1.6;">Do outro lado dele: as primeiras aulas da formação, o feed com o que a comunidade está fechando — cliente, preço e como foi — e os presentes liberados.</p>`,
   );
-  await sendMail({ to: opts.to, subject, text, html });
+  await sendMail({ to: opts.to, subject, text, html, category: "login" });
 }
 
 /** F073 — aviso agrupado de resposta (não é newsletter). */
@@ -170,6 +227,7 @@ export async function sendReplyDigestEmail(opts: {
       "List-Unsubscribe": `<${opts.unsubApiUrl}>`,
       "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
     },
+    category: "respostas",
   });
 }
 
@@ -206,6 +264,7 @@ export async function sendRegua48hEmail(opts: {
     subject,
     text,
     html,
+    category: "regua",
   });
 }
 
@@ -237,6 +296,7 @@ export async function sendRegua7dEmail(opts: {
     subject,
     text,
     html,
+    category: "regua",
   });
 }
 
@@ -268,6 +328,7 @@ export async function sendRegua14dEmail(opts: {
     subject,
     text,
     html,
+    category: "regua",
   });
 }
 
@@ -418,5 +479,6 @@ export async function sendLiveLembreteEmail(opts: {
     subject,
     text,
     html,
+    category: "live",
   });
 }
