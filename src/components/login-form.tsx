@@ -4,9 +4,7 @@ import { FormEvent, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { authClient } from "@/lib/auth/client";
-import { NOME_PRODUTO } from "@/lib/produto";
 import { safeCallbackPath } from "@/lib/security/urls";
-import { ThemeToggle } from "@/components/theme-toggle";
 
 function mensagemErroCallback(code: string | null): string | null {
   if (!code) return null;
@@ -78,140 +76,127 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
     }
   }
 
-  return (
-    <div className="relative flex min-h-dvh items-center justify-center px-4 py-12">
-      <div className="absolute right-4 top-4 z-10">
-        <ThemeToggle variant="icon" />
+  if (sent) {
+    return (
+      <div>
+        <h1 className="page-title">Link enviado</h1>
+        <p className="mt-3 text-sm leading-relaxed text-muted">
+          Enviamos um link para{" "}
+          <strong className="text-foreground">{email}</strong>. Abra o e-mail
+          para entrar. O link vale por poucos minutos.
+        </p>
       </div>
-      <div
-        className="pointer-events-none absolute inset-0 opacity-90"
-        aria-hidden
-      />
-      <div className="relative w-full max-w-md animate-[fadeIn_0.4s_ease-out]">
-        <p className="font-[family-name:var(--font-outfit)] text-4xl font-bold tracking-tight text-foreground md:text-5xl">
-          {NOME_PRODUTO}
-        </p>
-        {/* F067 — a tela de entrada diz o que o Club faz antes de pedir
-            o e-mail. */}
-        <p className="mt-3 max-w-sm text-base leading-relaxed text-muted">
-          A comunidade de quem está montando a própria operação de IA e
-          automação: aulas, skills prontas e gente fechando cliente junto.
-        </p>
+    );
+  }
 
-        <div
-          className="mt-8 rounded-2xl border border-border/80 bg-card p-7 shadow-[0_12px_40px_rgba(15,23,42,0.06)]"
+  return (
+    <div className="flex flex-col gap-7" data-clarity-mask="true">
+      <div>
+        <h1 className="page-title">Entre na comunidade</h1>
+        <p className="mt-2 text-sm text-muted">
+          Não tem conta?{" "}
+          <Link
+            href="/cadastro"
+            className="font-semibold text-accent hover:underline"
+          >
+            Criar conta grátis
+          </Link>
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-4">
+        {googleEnabled ? (
+          <>
+            <button
+              type="button"
+              className="btn-outline w-full"
+              disabled={loading}
+              onClick={onGoogle}
+            >
+              Entrar com Google
+            </button>
+            <div className="flex items-center gap-3" aria-hidden>
+              <span className="h-px flex-1 bg-border" />
+              <span className="text-xs text-muted">ou</span>
+              <span className="h-px flex-1 bg-border" />
+            </div>
+          </>
+        ) : null}
+
+        <form
+          onSubmit={onMagicLink}
+          className="flex flex-col gap-3"
           data-clarity-mask="true"
         >
-          {sent ? (
-            <div>
-              <p className="text-sm font-semibold text-foreground">
-                Link enviado
-              </p>
-              <p className="mt-2 text-sm leading-relaxed text-muted">
-                Enviamos um link para <strong className="text-foreground">{email}</strong>.
-                Abra o e-mail para entrar. O link vale por poucos minutos.
-              </p>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-4">
-              <p className="text-sm font-medium text-foreground">
-                Entre na comunidade
-              </p>
-              {googleEnabled ? (
-                <button
-                  type="button"
-                  className="btn-outline w-full"
-                  disabled={loading}
-                  onClick={onGoogle}
-                >
-                  Entrar com Google
-                </button>
-              ) : null}
+          <label className="text-xs font-medium text-muted">
+            E-mail
+            <input
+              className="input mt-1.5"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="voce@email.com"
+            />
+          </label>
+          <button
+            type="submit"
+            className="btn-primary w-full"
+            disabled={loading}
+          >
+            {/*
+             * F086 — "magic link" é jargão: quem chega na tela não sabe o que
+             * vai acontecer ao clicar. O rótulo diz o próximo passo real.
+             */}
+            {loading ? "Enviando…" : "Receber link de acesso"}
+          </button>
+        </form>
 
-              {googleEnabled ? (
-                <p className="text-center text-xs text-muted">ou use e-mail</p>
-              ) : null}
+        {error ? (
+          <p className="text-sm text-red-600 dark:text-red-400" role="alert">
+            {error}
+          </p>
+        ) : null}
 
-              <form
-                onSubmit={onMagicLink}
-                className="flex flex-col gap-3"
-                data-clarity-mask="true"
-              >
-                <label className="text-xs font-medium text-muted">
-                  E-mail
-                  <input
-                    className="input mt-1.5"
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="voce@email.com"
-                  />
-                </label>
-                <button
-                  type="submit"
-                  className="btn-primary w-full"
-                  disabled={loading}
-                >
-                  {loading ? "Enviando…" : "Receber magic link"}
-                </button>
-              </form>
+        {contaExcluida ? (
+          <p className="text-sm text-muted" role="status">
+            Sua conta foi excluída. Seus dados pessoais foram removidos.
+          </p>
+        ) : null}
+      </div>
 
-              {error ? (
-                <p className="text-sm text-red-600 dark:text-red-400" role="alert">
-                  {error}
-                </p>
-              ) : null}
-
-              {contaExcluida ? (
-                <p className="text-sm text-muted" role="status">
-                  Sua conta foi excluída. Seus dados pessoais foram removidos.
-                </p>
-              ) : null}
-
-              {/*
-               * F078 — mesma razão do `gift-signup-form`: em aba nova, ler os
-               * Termos não custa o e-mail digitado nem o código de 6 dígitos
-               * que acabou de chegar (o OTP expira em 10 min).
-               */}
-              <p className="pt-2 text-center text-xs text-muted">
-                Ao continuar, você concorda com os{" "}
-                <a
-                  href="/termos"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-accent hover:underline"
-                >
-                  Termos de Uso
-                </a>{" "}
-                e a{" "}
-                <a
-                  href="/privacidade"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-accent hover:underline"
-                >
-                  Política de Privacidade
-                </a>
-                .
-              </p>
-              <p className="text-center text-sm text-muted">
-                Não tem conta?{" "}
-                <Link
-                  href="/cadastro"
-                  className="font-semibold text-accent hover:underline"
-                >
-                  Criar conta grátis
-                </Link>
-              </p>
-              {/* F067 — o que a conta gratuita já entrega, sem pedágio. */}
-              <p className="text-center text-xs text-muted">
-                No gratuito você já assiste as primeiras aulas, lê o feed da
-                comunidade e pega os presentes.
-              </p>
-            </div>
-          )}
-        </div>
+      <div className="flex flex-col gap-3">
+        {/*
+         * F078 — mesma razão do `gift-signup-form`: em aba nova, ler os
+         * Termos não custa o e-mail digitado nem o código de 6 dígitos
+         * que acabou de chegar (o OTP expira em 10 min).
+         */}
+        <p className="text-center text-xs text-muted">
+          Ao continuar, você concorda com os{" "}
+          <a
+            href="/termos"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-accent hover:underline"
+          >
+            Termos de Uso
+          </a>{" "}
+          e a{" "}
+          <a
+            href="/privacidade"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-accent hover:underline"
+          >
+            Política de Privacidade
+          </a>
+          .
+        </p>
+        {/* F067 — o que a conta gratuita já entrega, sem pedágio. */}
+        <p className="text-center text-xs text-muted">
+          No gratuito você já assiste as primeiras aulas, lê o feed da
+          comunidade e pega os presentes.
+        </p>
       </div>
     </div>
   );
