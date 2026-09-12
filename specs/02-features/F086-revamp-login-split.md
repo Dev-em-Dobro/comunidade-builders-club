@@ -46,6 +46,20 @@ que a pessoa monta camada por camada — a metáfora que dá nome ao Club.
 
 - O painel é **escuro nos dois temas** (claro e escuro). É o contraste que a
   referência tira da foto. O que segue o tema é a coluna do formulário.
+
+> **Por que o painel não acompanha o tema claro.** O app abre no claro para
+> todo mundo: o bootstrap do F042 só aplica `dark` se `localStorage` disser
+> `dark`, e nem consulta o `prefers-color-scheme`. Então o login já abre
+> claro — o painel escuro é a única peça que não segue.
+>
+> Foi testada uma versão de painel claro (menta, blocos de face branca).
+> Ela é mais coerente com a comunidade, mas a divisão 50/50 quase some:
+> duas metades claras viram uma emenda sutil em vez do contraste que
+> sustenta o layout inteiro. O painel escuro é a porta de entrada; o app
+> é onde se trabalha. A troca de temperatura marca essa passagem.
+>
+> Decisão do dono do produto em 12/09/2026, com as duas versões
+> renderizadas lado a lado.
 - A **grade isométrica** é CSS (`repeating-linear-gradient` a ±30°), não SVG:
   ladrilha em qualquer proporção, então a mesma textura serve a coluna de
   720×900 do desktop e a faixa de 375×155 do mobile. Um `viewBox` fixo daria
