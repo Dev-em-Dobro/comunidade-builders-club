@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
-import { NOME_PRODUTO } from "@/lib/produto";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { AuthSplitLayout } from "@/components/auth-split-layout";
 import { GiftSignupForm } from "@/components/gift-signup-form";
 import { getOptionalUser } from "@/lib/auth/require-user";
 
@@ -17,30 +16,19 @@ export default async function CadastroPage() {
   if (user) redirect("/");
 
   return (
-    <div className="relative flex min-h-dvh items-center justify-center px-4 py-12">
-      <div className="absolute right-4 top-4 z-10">
-        <ThemeToggle variant="icon" />
-      </div>
-      <main className="relative w-full max-w-md animate-[fadeIn_0.4s_ease-out]">
-        <p className="font-[family-name:var(--font-outfit)] text-4xl font-bold tracking-tight text-foreground md:text-5xl">
-          {NOME_PRODUTO}
-        </p>
-        <h1 className="page-title mt-4">Crie sua conta no Builders Club</h1>
-        {/* F067 — o ganho antes do mecanismo: primeiro o que ela leva,
-            depois o código de 6 dígitos. */}
-        <p className="mt-2 text-sm leading-relaxed text-muted">
-          Grátis: as primeiras aulas da formação, o feed com o que a
-          comunidade está fechando e os presentes liberados. Sem senha —
-          enviamos um código de 6 dígitos para o seu e-mail.
-        </p>
-        <div className="mt-8">
-          <GiftSignupForm
-            headline="Criar conta grátis"
-            subhead="Nome, e-mail e o código que chega na caixa de entrada."
-            alreadyMemberHref="/login"
-          />
-        </div>
-      </main>
-    </div>
+    <AuthSplitLayout>
+      {/*
+       * F067 — o ganho antes do mecanismo: primeiro o que ela leva, depois o
+       * código de 6 dígitos. F086 juntou a antiga descrição da página ao
+       * `subhead`; na coluna estreita, dois blocos de texto antes do primeiro
+       * campo empurravam o formulário para fora da tela.
+       */}
+      <GiftSignupForm
+        variant="plain"
+        headline="Crie sua conta grátis"
+        subhead="Grátis: as primeiras aulas da formação, o feed com o que a comunidade está fechando e os presentes liberados. Sem senha — enviamos um código de 6 dígitos para o seu e-mail."
+        alreadyMemberHref="/login"
+      />
+    </AuthSplitLayout>
   );
 }
