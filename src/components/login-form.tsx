@@ -1,10 +1,21 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { authClient } from "@/lib/auth/client";
 import { safeCallbackPath } from "@/lib/security/urls";
+
+/**
+ * F086 — intervalo entre um envio e o próximo.
+ *
+ * O link vale 5 minutos (`magicLink.expiresIn` em `lib/auth`), então reenviar
+ * de segundo em segundo só gera e-mail que vence junto. O freio também existe
+ * porque este projeto não configura `rateLimit` no Better Auth: o que segura
+ * o servidor é o limite padrão dele, e não vale deixar um botão convidando a
+ * testá-lo.
+ */
+const ESPERA_REENVIO = 30;
 
 function mensagemErroCallback(code: string | null): string | null {
   if (!code) return null;
@@ -39,9 +50,18 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(erroCallback);
   const [loading, setLoading] = useState(false);
+  const [espera, setEspera] = useState(0);
+  // Só para confirmar o reenvio: sem isto, clicar em "Reenviar" não muda nada
+  // na tela e a pessoa clica de novo achando que falhou.
+  const [reenviado, setReenviado] = useState(false);
 
-  async function onMagicLink(e: FormEvent) {
-    e.preventDefault();
+  useEffect(() => {
+    if (espera <= 0) return;
+    const t = setTimeout(() => setEspera((s) => s - 1), 1000);
+    return () => clearTimeout(t);
+  }, [espera]);
+
+  async function enviarLink() {
     setLoading(true);
     setError(null);
     try {
@@ -52,14 +72,33 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
       });
       if (err) {
         setError(err.message ?? "Falha ao enviar link.");
-        return;
+        return false;
       }
-      setSent(true);
+      setEspera(ESPERA_REENVIO);
+      return true;
     } catch {
       setError("Falha ao enviar link.");
+      return false;
     } finally {
       setLoading(false);
     }
+  }
+
+  async function onMagicLink(e: FormEvent) {
+    e.preventDefault();
+    if (await enviarLink()) setSent(true);
+  }
+
+  async function onReenviar() {
+    setReenviado(false);
+    if (await enviarLink()) setReenviado(true);
+  }
+
+  /** Volta ao formulário com o e-mail preenchido: quase sempre é um typo. */
+  function onTrocarEmail() {
+    setSent(false);
+    setReenviado(false);
+    setError(null);
   }
 
   async function onGoogle() {
@@ -76,15 +115,65 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
     }
   }
 
+  /*
+   * F086 — a confirmação não é um beco sem saída. Antes ela substituía o
+   * formulário inteiro: quem errava o e-mail ou não recebia nada só saía dali
+   * recarregando a página. Agora leva as duas saídas reais — reenviar e
+   * corrigir o endereço.
+   */
   if (sent) {
     return (
-      <div>
+      <div data-clarity-mask="true">
         <h1 className="page-title">Link enviado</h1>
         <p className="mt-3 text-sm leading-relaxed text-muted">
           Enviamos um link para{" "}
           <strong className="text-foreground">{email}</strong>. Abra o e-mail
-          para entrar. O link vale por poucos minutos.
+          para entrar — o link vale por 5 minutos.
         </p>
+        {/* A causa mais comum de "não chegou" é a caixa errada, não o envio. */}
+        <p className="mt-3 text-sm font-medium text-foreground">
+          Não achou? Olhe em spam e em promoções.
+        </p>
+
+        {error ? (
+          <p className="mt-4 text-sm text-red-600 dark:text-red-400" role="alert">
+            {error}
+          </p>
+        ) : null}
+
+        {/*
+         * Sem afirmar que o link anterior morreu: o plugin do Better Auth
+         * emite um token novo, mas não confirmei que invalida o antigo.
+         * "O mais recente" é orientação segura nos dois casos.
+         */}
+        {reenviado && !error ? (
+          <p className="mt-4 text-sm text-accent" role="status">
+            Link reenviado para {email}. Use o e-mail mais recente.
+          </p>
+        ) : null}
+
+        <div className="mt-6 flex flex-col gap-2">
+          <button
+            type="button"
+            className="btn-outline w-full"
+            disabled={loading || espera > 0}
+            onClick={onReenviar}
+          >
+            {loading
+              ? "Enviando…"
+              : espera > 0
+                ? `Reenviar em ${espera}s`
+                : "Reenviar link"}
+          </button>
+          <button
+            type="button"
+            className="btn-ghost w-full text-sm"
+            disabled={loading}
+            onClick={onTrocarEmail}
+          >
+            Usar outro e-mail
+          </button>
+        </div>
       </div>
     );
   }
