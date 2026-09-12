@@ -53,6 +53,10 @@ que a pessoa monta camada por camada — a metáfora que dá nome ao Club.
 - A **pilha de blocos** é SVG e só aparece a partir de `lg`, no vão entre o
   wordmark e o texto. Na faixa mobile ela teria tamanho de ícone; lá a grade
   sozinha carrega a textura.
+- A pilha fica **no fluxo** (`flex-1`), não posicionada por cima. Com
+  `absolute` + largura em `rem` ela encostava no wordmark e na frase em telas
+  largas, onde o painel cresce mas o SVG não. No fluxo, o `py` vira folga
+  garantida e o `preserveAspectRatio` encolhe a arte para caber no que sobrar.
 - Conteúdo: wordmark `BUILDERS CLUB` + a frase de posicionamento do F067.
 - Três provas de valor no rodapé do painel, **só no desktop** (`hidden lg:…`).
   Na faixa mobile não cabe sem empurrar o formulário para baixo da dobra.
@@ -71,7 +75,39 @@ Hierarquia da coluna do formulário:
 6. Termos e privacidade
 7. A linha do F067 sobre o que o gratuito entrega
 
-### 4. O que não muda
+### 4. Entrada animada
+A tela se monta em ~1s. A ordem conta a mesma história do desenho: primeiro a
+marca, depois a operação sendo empilhada, depois a promessa.
+
+| Elemento | Atraso | Movimento |
+| --- | --- | --- |
+| Wordmark | 0 | sobe 14px + fade |
+| Risco sob o wordmark | 180 ms | desenha da esquerda para a direita |
+| Bloco da base | 120 ms | cai de cima e assenta com repique curto |
+| Bloco do meio | 250 ms | idem |
+| Bloco do topo | 380 ms | idem |
+| Frase de posicionamento | 140 ms | sobe 14px + fade |
+| Provas de valor | 420/510/600 ms | sobe 14px + fade, em cascata |
+| Coluna do formulário | 0 | sobe 14px + fade |
+
+- Os blocos empilham **de baixo para cima**: é a ordem de quem constrói.
+- A queda é medida em unidades do `viewBox`, não em px de tela, para escalar
+  junto com a arte quando o painel encolhe.
+- A coluna do formulário **não espera** o painel. É a parte funcional da tela;
+  atrasar o campo de e-mail para exibir enfeite é custo, não polimento.
+- `prefers-reduced-motion: reduce` zera todas as animações. Como nenhum
+  elemento depende do `fill: both` para ficar visível, a tela aparece pronta.
+
+### 5. Sem jargão no botão
+O botão do login dizia `Receber magic link`. "Magic link" é vocabulário de
+quem constrói autenticação, não de quem está tentando entrar: o rótulo não
+diz o que acontece ao clicar. Passa a ser **`Receber link de acesso`**.
+
+Os documentos legais (`/termos`, `/privacidade`) mantêm o termo técnico —
+ali ele descreve o mecanismo para efeito de contrato, e mexer em texto legal
+é decisão separada.
+
+### 6. O que não muda
 - Toda a lógica de autenticação de `login-form.tsx` e `gift-signup-form.tsx`
   fica intacta: magic link, Google, erros de callback, estado `sent`,
   `conta=excluida`, `data-clarity-mask`.
@@ -81,7 +117,7 @@ Hierarquia da coluna do formulário:
 - O `ThemeToggle` continua no canto superior direito, mas ancorado na **coluna
   do formulário**, nunca sobre o painel escuro (onde `btn-ghost` fica ilegível).
 
-### 5. Fora de escopo
+### 7. Fora de escopo
 `/cadastro/[utmContent]` (landing de atribuição de presente) segue com o layout
 atual. Ela tem copy e estados próprios (visitante já logado, aviso de conta
 criada) e entra numa feature separada se for o caso.
@@ -96,9 +132,14 @@ criada) e entra numa feature separada se for o caso.
 - [ ] Pilha de blocos aparece só a partir de `lg`, sem encostar no wordmark
       nem na frase de posicionamento (conferir em 1024px e em 1440px)
 - [ ] As três provas de valor aparecem só a partir de `lg`
+- [ ] Sem rolagem vertical no painel em 1920, 1440, 1280 e 1024 de largura
+- [ ] Blocos empilham de baixo para cima e a tela toda se monta em ~1s
+- [ ] Com `prefers-reduced-motion: reduce` nada some: tudo em `opacity: 1`
+- [ ] Botão do login diz `Receber link de acesso`, sem "magic link"
 - [ ] Formulário sem card: sem borda, sem sombra, coluna `max-w-sm` centrada
 - [ ] `ThemeToggle` fica na coluna do formulário, não sobre o painel
-- [ ] Magic link, Google, estado `sent` e mensagens de erro seguem funcionando
+- [ ] Link por e-mail, Google, estado `sent` e mensagens de erro seguem
+      funcionando
 - [ ] Linha do F067 sobre o gratuito continua visível nos dois tamanhos
 - [ ] `data-clarity-mask` preservado nos campos
 - [ ] Sem rolagem horizontal em 375px
