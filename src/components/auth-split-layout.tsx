@@ -16,23 +16,38 @@ import { ThemeToggle } from "@/components/theme-toggle";
  */
 const PAINEL_FUNDO = {
   backgroundImage: [
-    "radial-gradient(ellipse 85% 55% at 12% 0%, rgba(45,212,191,0.30), transparent 62%)",
-    "radial-gradient(ellipse 60% 45% at 72% 42%, rgba(20,184,166,0.15), transparent 62%)",
-    "radial-gradient(ellipse 75% 50% at 95% 100%, rgba(13,148,136,0.34), transparent 58%)",
-    "linear-gradient(158deg, #052e2c 0%, #06231f 48%, #03191a 100%)",
+    "radial-gradient(ellipse 80% 50% at 14% 0%, rgba(45,212,191,0.24), transparent 62%)",
+    "radial-gradient(ellipse 70% 45% at 92% 100%, rgba(13,148,136,0.28), transparent 58%)",
+    "linear-gradient(162deg, #052e2c 0%, #051f22 55%, #02161a 100%)",
   ].join(","),
 } as const;
 
-/** Malha fina por cima do gradiente — eco da identidade do boas-vindas. */
-const PAINEL_MALHA = {
+/**
+ * Grade isométrica: o chão onde os blocos assentam.
+ *
+ * Em CSS e não no SVG de propósito — o `repeating-linear-gradient` ladrilha
+ * em qualquer proporção, então a mesma textura serve a coluna de 720x900 do
+ * desktop e a faixa de 375x155 do mobile. Um SVG com `viewBox` fixo daria
+ * zoom absurdo na faixa.
+ *
+ * O ângulo do gradiente é perpendicular às listras: 120deg desenha linhas a
+ * +30° e 60deg desenha a -30°, que é o par isométrico.
+ */
+const PAINEL_GRADE = {
   backgroundImage: [
-    "linear-gradient(to right, rgba(255,255,255,0.045) 1px, transparent 1px)",
-    "linear-gradient(to bottom, rgba(255,255,255,0.045) 1px, transparent 1px)",
+    "repeating-linear-gradient(120deg, rgba(255,255,255,0.05) 0 1px, transparent 1px 56px)",
+    "repeating-linear-gradient(60deg, rgba(255,255,255,0.05) 0 1px, transparent 1px 56px)",
   ].join(","),
-  backgroundSize: "34px 34px",
-  maskImage: "radial-gradient(ellipse 70% 70% at 50% 40%, black, transparent)",
+  maskImage: "radial-gradient(ellipse 75% 75% at 50% 42%, black, transparent)",
   WebkitMaskImage:
-    "radial-gradient(ellipse 70% 70% at 50% 40%, black, transparent)",
+    "radial-gradient(ellipse 75% 75% at 50% 42%, black, transparent)",
+} as const;
+
+/** Brilho por trás da pilha, para os blocos não flutuarem no vazio. */
+const BLOCOS_BRILHO = {
+  backgroundImage:
+    "radial-gradient(ellipse 50% 40% at 50% 50%, rgba(45,212,191,0.22), transparent 70%)",
+  filter: "blur(46px)",
 } as const;
 
 const PROVAS = [
@@ -40,6 +55,40 @@ const PROVAS = [
   "Feed com o que a comunidade está fechando",
   "Skills prontas e presentes pra usar hoje",
 ];
+
+/**
+ * Três blocos empilhados, do mais largo ao mais estreito: a operação que a
+ * pessoa monta camada por camada. Cada bloco são três faces — topo iluminado,
+ * lateral esquerda neutra, lateral direita na sombra.
+ *
+ * Só a partir de `lg`: na faixa mobile a pilha ficaria do tamanho de um
+ * ícone, e aí a grade isométrica sozinha carrega a textura.
+ */
+function BlocosIsometricos() {
+  return (
+    <svg
+      viewBox="100 110 240 385"
+      fill="none"
+      className="pointer-events-none absolute left-1/2 top-[36%] -z-10 hidden w-[13rem] -translate-x-1/2 -translate-y-1/2 lg:block xl:w-[15rem]"
+      aria-hidden
+    >
+      <g stroke="rgba(94,234,212,0.32)" strokeWidth="1.4">
+        {/* base */}
+        <path d="M220 430l108-62-108-62-108 62z" fill="rgba(45,212,191,0.13)" />
+        <path d="M112 368v54l108 62v-54z" fill="rgba(255,255,255,0.04)" />
+        <path d="M328 368v54l-108 62v-54z" fill="rgba(0,0,0,0.28)" />
+        {/* meio */}
+        <path d="M220 300l84-48-84-49-84 49z" fill="rgba(45,212,191,0.17)" />
+        <path d="M136 252v50l84 49v-50z" fill="rgba(255,255,255,0.05)" />
+        <path d="M304 252v50l-84 49v-50z" fill="rgba(0,0,0,0.28)" />
+        {/* topo */}
+        <path d="M220 188l58-34-58-33-58 33z" fill="rgba(94,234,212,0.24)" />
+        <path d="M162 154v40l58 33v-40z" fill="rgba(255,255,255,0.06)" />
+        <path d="M278 154v40l-58 33v-40z" fill="rgba(0,0,0,0.28)" />
+      </g>
+    </svg>
+  );
+}
 
 function CheckIcon() {
   return (
@@ -67,9 +116,15 @@ export function AuthSplitLayout({ children }: { children: ReactNode }) {
       >
         <div
           className="pointer-events-none absolute inset-0 -z-10"
-          style={PAINEL_MALHA}
+          style={PAINEL_GRADE}
           aria-hidden
         />
+        <div
+          className="pointer-events-none absolute left-1/2 top-[36%] -z-10 hidden h-80 w-80 -translate-x-1/2 -translate-y-1/2 lg:block"
+          style={BLOCOS_BRILHO}
+          aria-hidden
+        />
+        <BlocosIsometricos />
 
         <div>
           <p className="font-[family-name:var(--font-outfit)] text-xl font-bold uppercase tracking-[0.16em] text-white lg:text-2xl">

@@ -37,11 +37,22 @@ DESKTOP (lg+, 1024px)          MOBILE (< lg)
 
 ### 2. O painel é de marca, não foto
 Não existe asset vertical no repositório, e a capa 16:9 do boas-vindas tem
-texto queimado que o recorte vertical decapita. O painel é construído em CSS:
-gradiente teal da marca + brilhos radiais + malha sutil.
+texto queimado que o recorte vertical decapita. O painel é desenhado em
+CSS + SVG: sem arquivo, sem peso, nítido em qualquer densidade de tela.
+
+A direção escolhida é **estrutura isométrica**: três blocos empilhados, do
+mais largo ao mais estreito, assentados numa grade isométrica. É a operação
+que a pessoa monta camada por camada — a metáfora que dá nome ao Club.
 
 - O painel é **escuro nos dois temas** (claro e escuro). É o contraste que a
   referência tira da foto. O que segue o tema é a coluna do formulário.
+- A **grade isométrica** é CSS (`repeating-linear-gradient` a ±30°), não SVG:
+  ladrilha em qualquer proporção, então a mesma textura serve a coluna de
+  720×900 do desktop e a faixa de 375×155 do mobile. Um `viewBox` fixo daria
+  zoom absurdo na faixa.
+- A **pilha de blocos** é SVG e só aparece a partir de `lg`, no vão entre o
+  wordmark e o texto. Na faixa mobile ela teria tamanho de ícone; lá a grade
+  sozinha carrega a textura.
 - Conteúdo: wordmark `BUILDERS CLUB` + a frase de posicionamento do F067.
 - Três provas de valor no rodapé do painel, **só no desktop** (`hidden lg:…`).
   Na faixa mobile não cabe sem empurrar o formulário para baixo da dobra.
@@ -81,6 +92,9 @@ criada) e entra numa feature separada se for o caso.
 - [ ] Mobile: painel é faixa no topo de ~150px, formulário logo abaixo
 - [ ] Painel é escuro nos dois temas; coluna do formulário segue o tema
 - [ ] Painel mostra wordmark + frase de posicionamento nos dois tamanhos
+- [ ] Grade isométrica visível nos dois tamanhos, sem deformar na faixa mobile
+- [ ] Pilha de blocos aparece só a partir de `lg`, sem encostar no wordmark
+      nem na frase de posicionamento (conferir em 1024px e em 1440px)
 - [ ] As três provas de valor aparecem só a partir de `lg`
 - [ ] Formulário sem card: sem borda, sem sombra, coluna `max-w-sm` centrada
 - [ ] `ThemeToggle` fica na coluna do formulário, não sobre o painel
