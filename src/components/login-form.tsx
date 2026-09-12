@@ -144,7 +144,11 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
             className="btn-primary w-full"
             disabled={loading}
           >
-            {loading ? "Enviando…" : "Receber magic link"}
+            {/*
+             * F086 — "magic link" é jargão: quem chega na tela não sabe o que
+             * vai acontecer ao clicar. O rótulo diz o próximo passo real.
+             */}
+            {loading ? "Enviando…" : "Receber link de acesso"}
           </button>
         </form>
 

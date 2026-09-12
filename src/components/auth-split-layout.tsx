@@ -46,7 +46,7 @@ const PAINEL_GRADE = {
 /** Brilho por trás da pilha, para os blocos não flutuarem no vazio. */
 const BLOCOS_BRILHO = {
   backgroundImage:
-    "radial-gradient(ellipse 50% 40% at 50% 50%, rgba(45,212,191,0.22), transparent 70%)",
+    "radial-gradient(ellipse 42% 38% at 50% 50%, rgba(45,212,191,0.24), transparent 70%)",
   filter: "blur(46px)",
 } as const;
 
@@ -61,32 +61,68 @@ const PROVAS = [
  * pessoa monta camada por camada. Cada bloco são três faces — topo iluminado,
  * lateral esquerda neutra, lateral direita na sombra.
  *
+ * A pilha fica **no fluxo** (`flex-1`), não posicionada por cima. Com
+ * `absolute` + largura em `rem` ela encostava no wordmark e na frase em
+ * telas largas, onde o painel cresce mas o SVG não. No fluxo, o `py` vira
+ * folga garantida e o `preserveAspectRatio` encolhe a arte para caber no
+ * que sobrar — em qualquer viewport.
+ *
  * Só a partir de `lg`: na faixa mobile a pilha ficaria do tamanho de um
  * ícone, e aí a grade isométrica sozinha carrega a textura.
  */
 function BlocosIsometricos() {
   return (
-    <svg
-      viewBox="100 110 240 385"
-      fill="none"
-      className="pointer-events-none absolute left-1/2 top-[36%] -z-10 hidden w-[13rem] -translate-x-1/2 -translate-y-1/2 lg:block xl:w-[15rem]"
-      aria-hidden
-    >
-      <g stroke="rgba(94,234,212,0.32)" strokeWidth="1.4">
-        {/* base */}
-        <path d="M220 430l108-62-108-62-108 62z" fill="rgba(45,212,191,0.13)" />
-        <path d="M112 368v54l108 62v-54z" fill="rgba(255,255,255,0.04)" />
-        <path d="M328 368v54l-108 62v-54z" fill="rgba(0,0,0,0.28)" />
-        {/* meio */}
-        <path d="M220 300l84-48-84-49-84 49z" fill="rgba(45,212,191,0.17)" />
-        <path d="M136 252v50l84 49v-50z" fill="rgba(255,255,255,0.05)" />
-        <path d="M304 252v50l-84 49v-50z" fill="rgba(0,0,0,0.28)" />
-        {/* topo */}
-        <path d="M220 188l58-34-58-33-58 33z" fill="rgba(94,234,212,0.24)" />
-        <path d="M162 154v40l58 33v-40z" fill="rgba(255,255,255,0.06)" />
-        <path d="M278 154v40l-58 33v-40z" fill="rgba(0,0,0,0.28)" />
-      </g>
-    </svg>
+    <div className="relative hidden min-h-0 flex-1 lg:block">
+      {/*
+       * O SVG mora num box `absolute inset-0`, de altura definida, e não solto
+       * no fluxo: com `h-full` sobre altura indefinida ele caía na altura por
+       * aspect-ratio (~409px), estourava o painel e cortava a última prova em
+       * 1440x900. Ancorado, a arte encolhe para o que sobrar e nunca empurra.
+       */}
+      <div className="absolute inset-0 py-14">
+        <div
+          className="pointer-events-none absolute inset-0 -z-10"
+          style={BLOCOS_BRILHO}
+          aria-hidden
+        />
+        <svg
+          viewBox="100 110 240 385"
+          fill="none"
+          preserveAspectRatio="xMidYMid meet"
+          className="mx-auto h-full w-full max-w-[15rem] xl:max-w-[17rem]"
+          aria-hidden
+        >
+          {/* Empilha de baixo para cima: é a ordem de quem constrói. */}
+          <g
+            className="auth-bloco [animation-delay:120ms]"
+            stroke="rgba(94,234,212,0.32)"
+            strokeWidth="1.4"
+          >
+            <path d="M220 430l108-62-108-62-108 62z" fill="rgba(45,212,191,0.13)" />
+            <path d="M112 368v54l108 62v-54z" fill="rgba(255,255,255,0.04)" />
+            <path d="M328 368v54l-108 62v-54z" fill="rgba(0,0,0,0.28)" />
+          </g>
+          <g
+            className="auth-bloco [animation-delay:250ms]"
+            stroke="rgba(94,234,212,0.32)"
+            strokeWidth="1.4"
+          >
+            <path d="M220 300l84-48-84-49-84 49z" fill="rgba(45,212,191,0.17)" />
+            <path d="M136 252v50l84 49v-50z" fill="rgba(255,255,255,0.05)" />
+            <path d="M304 252v50l-84 49v-50z" fill="rgba(0,0,0,0.28)" />
+          </g>
+          <g
+            className="auth-bloco [animation-delay:380ms]"
+            stroke="rgba(94,234,212,0.32)"
+            strokeWidth="1.4"
+          >
+            <path d="M220 188l58-34-58-33-58 33z" fill="rgba(94,234,212,0.24)" />
+            <path d="M162 154v40l58 33v-40z" fill="rgba(255,255,255,0.06)" />
+            <path d="M278 154v40l-58 33v-40z" fill="rgba(0,0,0,0.28)" />
+          </g>
+        </svg>
+      </div>
+    </div>
   );
 }
 
@@ -111,7 +147,7 @@ export function AuthSplitLayout({ children }: { children: ReactNode }) {
   return (
     <div className="grid min-h-dvh grid-rows-[auto_1fr] lg:grid-cols-2 lg:grid-rows-1">
       <aside
-        className="relative isolate flex flex-col justify-center gap-3 overflow-hidden px-6 py-8 lg:justify-between lg:gap-10 lg:px-12 lg:py-14 xl:px-16"
+        className="relative isolate flex flex-col justify-center gap-3 overflow-hidden px-6 py-8 lg:justify-between lg:gap-0 lg:px-12 lg:py-14 xl:px-16"
         style={PAINEL_FUNDO}
       >
         <div
@@ -119,35 +155,32 @@ export function AuthSplitLayout({ children }: { children: ReactNode }) {
           style={PAINEL_GRADE}
           aria-hidden
         />
-        <div
-          className="pointer-events-none absolute left-1/2 top-[36%] -z-10 hidden h-80 w-80 -translate-x-1/2 -translate-y-1/2 lg:block"
-          style={BLOCOS_BRILHO}
-          aria-hidden
-        />
-        <BlocosIsometricos />
 
         <div>
-          <p className="font-[family-name:var(--font-outfit)] text-xl font-bold uppercase tracking-[0.16em] text-white lg:text-2xl">
+          <p className="auth-sobe font-[family-name:var(--font-outfit)] text-xl font-bold uppercase tracking-[0.16em] text-white lg:text-2xl">
             Builders <span className="text-teal-400">Club</span>
           </p>
           <span
-            className="mt-2 block h-0.5 w-12 rounded-full bg-teal-400"
+            className="auth-risco mt-2 block h-0.5 w-12 rounded-full bg-teal-400 [animation-delay:180ms]"
             aria-hidden
           />
         </div>
 
+        <BlocosIsometricos />
+
         <div>
           {/* F067 — o posicionamento do Club antes de a tela pedir o e-mail. */}
-          <p className="max-w-md text-sm leading-relaxed text-white/75 lg:font-[family-name:var(--font-outfit)] lg:text-[1.6rem] lg:font-semibold lg:leading-snug lg:text-white">
+          <p className="auth-sobe max-w-md text-sm leading-relaxed text-white/75 [animation-delay:140ms] lg:font-[family-name:var(--font-outfit)] lg:text-[1.6rem] lg:font-semibold lg:leading-snug lg:text-white">
             A comunidade de quem está montando a própria operação de IA e
             automação.
           </p>
 
           <ul className="mt-8 hidden max-w-md flex-col gap-3 lg:flex">
-            {PROVAS.map((prova) => (
+            {PROVAS.map((prova, i) => (
               <li
                 key={prova}
-                className="flex items-start gap-2.5 text-[15px] leading-relaxed text-white/70"
+                className="auth-sobe flex items-start gap-2.5 text-[15px] leading-relaxed text-white/70"
+                style={{ animationDelay: `${420 + i * 90}ms` }}
               >
                 <CheckIcon />
                 {prova}
@@ -166,9 +199,8 @@ export function AuthSplitLayout({ children }: { children: ReactNode }) {
         <div className="absolute right-4 top-4 z-10">
           <ThemeToggle variant="icon" />
         </div>
-        <main className="w-full max-w-sm animate-[fadeIn_0.4s_ease-out]">
-          {children}
-        </main>
+        {/* O formulário não espera o painel: é a parte funcional da tela. */}
+        <main className="auth-sobe w-full max-w-sm">{children}</main>
       </div>
     </div>
   );
