@@ -7,7 +7,7 @@
  * viciado o banner que destaca "aceitar" e esconde a recusa.
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   CONSENTIMENTO_ANALYTICS_EVENT,
@@ -33,14 +33,47 @@ function gravarDecisao(decisao: Decisao) {
     `; Path=/; Max-Age=${CONSENTIMENTO_MAX_AGE}; SameSite=Lax${seguro}`;
 }
 
+/**
+ * F086 — enquanto o aviso está na tela, ele publica a própria altura em
+ * `--bc-consent-h` na raiz.
+ *
+ * O aviso é `fixed` no rodapé, então ele tapa o que estiver embaixo. Em
+ * página que rola isso não custa nada: a pessoa rola e vê. No painel das
+ * telas de entrada nada rola — as provas de valor ficavam escondidas até
+ * alguém decidir sobre cookies. Com a altura publicada, quem precisa
+ * reserva o espaço e ninguém precisa chutar um número que muda quando o
+ * texto reflui.
+ */
+const VAR_ALTURA = "--bc-consent-h";
+
 export function CookieConsent() {
   // Sem valor no primeiro render: o cookie só existe no cliente e um banner
   // renderizado no servidor piscaria para quem já decidiu.
   const [visivel, setVisivel] = useState(false);
+  const caixaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setVisivel(precisaDecidir(lerCookie(COOKIE_CONSENTIMENTO)));
   }, []);
+
+  useEffect(() => {
+    const raiz = document.documentElement;
+    const caixa = caixaRef.current;
+    if (!visivel || !caixa) {
+      raiz.style.removeProperty(VAR_ALTURA);
+      return;
+    }
+    // ResizeObserver e não `resize` da janela: o aviso também muda de altura
+    // quando o texto reflui sozinho (zoom, fonte do sistema).
+    const observador = new ResizeObserver(() => {
+      raiz.style.setProperty(VAR_ALTURA, `${caixa.offsetHeight}px`);
+    });
+    observador.observe(caixa);
+    return () => {
+      observador.disconnect();
+      raiz.style.removeProperty(VAR_ALTURA);
+    };
+  }, [visivel]);
 
   if (!visivel) return null;
 
@@ -54,6 +87,7 @@ export function CookieConsent() {
 
   return (
     <div
+      ref={caixaRef}
       role="region"
       aria-label="Aviso de cookies"
       className="fixed inset-x-0 bottom-0 z-50 p-4 sm:p-6"

@@ -250,6 +250,26 @@
   }
 
   /*
+   * F086 — painel das telas de entrada.
+   *
+   * O `padding-bottom` mora aqui e não numa utility `lg:pb-*` porque no
+   * Tailwind 4 as utilities vêm depois de `components`: um `lg:pb-14` no
+   * JSX ganharia desta regra e a reserva do aviso de cookies não valeria.
+   *
+   * A reserva só existe a partir de `lg`. No mobile o painel é a faixa do
+   * topo e o aviso fica no rodapé, embaixo do formulário — não se cruzam.
+   */
+  .auth-painel {
+    padding-bottom: 2rem;
+  }
+
+  @media (min-width: 1024px) {
+    .auth-painel {
+      padding-bottom: calc(var(--bc-consent-h, 0px) + 3.5rem);
+    }
+  }
+
+  /*
    * F086 — entrada das telas de login e cadastro (ver `auth-split-layout`).
    * O atraso de cada elemento vai no componente, via `[animation-delay:*]`.
    */

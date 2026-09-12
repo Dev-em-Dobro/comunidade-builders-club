@@ -147,7 +147,26 @@ empilhava dois títulos concorrentes. Cada estado tem um `h1` só.
 
 A atribuição (`recordGiftVisit` com o `utmContent` da URL) não muda.
 
-### 8. Uma frase, quatro lugares
+### 8. O aviso de cookies não tapa mais as provas
+O aviso do F057 é `fixed` no rodapé. Em página que rola isso não custa nada
+— a pessoa rola e vê o que estava embaixo. No painel das telas de entrada
+nada rola: as três provas de valor ficavam escondidas até alguém decidir
+sobre cookies, que é justamente o primeiro contato com o produto.
+
+`CookieConsent` passa a publicar a própria altura em `--bc-consent-h` na
+raiz enquanto está visível, medida por `ResizeObserver` (e não por um número
+fixo, que quebraria quando o texto refluísse). O painel soma essa altura ao
+`padding-bottom`. Ao decidir, a variável é removida e o painel volta ao
+normal.
+
+A reserva só vale de `lg` para cima: no mobile o painel é a faixa do topo e
+o aviso fica no rodapé, embaixo do formulário — não se cruzam.
+
+> O `padding-bottom` do painel mora no `globals.css`, não numa utility
+> `lg:pb-*`. No Tailwind 4 as utilities vêm depois da camada `components`,
+> então um `lg:pb-14` no JSX ganharia da regra e anularia a reserva.
+
+### 9. Uma frase, quatro lugares
 "o feed com o que a comunidade está fechando" vira a comunidade **fechando
 clientes** — o resultado, não o canal onde ele aparece. Cada lugar tem uma
 construção diferente e a frase foi adaptada, não copiada:
@@ -178,6 +197,9 @@ por quanto e como foi": com "fechando clientes" logo antes, a palavra
 - [ ] Pilha de blocos aparece só a partir de `lg`, sem encostar no wordmark
       nem na frase de posicionamento (conferir em 1024px e em 1440px)
 - [ ] As três provas de valor aparecem só a partir de `lg`
+- [ ] Com o aviso de cookies na tela, as três provas continuam visíveis no
+      desktop; ao decidir, o painel volta ao espaçamento normal
+- [ ] No mobile o aviso não altera o espaçamento do painel
 - [ ] Sem rolagem vertical no painel em 1920, 1440, 1280 e 1024 de largura
 - [ ] Blocos empilham de baixo para cima, cada um visivelmente separado do
       anterior, e a tela toda se monta em ~1,4s
