@@ -147,7 +147,7 @@ export function AuthSplitLayout({ children }: { children: ReactNode }) {
   return (
     <div className="grid min-h-dvh grid-rows-[auto_1fr] lg:grid-cols-2 lg:grid-rows-1">
       <aside
-        className="relative isolate flex flex-col justify-center gap-3 overflow-hidden px-6 py-8 lg:justify-between lg:gap-0 lg:px-12 lg:py-14 xl:px-16"
+        className="auth-painel relative isolate flex flex-col justify-center gap-3 overflow-hidden px-6 pt-8 lg:justify-between lg:gap-0 lg:px-12 lg:pt-14 xl:px-16"
         style={PAINEL_FUNDO}
       >
         <div
