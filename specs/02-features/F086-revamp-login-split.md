@@ -47,20 +47,6 @@ que a pessoa monta camada por camada — a metáfora que dá nome ao Club.
 
 - O painel é **escuro nos dois temas** (claro e escuro). É o contraste que a
   referência tira da foto. O que segue o tema é a coluna do formulário.
-
-> **Por que o painel não acompanha o tema claro.** O app abre no claro para
-> todo mundo: o bootstrap do F042 só aplica `dark` se `localStorage` disser
-> `dark`, e nem consulta o `prefers-color-scheme`. Então o login já abre
-> claro — o painel escuro é a única peça que não segue.
->
-> Foi testada uma versão de painel claro (menta, blocos de face branca).
-> Ela é mais coerente com a comunidade, mas a divisão 50/50 quase some:
-> duas metades claras viram uma emenda sutil em vez do contraste que
-> sustenta o layout inteiro. O painel escuro é a porta de entrada; o app
-> é onde se trabalha. A troca de temperatura marca essa passagem.
->
-> Decisão do dono do produto em 12/09/2026, com as duas versões
-> renderizadas lado a lado.
 - A **grade isométrica** é CSS (`repeating-linear-gradient` a ±30°), não SVG:
   ladrilha em qualquer proporção, então a mesma textura serve a coluna de
   720×900 do desktop e a faixa de 375×155 do mobile. Um `viewBox` fixo daria
@@ -75,6 +61,20 @@ que a pessoa monta camada por camada — a metáfora que dá nome ao Club.
 - Conteúdo: wordmark `BUILDERS CLUB` + a frase de posicionamento do F067.
 - Três provas de valor no rodapé do painel, **só no desktop** (`hidden lg:…`).
   Na faixa mobile não cabe sem empurrar o formulário para baixo da dobra.
+
+> **Por que o painel não acompanha o tema claro.** O app abre no claro para
+> todo mundo: o bootstrap do F042 só aplica `dark` se `localStorage` disser
+> `dark`, e nem consulta o `prefers-color-scheme`. Então o login já abre
+> claro — o painel escuro é a única peça que não segue.
+>
+> Foi testada uma versão de painel claro (menta, blocos de face branca).
+> Ela é mais coerente com a comunidade, mas a divisão 50/50 quase some:
+> duas metades claras viram uma emenda sutil em vez do contraste que
+> sustenta o layout inteiro. O painel escuro é a porta de entrada; o app
+> é onde se trabalha. A troca de temperatura marca essa passagem.
+>
+> Decisão do dono do produto em 12/09/2026, com as duas versões
+> renderizadas lado a lado.
 
 ### 3. O formulário perde o card
 Sai o `rounded-2xl border bg-card shadow` que envolvia os campos. O formulário
@@ -147,7 +147,36 @@ empilhava dois títulos concorrentes. Cada estado tem um `h1` só.
 
 A atribuição (`recordGiftVisit` com o `utmContent` da URL) não muda.
 
-### 8. O aviso de cookies não tapa mais as provas
+### 8. A confirmação do link não é um beco sem saída
+Depois de pedir o link, a tela dizia "Link enviado" e substituía o formulário
+inteiro. Quem digitou o e-mail errado, ou simplesmente não recebeu nada, não
+tinha ação nenhuma disponível — só recarregar a página.
+
+A confirmação passa a levar as duas saídas reais:
+
+1. **Reenviar link** — reenvia para o mesmo endereço, com intervalo de 30s
+   entre envios (`ESPERA_REENVIO`). O botão mostra a contagem.
+2. **Usar outro e-mail** — volta ao formulário **com o endereço preenchido**.
+   O erro quase sempre é um typo, não o domínio inteiro; apagar o campo
+   obrigaria a redigitar tudo.
+
+Some junto a linha "Não achou? Olhe em spam e em promoções.", que é a causa
+mais comum de "não chegou" e resolve antes de gastar um reenvio. Mesma frase
+já usada no passo de OTP do `gift-signup-form`.
+
+O prazo do link deixa de ser "poucos minutos" e passa a dizer **5 minutos**,
+que é o `magicLink.expiresIn` real em `lib/auth`.
+
+> **Por que o intervalo.** Este projeto não configura `rateLimit` no Better
+> Auth — o que segura o servidor é o limite padrão dele. Um botão de reenvio
+> sem freio seria um convite a testar esse limite, e reenviar de segundo em
+> segundo só gera link que vence junto com o anterior.
+
+> A confirmação **não** afirma que o link anterior deixou de valer. O plugin
+> emite um token novo, mas não foi confirmado que ele invalida o antigo —
+> "use o e-mail mais recente" é orientação correta nos dois casos.
+
+### 9. O aviso de cookies não tapa mais as provas
 O aviso do F057 é `fixed` no rodapé. Em página que rola isso não custa nada
 — a pessoa rola e vê o que estava embaixo. No painel das telas de entrada
 nada rola: as três provas de valor ficavam escondidas até alguém decidir
@@ -166,7 +195,7 @@ o aviso fica no rodapé, embaixo do formulário — não se cruzam.
 > `lg:pb-*`. No Tailwind 4 as utilities vêm depois da camada `components`,
 > então um `lg:pb-14` no JSX ganharia da regra e anularia a reserva.
 
-### 9. Uma frase, quatro lugares
+### 10. Uma frase, quatro lugares
 "o feed com o que a comunidade está fechando" vira a comunidade **fechando
 clientes** — o resultado, não o canal onde ele aparece. Cada lugar tem uma
 construção diferente e a frase foi adaptada, não copiada:
@@ -205,6 +234,11 @@ por quanto e como foi": com "fechando clientes" logo antes, a palavra
       anterior, e a tela toda se monta em ~1,4s
 - [ ] Com `prefers-reduced-motion: reduce` nada some: tudo em `opacity: 1`
 - [ ] Botão do login diz `Receber link de acesso`, sem "magic link"
+- [ ] A confirmação "Link enviado" oferece `Reenviar link` e `Usar outro
+      e-mail`; ninguém fica sem ação se o e-mail não chegar
+- [ ] `Reenviar link` fica travado por 30s, com a contagem no próprio botão
+- [ ] `Usar outro e-mail` volta ao formulário com o endereço preenchido
+- [ ] A confirmação diz 5 minutos, o `expiresIn` real do `magicLink`
 - [ ] Formulário sem card: sem borda, sem sombra, coluna `max-w-sm` centrada
 - [ ] `ThemeToggle` fica na coluna do formulário, não sobre o painel
 - [ ] Link por e-mail, Google, estado `sent` e mensagens de erro seguem
