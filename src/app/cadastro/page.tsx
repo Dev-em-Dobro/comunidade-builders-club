@@ -26,7 +26,7 @@ export default async function CadastroPage() {
       <GiftSignupForm
         variant="plain"
         headline="Crie sua conta grátis"
-        subhead="Grátis: as primeiras aulas da formação, o feed com o que a comunidade está fechando e os presentes liberados. Sem senha — enviamos um código de 6 dígitos para o seu e-mail."
+        subhead="Grátis: as primeiras aulas da formação, o feed da comunidade fechando clientes e os presentes liberados. Sem senha — enviamos um código de 6 dígitos para o seu e-mail."
         alreadyMemberHref="/login"
       />
     </AuthSplitLayout>
