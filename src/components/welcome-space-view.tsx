@@ -56,7 +56,7 @@ const STEPS_FREE: Step[] = [
   {
     n: "3",
     href: "/spaces/conquistas",
-    label: "Ver o que a comunidade está fechando",
+    label: "Ver a comunidade fechando clientes",
     hint: "Cliente fechado, proposta aceita, primeiro pagamento — com quanto cobraram e como entregaram.",
   },
   {

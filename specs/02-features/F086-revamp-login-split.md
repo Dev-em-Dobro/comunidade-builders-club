@@ -18,8 +18,9 @@ sem sombra: o formulário respira direto sobre o fundo.
 ## Decisões
 
 ### 1. Shell compartilhado `AuthSplitLayout`
-Componente único (`src/components/auth-split-layout.tsx`) usado por `/login` e
-`/cadastro`. Recebe o formulário como `children`.
+Componente único (`src/components/auth-split-layout.tsx`) usado pelas três
+telas de entrada — `/login`, `/cadastro` e `/cadastro/[utmContent]`. Recebe o
+formulário como `children`.
 
 ```
 DESKTOP (lg+, 1024px)          MOBILE (< lg)
@@ -138,13 +139,37 @@ ali ele descreve o mecanismo para efeito de contrato, e mexer em texto legal
 - O `ThemeToggle` continua no canto superior direito, mas ancorado na **coluna
   do formulário**, nunca sobre o painel escuro (onde `btn-ghost` fica ilegível).
 
-### 7. Fora de escopo
-`/cadastro/[utmContent]` (landing de atribuição de presente) segue com o layout
-atual. Ela tem copy e estados próprios (visitante já logado, aviso de conta
-criada) e entra numa feature separada se for o caso.
+### 7. `/cadastro/[utmContent]`
+A landing de atribuição de presente entra no mesmo shell. Os três blocos
+condicionais viraram **ramos exclusivos** (`user ? (welcomeSeenAt ? … : …) :
+formulário`): antes eram três `if` independentes, o que na coluna estreita
+empilhava dois títulos concorrentes. Cada estado tem um `h1` só.
+
+A atribuição (`recordGiftVisit` com o `utmContent` da URL) não muda.
+
+### 8. Uma frase, quatro lugares
+"o feed com o que a comunidade está fechando" vira a comunidade **fechando
+clientes** — o resultado, não o canal onde ele aparece. Cada lugar tem uma
+construção diferente e a frase foi adaptada, não copiada:
+
+| Onde | Depois |
+| --- | --- |
+| Provas do painel | `Acompanhe a comunidade fechando clientes` |
+| Subhead do `/cadastro` | `…o feed da comunidade fechando clientes…` |
+| Card 3 do boas-vindas | `Ver a comunidade fechando clientes` |
+| E-mail do código (texto e HTML) | `…o feed da comunidade fechando clientes — quem fechou, por quanto e como foi…` |
+
+No e-mail o aposto passou de "cliente, preço e como foi" para "quem fechou,
+por quanto e como foi": com "fechando clientes" logo antes, a palavra
+`cliente` aparecia duas vezes na mesma linha.
 
 ## Critérios
-- [ ] `AuthSplitLayout` existe e é usado por `/login` e `/cadastro`
+- [ ] `AuthSplitLayout` existe e é usado por `/login`, `/cadastro` e
+      `/cadastro/[utmContent]`
+- [ ] Cada estado do `/cadastro/[utmContent]` tem exatamente um `h1` e um
+      `main` (visitante novo, conta recém-criada, membro que já viu o
+      boas-vindas)
+- [ ] `recordGiftVisit` segue gravando o `utmContent` da URL
 - [ ] Desktop (≥1024px): duas colunas de 50%, painel sangrando de topo a base
 - [ ] Mobile: painel é faixa no topo de ~150px, formulário logo abaixo
 - [ ] Painel é escuro nos dois temas; coluna do formulário segue o tema

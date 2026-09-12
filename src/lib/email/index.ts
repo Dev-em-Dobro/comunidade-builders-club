@@ -181,8 +181,8 @@ export async function sendOtpEmail(opts: { to: string; otp: string }): Promise<v
     ``,
     `O código vale por 10 minutos.`,
     ``,
-    `Do outro lado dele: as primeiras aulas da formação, o feed com o que a`,
-    `comunidade está fechando — cliente, preço e como foi — e os presentes`,
+    `Do outro lado dele: as primeiras aulas da formação, o feed da comunidade`,
+    `fechando clientes — quem fechou, por quanto e como foi — e os presentes`,
     `liberados.`,
     ``,
     `Se você não pediu este acesso, ignore este e-mail.`,
@@ -193,7 +193,7 @@ export async function sendOtpEmail(opts: { to: string; otp: string }): Promise<v
     "Seu código de acesso",
     `<p style="color:#64748b;font-size:15px;line-height:1.5;">Digite o código na tela em que você parou. Vale por 10 minutos.</p>
     <p style="margin:24px 0;font-size:32px;letter-spacing:0.28em;font-weight:700;color:#0f172a;text-align:center;">${escapeHtml(opts.otp)}</p>
-    <p style="color:#64748b;font-size:14px;line-height:1.6;">Do outro lado dele: as primeiras aulas da formação, o feed com o que a comunidade está fechando — cliente, preço e como foi — e os presentes liberados.</p>`,
+    <p style="color:#64748b;font-size:14px;line-height:1.6;">Do outro lado dele: as primeiras aulas da formação, o feed da comunidade fechando clientes — quem fechou, por quanto e como foi — e os presentes liberados.</p>`,
   );
   await sendMail({ to: opts.to, subject, text, html, category: "login" });
 }
