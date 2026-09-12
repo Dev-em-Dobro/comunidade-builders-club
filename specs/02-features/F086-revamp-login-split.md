@@ -76,23 +76,30 @@ Hierarquia da coluna do formulário:
 7. A linha do F067 sobre o que o gratuito entrega
 
 ### 4. Entrada animada
-A tela se monta em ~1s. A ordem conta a mesma história do desenho: primeiro a
-marca, depois a operação sendo empilhada, depois a promessa.
+A tela se monta em ~1,4s. A ordem conta a mesma história do desenho: primeiro
+a marca, depois a operação sendo empilhada, depois a promessa.
 
-| Elemento | Atraso | Movimento |
-| --- | --- | --- |
-| Wordmark | 0 | sobe 14px + fade |
-| Risco sob o wordmark | 180 ms | desenha da esquerda para a direita |
-| Bloco da base | 120 ms | cai de cima e assenta com repique curto |
-| Bloco do meio | 250 ms | idem |
-| Bloco do topo | 380 ms | idem |
-| Frase de posicionamento | 140 ms | sobe 14px + fade |
-| Provas de valor | 420/510/600 ms | sobe 14px + fade, em cascata |
-| Coluna do formulário | 0 | sobe 14px + fade |
+| Elemento | Atraso | Duração | Movimento |
+| --- | --- | --- | --- |
+| Wordmark | 0 | 420 ms | sobe 14px + fade |
+| Risco sob o wordmark | 180 ms | 360 ms | desenha da esquerda para a direita |
+| Bloco da base | 160 ms | 720 ms | cai de cima e assenta com repique curto |
+| Bloco do meio | 400 ms | 720 ms | idem |
+| Bloco do topo | 640 ms | 720 ms | idem |
+| Frase de posicionamento | 140 ms | 420 ms | sobe 14px + fade |
+| Provas de valor | 420/510/600 ms | 420 ms | sobe 14px + fade, em cascata |
+| Coluna do formulário | 0 | 420 ms | sobe 14px + fade |
 
 - Os blocos empilham **de baixo para cima**: é a ordem de quem constrói.
+- Os blocos são o movimento mais lento da tela de propósito — é o que a
+  pessoa deve acompanhar. Na primeira versão (440 ms, 120/250/380) eles se
+  sobrepunham e a pilha parecia aparecer de uma vez em vez de ser montada.
+- Com a duração maior, o repique forte virava borracha: a curva passa menos
+  de 1 do que a primeira versão (`1.15` no lugar de `1.3`).
 - A queda é medida em unidades do `viewBox`, não em px de tela, para escalar
   junto com a arte quando o painel encolhe.
+- O último bloco assenta em 1,36s e fecha a entrada — a pilha completa é o
+  final da cena, depois das provas de valor.
 - A coluna do formulário **não espera** o painel. É a parte funcional da tela;
   atrasar o campo de e-mail para exibir enfeite é custo, não polimento.
 - `prefers-reduced-motion: reduce` zera todas as animações. Como nenhum
@@ -133,7 +140,8 @@ criada) e entra numa feature separada se for o caso.
       nem na frase de posicionamento (conferir em 1024px e em 1440px)
 - [ ] As três provas de valor aparecem só a partir de `lg`
 - [ ] Sem rolagem vertical no painel em 1920, 1440, 1280 e 1024 de largura
-- [ ] Blocos empilham de baixo para cima e a tela toda se monta em ~1s
+- [ ] Blocos empilham de baixo para cima, cada um visivelmente separado do
+      anterior, e a tela toda se monta em ~1,4s
 - [ ] Com `prefers-reduced-motion: reduce` nada some: tudo em `opacity: 1`
 - [ ] Botão do login diz `Receber link de acesso`, sem "magic link"
 - [ ] Formulário sem card: sem borda, sem sombra, coluna `max-w-sm` centrada

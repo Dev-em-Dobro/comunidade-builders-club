@@ -267,9 +267,13 @@
    * Os blocos caem de cima e assentam com um repique curto — daí a curva
    * passar de 1 antes de voltar. A distância é em unidades do `viewBox`,
    * não em px de tela: escala junto com a arte.
+   *
+   * Mais lento que o resto da entrada de propósito: é o movimento que a
+   * pessoa deve acompanhar. Com a duração maior o repique forte virava
+   * borracha, por isso a curva passa menos de 1 do que a primeira versão.
    */
   .auth-bloco {
-    animation: bcBlocoAssenta 0.44s cubic-bezier(0.25, 1.3, 0.5, 1) both;
+    animation: bcBlocoAssenta 0.72s cubic-bezier(0.22, 1.15, 0.45, 1) both;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -304,7 +308,7 @@
 @keyframes bcBlocoAssenta {
   from {
     opacity: 0;
-    transform: translateY(-48px);
+    transform: translateY(-62px);
   }
   to {
     opacity: 1;

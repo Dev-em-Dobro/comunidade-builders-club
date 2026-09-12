@@ -52,7 +52,7 @@ const BLOCOS_BRILHO = {
 
 const PROVAS = [
   "As primeiras aulas da formação, de graça",
-  "Feed com o que a comunidade está fechando",
+  "Acompanhe a comunidade fechando clientes",
   "Skills prontas e presentes pra usar hoje",
 ];
 
@@ -94,7 +94,7 @@ function BlocosIsometricos() {
         >
           {/* Empilha de baixo para cima: é a ordem de quem constrói. */}
           <g
-            className="auth-bloco [animation-delay:120ms]"
+            className="auth-bloco [animation-delay:160ms]"
             stroke="rgba(94,234,212,0.32)"
             strokeWidth="1.4"
           >
@@ -103,7 +103,7 @@ function BlocosIsometricos() {
             <path d="M328 368v54l-108 62v-54z" fill="rgba(0,0,0,0.28)" />
           </g>
           <g
-            className="auth-bloco [animation-delay:250ms]"
+            className="auth-bloco [animation-delay:400ms]"
             stroke="rgba(94,234,212,0.32)"
             strokeWidth="1.4"
           >
@@ -112,7 +112,7 @@ function BlocosIsometricos() {
             <path d="M304 252v50l-84 49v-50z" fill="rgba(0,0,0,0.28)" />
           </g>
           <g
-            className="auth-bloco [animation-delay:380ms]"
+            className="auth-bloco [animation-delay:640ms]"
             stroke="rgba(94,234,212,0.32)"
             strokeWidth="1.4"
           >
