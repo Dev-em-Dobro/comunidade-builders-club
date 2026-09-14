@@ -82,6 +82,7 @@ async function aplicarAcao(acao: AcaoTmb): Promise<void> {
       email: acao.email,
       source: "tmb",
       note: noteParts.join("; "),
+      tier: acao.plan,
     });
     await concederPago(acao.email, acao.plan);
     return;
