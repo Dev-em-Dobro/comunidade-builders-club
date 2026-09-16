@@ -50,6 +50,32 @@ const BLOCOS_BRILHO = {
   filter: "blur(46px)",
 } as const;
 
+/**
+ * F086 — o mesmo brilho, com raio menor, para a faixa mobile.
+ *
+ * Os 46px do desktop são calibrados para uma pilha de ~270px de altura. Na
+ * faixa mobile a pilha tem pouco mais da metade disso, e o mesmo desfoque
+ * vazaria para fora da faixa como uma mancha sem forma.
+ */
+const BLOCOS_BRILHO_FAIXA = {
+  backgroundImage:
+    "radial-gradient(ellipse 46% 40% at 50% 52%, rgba(45,212,191,0.2), transparent 70%)",
+  filter: "blur(30px)",
+} as const;
+
+/**
+ * F086 — o brilho da faixa some antes de chegar ao texto.
+ *
+ * Só o brilho é mascarado, nunca os blocos: uma máscara sobre a pilha apaga
+ * as faces no meio da forma, e o losango pela metade lê como falha de render,
+ * não como escolha. O brilho não tem forma para quebrar, então nele o
+ * degradê resolve — tira a mancha clara de baixo da primeira linha da frase.
+ */
+const BLOCOS_FAIXA_MASCARA = {
+  maskImage: "linear-gradient(to right, transparent 0%, black 55%)",
+  WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 55%)",
+} as const;
+
 const PROVAS = [
   "As primeiras aulas da formação, de graça",
   "Acompanhe a comunidade fechando clientes",
@@ -61,14 +87,51 @@ const PROVAS = [
  * pessoa monta camada por camada. Cada bloco são três faces — topo iluminado,
  * lateral esquerda neutra, lateral direita na sombra.
  *
- * A pilha fica **no fluxo** (`flex-1`), não posicionada por cima. Com
+ * Só a arte, sem `<svg>` em volta: o desktop e a faixa mobile emolduram a
+ * mesma pilha em caixas diferentes. O `viewBox` (`100 110 240 385`) mora em
+ * quem monta o `<svg>`, porque é ele que decide o enquadramento.
+ */
+function PilhaDeBlocos() {
+  return (
+    <>
+      {/* Empilha de baixo para cima: é a ordem de quem constrói. */}
+      <g
+        className="auth-bloco [animation-delay:160ms]"
+        stroke="rgba(94,234,212,0.32)"
+        strokeWidth="1.4"
+      >
+        <path d="M220 430l108-62-108-62-108 62z" fill="rgba(45,212,191,0.13)" />
+        <path d="M112 368v54l108 62v-54z" fill="rgba(255,255,255,0.04)" />
+        <path d="M328 368v54l-108 62v-54z" fill="rgba(0,0,0,0.28)" />
+      </g>
+      <g
+        className="auth-bloco [animation-delay:400ms]"
+        stroke="rgba(94,234,212,0.32)"
+        strokeWidth="1.4"
+      >
+        <path d="M220 300l84-48-84-49-84 49z" fill="rgba(45,212,191,0.17)" />
+        <path d="M136 252v50l84 49v-50z" fill="rgba(255,255,255,0.05)" />
+        <path d="M304 252v50l-84 49v-50z" fill="rgba(0,0,0,0.28)" />
+      </g>
+      <g
+        className="auth-bloco [animation-delay:640ms]"
+        stroke="rgba(94,234,212,0.32)"
+        strokeWidth="1.4"
+      >
+        <path d="M220 188l58-34-58-33-58 33z" fill="rgba(94,234,212,0.24)" />
+        <path d="M162 154v40l58 33v-40z" fill="rgba(255,255,255,0.06)" />
+        <path d="M278 154v40l-58 33v-40z" fill="rgba(0,0,0,0.28)" />
+      </g>
+    </>
+  );
+}
+
+/**
+ * Desktop: a pilha fica **no fluxo** (`flex-1`), não posicionada por cima. Com
  * `absolute` + largura em `rem` ela encostava no wordmark e na frase em
  * telas largas, onde o painel cresce mas o SVG não. No fluxo, o `py` vira
  * folga garantida e o `preserveAspectRatio` encolhe a arte para caber no
  * que sobrar — em qualquer viewport.
- *
- * Só a partir de `lg`: na faixa mobile a pilha ficaria do tamanho de um
- * ícone, e aí a grade isométrica sozinha carrega a textura.
  */
 function BlocosIsometricos() {
   return (
@@ -92,36 +155,45 @@ function BlocosIsometricos() {
           className="mx-auto h-full w-full max-w-[15rem] xl:max-w-[17rem]"
           aria-hidden
         >
-          {/* Empilha de baixo para cima: é a ordem de quem constrói. */}
-          <g
-            className="auth-bloco [animation-delay:160ms]"
-            stroke="rgba(94,234,212,0.32)"
-            strokeWidth="1.4"
-          >
-            <path d="M220 430l108-62-108-62-108 62z" fill="rgba(45,212,191,0.13)" />
-            <path d="M112 368v54l108 62v-54z" fill="rgba(255,255,255,0.04)" />
-            <path d="M328 368v54l-108 62v-54z" fill="rgba(0,0,0,0.28)" />
-          </g>
-          <g
-            className="auth-bloco [animation-delay:400ms]"
-            stroke="rgba(94,234,212,0.32)"
-            strokeWidth="1.4"
-          >
-            <path d="M220 300l84-48-84-49-84 49z" fill="rgba(45,212,191,0.17)" />
-            <path d="M136 252v50l84 49v-50z" fill="rgba(255,255,255,0.05)" />
-            <path d="M304 252v50l-84 49v-50z" fill="rgba(0,0,0,0.28)" />
-          </g>
-          <g
-            className="auth-bloco [animation-delay:640ms]"
-            stroke="rgba(94,234,212,0.32)"
-            strokeWidth="1.4"
-          >
-            <path d="M220 188l58-34-58-33-58 33z" fill="rgba(94,234,212,0.24)" />
-            <path d="M162 154v40l58 33v-40z" fill="rgba(255,255,255,0.06)" />
-            <path d="M278 154v40l-58 33v-40z" fill="rgba(0,0,0,0.28)" />
-          </g>
+          <PilhaDeBlocos />
         </svg>
       </div>
+    </div>
+  );
+}
+
+/**
+ * F086 — a mesma pilha na faixa mobile, agora como camada de fundo.
+ *
+ * A primeira versão do F086 tinha descartado os blocos abaixo de `lg` porque
+ * eles estavam **no fluxo**, entre o wordmark e a frase: naquele vão de faixa
+ * curta a arte ficaria do tamanho de um ícone. Fora do fluxo a restrição cai —
+ * a camada é `absolute`, encosta nas bordas da faixa e a pilha ganha a altura
+ * inteira.
+ *
+ * `xMidYMax`: a pilha é ancorada pela base, não pelo centro. Ela assenta na
+ * beirada de baixo da faixa como assenta no chão da grade isométrica; o
+ * `-bottom-5` corta uns poucos pixels do bloco da base, e é esse corte que
+ * faz a estrutura parecer apoiada em vez de flutuando.
+ */
+function BlocosFaixa() {
+  return (
+    <div
+      className="pointer-events-none absolute -bottom-6 right-2 -top-2 -z-10 w-[7.5rem] lg:hidden"
+      aria-hidden
+    >
+      <div
+        className="absolute inset-0"
+        style={{ ...BLOCOS_BRILHO_FAIXA, ...BLOCOS_FAIXA_MASCARA }}
+      />
+      <svg
+        viewBox="100 110 240 385"
+        fill="none"
+        preserveAspectRatio="xMidYMax meet"
+        className="h-full w-full"
+      >
+        <PilhaDeBlocos />
+      </svg>
     </div>
   );
 }
@@ -155,6 +227,14 @@ export function AuthSplitLayout({ children }: { children: ReactNode }) {
           style={PAINEL_GRADE}
           aria-hidden
         />
+
+        {/*
+         * Depois da grade e antes do texto: os dois estão em `-z-10`, e entre
+         * irmãos de mesma camada quem vem depois no DOM fica por cima. Assim a
+         * pilha assenta sobre a grade, e o texto (sem `z-index`, portanto em
+         * `auto`) continua acima dos dois.
+         */}
+        <BlocosFaixa />
 
         <div>
           <p className="auth-sobe font-[family-name:var(--font-outfit)] text-xl font-bold uppercase tracking-[0.16em] text-white lg:text-2xl">
