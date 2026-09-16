@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<!--
+  MODELO DE CMS - Builders Club (F087)
+  Hub do entregavel: tutorial do zero ao painel rodando, para alunos leigos.
+  Fonte de verdade tambem em _GUIA-modelo-cms.md (versao pra download).
+  Self-contained: Ubuntu + _lib/jszip + baixar-zip. Copy sem travessao/em-dash.
+-->
+<html lang="pt-BR" class="no-js">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Modelo de CMS | Builders Club</title>
+  <meta name="description" content="Tutorial completo: fork do criador de CMS, pasta por cliente, Supabase, rodar no PC e publicar na Vercel. Feito pra quem nunca rodou um projeto assim.">
+  <meta name="theme-color" content="#0b0d10">
+  <meta name="robots" content="noindex, nofollow">
+  <script>document.documentElement.className = document.documentElement.className.replace('no-js', 'js');</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232bd576'/%3E%3C/svg%3E">
+  <style>
+    :root{
+      --bg:#0b0d10; --bg2:#0f1216;
+      --card:#14181e; --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.14);
+      --text:#f3f5f8; --muted:#9aa4b0; --muted2:#6f7883;
+      --accent:#2bd576;
+      --c:#f59e0b;
+      --box-bg:#0e1620;
+      --maxw:960px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--text);font-family:Ubuntu,system-ui,Segoe UI,Roboto,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+    a{color:inherit;text-decoration:none}
+    svg{display:block}
+    .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+    .glow{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(1100px 520px at 80% -8%, rgba(245,158,11,.14), transparent 60%),radial-gradient(900px 500px at 6% -12%, rgba(43,213,118,.08), transparent 55%)}
+    .page{position:relative;z-index:1}
+
+    header.top{padding:26px 0 6px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.5px}
+    .brand .dot{width:11px;height:11px;border-radius:50%;background:var(--accent);box-shadow:0 0 14px var(--accent)}
+    .brand small{color:var(--muted);font-weight:400;letter-spacing:.3px}
+    .voltar{display:inline-flex;align-items:center;gap:8px;font-size:.9rem;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:7px 15px;transition:border-color .25s,color .25s}
+    .voltar:hover{border-color:var(--line2);color:var(--text)}
+    .voltar svg{width:15px;height:15px}
+
+    .hero{padding:46px 0 14px}
+    .eyebrow{display:inline-flex;align-items:center;gap:9px;font-size:.78rem;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--c);border:1px solid var(--line2);border-radius:999px;padding:7px 15px;margin-bottom:22px}
+    .eyebrow .pin{width:6px;height:6px;border-radius:50%;background:var(--c)}
+    h1{font-size:clamp(2rem,5vw,3.1rem);line-height:1.08;margin:0 0 18px;font-weight:700;letter-spacing:-.5px;max-width:22ch}
+    h1 .hl{color:var(--c)}
+    .lead{font-size:clamp(1.02rem,1.7vw,1.18rem);color:var(--muted);max-width:64ch;margin:0}
+    .lead b{color:var(--text);font-weight:500}
+
+    .callout{margin:30px 0 4px;padding:22px 24px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,rgba(245,158,11,.09),rgba(245,158,11,.015))}
+    .callout h4{margin:0 0 12px;font-size:1.05rem;font-weight:500;display:flex;align-items:center;gap:10px}
+    .callout h4 .sq{width:9px;height:9px;border-radius:2px;background:var(--c)}
+    .callout ul{margin:0;padding-left:20px;color:var(--muted);display:grid;gap:8px}
+    .callout li{font-size:.95rem}
+    .callout li b{color:var(--text);font-weight:500}
+    .callout .fecho{margin:14px 0 0;font-size:.95rem;color:var(--text);border-left:3px solid var(--c);padding-left:14px}
+    .callout pre{margin:12px 0 0;padding:14px 16px;border-radius:10px;background:#0a0c0f;border:1px solid var(--line);overflow:auto;font-size:.85rem;color:#fcd34d;font-family:ui-monospace,Consolas,monospace;line-height:1.45}
+
+    .acoes{display:flex;flex-wrap:wrap;gap:12px;margin:26px 0 6px;align-items:center}
+    .btn{display:inline-flex;align-items:center;gap:9px;cursor:pointer;font-family:inherit;font-size:.92rem;font-weight:500;border-radius:12px;padding:11px 16px;min-height:44px;text-decoration:none;transition:transform .15s,background .25s,border-color .25s,color .25s,box-shadow .25s}
+    .btn svg{width:16px;height:16px;flex:0 0 auto}
+    .btn:active{transform:translateY(1px)}
+    .btn:focus-visible{outline:3px solid var(--c);outline-offset:2px}
+    .btn-ghost{background:rgba(255,255,255,.04);color:var(--text);border:1px solid var(--line2)}
+    .btn-ghost:hover{border-color:var(--c)}
+    .btn-solid{background:var(--c);color:#1a1203;border:1px solid var(--c);font-weight:700}
+    .btn-solid:hover{box-shadow:0 12px 30px -12px rgba(245,158,11,.7)}
+    .btn-ghost[disabled]{opacity:.7;cursor:progress}
+
+    .sec-titulo{display:flex;align-items:center;gap:12px;margin:48px 0 8px}
+    .sec-titulo h2{font-size:1.4rem;margin:0;font-weight:500;letter-spacing:-.2px}
+    .sec-titulo .sq{width:10px;height:10px;border-radius:3px;background:var(--c)}
+    .passos{display:grid;gap:14px;margin:22px 0 0;counter-reset:p}
+    .passo{position:relative;display:grid;grid-template-columns:44px 1fr;gap:16px;align-items:start;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;transition:border-color .3s,box-shadow .3s}
+    .passo::before{counter-increment:p;content:counter(p);display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:11px;background:color-mix(in srgb,var(--c) 15%,transparent);color:var(--c);font-weight:700;font-size:1.1rem}
+    .passo:hover{border-color:var(--line2);box-shadow:0 16px 40px -24px rgba(0,0,0,.7)}
+    .passo h3{margin:0 0 5px;font-size:1.05rem;font-weight:500}
+    .passo p{margin:0;color:var(--muted);font-size:.95rem}
+    .passo p b{color:var(--text);font-weight:500}
+    .passo a.lnk{color:var(--c);text-decoration:underline;text-underline-offset:2px;word-break:break-all}
+    .passo code{font-family:ui-monospace,Consolas,monospace;font-size:.85em;background:color-mix(in srgb,var(--c) 16%,transparent);padding:.12em .42em;border-radius:5px;color:#fde68a}
+    .passo pre{margin:10px 0 0;padding:12px 14px;border-radius:10px;background:#0a0c0f;border:1px solid var(--line);overflow:auto;font-size:.82rem;color:#fde68a;font-family:ui-monospace,Consolas,monospace;line-height:1.45}
+    .passo .nota{margin-top:9px;font-size:.88rem;color:var(--muted2);border-left:3px solid var(--line2);padding-left:12px}
+
+    .contas{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin:22px 0 0}
+    .conta{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+    .conta h3{margin:0 0 6px;font-size:.98rem;font-weight:500}
+    .conta p{margin:0;color:var(--muted);font-size:.88rem}
+    .conta .tag{display:inline-block;margin-top:10px;font-size:.72rem;letter-spacing:.04em;text-transform:uppercase;color:var(--c);border:1px solid color-mix(in srgb,var(--c) 35%,transparent);border-radius:999px;padding:3px 9px}
+
+    .erros{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin:22px 0 0}
+    .erro{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 18px;position:relative;overflow:hidden}
+    .erro::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:#ef4444;opacity:.7}
+    .erro h3{margin:0 0 8px;font-size:.98rem;font-weight:500;color:#fca5a5;display:flex;gap:8px;align-items:flex-start}
+    .erro h3 svg{width:16px;height:16px;flex:0 0 auto;margin-top:3px}
+    .erro p{margin:0;color:var(--muted);font-size:.92rem}
+    .erro p b{color:var(--text);font-weight:500}
+
+    footer.rod{border-top:1px solid var(--line);margin-top:52px;padding:26px 0 44px;color:var(--muted2);font-size:.86rem}
+    footer.rod strong{color:var(--muted);font-weight:500}
+    footer.rod a{color:var(--c);text-decoration:underline;text-underline-offset:2px}
+
+    html.js .reveal{opacity:0;transform:translateY(18px);transition:opacity .55s cubic-bezier(0.16,1,0.3,1),transform .55s cubic-bezier(0.16,1,0.3,1);transition-delay:calc(var(--i,0) * 45ms)}
+    html.js .reveal.visivel{opacity:1;transform:none}
+    html.js .hero .anima{opacity:0;transform:translateY(18px);transition:opacity .6s cubic-bezier(0.16,1,0.3,1),transform .6s cubic-bezier(0.16,1,0.3,1);transition-delay:calc(var(--i,0) * 85ms)}
+    html.js body.carregado .hero .anima{opacity:1;transform:none}
+    @media (prefers-reduced-motion: reduce){
+      html.js .reveal,html.js .hero .anima{opacity:1 !important;transform:none !important;transition:none !important}
+      html{scroll-behavior:auto}
+    }
+    @media (max-width:620px){
+      .hero{padding:34px 0 12px}
+      .passo{grid-template-columns:1fr}
+      .passo::before{margin-bottom:2px}
+    }
+  </style>
+</head>
+<body>
+  <div class="glow" aria-hidden="true"></div>
+  <div class="page">
+    <div class="wrap">
+
+      <header class="top">
+        <div class="brand"><span class="dot"></span> BUILDERS CLUB <small>&nbsp;/ Materiais</small></div>
+        <a class="voltar" href="/entregaveis" target="_top">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          Voltar aos entregáveis
+        </a>
+      </header>
+
+      <section class="hero">
+        <span class="eyebrow anima" style="--i:0"><span class="pin"></span> Modelo de CMS</span>
+        <h1 class="anima" style="--i:1">Painel pro cliente <span class="hl">editar o site</span>.</h1>
+        <p class="lead anima" style="--i:2">Você usa o mesmo template da Dev em Dobro: faz um <b>fork</b>, gera uma pasta por cliente e sobe o admin. Esta página é o tutorial completo, pensado pra quem <b>nunca rodou um projeto</b> no terminal.</p>
+
+        <div class="callout anima" style="--i:3">
+          <h4><span class="sq"></span> Pasta por cliente (não um CMS gigante só)</h4>
+          <ul>
+            <li>No <b>seu fork</b>, cada cliente vira uma pasta em <code>clients/</code> + um arquivo em <code>configs/</code>.</li>
+            <li>Na Vercel você cria <b>um projeto por cliente</b>, apontando o Root Directory pra essa pasta.</li>
+            <li>É o mesmo fluxo interno: vários CMS no monorepo; depois, se quiser, copia um cliente pra um repo só dele.</li>
+          </ul>
+<pre>clients/
+  padaria-da-rua/     ← CMS do cliente 1
+  clinica-sorriso/    ← CMS do cliente 2
+configs/
+  padaria-da-rua.config.ts
+  clinica-sorriso.config.ts</pre>
+          <p class="fecho">Prefira fork <b>privado</b> se tiver dados reais do cliente. Não jogue segredos no GitHub.</p>
+        </div>
+
+        <div class="acoes anima" style="--i:4">
+          <a class="btn btn-solid" href="https://github.com/Dev-em-Dobro/criador-de-cms-builders" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.58 2 12.26c0 4.52 2.87 8.35 6.84 9.7.5.1.68-.22.68-.48 0-.24-.01-.87-.01-1.7-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.63.07-.63 1 .07 1.53 1.06 1.53 1.06.89 1.56 2.34 1.11 2.91.85.09-.66.35-1.11.63-1.37-2.22-.26-4.56-1.14-4.56-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.31.1-2.73 0 0 .84-.27 2.75 1.05A9.3 9.3 0 0 1 12 6.84c.85 0 1.71.12 2.51.35 1.91-1.32 2.75-1.05 2.75-1.05.55 1.42.2 2.47.1 2.73.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.8-4.57 5.06.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .26.18.58.69.48A10.03 10.03 0 0 0 22 12.26C22 6.58 17.52 2 12 2z"/></svg>
+            Abrir o repositório no GitHub
+          </a>
+          <button class="btn btn-ghost dl" type="button"
+                  data-zip-base=""
+                  data-zip-files="_GUIA-modelo-cms.md"
+                  data-zip-name="modelo-cms-builders-club.zip"
+                  data-zip-folder="modelo-cms">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+            <span class="dl-txt">Baixar o guia em .zip</span>
+          </button>
+        </div>
+      </section>
+
+      <div class="sec-titulo reveal"><span class="sq"></span><h2>O que você vai entregar</h2></div>
+      <p class="lead reveal" style="max-width:66ch;font-size:1rem">Isto <b>não é o site</b> do cliente. É o <b>painel</b> onde ele troca textos, posts e fotos. O site público continua separado e lê o conteúdo pela API do CMS.</p>
+
+      <div class="sec-titulo reveal"><span class="sq"></span><h2>Contas que você precisa</h2></div>
+      <div class="contas">
+        <div class="conta reveal" style="--i:0">
+          <h3>GitHub</h3>
+          <p>Fork do template e versionamento do código.</p>
+          <span class="tag">Obrigatório</span>
+        </div>
+        <div class="conta reveal" style="--i:1">
+          <h3>Node + pnpm</h3>
+          <p>Rodar o projeto no seu computador (Node 18+).</p>
+          <span class="tag">Obrigatório</span>
+        </div>
+        <div class="conta reveal" style="--i:2">
+          <h3>Supabase</h3>
+          <p>Banco Postgres + login do admin. Plano free serve.</p>
+          <span class="tag">Obrigatório</span>
+        </div>
+        <div class="conta reveal" style="--i:3">
+          <h3>Vercel</h3>
+          <p>Publicar o painel pra o cliente acessar.</p>
+          <span class="tag">Na entrega</span>
+        </div>
+      </div>
+
+      <div class="sec-titulo reveal"><span class="sq"></span><h2>Passo a passo</h2></div>
+      <p class="lead reveal" style="max-width:66ch;font-size:1rem">Faça na ordem. Se travar, veja a seção de erros no final.</p>
+
+      <div class="passos">
+
+        <div class="passo reveal" style="--i:0">
+          <div>
+            <h3>Instale Node e pnpm</h3>
+            <p>Baixe o <a class="lnk" href="https://nodejs.org/" rel="noopener">Node.js LTS</a>. Depois, no terminal:</p>
+<pre>npm i -g pnpm
+node -v
+pnpm -v</pre>
+            <p class="nota">Se os dois comandos mostrarem um número de versão, está ok.</p>
+          </div>
+        </div>
+
+        <div class="passo reveal" style="--i:1">
+          <div>
+            <h3>Faça o fork do template</h3>
+            <p>Abra <a class="lnk" href="https://github.com/Dev-em-Dobro/criador-de-cms-builders" rel="noopener">github.com/Dev-em-Dobro/criador-de-cms-builders</a>, clique em <b>Fork</b> e copie a URL do <b>seu</b> fork (Code → HTTPS).</p>
+          </div>
+        </div>
+
+        <div class="passo reveal" style="--i:2">
+          <div>
+            <h3>Clone e instale as dependências</h3>
+<pre>git clone https://github.com/SEU-USUARIO/criador-de-cms-builders.git
+cd criador-de-cms-builders
+pnpm install</pre>
+            <p class="nota">A primeira instalação demora. Espere terminar sem erro vermelho.</p>
+          </div>
+        </div>
+
+        <div class="passo reveal" style="--i:3">
+          <div>
+            <h3>Crie o config do primeiro cliente</h3>
+<pre>cp templates/config-examples/demo-corp.config.ts configs/meu-cliente.config.ts</pre>
+            <p>Abra o arquivo e mude pelo menos o <code>slug</code> (só minúsculas, números e hífen) e o <code>displayName</code>. Depois valide:</p>
+<pre>pnpm cms-factory validate --config configs/meu-cliente.config.ts</pre>
+          </div>
+        </div>
+
+        <div class="passo reveal" style="--i:4">
+          <div>
+            <h3>Gere a pasta do CMS (só no PC)</h3>
+<pre>pnpm cms-factory create-client --config configs/meu-cliente.config.ts --skip-provision</pre>
+            <p>O <code>--skip-provision</code> é importante pro começo: <b>não</b> cria nada na nuvem. Só gera <code>clients/&lt;slug&gt;/</code>.</p>
+          </div>
+        </div>
+
+        <div class="passo reveal" style="--i:5">
+          <div>
+            <h3>Crie um projeto no Supabase</h3>
+            <p>Em <a class="lnk" href="https://supabase.com" rel="noopener">supabase.com</a>, crie um projeto. Em Settings → API e → Database, copie URL, chave anon, service_role e as connection strings (pooler porta <b>6543</b> e direto porta <b>5432</b>).</p>
+          </div>
+        </div>
+
+        <div class="passo reveal" style="--i:6">
+          <div>
+            <h3>Preencha o <code>.env.local</code></h3>
+<pre>cd clients/meu-cliente
+cp .env.example .env.local</pre>
+            <p>Cole as chaves nos campos certos (há comentários no arquivo). <b>Nunca</b> faça commit desse arquivo.</p>
+            <p class="nota">Se <code>.env.example</code> não aparecer no seu clone, use o modelo em <code>templates/client-app/.env.example</code> (já está no repo atualizado).</p>
+          </div>
+        </div>
+
+        <div class="passo reveal" style="--i:7">
+          <div>
+            <h3>Migrate, seed e rode o admin</h3>
+            <p>Troque <code>meu-cliente</code> pelo seu slug:</p>
+<pre>pnpm --filter meu-cliente run db:migrate
+pnpm --filter meu-cliente run seed:locales
+pnpm --filter meu-cliente run seed:admin -- voce@email.com 'SenhaForte123!'
+pnpm --filter meu-cliente run dev</pre>
+            <p>Abra <a class="lnk" href="http://localhost:3010" rel="noopener">http://localhost:3010</a>. Faça login e complete o MFA no celular. Crie um post de teste.</p>
+            <p class="nota">O migrate também <b>fecha o banco</b> (harden). Não pule esse passo.</p>
+          </div>
+        </div>
+
+        <div class="passo reveal" style="--i:8">
+          <div>
+            <h3>Segundo cliente</h3>
+            <p>Repita os passos do config em diante com outro slug. Cada cliente: pasta própria + projeto Supabase <b>separado</b>.</p>
+          </div>
+        </div>
+
+        <div class="passo reveal" style="--i:9">
+          <div>
+            <h3>Publicar na Vercel (quando for entregar)</h3>
+            <p>Importe o <b>seu fork</b> na Vercel. Root Directory: <code>clients/&lt;slug&gt;</code>. Cole as mesmas variáveis do <code>.env.local</code> e faça o deploy. Um cliente = um projeto Vercel.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="sec-titulo reveal"><span class="sq"></span><h2>Deu erro? Os mais comuns</h2></div>
+      <div class="erros">
+        <div class="erro reveal" style="--i:0">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg> pnpm: command not found</h3>
+          <p>O pnpm não instalou. Rode de novo <b>npm i -g pnpm</b> e feche/abra o terminal.</p>
+        </div>
+        <div class="erro reveal" style="--i:1">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg> validate falhou</h3>
+          <p>Leia a mensagem: costuma ser typo no <b>slug</b> ou campo inválido no config. Corrija e rode o validate de novo.</p>
+        </div>
+        <div class="erro reveal" style="--i:2">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg> migrate / conexão com o banco</h3>
+          <p>Confira <b>DATABASE_URL</b> e <b>DIRECT_URL</b> (senhas, project-ref, sslmode). No Supabase, libere o IP se pedir.</p>
+        </div>
+        <div class="erro reveal" style="--i:3">
+          <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg> Login / MFA / idioma errado</h3>
+          <p>Rode <b>seed:locales</b> e o <b>seed:admin</b> de novo. No primeiro login o MFA (app autenticador) é obrigatório.</p>
+        </div>
+      </div>
+
+      <p class="lead reveal" style="max-width:66ch;font-size:1rem;margin-top:26px">Ainda travou? Manda um print do erro no grupo. A gente destrava rápido.</p>
+
+      <footer class="rod">
+        <strong>Arsenal Builders Club.</strong> Template:
+        <a href="https://github.com/Dev-em-Dobro/criador-de-cms-builders" rel="noopener">criador-de-cms-builders</a>.
+        Guia longo também em <code>docs/guia-alunos.md</code> no repositório.
+      </footer>
+
+    </div>
+  </div>
+
+  <script src="../_lib/jszip.min.js"></script>
+  <script src="../_lib/baixar-zip.js"></script>
+  <script>
+    (function(){
+      var reduz = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var alvos = document.querySelectorAll('.reveal');
+      function mostrarTodos(){ for(var i=0;i<alvos.length;i++) alvos[i].classList.add('visivel'); }
+      requestAnimationFrame(function(){ requestAnimationFrame(function(){ document.body.classList.add('carregado'); }); });
+      if(reduz || !('IntersectionObserver' in window)){
+        mostrarTodos();
+      }else{
+        var obs = new IntersectionObserver(function(entradas){
+          entradas.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('visivel'); obs.unobserve(e.target); } });
+        }, {threshold:0.08, rootMargin:'0px 0px -4% 0px'});
+        for(var j=0;j<alvos.length;j++) obs.observe(alvos[j]);
+      }
+    })();
+  </script>
+</body>
+</html>
