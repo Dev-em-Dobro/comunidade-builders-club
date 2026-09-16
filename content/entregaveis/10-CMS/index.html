@@ -138,14 +138,14 @@
       <section class="hero">
         <span class="eyebrow anima" style="--i:0"><span class="pin"></span> Modelo de CMS</span>
         <h1 class="anima" style="--i:1">Painel pro cliente <span class="hl">editar o site</span>.</h1>
-        <p class="lead anima" style="--i:2">Você usa o mesmo template da Dev em Dobro: faz um <b>fork</b>, gera uma pasta por cliente e sobe o admin. Esta página é o tutorial completo, pensado pra quem <b>nunca rodou um projeto</b> no terminal.</p>
+        <p class="lead anima" style="--i:2">Entregue um admin de verdade: o cliente troca textos, posts e fotos sem te chamar. Aqui está o passo a passo completo, do zero até o painel no ar, pra você copiar, adaptar e cobrar.</p>
 
         <div class="callout anima" style="--i:3">
-          <h4><span class="sq"></span> Pasta por cliente (não um CMS gigante só)</h4>
+          <h4><span class="sq"></span> Um CMS por cliente</h4>
           <ul>
-            <li>No <b>seu fork</b>, cada cliente vira uma pasta em <code>clients/</code> + um arquivo em <code>configs/</code>.</li>
-            <li>Na Vercel você cria <b>um projeto por cliente</b>, apontando o Root Directory pra essa pasta.</li>
-            <li>É o mesmo fluxo interno: vários CMS no monorepo; depois, se quiser, copia um cliente pra um repo só dele.</li>
+            <li>Cada cliente ganha a <b>própria pasta</b> no seu projeto (não mistura tudo num painel só).</li>
+            <li>Na Vercel, sobe <b>um deploy por cliente</b>, apontando pra pasta dele.</li>
+            <li>Assim você entrega com organização e, se quiser, depois separa o código daquele cliente.</li>
           </ul>
 <pre>clients/
   padaria-da-rua/     ← CMS do cliente 1
@@ -153,13 +153,13 @@
 configs/
   padaria-da-rua.config.ts
   clinica-sorriso.config.ts</pre>
-          <p class="fecho">Prefira fork <b>privado</b> se tiver dados reais do cliente. Não jogue segredos no GitHub.</p>
+          <p class="fecho">Com dados reais do cliente, deixe o projeto <b>privado</b> e nunca versione senhas ou chaves.</p>
         </div>
 
         <div class="acoes anima" style="--i:4">
           <a class="btn btn-solid" href="https://github.com/Dev-em-Dobro/criador-de-cms-builders" target="_blank" rel="noopener">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.58 2 12.26c0 4.52 2.87 8.35 6.84 9.7.5.1.68-.22.68-.48 0-.24-.01-.87-.01-1.7-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.63.07-.63 1 .07 1.53 1.06 1.53 1.06.89 1.56 2.34 1.11 2.91.85.09-.66.35-1.11.63-1.37-2.22-.26-4.56-1.14-4.56-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.31.1-2.73 0 0 .84-.27 2.75 1.05A9.3 9.3 0 0 1 12 6.84c.85 0 1.71.12 2.51.35 1.91-1.32 2.75-1.05 2.75-1.05.55 1.42.2 2.47.1 2.73.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.8-4.57 5.06.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .26.18.58.69.48A10.03 10.03 0 0 0 22 12.26C22 6.58 17.52 2 12 2z"/></svg>
-            Abrir o repositório no GitHub
+            Abrir o template no GitHub
           </a>
           <button class="btn btn-ghost dl" type="button"
                   data-zip-base=""
@@ -172,35 +172,35 @@ configs/
         </div>
       </section>
 
-      <div class="sec-titulo reveal"><span class="sq"></span><h2>O que você vai entregar</h2></div>
-      <p class="lead reveal" style="max-width:66ch;font-size:1rem">Isto <b>não é o site</b> do cliente. É o <b>painel</b> onde ele troca textos, posts e fotos. O site público continua separado e lê o conteúdo pela API do CMS.</p>
+      <div class="sec-titulo reveal"><span class="sq"></span><h2>O que você entrega</h2></div>
+      <p class="lead reveal" style="max-width:66ch;font-size:1rem">Não é o site do cliente. É o <b>painel</b> onde ele edita o conteúdo. O site público continua separado e busca os textos nesse CMS.</p>
 
-      <div class="sec-titulo reveal"><span class="sq"></span><h2>Contas que você precisa</h2></div>
+      <div class="sec-titulo reveal"><span class="sq"></span><h2>O que você precisa ter</h2></div>
       <div class="contas">
         <div class="conta reveal" style="--i:0">
           <h3>GitHub</h3>
-          <p>Fork do template e versionamento do código.</p>
+          <p>Pra copiar o template e guardar o código.</p>
           <span class="tag">Obrigatório</span>
         </div>
         <div class="conta reveal" style="--i:1">
           <h3>Node + pnpm</h3>
-          <p>Rodar o projeto no seu computador (Node 18+).</p>
+          <p>Pra rodar o projeto no seu computador (Node 18+).</p>
           <span class="tag">Obrigatório</span>
         </div>
         <div class="conta reveal" style="--i:2">
           <h3>Supabase</h3>
-          <p>Banco Postgres + login do admin. Plano free serve.</p>
+          <p>Banco e login do admin. O plano free dá conta.</p>
           <span class="tag">Obrigatório</span>
         </div>
         <div class="conta reveal" style="--i:3">
           <h3>Vercel</h3>
-          <p>Publicar o painel pra o cliente acessar.</p>
+          <p>Pra publicar o painel quando for entregar.</p>
           <span class="tag">Na entrega</span>
         </div>
       </div>
 
       <div class="sec-titulo reveal"><span class="sq"></span><h2>Passo a passo</h2></div>
-      <p class="lead reveal" style="max-width:66ch;font-size:1rem">Faça na ordem. Se travar, veja a seção de erros no final.</p>
+      <p class="lead reveal" style="max-width:66ch;font-size:1rem">Siga na ordem. Se travar, desça até os erros mais comuns.</p>
 
       <div class="passos">
 
@@ -217,14 +217,14 @@ pnpm -v</pre>
 
         <div class="passo reveal" style="--i:1">
           <div>
-            <h3>Faça o fork do template</h3>
-            <p>Abra <a class="lnk" href="https://github.com/Dev-em-Dobro/criador-de-cms-builders" rel="noopener">github.com/Dev-em-Dobro/criador-de-cms-builders</a>, clique em <b>Fork</b> e copie a URL do <b>seu</b> fork (Code → HTTPS).</p>
+            <h3>Copie o template pro seu GitHub</h3>
+            <p>Abra o template no botão acima, clique em <b>Fork</b> e copie a URL do <b>seu</b> projeto (Code → HTTPS).</p>
           </div>
         </div>
 
         <div class="passo reveal" style="--i:2">
           <div>
-            <h3>Clone e instale as dependências</h3>
+            <h3>Baixe pro PC e instale</h3>
 <pre>git clone https://github.com/SEU-USUARIO/criador-de-cms-builders.git
 cd criador-de-cms-builders
 pnpm install</pre>
@@ -243,16 +243,16 @@ pnpm install</pre>
 
         <div class="passo reveal" style="--i:4">
           <div>
-            <h3>Gere a pasta do CMS (só no PC)</h3>
+            <h3>Gere a pasta do CMS no seu PC</h3>
 <pre>pnpm cms-factory create-client --config configs/meu-cliente.config.ts --skip-provision</pre>
-            <p>O <code>--skip-provision</code> é importante pro começo: <b>não</b> cria nada na nuvem. Só gera <code>clients/&lt;slug&gt;/</code>.</p>
+            <p>O <code>--skip-provision</code> evita criar coisas na nuvem agora. Só gera a pasta <code>clients/&lt;slug&gt;/</code>.</p>
           </div>
         </div>
 
         <div class="passo reveal" style="--i:5">
           <div>
             <h3>Crie um projeto no Supabase</h3>
-            <p>Em <a class="lnk" href="https://supabase.com" rel="noopener">supabase.com</a>, crie um projeto. Em Settings → API e → Database, copie URL, chave anon, service_role e as connection strings (pooler porta <b>6543</b> e direto porta <b>5432</b>).</p>
+            <p>Em <a class="lnk" href="https://supabase.com" rel="noopener">supabase.com</a>, crie um projeto. Em Settings → API e → Database, copie a URL, a chave anon, a service_role e as duas connection strings (pooler na porta <b>6543</b> e direto na <b>5432</b>).</p>
           </div>
         </div>
 
@@ -262,34 +262,34 @@ pnpm install</pre>
 <pre>cd clients/meu-cliente
 cp .env.example .env.local</pre>
             <p>Cole as chaves nos campos certos (há comentários no arquivo). <b>Nunca</b> faça commit desse arquivo.</p>
-            <p class="nota">Se <code>.env.example</code> não aparecer no seu clone, use o modelo em <code>templates/client-app/.env.example</code> (já está no repo atualizado).</p>
+            <p class="nota">Se não achar o <code>.env.example</code>, copie de <code>templates/client-app/.env.example</code>.</p>
           </div>
         </div>
 
         <div class="passo reveal" style="--i:7">
           <div>
-            <h3>Migrate, seed e rode o admin</h3>
+            <h3>Suba o banco, o admin e rode local</h3>
             <p>Troque <code>meu-cliente</code> pelo seu slug:</p>
 <pre>pnpm --filter meu-cliente run db:migrate
 pnpm --filter meu-cliente run seed:locales
 pnpm --filter meu-cliente run seed:admin -- voce@email.com 'SenhaForte123!'
 pnpm --filter meu-cliente run dev</pre>
-            <p>Abra <a class="lnk" href="http://localhost:3010" rel="noopener">http://localhost:3010</a>. Faça login e complete o MFA no celular. Crie um post de teste.</p>
-            <p class="nota">O migrate também <b>fecha o banco</b> (harden). Não pule esse passo.</p>
+            <p>Abra <a class="lnk" href="http://localhost:3010" rel="noopener">http://localhost:3010</a>, faça login e complete o MFA no celular. Crie um post de teste pra confirmar.</p>
+            <p class="nota">O migrate também <b>trava o banco</b> (segurança). Não pule esse passo.</p>
           </div>
         </div>
 
         <div class="passo reveal" style="--i:8">
           <div>
-            <h3>Segundo cliente</h3>
-            <p>Repita os passos do config em diante com outro slug. Cada cliente: pasta própria + projeto Supabase <b>separado</b>.</p>
+            <h3>Repita pra o próximo cliente</h3>
+            <p>Outro slug, outra pasta, outro projeto no Supabase. Mesmo fluxo do config em diante.</p>
           </div>
         </div>
 
         <div class="passo reveal" style="--i:9">
           <div>
-            <h3>Publicar na Vercel (quando for entregar)</h3>
-            <p>Importe o <b>seu fork</b> na Vercel. Root Directory: <code>clients/&lt;slug&gt;</code>. Cole as mesmas variáveis do <code>.env.local</code> e faça o deploy. Um cliente = um projeto Vercel.</p>
+            <h3>Publique na Vercel (na hora de entregar)</h3>
+            <p>Importe o <b>seu</b> projeto na Vercel. Root Directory: <code>clients/&lt;slug&gt;</code>. Cole as mesmas variáveis do <code>.env.local</code> e faça o deploy. Um cliente = um projeto na Vercel.</p>
           </div>
         </div>
 
@@ -307,7 +307,7 @@ pnpm --filter meu-cliente run dev</pre>
         </div>
         <div class="erro reveal" style="--i:2">
           <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg> migrate / conexão com o banco</h3>
-          <p>Confira <b>DATABASE_URL</b> e <b>DIRECT_URL</b> (senhas, project-ref, sslmode). No Supabase, libere o IP se pedir.</p>
+          <p>Confira <b>DATABASE_URL</b> e <b>DIRECT_URL</b> (senha, project-ref, sslmode). No Supabase, libere o IP se pedir.</p>
         </div>
         <div class="erro reveal" style="--i:3">
           <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg> Login / MFA / idioma errado</h3>
@@ -318,9 +318,7 @@ pnpm --filter meu-cliente run dev</pre>
       <p class="lead reveal" style="max-width:66ch;font-size:1rem;margin-top:26px">Ainda travou? Manda um print do erro no grupo. A gente destrava rápido.</p>
 
       <footer class="rod">
-        <strong>Arsenal Builders Club.</strong> Template:
-        <a href="https://github.com/Dev-em-Dobro/criador-de-cms-builders" rel="noopener">criador-de-cms-builders</a>.
-        Guia longo também em <code>docs/guia-alunos.md</code> no repositório.
+        <strong>Arsenal Builders Club &middot; Builders Club.</strong> Depois do CMS no ar, combine com os <a href="../01-SITES-PRONTOS/index.html">sites prontos</a> e os <a href="../06-SCRIPTS-VENDA/index.html">scripts de venda</a> pra fechar a entrega completa.
       </footer>
 
     </div>
