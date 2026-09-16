@@ -109,9 +109,14 @@ export const ENTREGAVEIS: Entregavel[] = [
   {
     slug: "cms",
     titulo: "Modelo de CMS",
-    descricao: "Painel para o cliente editar o site — chegando em breve.",
-    pasta: "",
-    emBreve: true,
+    descricao:
+      "Template pra gerar o painel em que o cliente edita o site. Fork, pasta por cliente e tutorial completo.",
+    pasta: "10-CMS",
+    kitZip: {
+      nomeArquivo: "modelo-cms-builders-club.zip",
+      pastaInterna: "modelo-cms",
+      arquivos: ["_GUIA-modelo-cms.md"],
+    },
   },
   {
     slug: "agentes-whatsapp",
