@@ -51,13 +51,45 @@ que a pessoa monta camada por camada — a metáfora que dá nome ao Club.
   ladrilha em qualquer proporção, então a mesma textura serve a coluna de
   720×900 do desktop e a faixa de 375×155 do mobile. Um `viewBox` fixo daria
   zoom absurdo na faixa.
-- A **pilha de blocos** é SVG e só aparece a partir de `lg`, no vão entre o
-  wordmark e o texto. Na faixa mobile ela teria tamanho de ícone; lá a grade
-  sozinha carrega a textura.
-- A pilha fica **no fluxo** (`flex-1`), não posicionada por cima. Com
-  `absolute` + largura em `rem` ela encostava no wordmark e na frase em telas
-  largas, onde o painel cresce mas o SVG não. No fluxo, o `py` vira folga
-  garantida e o `preserveAspectRatio` encolhe a arte para caber no que sobrar.
+- A **pilha de blocos** é SVG e aparece nos dois tamanhos, em enquadramentos
+  diferentes. A arte é a mesma (`PilhaDeBlocos`); quem monta o `<svg>` decide
+  o `viewBox` e o `preserveAspectRatio`.
+- No **desktop** a pilha fica **no fluxo** (`flex-1`), não posicionada por
+  cima. Com `absolute` + largura em `rem` ela encostava no wordmark e na frase
+  em telas largas, onde o painel cresce mas o SVG não. No fluxo, o `py` vira
+  folga garantida e o `preserveAspectRatio` encolhe a arte para caber no que
+  sobrar.
+- Na **faixa mobile** a pilha é camada de **fundo** (`absolute`, `-z-10`),
+  encostada na borda direita.
+
+> **Por que os blocos voltaram ao mobile.** A primeira versão do F086 cortou a
+> pilha abaixo de `lg` com o argumento de que ela ficaria do tamanho de um
+> ícone. O argumento valia para a pilha **no fluxo**: espremida no vão entre o
+> wordmark e a frase, sobrava um naco de ~40px. Fora do fluxo ele cai — a
+> camada encosta nas bordas da faixa e a pilha ganha os 160px inteiros de
+> altura, com ~108px de largura. É arte de marca, não ícone.
+>
+> O que a mudança compra: a animação de montagem, que era o movimento
+> principal da tela, deixa de existir só para quem entra pelo desktop. A
+> maioria entra pelo celular.
+>
+> Pedido do dono do produto em 16/09/2026, já com o F086 em produção.
+
+Regras da camada mobile, todas para não roubar a tela do formulário:
+
+- **Não entra no fluxo.** É `absolute` com `pointer-events-none`, então a
+  altura da faixa continua em ~160px e o campo de e-mail não desce.
+- **Ancorada pela base** (`xMidYMax`), não pelo centro: a pilha assenta na
+  beirada de baixo da faixa como assenta no chão da grade. O `-bottom-6` corta
+  a saia do bloco da base, e é esse corte que faz a estrutura parecer apoiada
+  em vez de flutuando.
+- **Sem máscara sobre os blocos.** Uma máscara em degradê apaga as faces no
+  meio da forma, e losango pela metade lê como falha de render. Só o brilho é
+  mascarado — ele não tem forma para quebrar, e é o que precisava sumir de
+  baixo da primeira linha da frase.
+- **Fica atrás do texto.** A camada e a grade estão em `-z-10`; o texto, sem
+  `z-index`, fica em `auto` e portanto acima das duas. Entre camada e grade,
+  quem vem depois no DOM ganha — daí a pilha vir logo após a grade.
 - Conteúdo: wordmark `BUILDERS CLUB` + a frase de posicionamento do F067.
 - Três provas de valor no rodapé do painel, **só no desktop** (`hidden lg:…`).
   Na faixa mobile não cabe sem empurrar o formulário para baixo da dobra.
@@ -223,15 +255,21 @@ por quanto e como foi": com "fechando clientes" logo antes, a palavra
 - [ ] Painel é escuro nos dois temas; coluna do formulário segue o tema
 - [ ] Painel mostra wordmark + frase de posicionamento nos dois tamanhos
 - [ ] Grade isométrica visível nos dois tamanhos, sem deformar na faixa mobile
-- [ ] Pilha de blocos aparece só a partir de `lg`, sem encostar no wordmark
-      nem na frase de posicionamento (conferir em 1024px e em 1440px)
+- [ ] Desktop: pilha de blocos no fluxo, sem encostar no wordmark nem na frase
+      de posicionamento (conferir em 1024px e em 1440px)
+- [ ] Mobile: pilha de blocos como camada de fundo na direita da faixa, inteira
+      na horizontal (nenhum bloco cortado pela borda da tela) e ancorada pela
+      base, com a saia do bloco de baixo cortada pela beirada da faixa
+- [ ] Mobile: a faixa continua com ~160px — a camada dos blocos é `absolute` e
+      não empurra o formulário para baixo (conferir em 390×844 e 360×640)
+- [ ] Mobile: a frase de posicionamento continua legível por cima dos blocos
 - [ ] As três provas de valor aparecem só a partir de `lg`
 - [ ] Com o aviso de cookies na tela, as três provas continuam visíveis no
       desktop; ao decidir, o painel volta ao espaçamento normal
 - [ ] No mobile o aviso não altera o espaçamento do painel
 - [ ] Sem rolagem vertical no painel em 1920, 1440, 1280 e 1024 de largura
 - [ ] Blocos empilham de baixo para cima, cada um visivelmente separado do
-      anterior, e a tela toda se monta em ~1,4s
+      anterior, e a tela toda se monta em ~1,4s — nos dois tamanhos
 - [ ] Com `prefers-reduced-motion: reduce` nada some: tudo em `opacity: 1`
 - [ ] Botão do login diz `Receber link de acesso`, sem "magic link"
 - [ ] A confirmação "Link enviado" oferece `Reenviar link` e `Usar outro
