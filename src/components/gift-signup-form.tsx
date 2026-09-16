@@ -37,6 +37,14 @@ type Props = {
    * inteiro e o atrito de dois campos custa menos.
    */
   pedirNome?: boolean;
+  /**
+   * F086 — `plain` tira o card e promove a `headline` a `h1`. É o formato do
+   * `AuthSplitLayout`, onde o formulário já respira sozinho na coluna e um
+   * card dentro do card ficaria redundante. Presente, pop-up e rodapé seguem
+   * em `card`: lá o formulário está embutido numa página cheia e precisa da
+   * borda para se destacar.
+   */
+  variant?: "card" | "plain";
 };
 
 export function GiftSignupForm({
@@ -50,8 +58,21 @@ export function GiftSignupForm({
   redirectTo,
   formId = "cadastro-presente",
   pedirNome = true,
+  variant = "card",
 }: Props) {
   const router = useRouter();
+  const caixa =
+    variant === "card" ? "rounded-2xl border border-border/80 bg-card p-6" : "";
+  /**
+   * Função, não componente: como `<Titulo>` seria redeclarado a cada render,
+   * React remontaria o nó a cada tecla digitada no e-mail.
+   */
+  const titulo = (texto: string) =>
+    variant === "plain" ? (
+      <h1 className="page-title">{texto}</h1>
+    ) : (
+      <p className="text-sm font-semibold text-foreground">{texto}</p>
+    );
   const [step, setStep] = useState<Step>("form");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -136,10 +157,8 @@ export function GiftSignupForm({
 
   if (alreadyHadAccount) {
     return (
-      <div id={formId} className="rounded-2xl border border-border/80 bg-card p-6">
-        <p className="text-sm font-semibold text-foreground">
-          Você já tem conta, entramos com ela
-        </p>
+      <div id={formId} className={caixa}>
+        {titulo("Você já tem conta, entramos com ela")}
         <p className="mt-2 text-sm leading-relaxed text-muted">
           Este e-mail já pertencia a um membro. A origem deste link não foi
           alterada.
@@ -153,12 +172,10 @@ export function GiftSignupForm({
       <form
         id={formId}
         onSubmit={onVerify}
-        className="rounded-2xl border border-border/80 bg-card p-6"
+        className={caixa}
         data-clarity-mask="true"
       >
-        <p className="text-sm font-semibold text-foreground">
-          Digite o código
-        </p>
+        {titulo("Digite o código")}
         <p className="mt-2 text-sm leading-relaxed text-muted">
           Enviamos um código de 6 dígitos para{" "}
           <strong className="text-foreground">{email}</strong>.
@@ -212,12 +229,10 @@ export function GiftSignupForm({
     <form
       id={formId}
       onSubmit={onSend}
-      className="rounded-2xl border border-border/80 bg-card p-6"
+      className={caixa}
       data-clarity-mask="true"
     >
-      <p className="text-sm font-semibold text-foreground">
-        {headline}
-      </p>
+      {titulo(headline)}
       <p className="mt-2 text-sm leading-relaxed text-muted">
         {subhead}
       </p>

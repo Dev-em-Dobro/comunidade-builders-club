@@ -248,6 +248,92 @@
   .empty-state {
     @apply rounded-2xl border border-dashed border-border bg-card/60 px-6 py-14 text-center;
   }
+
+  /*
+   * F086 — painel das telas de entrada.
+   *
+   * O `padding-bottom` mora aqui e não numa utility `lg:pb-*` porque no
+   * Tailwind 4 as utilities vêm depois de `components`: um `lg:pb-14` no
+   * JSX ganharia desta regra e a reserva do aviso de cookies não valeria.
+   *
+   * A reserva só existe a partir de `lg`. No mobile o painel é a faixa do
+   * topo e o aviso fica no rodapé, embaixo do formulário — não se cruzam.
+   */
+  .auth-painel {
+    padding-bottom: 2rem;
+  }
+
+  @media (min-width: 1024px) {
+    .auth-painel {
+      padding-bottom: calc(var(--bc-consent-h, 0px) + 3.5rem);
+    }
+  }
+
+  /*
+   * F086 — entrada das telas de login e cadastro (ver `auth-split-layout`).
+   * O atraso de cada elemento vai no componente, via `[animation-delay:*]`.
+   */
+  .auth-sobe {
+    animation: bcSobe 0.42s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  }
+
+  /* O risco sob o wordmark é desenhado da esquerda para a direita. */
+  .auth-risco {
+    animation: bcRisco 0.36s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+    transform-origin: left center;
+  }
+
+  /*
+   * Os blocos caem de cima e assentam com um repique curto — daí a curva
+   * passar de 1 antes de voltar. A distância é em unidades do `viewBox`,
+   * não em px de tela: escala junto com a arte.
+   *
+   * Mais lento que o resto da entrada de propósito: é o movimento que a
+   * pessoa deve acompanhar. Com a duração maior o repique forte virava
+   * borracha, por isso a curva passa menos de 1 do que a primeira versão.
+   */
+  .auth-bloco {
+    animation: bcBlocoAssenta 0.72s cubic-bezier(0.22, 1.15, 0.45, 1) both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .auth-sobe,
+    .auth-risco,
+    .auth-bloco {
+      animation: none;
+    }
+  }
+}
+
+@keyframes bcSobe {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bcRisco {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes bcBlocoAssenta {
+  from {
+    opacity: 0;
+    transform: translateY(-62px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes fadeIn {

@@ -1,12 +1,21 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { authClient } from "@/lib/auth/client";
-import { NOME_PRODUTO } from "@/lib/produto";
 import { safeCallbackPath } from "@/lib/security/urls";
-import { ThemeToggle } from "@/components/theme-toggle";
+
+/**
+ * F086 — intervalo entre um envio e o próximo.
+ *
+ * O link vale 5 minutos (`magicLink.expiresIn` em `lib/auth`), então reenviar
+ * de segundo em segundo só gera e-mail que vence junto. O freio também existe
+ * porque este projeto não configura `rateLimit` no Better Auth: o que segura
+ * o servidor é o limite padrão dele, e não vale deixar um botão convidando a
+ * testá-lo.
+ */
+const ESPERA_REENVIO = 30;
 
 function mensagemErroCallback(code: string | null): string | null {
   if (!code) return null;
@@ -41,9 +50,18 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(erroCallback);
   const [loading, setLoading] = useState(false);
+  const [espera, setEspera] = useState(0);
+  // Só para confirmar o reenvio: sem isto, clicar em "Reenviar" não muda nada
+  // na tela e a pessoa clica de novo achando que falhou.
+  const [reenviado, setReenviado] = useState(false);
 
-  async function onMagicLink(e: FormEvent) {
-    e.preventDefault();
+  useEffect(() => {
+    if (espera <= 0) return;
+    const t = setTimeout(() => setEspera((s) => s - 1), 1000);
+    return () => clearTimeout(t);
+  }, [espera]);
+
+  async function enviarLink() {
     setLoading(true);
     setError(null);
     try {
@@ -54,14 +72,33 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
       });
       if (err) {
         setError(err.message ?? "Falha ao enviar link.");
-        return;
+        return false;
       }
-      setSent(true);
+      setEspera(ESPERA_REENVIO);
+      return true;
     } catch {
       setError("Falha ao enviar link.");
+      return false;
     } finally {
       setLoading(false);
     }
+  }
+
+  async function onMagicLink(e: FormEvent) {
+    e.preventDefault();
+    if (await enviarLink()) setSent(true);
+  }
+
+  async function onReenviar() {
+    setReenviado(false);
+    if (await enviarLink()) setReenviado(true);
+  }
+
+  /** Volta ao formulário com o e-mail preenchido: quase sempre é um typo. */
+  function onTrocarEmail() {
+    setSent(false);
+    setReenviado(false);
+    setError(null);
   }
 
   async function onGoogle() {
@@ -78,140 +115,177 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
     }
   }
 
-  return (
-    <div className="relative flex min-h-dvh items-center justify-center px-4 py-12">
-      <div className="absolute right-4 top-4 z-10">
-        <ThemeToggle variant="icon" />
-      </div>
-      <div
-        className="pointer-events-none absolute inset-0 opacity-90"
-        aria-hidden
-      />
-      <div className="relative w-full max-w-md animate-[fadeIn_0.4s_ease-out]">
-        <p className="font-[family-name:var(--font-outfit)] text-4xl font-bold tracking-tight text-foreground md:text-5xl">
-          {NOME_PRODUTO}
+  /*
+   * F086 — a confirmação não é um beco sem saída. Antes ela substituía o
+   * formulário inteiro: quem errava o e-mail ou não recebia nada só saía dali
+   * recarregando a página. Agora leva as duas saídas reais — reenviar e
+   * corrigir o endereço.
+   */
+  if (sent) {
+    return (
+      <div data-clarity-mask="true">
+        <h1 className="page-title">Link enviado</h1>
+        <p className="mt-3 text-sm leading-relaxed text-muted">
+          Enviamos um link para{" "}
+          <strong className="text-foreground">{email}</strong>. Abra o e-mail
+          para entrar — o link vale por 5 minutos.
         </p>
-        {/* F067 — a tela de entrada diz o que o Club faz antes de pedir
-            o e-mail. */}
-        <p className="mt-3 max-w-sm text-base leading-relaxed text-muted">
-          A comunidade de quem está montando a própria operação de IA e
-          automação: aulas, skills prontas e gente fechando cliente junto.
+        {/* A causa mais comum de "não chegou" é a caixa errada, não o envio. */}
+        <p className="mt-3 text-sm font-medium text-foreground">
+          Não achou? Olhe em spam e em promoções.
         </p>
 
-        <div
-          className="mt-8 rounded-2xl border border-border/80 bg-card p-7 shadow-[0_12px_40px_rgba(15,23,42,0.06)]"
+        {error ? (
+          <p className="mt-4 text-sm text-red-600 dark:text-red-400" role="alert">
+            {error}
+          </p>
+        ) : null}
+
+        {/*
+         * Sem afirmar que o link anterior morreu: o plugin do Better Auth
+         * emite um token novo, mas não confirmei que invalida o antigo.
+         * "O mais recente" é orientação segura nos dois casos.
+         */}
+        {reenviado && !error ? (
+          <p className="mt-4 text-sm text-accent" role="status">
+            Link reenviado para {email}. Use o e-mail mais recente.
+          </p>
+        ) : null}
+
+        <div className="mt-6 flex flex-col gap-2">
+          <button
+            type="button"
+            className="btn-outline w-full"
+            disabled={loading || espera > 0}
+            onClick={onReenviar}
+          >
+            {loading
+              ? "Enviando…"
+              : espera > 0
+                ? `Reenviar em ${espera}s`
+                : "Reenviar link"}
+          </button>
+          <button
+            type="button"
+            className="btn-ghost w-full text-sm"
+            disabled={loading}
+            onClick={onTrocarEmail}
+          >
+            Usar outro e-mail
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-7" data-clarity-mask="true">
+      <div>
+        <h1 className="page-title">Entre na comunidade</h1>
+        <p className="mt-2 text-sm text-muted">
+          Não tem conta?{" "}
+          <Link
+            href="/cadastro"
+            className="font-semibold text-accent hover:underline"
+          >
+            Criar conta grátis
+          </Link>
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-4">
+        {googleEnabled ? (
+          <>
+            <button
+              type="button"
+              className="btn-outline w-full"
+              disabled={loading}
+              onClick={onGoogle}
+            >
+              Entrar com Google
+            </button>
+            <div className="flex items-center gap-3" aria-hidden>
+              <span className="h-px flex-1 bg-border" />
+              <span className="text-xs text-muted">ou</span>
+              <span className="h-px flex-1 bg-border" />
+            </div>
+          </>
+        ) : null}
+
+        <form
+          onSubmit={onMagicLink}
+          className="flex flex-col gap-3"
           data-clarity-mask="true"
         >
-          {sent ? (
-            <div>
-              <p className="text-sm font-semibold text-foreground">
-                Link enviado
-              </p>
-              <p className="mt-2 text-sm leading-relaxed text-muted">
-                Enviamos um link para <strong className="text-foreground">{email}</strong>.
-                Abra o e-mail para entrar. O link vale por poucos minutos.
-              </p>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-4">
-              <p className="text-sm font-medium text-foreground">
-                Entre na comunidade
-              </p>
-              {googleEnabled ? (
-                <button
-                  type="button"
-                  className="btn-outline w-full"
-                  disabled={loading}
-                  onClick={onGoogle}
-                >
-                  Entrar com Google
-                </button>
-              ) : null}
+          <label className="text-xs font-medium text-muted">
+            E-mail
+            <input
+              className="input mt-1.5"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="voce@email.com"
+            />
+          </label>
+          <button
+            type="submit"
+            className="btn-primary w-full"
+            disabled={loading}
+          >
+            {/*
+             * F086 — "magic link" é jargão: quem chega na tela não sabe o que
+             * vai acontecer ao clicar. O rótulo diz o próximo passo real.
+             */}
+            {loading ? "Enviando…" : "Receber link de acesso"}
+          </button>
+        </form>
 
-              {googleEnabled ? (
-                <p className="text-center text-xs text-muted">ou use e-mail</p>
-              ) : null}
+        {error ? (
+          <p className="text-sm text-red-600 dark:text-red-400" role="alert">
+            {error}
+          </p>
+        ) : null}
 
-              <form
-                onSubmit={onMagicLink}
-                className="flex flex-col gap-3"
-                data-clarity-mask="true"
-              >
-                <label className="text-xs font-medium text-muted">
-                  E-mail
-                  <input
-                    className="input mt-1.5"
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="voce@email.com"
-                  />
-                </label>
-                <button
-                  type="submit"
-                  className="btn-primary w-full"
-                  disabled={loading}
-                >
-                  {loading ? "Enviando…" : "Receber magic link"}
-                </button>
-              </form>
+        {contaExcluida ? (
+          <p className="text-sm text-muted" role="status">
+            Sua conta foi excluída. Seus dados pessoais foram removidos.
+          </p>
+        ) : null}
+      </div>
 
-              {error ? (
-                <p className="text-sm text-red-600 dark:text-red-400" role="alert">
-                  {error}
-                </p>
-              ) : null}
-
-              {contaExcluida ? (
-                <p className="text-sm text-muted" role="status">
-                  Sua conta foi excluída. Seus dados pessoais foram removidos.
-                </p>
-              ) : null}
-
-              {/*
-               * F078 — mesma razão do `gift-signup-form`: em aba nova, ler os
-               * Termos não custa o e-mail digitado nem o código de 6 dígitos
-               * que acabou de chegar (o OTP expira em 10 min).
-               */}
-              <p className="pt-2 text-center text-xs text-muted">
-                Ao continuar, você concorda com os{" "}
-                <a
-                  href="/termos"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-accent hover:underline"
-                >
-                  Termos de Uso
-                </a>{" "}
-                e a{" "}
-                <a
-                  href="/privacidade"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-accent hover:underline"
-                >
-                  Política de Privacidade
-                </a>
-                .
-              </p>
-              <p className="text-center text-sm text-muted">
-                Não tem conta?{" "}
-                <Link
-                  href="/cadastro"
-                  className="font-semibold text-accent hover:underline"
-                >
-                  Criar conta grátis
-                </Link>
-              </p>
-              {/* F067 — o que a conta gratuita já entrega, sem pedágio. */}
-              <p className="text-center text-xs text-muted">
-                No gratuito você já assiste as primeiras aulas, lê o feed da
-                comunidade e pega os presentes.
-              </p>
-            </div>
-          )}
-        </div>
+      <div className="flex flex-col gap-3">
+        {/*
+         * F078 — mesma razão do `gift-signup-form`: em aba nova, ler os
+         * Termos não custa o e-mail digitado nem o código de 6 dígitos
+         * que acabou de chegar (o OTP expira em 10 min).
+         */}
+        <p className="text-center text-xs text-muted">
+          Ao continuar, você concorda com os{" "}
+          <a
+            href="/termos"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-accent hover:underline"
+          >
+            Termos de Uso
+          </a>{" "}
+          e a{" "}
+          <a
+            href="/privacidade"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-accent hover:underline"
+          >
+            Política de Privacidade
+          </a>
+          .
+        </p>
+        {/* F067 — o que a conta gratuita já entrega, sem pedágio. */}
+        <p className="text-center text-xs text-muted">
+          No gratuito você já assiste as primeiras aulas, lê o feed da
+          comunidade e pega os presentes.
+        </p>
       </div>
     </div>
   );
