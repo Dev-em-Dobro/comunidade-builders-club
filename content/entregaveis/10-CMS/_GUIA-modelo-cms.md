@@ -3,8 +3,7 @@
 Crie o painel em que o **cliente edita o próprio site**. No final você tem o CMS
 rodando no PC e sabe repetir o fluxo pra cada cliente novo.
 
-Template (botão "Abrir o template no GitHub" na página do material):
-https://github.com/Dev-em-Dobro/criador-de-cms-builders
+Baixe o template em `.zip` na página do material (não precisa fazer fork).
 
 ---
 
@@ -22,7 +21,6 @@ configs/
 ```
 
 Na Vercel: **um projeto por cliente**, com Root Directory = `clients/<slug>/`.
-Com dados reais, deixe o projeto **privado**.
 
 ---
 
@@ -35,11 +33,10 @@ Com dados reais, deixe o projeto **privado**.
 
 ## O que você precisa ter
 
-1. GitHub
-2. Node.js 18+ e pnpm (`npm i -g pnpm`)
-3. Supabase (plano free)
-4. Vercel (na hora de publicar)
-5. Resend / Bunny — opcional no primeiro teste
+1. Node.js 18+ e pnpm (`npm i -g pnpm`)
+2. Supabase (plano free)
+3. Vercel (na hora de publicar)
+4. GitHub — opcional no começo; útil depois pra versionar e ligar na Vercel
 
 ---
 
@@ -53,15 +50,15 @@ node -v
 pnpm -v
 ```
 
-### 2. Copie o template pro seu GitHub
+### 2. Baixe e abra o template
 
-Fork do template → copie a URL do **seu** projeto (Code → HTTPS).
+Na página do material, baixe o `.zip`, extraia a pasta `criador-de-cms-builders`
+e abra no terminal.
 
-### 3. Baixe pro PC e instale
+### 3. Instale as dependências
 
 ```bash
-git clone https://github.com/SEU-USUARIO/criador-de-cms-builders.git
-cd criador-de-cms-builders
+cd caminho/para/criador-de-cms-builders
 pnpm install
 ```
 
@@ -114,7 +111,8 @@ Outro slug, outra pasta, outro projeto Supabase.
 
 ### 10. Publicar na Vercel
 
-Importe o seu projeto → Root Directory `clients/<slug>` → cole as envs → Deploy.
+Crie um repositório **seu** no GitHub, envie essa pasta, importe na Vercel com
+Root Directory `clients/<slug>`, cole as envs e faça o deploy.
 
 ---
 

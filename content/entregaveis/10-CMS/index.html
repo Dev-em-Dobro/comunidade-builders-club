@@ -153,22 +153,14 @@
 configs/
   padaria-da-rua.config.ts
   clinica-sorriso.config.ts</pre>
-          <p class="fecho">Com dados reais do cliente, deixe o projeto <b>privado</b> e nunca versione senhas ou chaves.</p>
+          <p class="fecho">Quando for subir pro GitHub com dados reais do cliente, deixe o repositório <b>privado</b> e nunca versione senhas ou chaves.</p>
         </div>
 
         <div class="acoes anima" style="--i:4">
-          <a class="btn btn-solid" href="https://github.com/Dev-em-Dobro/criador-de-cms-builders" target="_blank" rel="noopener">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.58 2 12.26c0 4.52 2.87 8.35 6.84 9.7.5.1.68-.22.68-.48 0-.24-.01-.87-.01-1.7-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.63.07-.63 1 .07 1.53 1.06 1.53 1.06.89 1.56 2.34 1.11 2.91.85.09-.66.35-1.11.63-1.37-2.22-.26-4.56-1.14-4.56-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.31.1-2.73 0 0 .84-.27 2.75 1.05A9.3 9.3 0 0 1 12 6.84c.85 0 1.71.12 2.51.35 1.91-1.32 2.75-1.05 2.75-1.05.55 1.42.2 2.47.1 2.73.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.8-4.57 5.06.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .26.18.58.69.48A10.03 10.03 0 0 0 22 12.26C22 6.58 17.52 2 12 2z"/></svg>
-            Abrir o template no GitHub
-          </a>
-          <button class="btn btn-ghost dl" type="button"
-                  data-zip-base=""
-                  data-zip-files="_GUIA-modelo-cms.md"
-                  data-zip-name="modelo-cms-builders-club.zip"
-                  data-zip-folder="modelo-cms">
+          <a class="btn btn-solid" href="/api/entregaveis/download/cms" target="_top" rel="noopener">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
-            <span class="dl-txt">Baixar o guia em .zip</span>
-          </button>
+            Baixar o template em .zip
+          </a>
         </div>
       </section>
 
@@ -178,24 +170,24 @@ configs/
       <div class="sec-titulo reveal"><span class="sq"></span><h2>O que você precisa ter</h2></div>
       <div class="contas">
         <div class="conta reveal" style="--i:0">
-          <h3>GitHub</h3>
-          <p>Pra copiar o template e guardar o código.</p>
-          <span class="tag">Obrigatório</span>
-        </div>
-        <div class="conta reveal" style="--i:1">
           <h3>Node + pnpm</h3>
           <p>Pra rodar o projeto no seu computador (Node 18+).</p>
           <span class="tag">Obrigatório</span>
         </div>
-        <div class="conta reveal" style="--i:2">
+        <div class="conta reveal" style="--i:1">
           <h3>Supabase</h3>
           <p>Banco e login do admin. O plano free dá conta.</p>
           <span class="tag">Obrigatório</span>
         </div>
-        <div class="conta reveal" style="--i:3">
+        <div class="conta reveal" style="--i:2">
           <h3>Vercel</h3>
           <p>Pra publicar o painel quando for entregar.</p>
           <span class="tag">Na entrega</span>
+        </div>
+        <div class="conta reveal" style="--i:3">
+          <h3>GitHub</h3>
+          <p>Opcional no começo. Serve depois pra versionar e ligar na Vercel.</p>
+          <span class="tag">Depois</span>
         </div>
       </div>
 
@@ -217,16 +209,16 @@ pnpm -v</pre>
 
         <div class="passo reveal" style="--i:1">
           <div>
-            <h3>Copie o template pro seu GitHub</h3>
-            <p>Abra o template no botão acima, clique em <b>Fork</b> e copie a URL do <b>seu</b> projeto (Code → HTTPS).</p>
+            <h3>Baixe e abra o template</h3>
+            <p>Clique em <b>Baixar o template em .zip</b> (ou use o botão Baixar .zip no topo da página). Extraia a pasta <code>criador-de-cms-builders</code> pra um lugar fácil de achar (ex.: Desktop). Dentro dela tem o <code>LEIA-ME-BUILDERS-CLUB.md</code> com o mesmo guia.</p>
           </div>
         </div>
 
         <div class="passo reveal" style="--i:2">
           <div>
-            <h3>Baixe pro PC e instale</h3>
-<pre>git clone https://github.com/SEU-USUARIO/criador-de-cms-builders.git
-cd criador-de-cms-builders
+            <h3>Instale as dependências</h3>
+            <p>No terminal, entre na pasta extraída:</p>
+<pre>cd caminho/para/criador-de-cms-builders
 pnpm install</pre>
             <p class="nota">A primeira instalação demora. Espere terminar sem erro vermelho.</p>
           </div>
@@ -289,7 +281,7 @@ pnpm --filter meu-cliente run dev</pre>
         <div class="passo reveal" style="--i:9">
           <div>
             <h3>Publique na Vercel (na hora de entregar)</h3>
-            <p>Importe o <b>seu</b> projeto na Vercel. Root Directory: <code>clients/&lt;slug&gt;</code>. Cole as mesmas variáveis do <code>.env.local</code> e faça o deploy. Um cliente = um projeto na Vercel.</p>
+            <p>Crie um repositório <b>seu</b> no GitHub, envie essa pasta e importe na Vercel. Root Directory: <code>clients/&lt;slug&gt;</code>. Cole as mesmas variáveis do <code>.env.local</code> e faça o deploy. Um cliente = um projeto na Vercel.</p>
           </div>
         </div>
 
@@ -324,8 +316,6 @@ pnpm --filter meu-cliente run dev</pre>
     </div>
   </div>
 
-  <script src="../_lib/jszip.min.js"></script>
-  <script src="../_lib/baixar-zip.js"></script>
   <script>
     (function(){
       var reduz = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;

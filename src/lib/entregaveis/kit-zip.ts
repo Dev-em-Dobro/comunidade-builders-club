@@ -19,6 +19,11 @@ export async function montarKitZip(
   pasta: string,
   kit: KitZip,
 ): Promise<Buffer | null> {
+  if (kit.arquivoPronto) {
+    const pronto = await lerArquivoEntregavel([pasta, kit.arquivoPronto]);
+    return pronto?.body ?? null;
+  }
+
   const arquivos: ArquivoZip[] = [];
 
   for (const relativo of kit.arquivos) {
