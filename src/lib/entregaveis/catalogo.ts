@@ -4,10 +4,15 @@
 export type KitZip = {
   /** Nome do arquivo baixado (ex.: meu-portfolio.zip). */
   nomeArquivo: string;
-  /** Pasta raiz dentro do zip. */
+  /** Pasta raiz dentro do zip (ignorado se `arquivoPronto` estiver definido). */
   pastaInterna: string;
-  /** Arquivos relativos à pasta do entregável. */
+  /** Arquivos relativos à pasta do entregável (ignorado se `arquivoPronto`). */
   arquivos: string[];
+  /**
+   * Zip já montado na pasta do entregável (ex.: template completo).
+   * Quando definido, o download serve esse arquivo direto.
+   */
+  arquivoPronto?: string;
 };
 
 export type Entregavel = {
@@ -110,12 +115,13 @@ export const ENTREGAVEIS: Entregavel[] = [
     slug: "cms",
     titulo: "Modelo de CMS",
     descricao:
-      "Template pra gerar o painel em que o cliente edita o site. Fork, pasta por cliente e tutorial completo.",
+      "Template pra gerar o painel em que o cliente edita o site. Baixa o zip, pasta por cliente e tutorial completo.",
     pasta: "10-CMS",
     kitZip: {
-      nomeArquivo: "modelo-cms-builders-club.zip",
-      pastaInterna: "modelo-cms",
-      arquivos: ["_GUIA-modelo-cms.md"],
+      nomeArquivo: "criador-de-cms-builders.zip",
+      pastaInterna: "criador-de-cms-builders",
+      arquivos: [],
+      arquivoPronto: "criador-de-cms-builders.zip",
     },
   },
   {
