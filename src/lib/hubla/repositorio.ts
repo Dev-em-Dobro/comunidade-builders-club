@@ -104,6 +104,7 @@ export async function aplicarAcaoAllowlist(acao: AcaoAllowlist): Promise<void> {
       note: acao.offerId
         ? `product:${acao.productId} offer:${acao.offerId}`
         : `product:${acao.productId}`,
+      tier: acao.plan,
     });
     await concederPago(
       acao.emails.length > 0 ? acao.emails : [acao.email],

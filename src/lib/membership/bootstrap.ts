@@ -2,13 +2,14 @@ import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
 import type { Membership, Profile } from "@prisma/client";
 import { VERSAO_LEGAL } from "@/lib/legal";
-import { isEmailAllowed } from "./allowlist";
+import { isEmailAllowed, tierPagoDoEmailAllowlist } from "./allowlist";
 import { parseOrigemCookie, ORIGEM_COOKIE } from "@/lib/gifts/origem";
 import {
   precisaRegistrarAceite,
   registrarAceiteLegal,
   type ContextoAceite,
 } from "./aceite-legal";
+import type { TierPagoAllowlist } from "./tier-allowlist";
 
 export type BootstrapResult = {
   membership: Membership;
@@ -87,6 +88,11 @@ async function resolverBootstrap(
   }
 
   const allowed = isBootstrapAdmin || (await isEmailAllowed(email));
+  // F053 hotfix — allowlist Elite não pode nascer como PRO no 1º login.
+  let tierAllowlist: TierPagoAllowlist = "pro";
+  if (allowed && !isBootstrapAdmin) {
+    tierAllowlist = await tierPagoDoEmailAllowlist(email);
+  }
 
   let nextProfile = profile;
   if (!nextProfile) {
@@ -107,7 +113,7 @@ async function resolverBootstrap(
       data: {
         userId,
         status: "active",
-        tier: isBootstrapAdmin ? "elite" : allowed ? "pro" : "free",
+        tier: isBootstrapAdmin ? "elite" : allowed ? tierAllowlist : "free",
         role: isBootstrapAdmin ? "admin" : "member",
         ...(origin
           ? {
@@ -137,7 +143,7 @@ async function resolverBootstrap(
       where: { userId },
       data: {
         status: "active",
-        tier: isBootstrapAdmin ? "elite" : allowed ? "pro" : "free",
+        tier: isBootstrapAdmin ? "elite" : allowed ? tierAllowlist : "free",
         ...(isBootstrapAdmin ? { role: "admin" as const } : {}),
       },
     });
