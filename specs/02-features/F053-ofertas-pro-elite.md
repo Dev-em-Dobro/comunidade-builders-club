@@ -114,6 +114,18 @@ TMB (F047): codes `9DW254247E5` e `3XB272209KV` concedem **elite**
 (boleto Elite). Demais codes TMB (ex. Mentoria `1AS249898VN`) e allowlist
 concedem **pro**.
 
+### Hotfix 2026-09-14 — 1º login após compra Elite
+
+Se o webhook chega **antes** da conta existir, só a allowlist é gravada
+(`note` com `offer:…` / `plan=elite`). No primeiro login o bootstrap **não**
+pode forçar `pro` para todo mundo allowlisted.
+
+- Lê a `note` da allowlist (`tierPagoDaNotaAllowlist`) e cria membership
+  `elite` ou `pro` conforme a oferta.
+- `addAllowedEmail` recebe `tier` do grant Hubla/TMB e promove conta existente
+  sem rebaixar Elite.
+- Exige `HUBLA_OFFER_ID_ELITE` (e `HUBLA_OFFER_ID_PRO`) corretos na Vercel.
+
 ## UI
 
 Página **`/planos`** (liberada para free e PRO):

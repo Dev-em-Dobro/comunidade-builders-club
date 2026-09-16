@@ -1,4 +1,9 @@
 import { prisma } from "@/lib/db";
+import {
+  mesclarTierPago,
+  tierPagoDaNotaAllowlist,
+  type TierPagoAllowlist,
+} from "./tier-allowlist";
 
 export function normalizarEmail(email: string): string {
   return email.trim().toLowerCase();
@@ -18,10 +23,23 @@ export async function isEmailAllowed(email: string): Promise<boolean> {
   return !!row;
 }
 
+/** Plano pago indicado na allowlist (Elite vs PRO). Default pro. */
+export async function tierPagoDoEmailAllowlist(
+  email: string,
+): Promise<TierPagoAllowlist> {
+  const row = await prisma.allowedEmail.findUnique({
+    where: { email: normalizarEmail(email) },
+    select: { note: true },
+  });
+  return tierPagoDaNotaAllowlist(row?.note);
+}
+
 export async function addAllowedEmail(opts: {
   email: string;
   source?: string;
   note?: string | null;
+  /** Plano do grant Hubla/TMB. Sem isso, deriva da `note`. */
+  tier?: TierPagoAllowlist;
 }) {
   const email = normalizarEmail(opts.email);
   const row = await prisma.allowedEmail.upsert({
@@ -37,13 +55,14 @@ export async function addAllowedEmail(opts: {
     },
   });
 
-  // F053 / F014 — allowlist promove quem já tem conta (não rebaixa elite).
-  // Não mexe em originUtmContent / originGiftSlug / originAt.
+  // F053 — promove quem já tem conta no plano certo (nunca rebaixa elite).
   const user = await findUserByEmail(email);
   if (user) {
     const m = await prisma.membership.findUnique({ where: { userId: user.id } });
     if (m) {
-      const tier = m.tier === "elite" ? "elite" : "pro";
+      const desejado =
+        opts.tier ?? tierPagoDaNotaAllowlist(opts.note ?? row.note);
+      const tier = mesclarTierPago(m.tier, desejado);
       await prisma.membership.update({
         where: { userId: user.id },
         data: { status: "active", tier },
