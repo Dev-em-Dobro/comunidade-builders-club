@@ -1,11 +1,14 @@
 import { sanitizeUtmValue } from "@/lib/gifts/origem";
 
 /**
- * F077 — Imersão "2 a 5k com IA" (Dev em Dobro), 22 e 23/09/2026.
+ * F077 / F088 — Imersão "2 a 5k com IA" (Dev em Dobro), 22 e 23/09/2026.
  *
  * Copy, prazo e link vivem aqui, e não no `.tsx`, por dois motivos:
  * a faixa é datada e precisa sumir sozinha (decisão 1), e a copy é espelho
  * da landing — quando ela mudar, muda um objeto, num arquivo (decisão 2).
+ *
+ * Superfícies: Presente (`utm_medium=presente`, F077) e banner Free no Club
+ * (`utm_medium=club-banner`, F088).
  *
  * Sem dependência de Next: dá para testar sem React.
  */
@@ -29,11 +32,11 @@ export const IMERSAO_IA = {
   terminaEm: new Date("2026-09-24T00:00:00-03:00"),
 } as const;
 
-const UTM_FIXAS = {
-  utm_source: "builders-club",
-  utm_medium: "presente",
-  utm_campaign: "imersao-ia",
-} as const;
+const UTM_SOURCE = "builders-club";
+const UTM_CAMPAIGN = "imersao-ia";
+
+/** Medium que distingue a superfície: Presente (F077) vs banner do Club (F088). */
+export type ImersaoUtmMedium = "presente" | "club-banner";
 
 /** Passou da segunda aula, a faixa não aparece mais. */
 export function imersaoAtiva(agora: Date = new Date()): boolean {
@@ -41,15 +44,18 @@ export function imersaoAtiva(agora: Date = new Date()): boolean {
 }
 
 /**
- * Landing (não o checkout) com as UTMs do Club. O `utmContent` vem do path do
- * Presente (F059) e diz qual Presente trouxe a venda; passa pelo mesmo
- * saneamento do resto do funil antes de virar querystring.
+ * Landing (não o checkout) com as UTMs do Club.
+ * - `utm_medium=presente` (default): CTA no Presente (F077); `utmContent` = path F059
+ * - `utm_medium=club-banner`: faixa Free no app (F088)
  */
-export function imersaoHref(utmContent?: string | null): string {
+export function imersaoHref(
+  utmContent?: string | null,
+  opts?: { medium?: ImersaoUtmMedium },
+): string {
   const url = new URL(IMERSAO_IA.url);
-  for (const [chave, valor] of Object.entries(UTM_FIXAS)) {
-    url.searchParams.set(chave, valor);
-  }
+  url.searchParams.set("utm_source", UTM_SOURCE);
+  url.searchParams.set("utm_medium", opts?.medium ?? "presente");
+  url.searchParams.set("utm_campaign", UTM_CAMPAIGN);
   const content = sanitizeUtmValue(utmContent);
   if (content) url.searchParams.set("utm_content", content);
   return url.toString();

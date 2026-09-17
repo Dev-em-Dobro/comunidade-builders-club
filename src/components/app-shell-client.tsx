@@ -14,6 +14,7 @@ import { UserMenu } from "@/components/user-menu";
 import { isFreeSpaceSlug } from "@/lib/membership/capabilities";
 import { isFreePublishSpace } from "@/lib/spaces/constants";
 import { LiveBanner } from "@/components/live-banner";
+import { ClubImersaoBanner } from "@/components/club-imersao-banner";
 import { WhatsappLiveFab } from "@/components/whatsapp-live-fab";
 import {
   ICON_ADMIN,
@@ -531,7 +532,8 @@ function ShellInner({
       ) : null}
 
       <div className="relative flex min-w-0 flex-1 flex-col">
-        {/* F079 — faixa é só de Elite; `/api/nav` nem manda `live` pros outros. */}
+        {/* F088 — imersão só Free; F079 — live só Elite. Mutuamente exclusivos por tier. */}
+        {!isPaid ? <ClubImersaoBanner /> : null}
         {isElite && live ? (
           <LiveBanner liveAt={live.liveAt} calendarUrl={live.calendarUrl} />
         ) : null}
