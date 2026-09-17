@@ -6,7 +6,15 @@ import {
   sendRegua7dEmail,
 } from "@/lib/email";
 import { postTemLinkPublico } from "@/lib/posts/link-publico";
-import { PROJETOS_SPACE_SLUG } from "@/lib/spaces/constants";
+import {
+  PRESENTES_SPACE_SLUG,
+  PROJETOS_SPACE_SLUG,
+} from "@/lib/spaces/constants";
+import {
+  escolherMaterial48h,
+  pathFallbackPresentes,
+  type GiftResumo,
+} from "./material-48h";
 import {
   entradaCs,
   isElegivelReguaMember,
@@ -105,7 +113,14 @@ export async function dispararRegua(
     select: {
       id: true,
       email: true,
-      membership: { select: { status: true, role: true, createdAt: true } },
+      membership: {
+        select: {
+          status: true,
+          role: true,
+          createdAt: true,
+          originGiftSlug: true,
+        },
+      },
       profile: { select: { displayName: true, lastSeenAt: true, joinedAt: true } },
     },
   });
@@ -122,7 +137,7 @@ export async function dispararRegua(
   const base = appBaseUrl();
   const projetosUrl = `${base}/spaces/${PROJETOS_SPACE_SLUG}`;
 
-  const [allowlist, posts, comments, reactions, lessons, projetoPosts, envios] =
+  const [allowlist, posts, comments, reactions, lessons, projetoPosts, envios, giftPosts] =
     await Promise.all([
       prisma.allowedEmail.findMany({
         where: { email: { in: emails } },
@@ -156,7 +171,19 @@ export async function dispararRegua(
         where: { userId: { in: ids }, trigger: { in: [...TRIGGERS_REGUA] } },
         select: { userId: true, trigger: true, sentAt: true },
       }),
+      prisma.post.findMany({
+        where: {
+          space: { slug: PRESENTES_SPACE_SLUG },
+          slug: { not: null },
+        },
+        select: { slug: true, title: true },
+        orderBy: [{ pinnedAt: "desc" }, { createdAt: "desc" }],
+      }),
     ]);
+
+  const gifts: GiftResumo[] = giftPosts.flatMap((g) =>
+    g.slug ? [{ slug: g.slug, title: g.title }] : [],
+  );
 
   const allowByEmail = new Map(
     allowlist.map((a) => [a.email.toLowerCase(), a]),
@@ -188,10 +215,22 @@ export async function dispararRegua(
 
   const senders: Record<
     TriggerRegua,
-    (opts: { to: string; displayName: string }) => Promise<void>
+    (opts: {
+      to: string;
+      displayName: string;
+      originGiftSlug: string | null;
+    }) => Promise<void>
   > = {
-    [TRIGGER_SEM_ACESSO_48H]: ({ to, displayName }) =>
-      sendRegua48hEmail({ to, displayName, clubUrl: base }),
+    [TRIGGER_SEM_ACESSO_48H]: async ({ to, displayName, originGiftSlug }) => {
+      const material = escolherMaterial48h(gifts, originGiftSlug);
+      const path = material?.path ?? pathFallbackPresentes();
+      await sendRegua48hEmail({
+        to,
+        displayName,
+        materialUrl: `${base}${path}`,
+        material,
+      });
+    },
     [TRIGGER_SEM_AMOSTRA_7D]: ({ to, displayName }) =>
       sendRegua7dEmail({ to, displayName, projetosUrl }),
     [TRIGGER_SEM_ATIVIDADE_14D]: ({ to, displayName }) =>
@@ -244,7 +283,11 @@ export async function dispararRegua(
         continue;
       }
       try {
-        await senders[trigger]({ to: user.email, displayName });
+        await senders[trigger]({
+          to: user.email,
+          displayName,
+          originGiftSlug: user.membership?.originGiftSlug ?? null,
+        });
         await prisma.reguaEmailSend.create({
           data: { userId: user.id, trigger },
         });

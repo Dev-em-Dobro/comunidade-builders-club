@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 import { requireAuthEnv } from "@/lib/auth/env";
 import { NOME_PRODUTO } from "@/lib/produto";
+import { montarCopy48h } from "@/lib/regua/material-48h";
 import {
   RESEND_TAG_CATEGORY,
   type EmailCategoria,
@@ -236,33 +237,27 @@ function primeiroNome(displayName: string): string {
   return parte || "Builder";
 }
 
-/** F075 — toque de CS aos 48h sem abrir o Club. Sem opt-out. */
+/** F075 / F089 — toque aos 48h: entrega o próximo Presente (não cobra ausência). */
 export async function sendRegua48hEmail(opts: {
   to: string;
   displayName: string;
-  clubUrl: string;
+  materialUrl: string;
+  material: {
+    path: string;
+    titulo: string;
+    origemTitulo: string | null;
+  } | null;
 }): Promise<void> {
-  const nome = primeiroNome(opts.displayName);
-  const subject = `Faz dois dias que você não aparece no ${NOME_PRODUTO}`;
-  const text = [
-    `Olá, ${nome},`,
-    ``,
-    `Faz uns dois dias que o ${NOME_PRODUTO} não te vê por aqui. Sem cobrança — só um toque para você não perder o ritmo da comunidade.`,
-    ``,
-    `Quando puder, entra de novo:`,
-    opts.clubUrl,
-    ``,
-    `— ${NOME_PRODUTO}`,
-  ].join("\n");
-  const html = wrapHtml(
-    `Sentimos sua falta`,
-    `<p style="color:#64748b;font-size:15px;line-height:1.5;">Olá, ${escapeHtml(nome)}. Faz uns dois dias que você não abre o ${escapeHtml(NOME_PRODUTO)}. Sem cobrança — só um toque para você não perder o ritmo.</p>
-    <p style="margin:24px 0;"><a href="${escapeHtml(opts.clubUrl)}" style="display:inline-block;background:#0d9488;color:#fff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:600;">Abrir o ${escapeHtml(NOME_PRODUTO)}</a></p>`,
-  );
+  const copy = montarCopy48h({
+    displayName: opts.displayName,
+    materialUrl: opts.materialUrl,
+    material: opts.material,
+  });
+  const html = wrapHtml(copy.tituloHtml, copy.htmlInner);
   await sendMail({
     to: opts.to,
-    subject,
-    text,
+    subject: copy.subject,
+    text: copy.texto,
     html,
     category: "regua",
   });
