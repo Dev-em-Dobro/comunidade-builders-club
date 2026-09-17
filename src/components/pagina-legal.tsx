@@ -6,9 +6,12 @@ import { ThemeToggle } from "@/components/theme-toggle";
 export function PaginaLegal({
   titulo,
   children,
+  atualizadoEm,
 }: {
   titulo: string;
   children: ReactNode;
+  /** Override da data (ex.: garantia tem versão própria). */
+  atualizadoEm?: string;
 }) {
   return (
     <main className="relative mx-auto max-w-2xl px-6 py-12">
@@ -24,7 +27,7 @@ export function PaginaLegal({
         {titulo}
       </h1>
       <p className="mt-2 text-sm text-muted">
-        Última atualização: {ATUALIZADO_EM}
+        Última atualização: {atualizadoEm ?? ATUALIZADO_EM}
       </p>
       <div className="mt-10 space-y-6 text-sm leading-relaxed text-foreground/85">
         {children}
@@ -45,6 +48,10 @@ export function PaginaLegal({
         {" · "}
         <Link href="/privacidade" className="hover:text-accent hover:underline">
           Privacidade
+        </Link>
+        {" · "}
+        <Link href="/garantia" className="hover:text-accent hover:underline">
+          Lista da garantia
         </Link>
       </p>
     </main>

@@ -15,6 +15,7 @@ import {
   PROMESSA_PRIMEIRO_CLIENTE,
   urlOrionApp,
 } from "@/lib/membership/checkout";
+import { temAceiteGarantiaVigente } from "@/lib/membership/aceite-garantia";
 import { PlanCards } from "@/components/plan-cards";
 
 /**
@@ -71,6 +72,9 @@ export default async function PlanosPage({ searchParams }: Props) {
 
   const offers = ofertasBuildersClub();
   const currentPlan = isElite ? "elite" : isPaid ? "pro" : "none";
+  const garantiaJaAceita = user
+    ? await temAceiteGarantiaVigente(user.id)
+    : false;
 
   return (
     <div className="relative min-h-dvh px-4 py-10">
@@ -89,7 +93,7 @@ export default async function PlanosPage({ searchParams }: Props) {
           {isElite
             ? "Você já está no Elite. Orion, reunião semanal e o restante do Club já entram no seu plano."
             : highlightElite && isPaid
-              ? "Você já tem o PRO, com Orion no plano Free. O Elite libera reunião semanal, material extra e Orion com limites de Pro."
+              ? "Você já tem o PRO, com Orion no plano Free. O Elite libera reunião semanal, material extra, Orion com limites de Pro e a garantia de 90 dias condicionada à lista."
               : copy.body}
         </p>
 
@@ -107,7 +111,12 @@ export default async function PlanosPage({ searchParams }: Props) {
         ) : null}
 
         <div className="mt-8">
-          <PlanCards offers={offers} currentPlan={currentPlan} />
+          <PlanCards
+            offers={offers}
+            currentPlan={currentPlan}
+            loggedIn={!anonima}
+            garantiaJaAceita={garantiaJaAceita}
+          />
         </div>
 
         {/*

@@ -1,5 +1,11 @@
-// F053 — ofertas oficiais Hubla (PRO e Elite).
+// F053 / F090 — ofertas oficiais Hubla (PRO e Elite).
 
+import {
+  PROMESSA_ELITE,
+  PROMESSA_PRO,
+} from "@/lib/legal/garantia";
+
+/** Meta de marketing (Presentes / upgrade). Não é garantia de reembolso do Pro. */
 export const PROMESSA_PRIMEIRO_CLIENTE = "Feche o 1º cliente em 90 dias";
 
 export const CHECKOUT_PRO_FALLBACK_URL =
@@ -95,7 +101,7 @@ export function ofertaPro(): ClubOffer {
     name: "PRO",
     pricing: PRICING_PRO,
     paymentHint: "Pagamento em cartão ou Pix",
-    promise: PROMESSA_PRIMEIRO_CLIENTE,
+    promise: PROMESSA_PRO,
     highlights: [
       {
         title: "Aulas gravadas",
@@ -121,6 +127,10 @@ export function ofertaPro(): ClubOffer {
         title: "Comunidade",
         detail: "Spaces, posts e networking com outros builders",
       },
+      {
+        title: "7 dias para desistir (CDC)",
+        detail: "Arrependimento legal em compra online — sem garantia de resultado em 90 dias",
+      },
     ],
     checkoutUrl: checkoutUrlPro(),
   };
@@ -131,11 +141,16 @@ export function ofertaElite(): ClubOffer {
     id: "elite",
     name: "Elite",
     pricing: PRICING_ELITE,
-    promise: PROMESSA_PRIMEIRO_CLIENTE,
+    promise: PROMESSA_ELITE,
     highlights: [
       {
         title: "Tudo do PRO",
         detail: "Aulas, comunidade, skills, templates e ingresso da Imersão",
+      },
+      {
+        title: "Garantia de 90 dias (condicionada)",
+        detail:
+          "Cumpriu a lista de execução e não fechou cliente? Devolve 100% — veja /garantia",
       },
       {
         title: "Acesso ao Orion (plano PRO por 90 dias)",

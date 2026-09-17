@@ -1,3 +1,9 @@
+"use client";
+
+import { useState, useTransition } from "react";
+import Link from "next/link";
+import { aceitarGarantiaAction } from "@/actions/legal/aceitar-garantia";
+import { VERSAO_GARANTIA } from "@/lib/legal/garantia";
 import type { ClubOffer } from "@/lib/membership/checkout";
 
 function CheckIcon() {
@@ -20,12 +26,50 @@ function OfferCard({
   cta,
   current,
   featured,
+  loggedIn,
+  garantiaJaAceita,
 }: {
   offer: ClubOffer;
   cta: string;
   current?: boolean;
   featured?: boolean;
+  loggedIn: boolean;
+  garantiaJaAceita: boolean;
 }) {
+  const isElite = offer.id === "elite";
+  const [ciente, setCiente] = useState(garantiaJaAceita);
+  const [pending, start] = useTransition();
+  const [erro, setErro] = useState<string | null>(null);
+
+  const precisaCiente = isElite && !current;
+  const checkoutLiberado = !precisaCiente || ciente;
+
+  function irParaCheckout(url: string) {
+    if (!precisaCiente) {
+      window.open(url, "_blank", "noopener,noreferrer");
+      return;
+    }
+    if (!ciente) return;
+
+    if (!loggedIn) {
+      // Sem userId não grava legal_acceptance; o modal Elite cobre no 1º login.
+      window.open(url, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    start(async () => {
+      setErro(null);
+      if (!garantiaJaAceita) {
+        const res = await aceitarGarantiaAction();
+        if (!res.ok) {
+          setErro(res.erro);
+          return;
+        }
+      }
+      window.open(url, "_blank", "noopener,noreferrer");
+    });
+  }
+
   return (
     <article
       className={`flex h-full flex-col rounded-2xl border p-5 transition duration-200 sm:p-6 motion-safe:hover:-translate-y-1 ${
@@ -92,6 +136,16 @@ function OfferCard({
       <p className="mt-5 border-t border-border/60 pt-4 text-sm font-semibold text-foreground">
         {offer.promise}
       </p>
+      {isElite && !current ? (
+        <p className="mt-2 text-xs leading-relaxed text-muted">
+          Detalhes da régua:{" "}
+          <Link href="/garantia" className="text-accent hover:underline">
+            Lista da garantia
+          </Link>{" "}
+          (v{VERSAO_GARANTIA}).
+        </p>
+      ) : null}
+
       {current ? (
         <div className="mt-auto pt-5">
           <p className="btn-outline w-full cursor-default opacity-70">
@@ -100,28 +154,54 @@ function OfferCard({
         </div>
       ) : (
         <div className="mt-auto flex flex-col gap-2 pt-5">
-          <a
-            href={offer.checkoutUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={featured ? "btn-primary w-full" : "btn-outline w-full"}
+          {precisaCiente ? (
+            <label className="flex cursor-pointer items-start gap-2.5 text-xs leading-snug text-muted">
+              <input
+                type="checkbox"
+                className="mt-0.5"
+                checked={ciente}
+                onChange={(e) => setCiente(e.target.checked)}
+              />
+              <span>
+                Li a{" "}
+                <Link href="/garantia" className="text-accent hover:underline">
+                  Lista da garantia
+                </Link>{" "}
+                (v{VERSAO_GARANTIA}) e estou ciente.
+              </span>
+            </label>
+          ) : null}
+          {erro ? (
+            <p className="text-xs text-red-500" role="alert">
+              {erro}
+            </p>
+          ) : null}
+          <button
+            type="button"
+            disabled={!checkoutLiberado || pending}
+            onClick={() => irParaCheckout(offer.checkoutUrl)}
+            className={
+              featured
+                ? "btn-primary w-full disabled:opacity-50"
+                : "btn-outline w-full disabled:opacity-50"
+            }
           >
-            {cta}
-          </a>
+            {pending ? "Registrando…" : cta}
+          </button>
           {offer.paymentHint ? (
             <p className="text-center text-xs text-muted">{offer.paymentHint}</p>
           ) : null}
           {offer.boletoCheckouts && offer.boletoCheckouts.length > 0
             ? offer.boletoCheckouts.map((boleto) => (
-                <a
+                <button
                   key={boleto.url}
-                  href={boleto.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-outline w-full"
+                  type="button"
+                  disabled={!checkoutLiberado || pending}
+                  onClick={() => irParaCheckout(boleto.url)}
+                  className="btn-outline w-full disabled:opacity-50"
                 >
                   {boleto.label}
-                </a>
+                </button>
               ))
             : null}
         </div>
@@ -133,9 +213,13 @@ function OfferCard({
 export function PlanCards({
   offers,
   currentPlan,
+  loggedIn,
+  garantiaJaAceita,
 }: {
   offers: { pro: ClubOffer; elite: ClubOffer };
   currentPlan: "none" | "pro" | "elite";
+  loggedIn: boolean;
+  garantiaJaAceita: boolean;
 }) {
   return (
     <div className="grid items-stretch gap-4 sm:grid-cols-2 sm:gap-5">
@@ -143,12 +227,16 @@ export function PlanCards({
         offer={offers.pro}
         cta="Quero o PRO"
         current={currentPlan === "pro" || currentPlan === "elite"}
+        loggedIn={loggedIn}
+        garantiaJaAceita={garantiaJaAceita}
       />
       <OfferCard
         offer={offers.elite}
         cta="Quero o Elite"
         featured={currentPlan !== "elite"}
         current={currentPlan === "elite"}
+        loggedIn={loggedIn}
+        garantiaJaAceita={garantiaJaAceita}
       />
     </div>
   );
