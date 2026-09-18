@@ -114,7 +114,8 @@ manter sem problema para resolver.
 
 ## Fora de escopo
 
-- Faixa no feed, nas aulas ou em qualquer outra tela
+- Faixa no feed, nas aulas ou em qualquer outra tela — o CTA na
+  descrição da aula gratuita é a [F091](F091-cta-upgrade-descricao-aula.md)
 - Dispensar/ocultar a faixa (exige persistência)
 - Teste A/B ou variação de copy por origem de cadastro
 - Mudança de preço, de checkout ou das ofertas

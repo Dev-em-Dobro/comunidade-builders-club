@@ -8,6 +8,7 @@ import {
   isPaidMembership,
 } from "@/lib/membership/capabilities";
 import { canWatchLesson } from "@/lib/aulas/access";
+import { shouldShowLessonUpgradeCta } from "@/lib/aulas/upgrade-cta";
 import {
   ensureLessonDiscussionPost,
   getLessonForMember,
@@ -27,6 +28,7 @@ import { MarkdownBody } from "@/lib/markdown";
 import { EmptyState } from "@/components/empty-state";
 import { AulaCourseSidebar } from "@/components/aula-course-sidebar";
 import { AulaDetailsTabs } from "@/components/aula-details-tabs";
+import { LessonUpgradeCta } from "@/components/lesson-upgrade-cta";
 import {
   findRootContaining,
   flattenLessons,
@@ -224,16 +226,21 @@ export default async function LessonPage({ params }: Props) {
           <AulaDetailsTabs
             commentCount={discussion?.commentCount ?? 0}
             info={
-              lesson.description ? (
-                <MarkdownBody
-                  body={lesson.description}
-                  className="space-y-2 text-[15px] leading-relaxed text-muted md:text-base [&_a]:text-accent [&_h2]:text-foreground [&_pre]:text-foreground"
-                />
-              ) : (
-                <p className="text-sm text-muted">
-                  Esta aula ainda não tem descrição.
-                </p>
-              )
+              <>
+                {lesson.description ? (
+                  <MarkdownBody
+                    body={lesson.description}
+                    className="space-y-2 text-[15px] leading-relaxed text-muted md:text-base [&_a]:text-accent [&_h2]:text-foreground [&_pre]:text-foreground"
+                  />
+                ) : (
+                  <p className="text-sm text-muted">
+                    Esta aula ainda não tem descrição.
+                  </p>
+                )}
+                {shouldShowLessonUpgradeCta({ isPaid, canWatch }) ? (
+                  <LessonUpgradeCta />
+                ) : null}
+              </>
             }
             comments={
               <section>

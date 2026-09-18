@@ -104,6 +104,8 @@ export type UpgradeReason =
   | "orion"
   /** F069 — origem: faixa da tela de Boas-vindas. Nunca abre modal. */
   | "boas-vindas"
+  /** F091 — origem: CTA na descrição da aula gratuita. Nunca abre modal. */
+  | "aula-descricao"
   | "geral";
 
 const UPGRADE_REASONS: readonly UpgradeReason[] = [
@@ -116,6 +118,7 @@ const UPGRADE_REASONS: readonly UpgradeReason[] = [
   "reagir",
   "orion",
   "boas-vindas",
+  "aula-descricao",
   "geral",
 ];
 
@@ -177,6 +180,14 @@ export const UPGRADE_REASON_COPY: Record<
   "boas-vindas": {
     title: "Do primeiro dia ao primeiro cliente",
     body: "Você já tem o Comece por aqui, o feed e os presentes. PRO e Elite abrem a formação até o fechamento, as skills, os templates e a comunidade inteira.",
+  },
+  /**
+   * F091 — continuidade do banner na descrição da aula. Arsenal e
+   * preço do PRO. Sem live de terça nem garantia de 90 dias.
+   */
+  "aula-descricao": {
+    title: "Tenha acesso ao arsenal completo",
+    body: "Você já assiste as aulas gratuitas. O PRO libera o Arsenal — sites prontos, propostas e contratos — a partir de 12× R$ 30,18.",
   },
   geral: {
     title: PROMESSA_PRIMEIRO_CLIENTE,
