@@ -202,17 +202,19 @@ function LessonRows({
               href={`/aulas/${l.moduleSlug}/${l.slug}`}
               className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-surface/60 sm:gap-4 sm:px-5"
             >
+              {/* F092 — 16:9 exato; antes era 20/12 e 24/14, que cortavam
+                  fatias diferentes da mesma arte em cada breakpoint. */}
               {l.thumbnailUrl ? (
                 <Image
                   src={l.thumbnailUrl}
                   alt=""
-                  width={96}
-                  height={56}
-                  className="h-12 w-20 shrink-0 rounded-md object-cover sm:h-14 sm:w-24"
-                  sizes="96px"
+                  width={160}
+                  height={90}
+                  className="aspect-video w-20 shrink-0 rounded-md object-cover sm:w-28"
+                  sizes="(max-width: 640px) 80px, 112px"
                 />
               ) : (
-                <div className="flex h-12 w-20 shrink-0 items-center justify-center rounded-md bg-surface text-[10px] font-semibold uppercase tracking-wide text-muted sm:h-14 sm:w-24">
+                <div className="flex aspect-video w-20 shrink-0 items-center justify-center rounded-md bg-surface text-[10px] font-semibold uppercase tracking-wide text-muted sm:w-28">
                   Vídeo
                 </div>
               )}
@@ -270,14 +272,16 @@ function ModuleBranch({
             : "px-4 py-3 sm:px-5 sm:pl-8"
         }
       >
+        {/* F092 — a capa é 16:9; esta caixa era 3:4 (retrato) e espremia a
+            arte na vertical. Mesmo recorte do card do catálogo agora. */}
         {mod.coverImageUrl && depth < 2 ? (
           <Image
             src={mod.coverImageUrl}
             alt=""
-            width={36}
-            height={48}
-            className="h-12 w-9 shrink-0 rounded-lg object-cover"
-            sizes="36px"
+            width={160}
+            height={90}
+            className="aspect-video w-20 shrink-0 rounded-lg object-cover"
+            sizes="80px"
           />
         ) : null}
         <div className="min-w-0 flex-1">

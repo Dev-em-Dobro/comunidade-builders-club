@@ -89,6 +89,26 @@ function FeedLink({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 /**
+ * F092 — Aulas sobe do rodapé para junto do Feed. O rodapé é zona de conta e
+ * ferramentas; a formação é destino principal e estava enterrada lá embaixo.
+ * Sem cadeado: o catálogo é sempre visível e a F065 libera o M01 no gratuito —
+ * quem é free precisa chegar até a página para ver o que já pode assistir.
+ */
+function AulasLink({ onNavigate }: { onNavigate?: () => void }) {
+  const pathname = usePathname();
+  return (
+    <Link
+      href="/aulas"
+      onClick={onNavigate}
+      className={`nav-space flex items-center gap-2 ${pathname.startsWith("/aulas") ? "nav-space-active" : ""}`}
+    >
+      {ICON_AULAS}
+      <span className="truncate">Aulas</span>
+    </Link>
+  );
+}
+
+/**
  * F062 — um item só para os materiais. As categorias continuam existindo em
  * `/entregaveis/{slug}`, mas agora se chega nelas pela própria página.
  */
@@ -257,14 +277,6 @@ function SidebarFooter({
 
   return (
     <div className="relative z-[100] mt-auto flex flex-col gap-0.5 border-t border-border pt-3">
-      <Link
-        href="/aulas"
-        className={`btn-ghost justify-start gap-2 ${pathname.startsWith("/aulas") ? "text-accent" : ""}`}
-        onClick={onNavigate}
-      >
-        {ICON_AULAS}
-        Aulas
-      </Link>
       {isPaid ? (
         <a
           href={orionUrl}
@@ -458,6 +470,7 @@ function ShellInner({
         </Link>
         <div className="sidebar-scroll mt-5 flex min-h-0 flex-1 flex-col overflow-y-auto">
           <FeedLink />
+          <AulasLink />
           <div className="my-3 border-t border-border" />
           <SpaceNav spaces={spaces} isPaid={isPaid} />
           <div className="my-3 border-t border-border" />
@@ -503,6 +516,7 @@ function ShellInner({
             </div>
             <div className="sidebar-scroll flex min-h-0 flex-1 flex-col overflow-y-auto">
               <FeedLink onNavigate={() => setDrawerOpen(false)} />
+              <AulasLink onNavigate={() => setDrawerOpen(false)} />
               <div className="my-3 border-t border-border" />
               <SpaceNav
                 spaces={spaces}

@@ -244,7 +244,7 @@ function ModuleTree({
                 <img
                   src={mod.coverImageUrl}
                   alt=""
-                  className="h-8 w-6 shrink-0 rounded object-cover"
+                  className="aspect-video w-12 shrink-0 rounded object-cover"
                 />
               ) : null}
               <span className="min-w-0">
@@ -273,7 +273,7 @@ function ModuleTree({
                       <img
                         src={l.thumbnailUrl}
                         alt=""
-                        className="h-7 w-11 shrink-0 rounded object-cover"
+                        className="aspect-video w-11 shrink-0 rounded object-cover"
                       />
                     ) : null}
                     <span className="truncate">{l.title}</span>
