@@ -120,6 +120,18 @@ export default async function PlanosPage({ searchParams }: Props) {
         </div>
 
         {/*
+         * F093 — o aviso do CDC era um bullet do PRO, com check verde, no
+         * lugar de maior peso da lista. Virou rodapé: a informação legal
+         * continua na página sem ser vendida como benefício.
+         */}
+        <p className="mt-4 text-center text-xs leading-relaxed text-muted">
+          No PRO não há garantia de resultado em 90 dias: vale o direito de
+          arrependimento de 7 dias previsto no Código de Defesa do Consumidor. A
+          garantia de 90 dias é exclusiva do Elite e condicionada à lista de
+          execução.
+        </p>
+
+        {/*
          * O checkout da Hubla não exige conta: o webhook grava em `AllowedEmail`
          * e o tier é concedido no primeiro login com o mesmo e-mail. Sem este
          * aviso, a pessoa compra com um e-mail e entra com outro.

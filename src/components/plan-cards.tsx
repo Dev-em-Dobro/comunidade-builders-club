@@ -6,14 +6,16 @@ import { aceitarGarantiaAction } from "@/actions/legal/aceitar-garantia";
 import { VERSAO_GARANTIA } from "@/lib/legal/garantia";
 import type { ClubOffer } from "@/lib/membership/checkout";
 
-function CheckIcon() {
+function CheckIcon({ forte }: { forte?: boolean }) {
   return (
     <svg
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
       strokeWidth="2.2"
-      className="h-3.5 w-3.5 text-accent"
+      className={
+        forte ? "h-4 w-4 text-accent-foreground" : "h-3.5 w-3.5 text-accent"
+      }
       aria-hidden
     >
       <path d="M20 6 9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
@@ -116,19 +118,25 @@ function OfferCard({
           ou boleto de {offer.pricing.boletoPrice}
         </p>
       ) : null}
+      {/* F093 — item é uma linha só; ver `OfferHighlight` em checkout.ts. */}
       <ul className="mt-5 flex flex-col gap-3">
         {offer.highlights.map((item) => (
-          <li key={item.title} className="flex items-start gap-3">
-            <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent/15">
-              <CheckIcon />
+          <li key={item.texto} className="flex items-start gap-3">
+            <span
+              className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${
+                item.destaque ? "bg-accent" : "bg-accent/15"
+              }`}
+            >
+              <CheckIcon forte={item.destaque} />
             </span>
-            <span>
-              <span className="block text-sm font-semibold leading-snug text-foreground">
-                {item.title}
-              </span>
-              <span className="mt-0.5 block text-[13px] leading-snug text-muted">
-                {item.detail}
-              </span>
+            <span
+              className={`text-[15px] leading-snug ${
+                item.destaque
+                  ? "font-semibold text-accent"
+                  : "text-foreground/90"
+              }`}
+            >
+              {item.texto}
             </span>
           </li>
         ))}
@@ -154,6 +162,12 @@ function OfferCard({
         </div>
       ) : (
         <div className="mt-auto flex flex-col gap-2 pt-5">
+          {/* F093 — ocupa a folga que sobra no card mais curto dos dois. */}
+          {offer.notaFinal ? (
+            <p className="mb-2 rounded-xl bg-surface px-4 py-3 text-center text-[13px] leading-snug text-muted">
+              {offer.notaFinal}
+            </p>
+          ) : null}
           {precisaCiente ? (
             <label className="flex cursor-pointer items-start gap-2.5 text-xs leading-snug text-muted">
               <input
