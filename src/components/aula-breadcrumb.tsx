@@ -1,14 +1,26 @@
 import Link from "next/link";
-import type { AulaModuleCard } from "@/components/aulas-catalog";
+import {
+  flattenLessons,
+  type AulaModuleCard,
+} from "@/components/aulas-catalog";
 
-type Crumb = { key: string; label: string };
+type Crumb = {
+  key: string;
+  label: string;
+  href: string | null;
+};
+
+function hrefPrimeiraAula(mod: AulaModuleCard): string | null {
+  const first = flattenLessons(mod)[0];
+  if (!first) return null;
+  return `/aulas/${first.moduleSlug}/${first.slug}`;
+}
 
 /**
  * F094 — Aulas › fase › … › módulo › aula (quando informada).
  *
- * Ancestrais da árvore são texto, não link: `/aulas/[slug]` redireciona
- * para a 1ª aula daquele nó e, na fase, isso joga de volta no módulo
- * principal da jornada.
+ * Cada nó da árvore linka para a 1ª aula **daquele** subárvore (não um
+ * redirect genérico). A aula atual é o crumb final, sem link.
  */
 export function AulaBreadcrumb({
   path,
@@ -21,9 +33,14 @@ export function AulaBreadcrumb({
   const crumbs: Crumb[] = path.map((mod) => ({
     key: mod.id,
     label: mod.title,
+    href: hrefPrimeiraAula(mod),
   }));
   if (lessonTitle?.trim()) {
-    crumbs.push({ key: "lesson", label: lessonTitle.trim() });
+    crumbs.push({
+      key: "lesson",
+      label: lessonTitle.trim(),
+      href: null,
+    });
   }
 
   if (crumbs.length === 0) {
@@ -52,17 +69,20 @@ export function AulaBreadcrumb({
               <span aria-hidden className="text-muted/70">
                 ›
               </span>
-              {isLast ? (
+              {isLast || !crumb.href ? (
                 <span
                   className="truncate font-medium text-foreground"
-                  aria-current="page"
+                  aria-current={isLast ? "page" : undefined}
                 >
                   {crumb.label}
                 </span>
               ) : (
-                <span className="truncate font-medium text-accent">
+                <Link
+                  href={crumb.href}
+                  className="truncate font-medium text-accent hover:underline"
+                >
                   {crumb.label}
-                </span>
+                </Link>
               )}
             </li>
           );
