@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { SafeImage as Image } from "@/components/safe-image";
 
 type OptimizedMediaImageProps = {
   src: string;

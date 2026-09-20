@@ -29,6 +29,20 @@ export function loadAuthEnv(): AuthEnv {
 
   const clientId = presente("GOOGLE_CLIENT_ID");
   const clientSecret = presente("GOOGLE_CLIENT_SECRET");
+
+  /**
+   * F095 — as duas ou nenhuma. Nenhuma é configuração legítima: o login segue
+   * por magic link e OTP. Só uma era degradação silenciosa — o botão do Google
+   * sumia sem que nada reclamasse, e o sintoma aparecia em produção como
+   * "ninguém consegue entrar com Google".
+   */
+  if (Boolean(clientId) !== Boolean(clientSecret)) {
+    const ausente = clientId ? "GOOGLE_CLIENT_SECRET" : "GOOGLE_CLIENT_ID";
+    throw new Error(
+      `[auth] ${ausente} ausente — configure as duas envs do Google ou nenhuma.`,
+    );
+  }
+
   const google =
     clientId && clientSecret ? { clientId, clientSecret } : null;
 
