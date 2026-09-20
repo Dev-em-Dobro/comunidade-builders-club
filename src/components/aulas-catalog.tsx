@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { SafeImage as Image } from "@/components/safe-image";
 import Link from "next/link";
 import { snippetFromBody } from "@/lib/markdown/text";
 import { FASE_1_M01_SLUG } from "@/lib/aulas/access";

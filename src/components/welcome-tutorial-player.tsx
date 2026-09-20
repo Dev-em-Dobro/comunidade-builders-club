@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
+import { SafeImage as Image } from "@/components/safe-image";
 import { VideoPlayTracker } from "@/components/video-play-tracker";
 
 /**

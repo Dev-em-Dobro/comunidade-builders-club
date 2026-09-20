@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "node:crypto";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
@@ -7,13 +8,33 @@ import { listSpaces } from "@/lib/spaces";
 import { countUnread } from "@/lib/notifications";
 
 /**
+ * F095 — mesmo padrão dos crons (`/api/cron/regua`): sem a env, a rota não
+ * existe. Antes isto era `if (secret && ...)`, um guard opt-in — faltando
+ * `PERF_DIAG_SECRET`, a condição era falsa e a requisição passava direto.
+ */
+function segredoValido(h: Headers, esperado: string): boolean {
+  const recebido = h.get("x-perf-secret") ?? "";
+  const a = Buffer.from(recebido);
+  const b = Buffer.from(esperado);
+  if (a.length !== b.length) return false;
+  return timingSafeEqual(a, b);
+}
+
+/**
  * Diagnóstico de latência do hot path (auth → membership → feed).
- * Protegido por sessão + PERF_DIAG_SECRET (header x-perf-secret) se definido.
+ * Protegido por PERF_DIAG_SECRET (header x-perf-secret) + sessão.
  */
 export async function GET() {
   const secret = process.env.PERF_DIAG_SECRET?.trim();
+  if (!secret) {
+    return NextResponse.json(
+      { error: "PERF_DIAG_SECRET não configurado" },
+      { status: 503 },
+    );
+  }
+
   const h = await headers();
-  if (secret && h.get("x-perf-secret") !== secret) {
+  if (!segredoValido(h, secret)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
