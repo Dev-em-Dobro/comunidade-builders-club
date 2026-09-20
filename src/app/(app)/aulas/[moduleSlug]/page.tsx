@@ -1,11 +1,12 @@
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
 import { listCompletedLessonIds } from "@/lib/aulas";
 import { listPublishedModules } from "@/lib/aulas/published-modules";
 import { EmptyState } from "@/components/empty-state";
+import { AulaBreadcrumb } from "@/components/aula-breadcrumb";
 import {
   findModuleBySlug,
+  findModulePath,
   flattenLessons,
   mapModule,
 } from "@/components/aulas-catalog";
@@ -33,12 +34,7 @@ export default async function AulasModulePage({ params }: Props) {
 
   return (
     <div className="feed-wrap-wide">
-      <Link
-        href="/aulas"
-        className="text-[15px] font-medium text-accent hover:underline"
-      >
-        ← Aulas
-      </Link>
+      <AulaBreadcrumb path={findModulePath(catalog, moduleSlug)} />
       <h1 className="page-title mt-4">{mod.title}</h1>
       <div className="mt-8">
         <EmptyState

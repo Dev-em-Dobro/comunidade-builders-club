@@ -28,7 +28,8 @@ acordeão). Sem trava por “nível”, sem favoritar/avaliar neste recorte.
   as trilhas. No desktop, a lista tem a mesma altura do bloco do
   player (vídeo + aula anterior/próxima) e rola por dentro, para a
   descrição da aula continuar visível abaixo.
-- Voltar do player vai para `/aulas` (grid).
+- Voltar do player vai para `/aulas` (grid). No player, o breadcrumb
+  mostra a fase/formação ([F094](F094-breadcrumb-aulas-fase.md)).
 
 ## Critérios
 

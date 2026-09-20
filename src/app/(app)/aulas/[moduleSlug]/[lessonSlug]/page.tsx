@@ -26,10 +26,12 @@ import {
 } from "@/components/post-actions";
 import { MarkdownBody } from "@/lib/markdown";
 import { EmptyState } from "@/components/empty-state";
+import { AulaBreadcrumb } from "@/components/aula-breadcrumb";
 import { AulaCourseSidebar } from "@/components/aula-course-sidebar";
 import { AulaDetailsTabs } from "@/components/aula-details-tabs";
 import { LessonUpgradeCta } from "@/components/lesson-upgrade-cta";
 import {
+  findModulePath,
   findRootContaining,
   flattenLessons,
   mapModule,
@@ -79,6 +81,7 @@ export default async function LessonPage({ params }: Props) {
   const isAdmin = member.membership.role === "admin";
   const catalog = modules.map((mod) => mapModule(mod, completed));
   const root = findRootContaining(catalog, moduleSlug);
+  const breadcrumbPath = findModulePath(catalog, moduleSlug);
   const playlist = root ? flattenLessons(root) : [];
   const index = playlist.findIndex(
     (l) => l.slug === lessonSlug && l.moduleSlug === moduleSlug,
@@ -89,12 +92,7 @@ export default async function LessonPage({ params }: Props) {
 
   return (
     <div className="mx-auto w-full max-w-7xl">
-      <Link
-        href="/aulas"
-        className="text-[15px] font-medium text-accent hover:underline"
-      >
-        ← Aulas
-      </Link>
+      <AulaBreadcrumb path={breadcrumbPath} />
 
       <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div>

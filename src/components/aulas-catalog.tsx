@@ -136,6 +136,22 @@ export function findRootContaining(
   return null;
 }
 
+/**
+ * F094 — caminho da raiz (fase/formação) até o módulo do slug.
+ * Ex.: [Fase 1, M01] ou [Formação IA, IA Aplicada, submódulo].
+ */
+export function findModulePath(
+  roots: AulaModuleCard[],
+  slug: string,
+): AulaModuleCard[] {
+  for (const root of roots) {
+    if (root.slug === slug) return [root];
+    const nested = findModulePath(root.children ?? [], slug);
+    if (nested.length > 0) return [root, ...nested];
+  }
+  return [];
+}
+
 export function leafModules(mod: AulaModuleCard): AulaModuleCard[] {
   const kids = mod.children ?? [];
   const nested = kids.flatMap(leafModules);
