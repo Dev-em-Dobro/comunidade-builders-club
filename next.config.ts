@@ -33,6 +33,10 @@ const nextConfig: NextConfig = {
      */
     remotePatterns: [
       // Uploads de post e avatar (`storeUpload` com `@vercel/blob`).
+      // `**.x` não casa `x` pelado — por isso os dois, aqui e no Panda. As duas
+      // formas são aceitas por `hosts.ts`, e uma lista mais curta que a de lá
+      // faria `next/image` lançar justo no caso que o fallback deveria pegar.
+      { protocol: "https", hostname: "public.blob.vercel-storage.com" },
       { protocol: "https", hostname: "**.public.blob.vercel-storage.com" },
       // Avatar do Google, gravado pelo Better Auth no login.
       { protocol: "https", hostname: "lh3.googleusercontent.com" },
