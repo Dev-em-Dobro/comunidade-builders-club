@@ -1,11 +1,32 @@
 import Link from "next/link";
 import type { AulaModuleCard } from "@/components/aulas-catalog";
 
+type Crumb = { key: string; label: string };
+
 /**
- * F094 — Aulas › fase › … › módulo da aula atual.
+ * F094 — Aulas › fase › … › módulo › aula (quando informada).
+ *
+ * Ancestrais da árvore são texto, não link: `/aulas/[slug]` redireciona
+ * para a 1ª aula daquele nó e, na fase, isso joga de volta no módulo
+ * principal da jornada.
  */
-export function AulaBreadcrumb({ path }: { path: AulaModuleCard[] }) {
-  if (path.length === 0) {
+export function AulaBreadcrumb({
+  path,
+  lessonTitle,
+}: {
+  path: AulaModuleCard[];
+  /** Título da aula atual — último crumb, se houver. */
+  lessonTitle?: string | null;
+}) {
+  const crumbs: Crumb[] = path.map((mod) => ({
+    key: mod.id,
+    label: mod.title,
+  }));
+  if (lessonTitle?.trim()) {
+    crumbs.push({ key: "lesson", label: lessonTitle.trim() });
+  }
+
+  if (crumbs.length === 0) {
     return (
       <Link
         href="/aulas"
@@ -24,10 +45,10 @@ export function AulaBreadcrumb({ path }: { path: AulaModuleCard[] }) {
             Aulas
           </Link>
         </li>
-        {path.map((mod, i) => {
-          const isLast = i === path.length - 1;
+        {crumbs.map((crumb, i) => {
+          const isLast = i === crumbs.length - 1;
           return (
-            <li key={mod.id} className="flex min-w-0 items-center gap-x-1.5">
+            <li key={crumb.key} className="flex min-w-0 items-center gap-x-1.5">
               <span aria-hidden className="text-muted/70">
                 ›
               </span>
@@ -36,15 +57,12 @@ export function AulaBreadcrumb({ path }: { path: AulaModuleCard[] }) {
                   className="truncate font-medium text-foreground"
                   aria-current="page"
                 >
-                  {mod.title}
+                  {crumb.label}
                 </span>
               ) : (
-                <Link
-                  href={`/aulas/${mod.slug}`}
-                  className="truncate font-medium text-accent hover:underline"
-                >
-                  {mod.title}
-                </Link>
+                <span className="truncate font-medium text-accent">
+                  {crumb.label}
+                </span>
               )}
             </li>
           );

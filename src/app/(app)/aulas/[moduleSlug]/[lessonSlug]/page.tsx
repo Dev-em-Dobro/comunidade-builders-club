@@ -92,7 +92,7 @@ export default async function LessonPage({ params }: Props) {
 
   return (
     <div className="mx-auto w-full max-w-7xl">
-      <AulaBreadcrumb path={breadcrumbPath} />
+      <AulaBreadcrumb path={breadcrumbPath} lessonTitle={lesson.title} />
 
       <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div>
