@@ -744,7 +744,7 @@ const CATALOG: ModuleSeed[] = [
     slug: "fundamentos-do-builder-profissional",
     title: "Fundamentos do Builder Profissional",
     description:
-      "A base para operar como profissional: CNPJ, precificação, contrato, hospedagem, domínio e os primeiros clientes.",
+      "A base para operar como profissional: CNPJ, precificação, contrato, hospedagem, domínio, primeiros clientes e agentes no GPT Maker.",
     coverImageUrl: "/4-fundamentos-builder.png",
     sortOrder: 11,
     lessons: [
@@ -788,6 +788,51 @@ const CATALOG: ModuleSeed[] = [
         slug: "lista-de-templates",
         title: "Lista de templates",
         sortOrder: 6,
+      },
+    ],
+    children: [
+      {
+        // F098 — pasta Panda fda4fce4-fbb1-4875-baa3-bc220e4a14bd (ordem 1→4).
+        slug: "fundamentos-gpt-maker",
+        title: "Fundamentos GPT Maker",
+        description:
+          "Do zero ao agente no ar: criar conta, montar o agente, ligar no WhatsApp e integrar a Google Agenda.",
+        sortOrder: 0,
+        forceLessonSort: true,
+        lessons: [
+          {
+            slug: "criar-conta-e-falar-com-o-suporte",
+            title: "Criar conta e falar com o suporte",
+            description:
+              "Abre a conta no GPT Maker, entende o painel inicial e sabe quando (e como) acionar o suporte sem se perder.",
+            pandaVideoExternalId: "758a08a8-c6c1-4415-93bb-e83bc8a5c1da",
+            sortOrder: 0,
+          },
+          {
+            slug: "criacao-de-agente",
+            title: "Criação de agente",
+            description:
+              "Monta o primeiro agente: nome, objetivo, instruções e o básico pra ele responder do jeito certo.",
+            pandaVideoExternalId: "acb7eaa0-55b1-4154-b26c-b501dfab1c1d",
+            sortOrder: 1,
+          },
+          {
+            slug: "conectando-o-agente-ao-whatsapp",
+            title: "Conectando o agente ao WhatsApp",
+            description:
+              "Liga o agente ao WhatsApp pra atender conversa real — do vínculo à primeira mensagem chegando.",
+            pandaVideoExternalId: "1129e2f1-c0ab-45ae-97a4-7c8c7fbce136",
+            sortOrder: 2,
+          },
+          {
+            slug: "integracao-google-agenda-no-gpt-maker",
+            title: "Integração Google Agenda no GPT Maker",
+            description:
+              "Conecta a Google Agenda para o agente marcar e consultar horários sem você ficar no meio.",
+            pandaVideoExternalId: "3430e386-4e2e-4c80-b97d-5b78f12d3240",
+            sortOrder: 3,
+          },
+        ],
       },
     ],
   },
