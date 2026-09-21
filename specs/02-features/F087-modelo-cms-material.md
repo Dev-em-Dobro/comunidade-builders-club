@@ -16,6 +16,7 @@ e documenta o fluxo pasta por cliente + Supabase + Vercel.
 
 ### No Club
 - Tirar `cms` de `emBreve` no catálogo de entregáveis
+- **F097:** `cms` (e `crm`) com `eliteOnly` — PRO não abre nem baixa
 - Pasta `content/entregaveis/10-CMS/` com `index.html` self-contained (Ubuntu),
   `_GUIA-modelo-cms.md` e o zip pronto `criador-de-cms-builders.zip`
 - Kit download via `kitZip.arquivoPronto` (serve o zip direto)

@@ -47,7 +47,8 @@ Libera no Club:
 
 - Comunidade (todos os spaces + publicar, comentar, reagir)
 - Aulas gravadas
-- Skills e templates (Materiais de apoio)
+- Skills e templates (Materiais de apoio), **exceto** Modelo de CMS e
+  Modelo de CRM — esses são só Elite ([F097](F097-cms-crm-elite-only.md))
 - Busca
 - Ingresso da **Imersão 2 a 5k com IA** — próximo evento **online** da Imersão
   (benefício da oferta; não é rota no MVP). Não é evento presencial.
@@ -73,6 +74,8 @@ Boleto (TMB, R$ 1.297):
 - 1 reunião semanal em grupo (benefício da oferta; não é rota no MVP)
 - + Skills e + Templates (mesmo catálogo de materiais no MVP; mais conteúdo
   depois, sem gate extra agora)
+- **Modelo de CMS** e **Modelo de CRM** — só Elite
+  ([F097](F097-cms-crm-elite-only.md); CRM ainda Em breve)
 - **Garantia de 90 dias condicionada** à [Lista da garantia](F090-lista-garantia-ciente.md)
   (`/garantia` + ciente em `legal_acceptance`)
 

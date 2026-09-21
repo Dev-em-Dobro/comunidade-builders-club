@@ -2,10 +2,17 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import {
+  entregavelExigeElite,
+  entregavelPorPasta,
+} from "@/lib/entregaveis/catalogo";
+import {
   lerArquivoEntregavel,
   sanitizarCorpoEntregavel,
 } from "@/lib/entregaveis/servir";
-import { membroPagoAtivo } from "@/lib/membership/api-gate";
+import {
+  membroEliteAtivo,
+  membroPagoAtivo,
+} from "@/lib/membership/api-gate";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -18,6 +25,15 @@ export async function GET(_request: NextRequest, { params }: Params) {
   }
 
   const { path } = await params;
+  const pastaRaiz = path[0];
+  const item = pastaRaiz ? entregavelPorPasta(pastaRaiz) : undefined;
+  if (item && entregavelExigeElite(item) && !(await membroEliteAtivo())) {
+    return NextResponse.json(
+      { erro: "Disponível no plano Elite" },
+      { status: 403 },
+    );
+  }
+
   const arquivo = await lerArquivoEntregavel(path);
   if (!arquivo) {
     return NextResponse.json({ erro: "Não encontrado" }, { status: 404 });

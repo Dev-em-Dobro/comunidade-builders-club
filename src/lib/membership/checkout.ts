@@ -103,7 +103,11 @@ const ITENS_ELITE: OfferHighlight[] = [
   },
   {
     texto:
-      "CRM, CMS e agente de WhatsApp inclusos assim que saírem — a porta da recorrência mensal",
+      "Modelo de CMS incluso — o painel em que o cliente edita o site (só Elite)",
+  },
+  {
+    texto:
+      "CRM e agente de WhatsApp inclusos assim que saírem — a porta da recorrência mensal",
     novo: true,
   },
 ];

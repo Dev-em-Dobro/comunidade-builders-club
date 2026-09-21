@@ -96,6 +96,7 @@ export function tierLabel(tier: MembershipTier): string {
 export type UpgradeReason =
   | "space"
   | "materiais"
+  | "materiais-elite"
   | "aulas"
   | "busca"
   | "publicar"
@@ -111,6 +112,7 @@ export type UpgradeReason =
 const UPGRADE_REASONS: readonly UpgradeReason[] = [
   "space",
   "materiais",
+  "materiais-elite",
   "aulas",
   "busca",
   "publicar",
@@ -144,7 +146,14 @@ export const UPGRADE_REASON_COPY: Record<
   },
   materiais: {
     title: "Skills e templates prontos",
-    body: "Prompts, contratos, propostas e kits de entrega para usar já no próximo cliente. Liberados no PRO; o Elite soma a biblioteca ampliada.",
+    body: "Prompts, contratos, propostas e kits de entrega para usar já no próximo cliente. Liberados no PRO. CMS e CRM ficam no Elite.",
+  },
+  /**
+   * F097 — PRO tentou abrir CMS/CRM. Upsell Elite, não “compre o PRO de novo”.
+   */
+  "materiais-elite": {
+    title: "CMS e CRM entram no Elite",
+    body: "O Modelo de CMS (e o CRM, quando sair) é o caminho da recorrência com o cliente. No Elite você baixa e usa; no PRO o restante dos materiais já está liberado.",
   },
   aulas: {
     title: "Continue a formação",

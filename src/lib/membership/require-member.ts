@@ -7,7 +7,7 @@ import { requireUser } from "@/lib/auth/require-user";
 import { AuthError, ForbiddenError } from "@/lib/auth/errors";
 import { ensureMemberBootstrap } from "./bootstrap";
 import { contextoAceiteDeHeaders, type ContextoAceite } from "./aceite-legal";
-import { hrefPlanos, isPaidMembership } from "./capabilities";
+import { hrefPlanos, isEliteMembership, isPaidMembership } from "./capabilities";
 import { UPGRADE_REQUIRED } from "./errors";
 
 export type ActiveMember = {
@@ -87,6 +87,17 @@ export async function requirePaidMemberOrRedirect(
 ): Promise<ActiveMember> {
   const member = await requireActiveMemberOrRedirect();
   if (!isPaidMembership(member.membership)) {
+    redirect(upgradePath);
+  }
+  return member;
+}
+
+/** F097 — exige Elite (ou staff). Sem Elite → upgrade com destaque Elite. */
+export async function requireEliteMemberOrRedirect(
+  upgradePath = hrefPlanos({ motivo: "materiais-elite", destaque: "elite" }),
+): Promise<ActiveMember> {
+  const member = await requirePaidMemberOrRedirect(upgradePath);
+  if (!isEliteMembership(member.membership)) {
     redirect(upgradePath);
   }
   return member;

@@ -79,7 +79,8 @@ Itens que a operação ainda **não** entrega carregam `novo: true`. A flag
 |------|-------|------------------------------|
 | Revisão da proposta (1x) | Elite | Alguém revisa e devolve a proposta do membro |
 | Resposta em 24h úteis | Elite | SLA de suporte enquanto a garantia corre |
-| CRM, CMS e agente de WhatsApp inclusos | Elite | Entregar os 3 "Em breve" sem cobrar à parte |
+| CMS incluso (só Elite) | Elite | Já no catálogo com gate ([F097](F097-cms-crm-elite-only.md)) |
+| CRM e agente de WhatsApp inclusos | Elite | Entregar os "Em breve" sem cobrar à parte |
 | Upgrade pagando a diferença | PRO→Elite | Regra de cobrança na Hubla (citada na nota do card PRO) |
 
 Números citados na copy (66 aulas, 12 sites, 27 scripts) vieram da contagem
