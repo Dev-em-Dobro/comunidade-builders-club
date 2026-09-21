@@ -51,6 +51,38 @@ OBS: Eles estão em inglês. Alguns foram utilizados bootstrap, mas pode ser usa
 ## Materiais
 - [Baixar templates](/materiais/templates.zip)`,
 
+  "fundamentos-gpt-maker/criar-conta-e-falar-com-o-suporte": `Primeiro passo no GPT Maker: criar a conta, reconhecer o painel e saber quando chamar o suporte.
+
+Nessa aula você deixa a conta pronta pra usar — sem travar na configuração inicial nem ficar perdido se algo não abrir.
+
+## O que você leva
+- Conta criada e acesso ao painel
+- Quando vale a pena falar com o suporte (e como fazer isso direito)`,
+
+  "fundamentos-gpt-maker/criacao-de-agente": `Aqui você monta o primeiro agente de verdade: objetivo, instruções e o jeito que ele deve responder.
+
+É a base de tudo que vem depois — WhatsApp e Agenda só funcionam bem se o agente estiver claro.
+
+## O que você leva
+- Um agente configurado no GPT Maker
+- Critérios simples pra ajustar o comportamento sem recomeçar do zero`,
+
+  "fundamentos-gpt-maker/conectando-o-agente-ao-whatsapp": `Nessa aula o agente sai do painel e entra na conversa: você liga o WhatsApp e testa a primeira mensagem real.
+
+É o passo que transforma o agente em atendimento — o cliente manda no Zap e o agente responde.
+
+## O que você leva
+- Agente conectado ao WhatsApp
+- Checklist rápido pra validar se a mensagem está chegando`,
+
+  "fundamentos-gpt-maker/integracao-google-agenda-no-gpt-maker": `Último bloco dos fundamentos: conectar a Google Agenda para o agente marcar e consultar horários.
+
+Assim o atendimento ganha agenda sem você ficar no meio de cada "tem horário amanhã?".
+
+## O que você leva
+- Google Agenda integrada ao GPT Maker
+- Fluxo simples de marcar / consultar horário pelo agente`,
+
   "ia-aplicada-introducao/aula-1-introducao": `Nessa primeira aula, tu vai entender como funciona a Formação IA na Prática, qual é a jornada completa até o projeto final e por que esse curso é diferente da maioria. A gente apresenta os módulos, explica o Copiloto de Documentação que tu vai construir do zero e, principalmente, mostra o caminho das pedras pra tu realmente desenvolver aplicações usando IA do jeito mais eficiente e alinhado com o mercado.
 
 É o ponto de partida pra tu sair da teoria e começar a construir com IA na prática, usando a IA como copiloto no teu dia a dia de desenvolvimento.

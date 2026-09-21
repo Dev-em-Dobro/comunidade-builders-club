@@ -96,6 +96,7 @@ export function tierLabel(tier: MembershipTier): string {
 export type UpgradeReason =
   | "space"
   | "materiais"
+  | "materiais-elite"
   | "aulas"
   | "busca"
   | "publicar"
@@ -104,11 +105,14 @@ export type UpgradeReason =
   | "orion"
   /** F069 — origem: faixa da tela de Boas-vindas. Nunca abre modal. */
   | "boas-vindas"
+  /** F091 — origem: CTA na descrição da aula gratuita. Nunca abre modal. */
+  | "aula-descricao"
   | "geral";
 
 const UPGRADE_REASONS: readonly UpgradeReason[] = [
   "space",
   "materiais",
+  "materiais-elite",
   "aulas",
   "busca",
   "publicar",
@@ -116,6 +120,7 @@ const UPGRADE_REASONS: readonly UpgradeReason[] = [
   "reagir",
   "orion",
   "boas-vindas",
+  "aula-descricao",
   "geral",
 ];
 
@@ -141,7 +146,14 @@ export const UPGRADE_REASON_COPY: Record<
   },
   materiais: {
     title: "Skills e templates prontos",
-    body: "Prompts, contratos, propostas e kits de entrega para usar já no próximo cliente. Liberados no PRO; o Elite soma a biblioteca ampliada.",
+    body: "Prompts, contratos, propostas e kits de entrega para usar já no próximo cliente. Liberados no PRO. CMS e CRM ficam no Elite.",
+  },
+  /**
+   * F097 — PRO tentou abrir CMS/CRM. Upsell Elite, não “compre o PRO de novo”.
+   */
+  "materiais-elite": {
+    title: "CMS e CRM entram no Elite",
+    body: "O Modelo de CMS (e o CRM, quando sair) é o caminho da recorrência com o cliente. No Elite você baixa e usa; no PRO o restante dos materiais já está liberado.",
   },
   aulas: {
     title: "Continue a formação",
@@ -177,6 +189,14 @@ export const UPGRADE_REASON_COPY: Record<
   "boas-vindas": {
     title: "Do primeiro dia ao primeiro cliente",
     body: "Você já tem o Comece por aqui, o feed e os presentes. PRO e Elite abrem a formação até o fechamento, as skills, os templates e a comunidade inteira.",
+  },
+  /**
+   * F091 — continuidade do banner na descrição da aula. Arsenal e
+   * preço do PRO. Sem live de terça nem garantia de 90 dias.
+   */
+  "aula-descricao": {
+    title: "Tenha acesso ao arsenal completo",
+    body: "Você já assiste as aulas gratuitas. O PRO libera o Arsenal — sites prontos, propostas e contratos — a partir de 12× R$ 30,18.",
   },
   geral: {
     title: PROMESSA_PRIMEIRO_CLIENTE,

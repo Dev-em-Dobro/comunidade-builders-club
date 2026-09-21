@@ -11,9 +11,9 @@ membro (free ou pago) não abre o Club há 48h. Serve para o CS
 identificar e reativar quem parou de acessar. WhatsApp automático fica
 de fora (sem telefone, sem API, sem ADR).
 
-Os outros três gatilhos (7d sem amostra, 14d sem atividade, 30d sem
-proposta no Orion) **não** disparam nesta entrega. A tabela de envio já
-nasce com `trigger` para eles entrarem depois sem migração de modelo.
+Os outros gatilhos (7d sem amostra, 14d sem atividade) disparam em
+[F084](F084-regua-7d-14d.md). 30d sem proposta no Orion continua fora.
+A tabela de envio já nasceu com `trigger` para eles.
 
 ## Quem recebe
 
@@ -64,7 +64,7 @@ Tom de acompanhamento, não de cobrança. CTA: abrir o Club
 - WhatsApp / SMS / push
 - Staff
 - Opt-out / preferência do aluno
-- Amostra, 14d, proposta
+- Amostra e 14d (F084); proposta no Orion
 - Tela nova no admin (CS continua com Progresso F057; o log
   `regua_email_send` é a prova de quem foi tocado)
 - Migration de produção (só após preview + confirmação)

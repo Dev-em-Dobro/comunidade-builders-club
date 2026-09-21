@@ -24,6 +24,7 @@ import { AdminBulkAllowlist } from "@/components/admin-bulk-allowlist";
 import { AdminAulasPanel } from "@/components/admin-aulas-panel";
 import { AdminGiftLinks } from "@/components/admin-gift-links";
 import { AdminGiftMetrics } from "@/components/admin-gift-metrics";
+import { AdminEmailMetrics } from "@/components/admin-email-metrics";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import {
   AdminTabs,
@@ -32,9 +33,23 @@ import { isAdminTab, type AdminTabId } from "@/lib/admin/tabs";
 import { labelAllowedEmailSource } from "@/lib/membership/allowlist-labels";
 import type { MembershipStatus } from "@prisma/client";
 import { tierLabel } from "@/lib/membership/capabilities";
+import { agregarMetricasEmail } from "@/lib/email/metricas-resend";
+import {
+  EMAIL_CATEGORIAS,
+  isEmailCategoria,
+  type EmailCategoria,
+} from "@/lib/email/categorias";
 
 type Props = {
-  searchParams: Promise<{ status?: string; q?: string; tab?: string }>;
+  searchParams: Promise<{
+    status?: string;
+    q?: string;
+    tab?: string;
+    dias?: string;
+    categoria?: string;
+    emailStatus?: string;
+    page?: string;
+  }>;
 };
 
 export const dynamic = "force-dynamic";
@@ -94,7 +109,24 @@ export default async function AdminPage({ searchParams }: Props) {
       : undefined;
   const q = sp.q?.trim() || undefined;
 
-  const [spaces, memberships, counts, allowed, modules, utmMetrics, giftPosts, liveRegra] = await Promise.all([
+  const emailDias = (() => {
+    const n = Number(sp.dias);
+    if (n === 7 || n === 15 || n === 30) return n;
+    return 15;
+  })();
+  const emailStatus =
+    sp.emailStatus &&
+    ["delivered", "opened", "clicked", "bounced", "failed", "sent"].includes(
+      sp.emailStatus,
+    )
+      ? sp.emailStatus
+      : "all";
+  const emailCategoria: EmailCategoria | "all" =
+    sp.categoria && isEmailCategoria(sp.categoria) ? sp.categoria : "all";
+  const emailPage = Math.max(1, Number(sp.page) || 1);
+
+  const [spaces, memberships, counts, allowed, modules, utmMetrics, giftPosts, liveRegra, emailMetrics] =
+    await Promise.all([
     tab === "spaces" ? listSpaces() : Promise.resolve([]),
     tab === "membros"
       ? listMemberships({ status: statusFilter, q })
@@ -107,6 +139,31 @@ export default async function AdminPage({ searchParams }: Props) {
     tab === "presentes" ? listUtmPostMetrics() : Promise.resolve([]),
     tab === "presentes" ? listGiftPostsAdmin() : Promise.resolve([]),
     tab === "live" ? obterRegraLiveSchedule() : Promise.resolve(null),
+    tab === "emails"
+      ? agregarMetricasEmail({
+          dias: emailDias,
+          status: emailStatus,
+          categoria: emailCategoria,
+          page: emailPage,
+          pageSize: 20,
+        }).catch((e) => ({
+          total: 0,
+          byStatus: {},
+          byCategoria: Object.fromEntries(
+            EMAIL_CATEGORIAS.map((c) => [c, 0]),
+          ) as Record<EmailCategoria, number>,
+          opened: 0,
+          clicked: 0,
+          delivered: 0,
+          taxaOpen: null,
+          taxaClick: null,
+          page: 1,
+          pageSize: 20,
+          totalPages: 1,
+          itens: [],
+          aviso: e instanceof Error ? e.message : "Falha ao consultar Resend.",
+        }))
+      : Promise.resolve(null),
   ]);
 
   return (
@@ -480,6 +537,18 @@ export default async function AdminPage({ searchParams }: Props) {
               Salvar
             </button>
           </form>
+        </section>
+      ) : null}
+
+      {tab === "emails" && emailMetrics ? (
+        <section className="mt-8">
+          <h2 className="text-lg font-semibold">E-mails (Resend)</h2>
+          <AdminEmailMetrics
+            data={emailMetrics}
+            dias={emailDias}
+            status={emailStatus}
+            categoria={emailCategoria}
+          />
         </section>
       ) : null}
     </div>

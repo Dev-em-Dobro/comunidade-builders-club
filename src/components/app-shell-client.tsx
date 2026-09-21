@@ -14,6 +14,8 @@ import { UserMenu } from "@/components/user-menu";
 import { isFreeSpaceSlug } from "@/lib/membership/capabilities";
 import { isFreePublishSpace } from "@/lib/spaces/constants";
 import { LiveBanner } from "@/components/live-banner";
+import { ClubImersaoBanner } from "@/components/club-imersao-banner";
+import { WhatsappLiveFab } from "@/components/whatsapp-live-fab";
 import {
   ICON_ADMIN,
   ICON_AULAS,
@@ -82,6 +84,26 @@ function FeedLink({ onNavigate }: { onNavigate?: () => void }) {
     >
       {ICON_TODOS}
       <span className="truncate">Feed</span>
+    </Link>
+  );
+}
+
+/**
+ * F092 — Aulas sobe do rodapé para junto do Feed. O rodapé é zona de conta e
+ * ferramentas; a formação é destino principal e estava enterrada lá embaixo.
+ * Sem cadeado: o catálogo é sempre visível e a F065 libera o M01 no gratuito —
+ * quem é free precisa chegar até a página para ver o que já pode assistir.
+ */
+function AulasLink({ onNavigate }: { onNavigate?: () => void }) {
+  const pathname = usePathname();
+  return (
+    <Link
+      href="/aulas"
+      onClick={onNavigate}
+      className={`nav-space flex items-center gap-2 ${pathname.startsWith("/aulas") ? "nav-space-active" : ""}`}
+    >
+      {ICON_AULAS}
+      <span className="truncate">Aulas</span>
     </Link>
   );
 }
@@ -255,14 +277,6 @@ function SidebarFooter({
 
   return (
     <div className="relative z-[100] mt-auto flex flex-col gap-0.5 border-t border-border pt-3">
-      <Link
-        href="/aulas"
-        className={`btn-ghost justify-start gap-2 ${pathname.startsWith("/aulas") ? "text-accent" : ""}`}
-        onClick={onNavigate}
-      >
-        {ICON_AULAS}
-        Aulas
-      </Link>
       {isPaid ? (
         <a
           href={orionUrl}
@@ -362,7 +376,7 @@ function NovaPublicacaoFab({
       : "/nova";
 
   const className =
-    "fixed bottom-5 right-5 z-40 inline-flex h-14 cursor-pointer items-center gap-2 rounded-full bg-accent px-5 text-sm font-semibold text-white shadow-lg shadow-accent/30 transition hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent md:bottom-8 md:right-8";
+    "inline-flex h-14 cursor-pointer items-center gap-2 rounded-full bg-accent px-5 text-sm font-semibold text-white shadow-lg shadow-accent/30 transition hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
 
   if (!isPaid) {
     if (isFreePublishSpace(spaceSlug)) {
@@ -412,6 +426,7 @@ function ShellInner({
   avatarUrl,
   notifPreview,
   live,
+  whatsappAvisosLiveUrl,
 }: {
   children: React.ReactNode;
   displayName: string;
@@ -425,6 +440,8 @@ function ShellInner({
   avatarUrl?: string | null;
   notifPreview: NotifPreview[];
   live: LiveInfo | null;
+  /** F082 — null = env vazia, sem FAB. */
+  whatsappAvisosLiveUrl: string | null;
 }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const pathname = usePathname();
@@ -453,6 +470,7 @@ function ShellInner({
         </Link>
         <div className="sidebar-scroll mt-5 flex min-h-0 flex-1 flex-col overflow-y-auto">
           <FeedLink />
+          <AulasLink />
           <div className="my-3 border-t border-border" />
           <SpaceNav spaces={spaces} isPaid={isPaid} />
           <div className="my-3 border-t border-border" />
@@ -498,6 +516,7 @@ function ShellInner({
             </div>
             <div className="sidebar-scroll flex min-h-0 flex-1 flex-col overflow-y-auto">
               <FeedLink onNavigate={() => setDrawerOpen(false)} />
+              <AulasLink onNavigate={() => setDrawerOpen(false)} />
               <div className="my-3 border-t border-border" />
               <SpaceNav
                 spaces={spaces}
@@ -527,7 +546,8 @@ function ShellInner({
       ) : null}
 
       <div className="relative flex min-w-0 flex-1 flex-col">
-        {/* F079 — faixa é só de Elite; `/api/nav` nem manda `live` pros outros. */}
+        {/* F088 — imersão só Free; F079 — live só Elite. Mutuamente exclusivos por tier. */}
+        {!isPaid ? <ClubImersaoBanner /> : null}
         {isElite && live ? (
           <LiveBanner liveAt={live.liveAt} calendarUrl={live.calendarUrl} />
         ) : null}
@@ -567,7 +587,17 @@ function ShellInner({
         <main className="flex-1 px-4 py-6 pb-24 md:px-8 md:py-10 md:pb-28">
           {children}
         </main>
-        <NovaPublicacaoFab isAdmin={isAdmin} isPaid={isPaid} />
+        {/* F082 — WhatsApp + Nova publicação empilhados no canto inferior direito. */}
+        <div className="pointer-events-none fixed bottom-5 right-5 z-40 flex flex-col-reverse items-end gap-3 md:bottom-8 md:right-8">
+          <div className="pointer-events-auto">
+            <NovaPublicacaoFab isAdmin={isAdmin} isPaid={isPaid} />
+          </div>
+          {whatsappAvisosLiveUrl ? (
+            <div className="pointer-events-auto">
+              <WhatsappLiveFab url={whatsappAvisosLiveUrl} />
+            </div>
+          ) : null}
+        </div>
       </div>
     </div>
   );
@@ -585,6 +615,7 @@ export function AppShellClient({
   spaces: initialSpaces,
   avatarUrl,
   notifPreview,
+  whatsappAvisosLiveUrl = null,
   hydrateNav = false,
 }: {
   children: React.ReactNode;
@@ -598,6 +629,8 @@ export function AppShellClient({
   spaces: SpaceLink[];
   avatarUrl?: string | null;
   notifPreview: NotifPreview[];
+  /** F082 — URL do grupo; null esconde o FAB. */
+  whatsappAvisosLiveUrl?: string | null;
   /** Busca spaces em /api/nav após o paint (não bloqueia o feed no SSR). */
   hydrateNav?: boolean;
 }) {
@@ -662,6 +695,7 @@ export function AppShellClient({
         live={live}
         avatarUrl={avatarUrl}
         notifPreview={notifPreview}
+        whatsappAvisosLiveUrl={whatsappAvisosLiveUrl}
       >
         {children}
       </ShellInner>

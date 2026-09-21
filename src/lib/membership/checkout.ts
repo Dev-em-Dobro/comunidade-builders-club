@@ -1,5 +1,11 @@
-// F053 — ofertas oficiais Hubla (PRO e Elite).
+// F053 / F090 — ofertas oficiais Hubla (PRO e Elite).
 
+import {
+  PROMESSA_ELITE,
+  PROMESSA_PRO,
+} from "@/lib/legal/garantia";
+
+/** Meta de marketing (Presentes / upgrade). Não é garantia de reembolso do Pro. */
 export const PROMESSA_PRIMEIRO_CLIENTE = "Feche o 1º cliente em 90 dias";
 
 export const CHECKOUT_PRO_FALLBACK_URL =
@@ -9,10 +15,106 @@ export const CHECKOUT_ELITE_FALLBACK_URL =
 
 export type OfferId = "pro" | "elite";
 
+/**
+ * F093 — item de plano é **uma linha só**, que se explica sozinha.
+ *
+ * Era título curto + parágrafo de apoio: 12 itens viravam 24 blocos de texto
+ * e a lista não era lida até o fim. Agora cada linha carrega o benefício e a
+ * prova junto ("12 sites prontos por nicho: troca os dados do cliente e
+ * publica em minutos"). Se a linha precisa de explicação embaixo, ela está
+ * mal escrita.
+ *
+ * Esta é a fonte única: `/planos` e `/planos-v2` leem daqui.
+ */
 export type OfferHighlight = {
-  title: string;
-  detail: string;
+  texto: string;
+  /** Renderiza com peso maior no card (a garantia do Elite). */
+  destaque?: boolean;
+  /** Promessa que a operação ainda precisa assumir (ver spec F093). */
+  novo?: boolean;
 };
+
+/**
+ * Desliga de uma vez os itens que a operação ainda não entrega
+ * (`novo: true`). Ver "Compromissos operacionais" na spec F093.
+ */
+export const INCLUIR_PROMESSAS_NOVAS: boolean = true;
+
+const ITENS_PRO: OfferHighlight[] = [
+  {
+    texto:
+      "12 sites prontos por nicho: troca os dados do cliente e publica em minutos — e o prompt-mestre gera qualquer outro",
+  },
+  {
+    texto:
+      "27 scripts de venda do primeiro “oi” ao contrato assinado, prontos pra copiar, trocar o nome e mandar",
+  },
+  {
+    texto:
+      "Orion: as empresas da sua cidade que estão sem site (ou com site quebrado), com telefone, prioridade e a abordagem pronta",
+  },
+  {
+    texto:
+      "Contrato à prova de calote, proposta, briefing e tabela de preço prontos pra preencher e enviar hoje",
+  },
+  {
+    texto:
+      "Formação completa em 66 aulas: do zero ao primeiro site entregue, cobrado e no ar",
+  },
+  { texto: "Ingresso da Imersão 2 a 5k com IA já incluso, sem pagar à parte" },
+  {
+    texto:
+      "Comunidade que te destrava na mesma noite — quem já resolveu esse erro responde você",
+  },
+  { texto: "7 dias pra testar tudo por dentro: não serviu, devolvemos 100%" },
+];
+
+const ITENS_ELITE: OfferHighlight[] = [
+  {
+    texto:
+      "Tudo do PRO: os 12 sites, os 27 scripts, as 66 aulas, o Orion e o arsenal inteiro",
+  },
+  {
+    texto:
+      "Fechou cliente em 90 dias ou devolvemos 100% — a lista que vale a garantia está aberta antes de você comprar",
+    destaque: true,
+  },
+  {
+    texto:
+      "Plantão ao vivo toda semana pra você abrir a tela e destravar o SEU caso: o orçamento que travou, o cliente que sumiu",
+  },
+  {
+    texto:
+      "Orion no plano PRO por 90 dias: prospecção sem o teto do Free, justo nos meses que valem a garantia",
+  },
+  {
+    texto:
+      "Seu mapa de 90 dias semana a semana — você nunca abre a plataforma sem saber o que fazer hoje",
+  },
+  {
+    texto:
+      "A gente revisa a proposta do seu primeiro cliente antes de você mandar",
+    novo: true,
+  },
+  {
+    texto:
+      "Resposta garantida em 24h úteis enquanto a sua garantia estiver correndo",
+    novo: true,
+  },
+  {
+    texto:
+      "Modelo de CMS incluso — o painel em que o cliente edita o site (só Elite)",
+  },
+  {
+    texto:
+      "CRM e agente de WhatsApp inclusos assim que saírem — a porta da recorrência mensal",
+    novo: true,
+  },
+];
+
+function filtrarItens(itens: OfferHighlight[]): OfferHighlight[] {
+  return INCLUIR_PROMESSAS_NOVAS ? itens : itens.filter((i) => !i.novo);
+}
 
 export type BoletoCheckout = {
   label: string;
@@ -41,6 +143,8 @@ export type ClubOffer = {
   checkoutUrl: string;
   boletoCheckouts?: BoletoCheckout[];
   recommended?: boolean;
+  /** Linha de segurança logo acima do CTA do rodapé do card (F093). */
+  notaFinal?: string;
 };
 
 /** Checkout de boleto Elite na página de planos. */
@@ -95,33 +199,10 @@ export function ofertaPro(): ClubOffer {
     name: "PRO",
     pricing: PRICING_PRO,
     paymentHint: "Pagamento em cartão ou Pix",
-    promise: PROMESSA_PRIMEIRO_CLIENTE,
-    highlights: [
-      {
-        title: "Aulas gravadas",
-        detail: "Formação completa para assistir no seu ritmo e marcar progresso",
-      },
-      {
-        title: "Skills",
-        detail: "Pacotes prontos para o atendimento e a entrega do cliente",
-      },
-      {
-        title: "Templates",
-        detail: "Proposta, contrato e materiais para fechar e executar",
-      },
-      {
-        title: "Ingresso da Imersão 2 a 5k com IA",
-        detail: "Acesso ao próximo evento online da Imersão",
-      },
-      {
-        title: "Orion (plano Free)",
-        detail: "Motor de prospecção para encontrar e priorizar leads locais",
-      },
-      {
-        title: "Comunidade",
-        detail: "Spaces, posts e networking com outros builders",
-      },
-    ],
+    promise: PROMESSA_PRO,
+    highlights: filtrarItens(ITENS_PRO),
+    notaFinal:
+      "Quer que a gente ande junto e assuma o risco dos 90 dias? Olhe o Elite. Começou pelo PRO e mudou de ideia depois? Você paga só a diferença.",
     checkoutUrl: checkoutUrlPro(),
   };
 }
@@ -131,29 +212,10 @@ export function ofertaElite(): ClubOffer {
     id: "elite",
     name: "Elite",
     pricing: PRICING_ELITE,
-    promise: PROMESSA_PRIMEIRO_CLIENTE,
-    highlights: [
-      {
-        title: "Tudo do PRO",
-        detail: "Aulas, comunidade, skills, templates e ingresso da Imersão",
-      },
-      {
-        title: "Acesso ao Orion (plano PRO por 90 dias)",
-        detail: "Motor de prospecção com limites bem acima do plano Free",
-      },
-      {
-        title: "Reunião semanal em grupo",
-        detail: "Encontro ao vivo para tirar dúvida e avançar o comercial",
-      },
-      {
-        title: "Skills extras",
-        detail: "Biblioteca ampliada do plano Elite",
-      },
-      {
-        title: "Templates extras",
-        detail: "Mais modelos para operação e comercial",
-      },
-    ],
+    promise: PROMESSA_ELITE,
+    highlights: filtrarItens(ITENS_ELITE),
+    notaFinal:
+      "Pagamento pela Hubla. O acesso é liberado no seu primeiro login com o mesmo e-mail da compra.",
     checkoutUrl: checkoutUrlElite(),
     boletoCheckouts: [
       {

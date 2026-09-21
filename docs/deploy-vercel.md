@@ -63,6 +63,7 @@ mostram indisponível (não zero).
 | `BETTER_AUTH_URL`       | `https://comunidade-builders-club.devemdobro.com` | `https://hml-comunidade-builders-club.devemdobro.com` | `http://localhost:3000` |
 | `EMAIL_PROVIDER`        | `resend`                               | `resend` (ou mailpit só local)                 | `mailpit`               |
 | `NEXT_PUBLIC_CLARITY_PROJECT_ID` | Project ID prod (F074, projeto Clarity próprio) | Project ID **staging** (outro projeto) | vazio = desligado |
+| `NEXT_PUBLIC_WHATSAPP_AVISOS_LIVE_URL` | **não definir** até link oficial (F082) | URL do convite do grupo (FAB avisos lives) | vazio = FAB desligado |
 | `BOOTSTRAP_ADMIN_EMAIL` | seu e-mail admin                       | mesmo ou de teste                              | seu e-mail              |
 | `HUBLA_WEBHOOK_TOKEN`   | token do webhook Hubla                 | mesmo ou dedicado de staging                   | obrigatório p/ webhook  |
 | `HUBLA_PRODUCT_ID`      | Produto Club (allowlist `product.id`) | mesmo | obrigatório p/ webhook se os dois abaixo vazios |
@@ -110,33 +111,44 @@ DevQuest continua via seed sazonal (não passa neste webhook).
 
 | Variável                 | Exemplo                                       |
 | ------------------------ | --------------------------------------------- |
+| `RESEND_API_KEY`         | `re_…` da app Comunidade (F085 envio + métricas) |
 | `RESEND_SMTP_FROM_EMAIL` | `Builders Club <noreply@mail.devemdobro.com>` |
-| `RESEND_SMTP_HOST`       | `smtp.resend.com`                             |
+| `RESEND_SMTP_PASS`       | fallback da mesma `re_…` se `RESEND_API_KEY` vazia |
+| `RESEND_SMTP_HOST`       | `smtp.resend.com` (legado; envio usa API)     |
 | `RESEND_SMTP_PORT`       | `465`                                         |
 | `RESEND_SMTP_USER`       | `resend`                                      |
-| `RESEND_SMTP_PASS`       | API key Resend                                |
 
 
-Domínio de envio precisa estar verificado no Resend (SPF/DKIM).
+Domínio de envio precisa estar verificado no Resend (SPF/DKIM). Tracking
+open/click no domínio (F085 Admin → E-mails).
 
-### Cron (F075 — régua 48h)
+### Cron (F075 / F084 — régua)
 
 Vercel Cron (só **Production**) chama `GET /api/cron/regua` todos os dias às
 12:00 UTC (9h em Brasília) com `Authorization: Bearer CRON_SECRET`. Sem a
-env, o endpoint responde 503.
+env, o endpoint responde 503. Dispara 48h sem acesso, 7d sem amostra e 14d
+sem atividade.
 
-Preview / HML: o cron da Vercel **não** roda. QA:
+Preview / HML: o cron da Vercel **não** roda. QA (filtre `email` e `trigger`
+senão o 7d manda para todo membro sem amostra há 7+ dias):
 
 ```
 curl -sS -H "Authorization: Bearer $CRON_SECRET" \
-  https://hml-comunidade-builders-club.devemdobro.com/api/cron/regua
+  "https://hml-comunidade-builders-club.devemdobro.com/api/cron/regua?trigger=sem_amostra_7d&email=voce@devemdobro.com"
+
+curl -sS -H "Authorization: Bearer $CRON_SECRET" \
+  "https://hml-comunidade-builders-club.devemdobro.com/api/cron/regua?trigger=sem_atividade_14d&email=voce@devemdobro.com"
 ```
+
+`trigger`: `sem_acesso_48h` | `sem_amostra_7d` | `sem_atividade_14d`.
+Omite = os três.
 
 O SSO da Vercel responde antes do app: sem bypass, este `curl` devolve 302 para
 `vercel.com/sso-api`, não o JSON do endpoint.
 
-O disparo não envia para quem ainda tem `lastSeenAt` null (evita blast no
-dia do migrate). Primeiro heartbeat é o poll do sininho.
+O 48h não envia para quem ainda tem `lastSeenAt` null (evita blast no
+dia do migrate). Primeiro heartbeat é o poll do sininho. 7d e 14d usam
+entrada / última atividade, não o lastSeen.
 
 ### Google OAuth (opcional)
 

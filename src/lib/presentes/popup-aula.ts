@@ -14,7 +14,7 @@ import { PROMESSA_PRIMEIRO_CLIENTE } from "@/lib/membership/checkout";
  * aquela visita; voltar ao Presente é uma chance nova.
  */
 
-/** Aula que abre o módulo gratuito — destino de quem se cadastra pela modal. */
+/** Aula que abre o módulo gratuito — destino de cadastro no Presente (F078 pop-up, F083 rodapé). */
 export const AULA_ABERTURA_HREF = `/aulas/${FASE_1_M01_SLUG}/aula-introducao-builders-club`;
 
 /**

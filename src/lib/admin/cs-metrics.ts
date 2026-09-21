@@ -1,5 +1,6 @@
 import type { MembershipTier, Role } from "@prisma/client";
 import { prisma } from "@/lib/db";
+import { postTemLinkPublico } from "@/lib/posts/link-publico";
 import { PROJETOS_SPACE_SLUG } from "@/lib/spaces/constants";
 import {
   firstLeadAtByEmail,
@@ -54,17 +55,6 @@ function entradaDe(m: MemberRow): Date {
     return m.allowlistAt!;
   }
   return m.loginAt;
-}
-
-export function postTemLinkPublico(
-  linkUrl: string | null | undefined,
-  body: string,
-): boolean {
-  const link = linkUrl?.trim() ?? "";
-  if (/^https:\/\//i.test(link) && !link.startsWith("builders-club:")) {
-    return true;
-  }
-  return /https:\/\/[^\s)>\]]+/i.test(body);
 }
 
 function toPerson(

@@ -4,10 +4,15 @@
 export type KitZip = {
   /** Nome do arquivo baixado (ex.: meu-portfolio.zip). */
   nomeArquivo: string;
-  /** Pasta raiz dentro do zip. */
+  /** Pasta raiz dentro do zip (ignorado se `arquivoPronto` estiver definido). */
   pastaInterna: string;
-  /** Arquivos relativos à pasta do entregável. */
+  /** Arquivos relativos à pasta do entregável (ignorado se `arquivoPronto`). */
   arquivos: string[];
+  /**
+   * Zip já montado na pasta do entregável (ex.: template completo).
+   * Quando definido, o download serve esse arquivo direto.
+   */
+  arquivoPronto?: string;
 };
 
 export type Entregavel = {
@@ -18,6 +23,10 @@ export type Entregavel = {
   pasta: string;
   /** false = aparece no menu lateral */
   emBreve?: boolean;
+  /**
+   * F097 — só Elite (e staff). PRO vê o card com cadeado; APIs recusam.
+   */
+  eliteOnly?: boolean;
   /** Se definido, visão geral e breadcrumb da página exibem "Baixar .zip". */
   kitZip?: KitZip;
 };
@@ -105,13 +114,21 @@ export const ENTREGAVEIS: Entregavel[] = [
     descricao: "CRM para usar e revender — chegando nas próximas consultorias.",
     pasta: "",
     emBreve: true,
+    eliteOnly: true,
   },
   {
     slug: "cms",
     titulo: "Modelo de CMS",
-    descricao: "Painel para o cliente editar o site — chegando em breve.",
-    pasta: "",
-    emBreve: true,
+    descricao:
+      "Template pra gerar o painel em que o cliente edita o site. Baixa o zip, pasta por cliente e tutorial completo.",
+    pasta: "10-CMS",
+    eliteOnly: true,
+    kitZip: {
+      nomeArquivo: "criador-de-cms-builders.zip",
+      pastaInterna: "criador-de-cms-builders",
+      arquivos: [],
+      arquivoPronto: "criador-de-cms-builders.zip",
+    },
   },
   {
     slug: "agentes-whatsapp",
@@ -126,4 +143,15 @@ export const ENTREGAVEIS_MENU = ENTREGAVEIS.filter((e) => !e.emBreve);
 
 export function entregavelPorSlug(slug: string): Entregavel | undefined {
   return ENTREGAVEIS.find((e) => e.slug === slug);
+}
+
+/** Pasta raiz em `content/entregaveis/` → item do catálogo (gate da API). */
+export function entregavelPorPasta(pasta: string): Entregavel | undefined {
+  if (!pasta) return undefined;
+  return ENTREGAVEIS.find((e) => e.pasta === pasta);
+}
+
+/** F097 — Elite-only exige Elite/staff; demais itens liberam a qualquer pago. */
+export function entregavelExigeElite(item: Pick<Entregavel, "eliteOnly">): boolean {
+  return Boolean(item.eliteOnly);
 }

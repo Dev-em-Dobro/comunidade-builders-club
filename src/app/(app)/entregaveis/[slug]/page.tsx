@@ -1,8 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requirePaidMemberOrRedirect } from "@/lib/membership/require-member";
+import {
+  requireEliteMemberOrRedirect,
+  requirePaidMemberOrRedirect,
+} from "@/lib/membership/require-member";
 import { hrefPlanos } from "@/lib/membership/capabilities";
-import { entregavelPorSlug } from "@/lib/entregaveis/catalogo";
+import {
+  entregavelExigeElite,
+  entregavelPorSlug,
+} from "@/lib/entregaveis/catalogo";
 import { urlInternaEntregavel } from "@/lib/entregaveis/servir";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -27,7 +33,6 @@ function IconeDownload() {
 }
 
 export default async function EntregavelPage({ params }: Props) {
-  const member = await requirePaidMemberOrRedirect(hrefPlanos({ motivo: "materiais" }));
   const { slug } = await params;
   const item = entregavelPorSlug(slug);
 
@@ -35,45 +40,53 @@ export default async function EntregavelPage({ params }: Props) {
     notFound();
   }
 
+  if (entregavelExigeElite(item)) {
+    await requireEliteMemberOrRedirect(
+      hrefPlanos({ motivo: "materiais-elite", destaque: "elite" }),
+    );
+  } else {
+    await requirePaidMemberOrRedirect(hrefPlanos({ motivo: "materiais" }));
+  }
+
   const src = urlInternaEntregavel(item.pasta);
 
   return (
-      <div className="-mx-4 -my-6 flex h-[calc(100dvh-3.5rem)] flex-col md:-mx-8 md:-my-10 md:h-[calc(100dvh)]">
-        <header className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-2 border-b border-border bg-card/95 px-3 py-2.5 backdrop-blur sm:px-4 sm:py-3">
-          <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
-            <Link
-              href="/entregaveis"
-              className="shrink-0 text-sm text-muted transition-colors hover:text-foreground"
-            >
-              <span className="sm:hidden">←</span>
-              <span className="hidden sm:inline">← Materiais</span>
-            </Link>
-            <span className="hidden text-border sm:inline" aria-hidden>
-              /
-            </span>
-            <h1 className="min-w-0 truncate text-sm font-semibold text-foreground">
-              {item.titulo}
-            </h1>
-          </div>
-          {item.kitZip ? (
-            <a
-              href={`/api/entregaveis/download/${item.slug}`}
-              className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-border bg-surface/50 px-2.5 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-surface"
-              download={item.kitZip.nomeArquivo}
-            >
-              <IconeDownload />
-              <span className="sm:hidden">Baixar</span>
-              <span className="hidden sm:inline">Baixar .zip</span>
-            </a>
-          ) : null}
-        </header>
+    <div className="-mx-4 -my-6 flex h-[calc(100dvh-3.5rem)] flex-col md:-mx-8 md:-my-10 md:h-[calc(100dvh)]">
+      <header className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-2 border-b border-border bg-card/95 px-3 py-2.5 backdrop-blur sm:px-4 sm:py-3">
+        <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+          <Link
+            href="/entregaveis"
+            className="shrink-0 text-sm text-muted transition-colors hover:text-foreground"
+          >
+            <span className="sm:hidden">←</span>
+            <span className="hidden sm:inline">← Materiais</span>
+          </Link>
+          <span className="hidden text-border sm:inline" aria-hidden>
+            /
+          </span>
+          <h1 className="min-w-0 truncate text-sm font-semibold text-foreground">
+            {item.titulo}
+          </h1>
+        </div>
+        {item.kitZip ? (
+          <a
+            href={`/api/entregaveis/download/${item.slug}`}
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-border bg-surface/50 px-2.5 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-surface"
+            download={item.kitZip.nomeArquivo}
+          >
+            <IconeDownload />
+            <span className="sm:hidden">Baixar</span>
+            <span className="hidden sm:inline">Baixar .zip</span>
+          </a>
+        ) : null}
+      </header>
 
-        <iframe
-          src={src}
-          title={item.titulo}
-          className="min-h-0 w-full flex-1 border-0 bg-[#0b0d10]"
-          sandbox="allow-scripts allow-same-origin allow-downloads allow-popups allow-top-navigation-by-user-activation"
-        />
-      </div>
+      <iframe
+        src={src}
+        title={item.titulo}
+        className="min-h-0 w-full flex-1 border-0 bg-[#0b0d10]"
+        sandbox="allow-scripts allow-same-origin allow-downloads allow-popups allow-top-navigation-by-user-activation"
+      />
+    </div>
   );
 }

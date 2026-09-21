@@ -18,6 +18,7 @@
     "db:seed:dev-posts": "npx tsx scripts/seed-dev-posts.mts",
     "db:seed:aulas-panda": "npx tsx scripts/seed-aulas-panda.mts",
     "db:seed:devquest": "npx tsx scripts/seed-devquest-allowed.mts",
+    "db:seed:regua": "npx tsx scripts/seed-regua-qa.mts",
     "db:import-allowed": "npx tsx scripts/import-allowed-emails.mts",
     "db:studio": "prisma studio",
     "audit:presentes": "npx tsx scripts/audit-cta-presentes.mts",

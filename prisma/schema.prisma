@@ -209,7 +209,7 @@ model LegalAcceptance {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  /// `termos` | `privacidade` (DOCUMENTOS_LEGAIS em src/lib/legal.ts).
+  /// `termos` | `privacidade` | `garantia` (F058 / F090).
   documento String
   versao    String
   aceitoEm  DateTime @default(now()) @map("aceito_em")

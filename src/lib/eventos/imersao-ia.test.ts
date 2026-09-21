@@ -39,6 +39,14 @@ describe("imersaoHref — link e atribuição (F077)", () => {
     assert.equal(p.get("utm_campaign"), "imersao-ia");
   });
 
+  it("F088 — banner do Club usa utm_medium=club-banner", () => {
+    const p = new URL(imersaoHref(null, { medium: "club-banner" })).searchParams;
+    assert.equal(p.get("utm_source"), "builders-club");
+    assert.equal(p.get("utm_medium"), "club-banner");
+    assert.equal(p.get("utm_campaign"), "imersao-ia");
+    assert.equal(p.has("utm_content"), false);
+  });
+
   it("sem utm_content no path, não inventa um", () => {
     const p = new URL(imersaoHref(null)).searchParams;
     assert.equal(p.has("utm_content"), false);

@@ -77,8 +77,9 @@ atividade e a entrada foi há ≥ 14 dias.
 
 Lista no clique: esses nomes. Sem nome não vira resgate.
 
-O toque automático aos 48h sem abrir o Club é [F075](F075-regua-email-48h.md)
-(e-mail). Este card continua o recorte de 14 dias para resgate manual.
+O toque automático aos 48h sem abrir o Club é [F075](F075-regua-email-48h.md).
+7d sem amostra e 14d sem atividade: [F084](F084-regua-7d-14d.md). Este card
+continua o recorte de 14 dias para a reunião de CS.
 
 ### 3. Propostas enviadas na semana
 

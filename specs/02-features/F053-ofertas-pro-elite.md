@@ -47,13 +47,15 @@ Libera no Club:
 
 - Comunidade (todos os spaces + publicar, comentar, reagir)
 - Aulas gravadas
-- Skills e templates (Materiais de apoio)
+- Skills e templates (Materiais de apoio), **exceto** Modelo de CMS e
+  Modelo de CRM — esses são só Elite ([F097](F097-cms-crm-elite-only.md))
 - Busca
 - Ingresso da **Imersão 2 a 5k com IA** — próximo evento **online** da Imersão
   (benefício da oferta; não é rota no MVP). Não é evento presencial.
 - **Orion no plano Free** (teto Free do app; [F058](F058-pro-orion-free.md))
 
-**Promessa:** feche o 1º cliente em **90 dias**.
+**Promessa (card):** formação e comunidade pra fechar o 1º cliente.
+**Não** inclui garantia de resultado em 90 dias (só 7 dias CDC).
 
 ## Elite — R$ 997 (boleto R$ 1.297)
 
@@ -72,8 +74,12 @@ Boleto (TMB, R$ 1.297):
 - 1 reunião semanal em grupo (benefício da oferta; não é rota no MVP)
 - + Skills e + Templates (mesmo catálogo de materiais no MVP; mais conteúdo
   depois, sem gate extra agora)
+- **Modelo de CMS** e **Modelo de CRM** — só Elite
+  ([F097](F097-cms-crm-elite-only.md); CRM ainda Em breve)
+- **Garantia de 90 dias condicionada** à [Lista da garantia](F090-lista-garantia-ciente.md)
+  (`/garantia` + ciente em `legal_acceptance`)
 
-**Promessa:** feche o 1º cliente em **90 dias**.
+**Promessa (card):** garantia de 90 dias condicionada à lista de execução.
 
 Membro **Free** que clica em Orion vai a `/planos` (motivo orion). PRO e Elite
 abrem o app (`ORION_APP_URL`).
@@ -147,8 +153,10 @@ Página **`/planos`** (liberada para free e PRO):
 > sobre os R$ 297 à vista. O à vista **não** mudou. Parcela menor na vitrine,
 > acréscimo maior no total — o que reforça a regra acima de nunca escrever
 > “sem juros”.
-- A promessa aparece **sem o rótulo “Promessa:”** — só a frase
-  “Feche o 1º cliente em 90 dias”, separada da lista por um filete
+- A promessa aparece **sem o rótulo “Promessa:”**, separada da lista por um
+  filete — **PRO** e **Elite** têm frases distintas ([F090](F090-lista-garantia-ciente.md)):
+  Pro = formação/comunidade; Elite = garantia de 90 dias condicionada + link
+  `/garantia` e checkbox de ciente antes do checkout (logado)
 - CTA principal: checkout Hubla (cartão/Pix)
 - Elite: **um** CTA de boleto TMB (`9DW254247E5`) com o label “Opção para boleto” (sem valor no botão)
 - Sem rodapé de meios de pagamento
