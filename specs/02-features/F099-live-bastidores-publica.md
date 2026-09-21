@@ -1,8 +1,14 @@
 # F099 — Bastidores: a live pública de quinta assume o topo do Club
 
 ## Status
-Spec — 2026-09-21. Branch `feature/F099-live-bastidores-publica` (base `main`
-`31c39cd`). Não implementada.
+Implementada no código — 2026-09-21. Branch
+`feature/F099-live-bastidores-publica` (base `main` `31c39cd`). Falta validar em
+Preview/HML.
+
+**Subiu com as artes provisórias cortadas** (decisão 6.5.4): as três peças
+definitivas de 6.2/6.3 ainda não existem. Com o crop, o critério 8 (CTA a ≥14px
+em 390px) **não é cumprido** — o que o garante hoje é a faixa inteira ser o
+link, não o botão desenhado.
 
 Muda comportamento de: [F079](F079-aviso-live-faixa-agenda-email.md) (faixa da
 live semanal sai do topo) e [F082](F082-whatsapp-avisos-live.md) (FAB de
