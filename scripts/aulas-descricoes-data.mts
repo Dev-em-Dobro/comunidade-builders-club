@@ -75,13 +75,24 @@ Nessa aula você deixa a conta pronta pra usar — sem travar na configuração 
 - Agente conectado ao WhatsApp
 - Checklist rápido pra validar se a mensagem está chegando`,
 
-  "fundamentos-gpt-maker/integracao-google-agenda-no-gpt-maker": `Último bloco dos fundamentos: conectar a Google Agenda para o agente marcar e consultar horários.
+  "fundamentos-gpt-maker/integracao-google-agenda-no-gpt-maker": `Conectar a Google Agenda para o agente marcar e consultar horários.
 
 Assim o atendimento ganha agenda sem você ficar no meio de cada "tem horário amanhã?".
 
 ## O que você leva
 - Google Agenda integrada ao GPT Maker
 - Fluxo simples de marcar / consultar horário pelo agente`,
+
+  "fundamentos-gpt-maker/como-cobrar-por-agentes": `O agente no ar não é o fim do trabalho. Alguém precisa acompanhar as mensagens do bot e ir melhorando com o tempo.
+
+Por isso a referência da casa é **R$ 150 de recorrência** por mês. Esse valor paga o acompanhamento — não o "configurei e fui embora".
+
+Com o tempo, o caminho é pegar um plano maior do GPT Maker e colocar **todos os clientes no mesmo plano**. O custo da ferramenta dilui; a recorrência de cada cliente continua.
+
+## Precificação
+A tabela (site, bot, manutenção) está no material:
+
+- [Ver precificação](/entregaveis/precificacao)`,
 
   "ia-aplicada-introducao/aula-1-introducao": `Nessa primeira aula, tu vai entender como funciona a Formação IA na Prática, qual é a jornada completa até o projeto final e por que esse curso é diferente da maioria. A gente apresenta os módulos, explica o Copiloto de Documentação que tu vai construir do zero e, principalmente, mostra o caminho das pedras pra tu realmente desenvolver aplicações usando IA do jeito mais eficiente e alinhado com o mercado.
 

@@ -1,5 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
+import { isPaidMembership } from "@/lib/membership/capabilities";
+import { AULAS_FREE_HREF, canWatchLesson } from "@/lib/aulas/access";
 import { listCompletedLessonIds } from "@/lib/aulas";
 import { listPublishedModules } from "@/lib/aulas/published-modules";
 import { EmptyState } from "@/components/empty-state";
@@ -18,6 +20,7 @@ type Props = {
 export default async function AulasModulePage({ params }: Props) {
   const { moduleSlug } = await params;
   const member = await requireActiveMemberOrRedirect();
+  const isPaid = isPaidMembership(member.membership);
   const [modules, completed] = await Promise.all([
     listPublishedModules(),
     listCompletedLessonIds(member.user.id),
@@ -28,6 +31,9 @@ export default async function AulasModulePage({ params }: Props) {
   if (!mod) notFound();
 
   const first = flattenLessons(mod)[0];
+  if (first && !canWatchLesson(isPaid, { freeAccess: mod.freeAccess, slug: mod.slug })) {
+    redirect(AULAS_FREE_HREF);
+  }
   if (first) {
     redirect(`/aulas/${first.moduleSlug}/${first.slug}`);
   }

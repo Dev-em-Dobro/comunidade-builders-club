@@ -796,7 +796,7 @@ const CATALOG: ModuleSeed[] = [
         slug: "fundamentos-gpt-maker",
         title: "Fundamentos GPT Maker",
         description:
-          "Do zero ao agente no ar: criar conta, montar o agente, ligar no WhatsApp e integrar a Google Agenda.",
+          "Do zero ao agente no ar: criar conta, montar o agente, ligar no WhatsApp, integrar a Google Agenda e cobrar a recorrência.",
         sortOrder: 0,
         forceLessonSort: true,
         lessons: [
@@ -831,6 +831,22 @@ const CATALOG: ModuleSeed[] = [
               "Conecta a Google Agenda para o agente marcar e consultar horários sem você ficar no meio.",
             pandaVideoExternalId: "3430e386-4e2e-4c80-b97d-5b78f12d3240",
             sortOrder: 3,
+          },
+          {
+            // F099 — aula em texto, sem Panda.
+            slug: "como-cobrar-por-agentes",
+            title: "Como cobrar por agentes no GPT Maker",
+            description: `O agente no ar não é o fim do trabalho. Alguém precisa acompanhar as mensagens do bot e ir melhorando com o tempo.
+
+Por isso a referência da casa é **R$ 150 de recorrência** por mês. Esse valor paga o acompanhamento — não o "configurei e fui embora".
+
+Com o tempo, o caminho é pegar um plano maior do GPT Maker e colocar **todos os clientes no mesmo plano**. O custo da ferramenta dilui; a recorrência de cada cliente continua.
+
+## Precificação
+A tabela (site, bot, manutenção) está no material:
+
+- [Ver precificação](/entregaveis/precificacao)`,
+            sortOrder: 4,
           },
         ],
       },
