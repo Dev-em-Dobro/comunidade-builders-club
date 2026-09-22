@@ -1,7 +1,8 @@
 # F090 — Lista da garantia publicada + ciente (Elite)
 
 ## Status
-Implementada — 2026-09-17
+Implementada — 2026-09-17. Ajustada — 2026-09-18: aceite no `/planos` removido (ver
+"Ajuste" abaixo).
 
 Fonte operacional: Dobro OS `bc-regua-garantia` (régua Elite).
 Depende de: [F058](F058-registro-aceite-legal.md) (`legal_acceptance`),
@@ -45,9 +46,25 @@ isso precisa ser corrigido nesta feature.
 1. `/garantia` pública, com versão e os 8 itens da régua
 2. Aceite grava `documento=garantia`, versão, data, IP, UA
 3. Elite sem ciente não usa o app até aceitar
-4. Checkout Elite no `/planos` exige ciente quando o usuário está logado
+4. ~~Checkout Elite no `/planos` exige ciente quando o usuário está logado~~ —
+   **removido no ajuste de 2026-09-18** (ver abaixo)
 5. Card Pro não promete garantia de 90 dias / resultado
 6. Sem migration (usa tabela existente)
+
+## Ajuste — 2026-09-18
+
+O checkbox "Li a Lista da garantia e estou ciente" no card Elite de `/planos`
+gerava fricção antes da compra. Decisão: o aceite deixa de bloquear o
+checkout e passa a ser exigido **só depois** da compra, pelo modal
+bloqueante já existente (`GarantiaCienteModal`) no primeiro acesso ao app.
+
+- `/planos`: botão de checkout do Elite não depende mais de um checkbox de
+  ciente; para usuário logado, o aceite ainda é registrado silenciosamente
+  ao clicar (sem bloquear o clique) quando ainda não houver aceite.
+- O link "Detalhes da régua: Lista da garantia" no card Elite permanece,
+  informativo, sem exigir marcação.
+- Critério 3 (modal bloqueante pós-login) continua sendo o mecanismo que
+  garante o aceite antes de o Elite usar o app.
 
 ## Fora de escopo
 
