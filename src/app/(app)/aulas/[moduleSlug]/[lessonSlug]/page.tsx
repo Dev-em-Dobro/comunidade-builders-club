@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { VideoPlayTracker } from "@/components/video-play-tracker";
 import { moduloMedido } from "@/lib/video/escopo";
 import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
@@ -7,7 +7,7 @@ import {
   hrefPlanos,
   isPaidMembership,
 } from "@/lib/membership/capabilities";
-import { canWatchLesson } from "@/lib/aulas/access";
+import { canWatchLesson, AULAS_FREE_HREF } from "@/lib/aulas/access";
 import { shouldShowLessonUpgradeCta } from "@/lib/aulas/upgrade-cta";
 import {
   ensureLessonDiscussionPost,
@@ -50,6 +50,7 @@ export default async function LessonPage({ params }: Props) {
   if (!lesson) notFound();
 
   const canWatch = canWatchLesson(isPaid, lesson.module);
+  if (!canWatch) redirect(AULAS_FREE_HREF);
   const hasVideo = Boolean(
     lesson.pandaLibraryId && lesson.pandaVideoExternalId,
   );
@@ -130,10 +131,10 @@ export default async function LessonPage({ params }: Props) {
               ) : canWatch ? (
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-card px-6 text-center">
                   <p className="font-[family-name:var(--font-outfit)] text-lg font-semibold">
-                    Material de apoio
+                    Aula em texto
                   </p>
                   <p className="mt-2 max-w-sm text-sm text-muted">
-                    Esta aula não tem vídeo. Baixe os arquivos na descrição
+                    Esta aula não tem vídeo. O conteúdo está na descrição
                     abaixo.
                   </p>
                 </div>
@@ -225,14 +226,21 @@ export default async function LessonPage({ params }: Props) {
             commentCount={discussion?.commentCount ?? 0}
             info={
               <>
-                {lesson.description ? (
-                  <MarkdownBody
-                    body={lesson.description}
-                    className="space-y-2 text-[15px] leading-relaxed text-muted md:text-base [&_a]:text-accent [&_h2]:text-foreground [&_pre]:text-foreground"
-                  />
+                {canWatch ? (
+                  lesson.description ? (
+                    <MarkdownBody
+                      body={lesson.description}
+                      className="space-y-2 text-[15px] leading-relaxed text-muted md:text-base [&_a]:text-accent [&_h2]:text-foreground [&_pre]:text-foreground"
+                    />
+                  ) : (
+                    <p className="text-sm text-muted">
+                      Esta aula ainda não tem descrição.
+                    </p>
+                  )
                 ) : (
                   <p className="text-sm text-muted">
-                    Esta aula ainda não tem descrição.
+                    A descrição desta aula entra no PRO — é o conteúdo,
+                    não um resumo.
                   </p>
                 )}
                 {shouldShowLessonUpgradeCta({ isPaid, canWatch }) ? (
