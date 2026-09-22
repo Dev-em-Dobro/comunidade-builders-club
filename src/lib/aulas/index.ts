@@ -4,7 +4,7 @@ import { ForbiddenError } from "@/lib/auth/errors";
 import { UPGRADE_REQUIRED } from "@/lib/membership/errors";
 import { canWatchLesson, FASE_1_M01_SLUG } from "./access";
 
-export { canWatchLesson, moduleAllowsFree, FASE_1_M01_SLUG } from "./access";
+export { canWatchLesson, moduleAllowsFree, FASE_1_M01_SLUG, AULAS_FREE_HREF } from "./access";
 export type { ModuleAccessNode } from "./access";
 export { listPublishedModules } from "./published-modules";
 

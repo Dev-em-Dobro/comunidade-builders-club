@@ -3,6 +3,11 @@
 /** Submódulo gratuito. Spec F065 / F051 — só o Comece por aqui. */
 export const FASE_1_M01_SLUG = "fase-1-m01-comece-por-aqui";
 
+/** Primeira aula do M01 — destino do Free (presente, cadastro, aula paga). */
+export const AULA_INTRO_SLUG = "aula-introducao-builders-club";
+
+export const AULAS_FREE_HREF = `/aulas/${FASE_1_M01_SLUG}/${AULA_INTRO_SLUG}`;
+
 export type ModuleAccessNode = {
   freeAccess: boolean;
   slug?: string;

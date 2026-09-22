@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { canWatchLesson, moduleAllowsFree } from "./access";
+import { canWatchLesson, moduleAllowsFree, AULAS_FREE_HREF } from "./access";
 
 describe("moduleAllowsFree — F065", () => {
   it("libera quando o próprio módulo tem a flag", () => {
@@ -101,6 +101,15 @@ describe("canWatchLesson — F065", () => {
         },
       }),
       false,
+    );
+  });
+});
+
+describe("AULAS_FREE_HREF — F099", () => {
+  it("é a aula de abertura do Comece por aqui", () => {
+    assert.equal(
+      AULAS_FREE_HREF,
+      "/aulas/fase-1-m01-comece-por-aqui/aula-introducao-builders-club",
     );
   });
 });

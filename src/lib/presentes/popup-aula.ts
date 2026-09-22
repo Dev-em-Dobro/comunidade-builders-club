@@ -1,4 +1,4 @@
-import { FASE_1_M01_SLUG } from "@/lib/aulas/access";
+import { AULAS_FREE_HREF } from "@/lib/aulas/access";
 import { PROMESSA_PRIMEIRO_CLIENTE } from "@/lib/membership/checkout";
 
 /**
@@ -15,7 +15,7 @@ import { PROMESSA_PRIMEIRO_CLIENTE } from "@/lib/membership/checkout";
  */
 
 /** Aula que abre o módulo gratuito — destino de cadastro no Presente (F078 pop-up, F083 rodapé). */
-export const AULA_ABERTURA_HREF = `/aulas/${FASE_1_M01_SLUG}/aula-introducao-builders-club`;
+export const AULA_ABERTURA_HREF = AULAS_FREE_HREF;
 
 /**
  * Zero: a modal abre assim que a página hidrata (decisão 1).
