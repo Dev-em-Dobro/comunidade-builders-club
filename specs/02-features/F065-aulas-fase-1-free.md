@@ -126,7 +126,9 @@ Prometer avaliação e não entregar é pior que não prometer.
 
 - [x] Spec antes do código
 - [x] `Module.freeAccess` + herança; M01 Comece por aqui marcado na migration
-- [x] Free abre `/aulas` e assiste o M01; M02–M05 e Fase 2 cadeado, sem player
+- [x] Free abre `/aulas` e assiste o M01; rota de aula fora do M01
+  redireciona para o Comece por aqui (F099). Catálogo continua visível
+  com cadeado.
 - [x] Free não comenta em aula (UI + server); pode comentar em `projetos`
 - [x] Free publica só em `projetos` (FAB + `/nova` + `createPost`)
 - [x] Progresso: coluna de tier; % do free sobre aulas acessíveis
