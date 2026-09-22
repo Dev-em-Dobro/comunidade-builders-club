@@ -28,9 +28,9 @@ numerador. A lista do admin segue a ordem da jornada (raiz → trilha →
 submódulo → aula), com o caminho do módulo.
 
 Descrição da aula: mesmo subset de posts (`**`, listas, `` ` ``, `##`, bloco
-` ``` `). Links `http(s)` e downloads internos (`/materiais/arquivo.zip`)
-abrem em **nova guia** (`target=_blank`). Anexos zip/md/docx/xlsx ficam em
-`public/materiais/` e entram como link de download na descrição.
+` ``` `). Links `http(s)` abrem em nova guia. Downloads internos
+(`/materiais/arquivo.zip`) também, com `download`. Rotas do app
+(`/entregaveis/precificacao`, F100) navegam na mesma aba — não baixam HTML.
 
 Aula **sem vídeo Panda** é permitida quando o conteúdo é só material
 (ex.: lista de templates). O player mostra um painel de material no
