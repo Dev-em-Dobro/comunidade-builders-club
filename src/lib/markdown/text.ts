@@ -53,3 +53,12 @@ export function isSafeHref(href: string): boolean {
   if (value.includes("\\") || value.includes(":")) return false;
   return true;
 }
+
+/**
+ * F100 — `download` só em anexo de `/materiais/`.
+ * `/entregaveis/precificacao` é rota do app, não arquivo.
+ */
+export function markdownHrefIsDownload(href: string): boolean {
+  const path = href.trim().split("?")[0] ?? "";
+  return path.startsWith("/materiais/");
+}

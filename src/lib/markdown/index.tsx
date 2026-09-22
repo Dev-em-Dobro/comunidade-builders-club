@@ -4,9 +4,10 @@ import {
   isSafeHref,
   isSafeHttpUrl,
   parseImagemBloco,
+  markdownHrefIsDownload,
 } from "@/lib/markdown/text";
 
-export { escapeHtml, snippetFromBody, isSafeHttpUrl, isSafeHref } from "@/lib/markdown/text";
+export { escapeHtml, snippetFromBody, isSafeHttpUrl, isSafeHref, markdownHrefIsDownload } from "@/lib/markdown/text";
 
 /**
  * Inline Markdown seguro + @menções + autolink http(s).
@@ -45,14 +46,16 @@ export function renderInlineMarkdown(text: string): ReactNode[] {
     } else if (italic) {
       nodes.push(<em key={key++}>{italic.slice(1, -1)}</em>);
     } else if (mdHref && mdLabel && isSafeHref(mdHref)) {
-      const isDownload = mdHref.startsWith("/");
+      const isDownload = markdownHrefIsDownload(mdHref);
+      const isInternal = mdHref.startsWith("/") && !mdHref.startsWith("//");
       nodes.push(
         <a
           key={key++}
           href={mdHref}
-          target="_blank"
-          rel="noopener noreferrer"
           className="cursor-pointer font-medium text-accent underline-offset-2 hover:underline"
+          {...(isDownload || !isInternal
+            ? { target: "_blank", rel: "noopener noreferrer" }
+            : {})}
           {...(isDownload ? { download: true } : {})}
         >
           {mdLabel}
