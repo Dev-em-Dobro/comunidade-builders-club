@@ -39,22 +39,13 @@ function OfferCard({
   garantiaJaAceita: boolean;
 }) {
   const isElite = offer.id === "elite";
-  const [ciente, setCiente] = useState(garantiaJaAceita);
   const [pending, start] = useTransition();
   const [erro, setErro] = useState<string | null>(null);
 
-  const precisaCiente = isElite && !current;
-  const checkoutLiberado = !precisaCiente || ciente;
-
+  // F090: o aceite da garantia não bloqueia mais o checkout (fricção antes da
+  // compra). Segue exigido no app após o 1º login via `GarantiaCienteModal`.
   function irParaCheckout(url: string) {
-    if (!precisaCiente) {
-      window.open(url, "_blank", "noopener,noreferrer");
-      return;
-    }
-    if (!ciente) return;
-
-    if (!loggedIn) {
-      // Sem userId não grava legal_acceptance; o modal Elite cobre no 1º login.
+    if (!isElite || current || !loggedIn) {
       window.open(url, "_blank", "noopener,noreferrer");
       return;
     }
@@ -168,23 +159,6 @@ function OfferCard({
               {offer.notaFinal}
             </p>
           ) : null}
-          {precisaCiente ? (
-            <label className="flex cursor-pointer items-start gap-2.5 text-xs leading-snug text-muted">
-              <input
-                type="checkbox"
-                className="mt-0.5"
-                checked={ciente}
-                onChange={(e) => setCiente(e.target.checked)}
-              />
-              <span>
-                Li a{" "}
-                <Link href="/garantia" className="text-accent hover:underline">
-                  Lista da garantia
-                </Link>{" "}
-                (v{VERSAO_GARANTIA}) e estou ciente.
-              </span>
-            </label>
-          ) : null}
           {erro ? (
             <p className="text-xs text-red-500" role="alert">
               {erro}
@@ -192,7 +166,7 @@ function OfferCard({
           ) : null}
           <button
             type="button"
-            disabled={!checkoutLiberado || pending}
+            disabled={pending}
             onClick={() => irParaCheckout(offer.checkoutUrl)}
             className={
               featured
@@ -210,7 +184,7 @@ function OfferCard({
                 <button
                   key={boleto.url}
                   type="button"
-                  disabled={!checkoutLiberado || pending}
+                  disabled={pending}
                   onClick={() => irParaCheckout(boleto.url)}
                   className="btn-outline w-full disabled:opacity-50"
                 >
