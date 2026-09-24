@@ -92,13 +92,21 @@ Não dispensável, como a F079 e a F088 — é faixa de campanha, não notifica�
 
 ### 5. Precedência no slot do topo
 
-O slot já é disputado: `app-shell-client.tsx:549-553` tem "F088 imersão só Free;
-F079 live só Elite, mutuamente exclusivos por tier". Com a F079 fora, sobra a
-Imersão, que expira sozinha em 24/09 (`IMERSAO_IA.terminaEm`).
+O slot já era disputado por duas faixas mutuamente exclusivas por tier: a
+Imersão (F088) e a live semanal (F079). Com a F079 fora (decisão 2), sobra a
+Imersão, que expira sozinha (`IMERSAO_IA.terminaEm`).
 
-Ordem: **Imersão ganha enquanto `imersaoAtiva()`**; Bastidores aparece para todo
-o resto e assume o slot inteiro depois do dia 24. Uma faixa por vez — nunca as
+Ordem: **Imersão ganha enquanto `imersaoAtiva()`**; Bastidores aparece para o
+resto e assume o slot inteiro depois do prazo. Uma faixa por vez — nunca as
 duas empilhadas.
+
+**O gate da Imersão é `isElite`, não `isPaid`.** A F088 corrigiu isso em 24/09,
+depois que esta spec foi escrita: a Imersão é onde o Elite é vendido, então
+esconder a faixa de quem é PRO tirava dela justamente o público que ainda tem o
+que comprar. Quem não vê a Imersão é só o Elite — e staff, que
+`isEliteMembership` também devolve como Elite. `faixaDoTopo` recebe `isElite` e
+espelha essa regra; quem cai fora dela vê Bastidores, que é aberta e não tem
+gate de tier nenhum.
 
 ### 6. A faixa é HTML, não imagem
 
@@ -222,9 +230,10 @@ quinta. Sem instrumentação nova nesta entrega.
    ativo, na véspera e pouco antes — sem alteração de regra nem de dedupe.
 5. O FAB verde de WhatsApp não aparece mais, com ou sem env definida.
 6. `/api/nav` não devolve mais `live`, e nenhum `zoomUrl` trafega para o client.
-7. Enquanto a Imersão estiver no prazo, o Free vê a faixa dela (não a de
-   Bastidores); PRO e Elite veem a de Bastidores. Depois do prazo, todo mundo
-   vê a de Bastidores. Nunca as duas juntas.
+7. Enquanto a Imersão estiver no prazo, **todo mundo menos Elite** vê a faixa
+   dela — Free, `paid` legado e PRO (gate `isElite`, F088). Elite e staff veem
+   a de Bastidores. Depois do prazo, todo mundo vê a de Bastidores. Nunca as
+   duas juntas.
 8. **A faixa nunca passa de 150px de altura**, em nenhuma largura de 320px a
    2560px, e nada do conteúdo é cortado pelo `overflow-hidden`. Medido em
    320/390/508/764/1180/1660px de faixa.

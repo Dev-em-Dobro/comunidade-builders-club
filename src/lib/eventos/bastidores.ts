@@ -53,14 +53,19 @@ export type FaixaDoTopo = "imersao" | "bastidores";
  * empilhadas.
  *
  * A Imersão tem data marcada e some sozinha (`imersaoAtiva`), então ela tem
- * precedência enquanto existe — mas só para quem é Free, que é o público
- * dela. Bastidores é aberta e fica com todo o resto, e com todo mundo depois
- * que a Imersão passa.
+ * precedência enquanto existe. Bastidores é aberta e fica com o resto, e com
+ * todo mundo depois que a Imersão passa.
+ *
+ * O gate é `isElite`, não `isPaid`: a F088 corrigiu isso em 24/09 porque a
+ * Imersão é **onde o Elite é vendido** — esconder a faixa do PRO tirava dela
+ * justamente o público que ainda tem o que comprar. Quem não vê é só o Elite
+ * (e staff, que `isEliteMembership` também devolve como Elite): convidar quem
+ * já é seria vender o que a pessoa tem.
  */
 export function faixaDoTopo(opts: {
-  isPaid: boolean;
+  isElite: boolean;
   agora?: Date;
 }): FaixaDoTopo {
-  if (!opts.isPaid && imersaoAtiva(opts.agora ?? new Date())) return "imersao";
+  if (!opts.isElite && imersaoAtiva(opts.agora ?? new Date())) return "imersao";
   return "bastidores";
 }

@@ -539,9 +539,15 @@ function ShellInner({
       ) : null}
 
       <div className="relative flex min-w-0 flex-1 flex-col">
-        {/* F102 — uma faixa por vez: a Imersão (F088, só Free) tem precedência
-            enquanto existe; depois disso Bastidores fica com todo mundo. */}
-        {faixaDoTopo({ isPaid }) === "imersao" ? (
+        {/*
+         * F102 — uma faixa por vez no topo, nunca duas empilhadas.
+         *
+         * A Imersão (F088) tem precedência enquanto está no prazo, para todo
+         * mundo menos Elite: é nela que o Elite é vendido, então o PRO
+         * precisa ver. Passado o prazo, ou para quem já é Elite, entra
+         * Bastidores — que é aberta e não tem gate de tier.
+         */}
+        {faixaDoTopo({ isElite }) === "imersao" ? (
           <ClubImersaoBanner />
         ) : (
           <BastidoresBanner />

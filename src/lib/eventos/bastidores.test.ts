@@ -8,31 +8,45 @@ const DEPOIS_DA_IMERSAO = new Date("2026-09-24T10:00:00-03:00");
 describe("faixaDoTopo — uma faixa por vez no topo (F102)", () => {
   it("Free vê a Imersão enquanto ela existe", () => {
     assert.equal(
-      faixaDoTopo({ isPaid: false, agora: DURANTE_IMERSAO }),
+      faixaDoTopo({ isElite: false, agora: DURANTE_IMERSAO }),
       "imersao",
     );
   });
 
-  it("pagante vê Bastidores mesmo durante a Imersão", () => {
-    // A faixa da Imersão sempre foi só para Free (F088). Quem já pagou cai
-    // direto em Bastidores, que é aberta a todo mundo.
+  it("PRO também vê a Imersão — o gate é isElite, não isPaid", () => {
+    // F088 (24/09): a Imersão é onde o Elite é vendido, então esconder a
+    // faixa de quem é PRO tirava dela justamente o público que ainda tem o
+    // que comprar. `isElite: false` cobre Free, `paid` legado e PRO.
     assert.equal(
-      faixaDoTopo({ isPaid: true, agora: DURANTE_IMERSAO }),
+      faixaDoTopo({ isElite: false, agora: DURANTE_IMERSAO }),
+      "imersao",
+    );
+  });
+
+  it("Elite vê Bastidores mesmo durante a Imersão", () => {
+    // Convidar quem já é Elite para o evento que vende Elite seria vender o
+    // que a pessoa tem. Staff cai aqui também (isEliteMembership).
+    assert.equal(
+      faixaDoTopo({ isElite: true, agora: DURANTE_IMERSAO }),
       "bastidores",
     );
   });
 
-  it("Free cai em Bastidores depois que a Imersão passa", () => {
-    assert.equal(
-      faixaDoTopo({ isPaid: false, agora: DEPOIS_DA_IMERSAO }),
-      "bastidores",
-    );
+  it("depois que a Imersão passa, todo mundo cai em Bastidores", () => {
+    for (const isElite of [true, false]) {
+      assert.equal(
+        faixaDoTopo({ isElite, agora: DEPOIS_DA_IMERSAO }),
+        "bastidores",
+      );
+    }
   });
 
   it("nunca devolve as duas — o retorno é uma faixa só", () => {
-    for (const isPaid of [true, false]) {
+    for (const isElite of [true, false]) {
       for (const agora of [DURANTE_IMERSAO, DEPOIS_DA_IMERSAO]) {
-        assert.ok(["imersao", "bastidores"].includes(faixaDoTopo({ isPaid, agora })));
+        assert.ok(
+          ["imersao", "bastidores"].includes(faixaDoTopo({ isElite, agora })),
+        );
       }
     }
   });
