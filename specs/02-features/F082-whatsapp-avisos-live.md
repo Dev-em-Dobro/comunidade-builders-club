@@ -1,7 +1,7 @@
 # F082 — Botão flutuante: grupo WhatsApp de avisos das lives
 
 ## Status
-**Revogada em 2026-09-21 pela [F099](F099-live-bastidores-publica.md)** — o FAB
+**Revogada em 2026-09-21 pela [F102](F102-live-bastidores-publica.md)** — o FAB
 saiu do Club, junto com `src/lib/live/whatsapp-grupo.ts` e a env
 `NEXT_PUBLIC_WHATSAPP_AVISOS_LIVE_URL`. O convite ao grupo virou o clique da
 faixa de Bastidores, com link fixo em `src/lib/eventos/bastidores.ts`.

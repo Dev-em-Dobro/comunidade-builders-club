@@ -6,7 +6,7 @@ Hotfix 2026-09-05: faixa e e-mail restritos a tier pago.
 Hotfix 2026-09-07: restritos de novo, agora só a **Elite** — o PRO não tem a
 reunião semanal na oferta (ver [Quem vê / quem recebe](#quem-vê--quem-recebe)).
 
-**2026-09-21 — a faixa saiu**, por [F099](F099-live-bastidores-publica.md): o
+**2026-09-21 — a faixa saiu**, por [F102](F102-live-bastidores-publica.md): o
 topo do Club passou a ser da live pública de quinta. Do que esta spec descreve,
 continua valendo **só o lembrete por e-mail** (véspera e pouco antes, mesmas
 regras de elegibilidade). Caíram junto o botão "Marcar na agenda" — que só

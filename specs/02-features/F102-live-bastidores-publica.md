@@ -1,21 +1,21 @@
-# F099 — Bastidores: a live pública de quinta assume o topo do Club
+# F102 — Bastidores: a live pública de quinta assume o topo do Club
 
 ## Status
-Implementada no código — 2026-09-21. Branch
-`feature/F099-live-bastidores-publica` (base `main` `31c39cd`). Falta validar em
-Preview/HML.
 
-**Subiu com as artes provisórias cortadas** (decisão 6.5.4): as três peças
-definitivas de 6.2/6.3 ainda não existem. Com o crop, o critério 8 (CTA a ≥14px
-em 390px) **não é cumprido** — o que o garante hoje é a faixa inteira ser o
-link, não o botão desenhado.
+Implementada — 2026-09-24. Branch `feature/F102-live-bastidores-publica`
+(base `main` `75a2220`). Falta validar em Preview/HML.
+
+**A faixa é HTML, não imagem** (decisão 6). As duas artes provisórias em WebP
+foram removidas do repositório junto com o `alt` que duplicava a copy.
+
+Renumerada de F099 para F102 em 2026-09-24: `F099` já tinha sido usado por
+`F099-aula-texto-precificacao-gpt-maker`, que entrou na `main` antes desta.
 
 Muda comportamento de: [F079](F079-aviso-live-faixa-agenda-email.md) (faixa da
 live semanal sai do topo) e [F082](F082-whatsapp-avisos-live.md) (FAB de
 WhatsApp sai).
 Divide o slot do topo com: [F088](F088-banner-imersao-free.md) (faixa da
-Imersão, com prazo até 24/09).
-Reaproveita o padrão de arte da [F091](F091-cta-upgrade-descricao-aula.md).
+Imersão, com prazo até 24/09 — já vencido).
 
 ## Contexto
 
@@ -100,101 +100,87 @@ Ordem: **Imersão ganha enquanto `imersaoAtiva()`**; Bastidores aparece para tod
 o resto e assume o slot inteiro depois do dia 24. Uma faixa por vez — nunca as
 duas empilhadas.
 
-### 6. A arte, e por que a peça mobile precisa mudar
+### 6. A faixa é HTML, não imagem
 
-Padrão da F091: PNG vira WebP q90 em `public/banners/`, servido por
-`<Image unoptimized>` — mas aqui em **três** versões, não duas (ver 6.1).
+A primeira entrega usou duas artes em WebP e não sobreviveu. O motivo é
+geométrico: o shell tira **260px de sidebar a partir de 768px**
+(`app-shell-client.tsx:457`), então a faixa **encolhe de 767px para 508px
+exatamente quando a tela cresce**. A caixa que a arte precisa preencher varia
+de 2,1:1 (celular) a 11:1 (monitor largo), e nenhuma peça de proporção fixa
+cobre isso:
 
-A conta que decide o corte:
+- servindo a arte inteira (`h-auto`), o tipo renderizava a **7–9px**;
+- cortando com altura fixa + `object-cover`, sumia **60% da peça** no tablet.
 
-```
-fonte renderizada = (fonte na arte ÷ largura da arte) × largura da faixa
-```
+A versão anterior desta decisão especificava três peças de arte, com canvas,
+tipografia mínima e zona de segurança para cada uma. **Está descartada.** Era
+um remendo caro para um problema que o HTML não tem.
 
-A faixa nunca tem a largura da tela — o shell tira 260px de sidebar em `md+`
-(`app-shell-client.tsx:464`).
+#### 6.1 Container query, não `md:`
 
-| Peça | Arquivo | Elemento | Proporção da largura | Faixa real | Renderiza |
-|---|---|---|---|---|---|
-| Wide | 3840×600 (1920×300 @2x) | título | ~2,1% | 1660px (tela de 1920) | ~35px ✅ |
-| Wide | | parágrafo | ~0,55% | 1660px | **~9px** ❌ |
-| Mobile | 1600×680 (800×340 @2x) | título | ~5,9% | 390px (celular) | ~23px ✅ |
-| Mobile | | parágrafo | ~1,9% | 390px | **~7px** ❌ |
-| Mobile | | botão "Entrar no grupo" | ~2,0% | 390px | **~8px** ❌ |
+O ponto que derrubou a primeira tentativa em HTML também: `md:` mede o
+**viewport**, e 768px é justamente onde a sidebar entra. O layout largo ligaria
+no mesmo pixel em que a caixa cai para 508px.
 
-(Medido nas artes; ±1px.)
+A faixa usa `@container` e reage à **própria largura**. O corte é `@lg`
+(512px), escolhido para deixar a faixa de 508px — o aperto do tablet — do lado
+estreito. Efeito colateral desejável: a faixa fica correta em qualquer
+superfície onde for reusada, com ou sem sidebar, sem saber nada sobre o shell.
 
-Os títulos aguentam as duas. O parágrafo não aguenta nenhuma, e no celular o
-**CTA** — a única coisa que precisa ser clicada — sai a 8px.
+#### 6.2 Dois arranjos
 
-### 6.1 São **três** peças, não duas
-
-A sidebar tem 260px fixos a partir de 768px (`app-shell-client.tsx:464`). Ou
-seja, a faixa **encolhe** de 767px para 508px justamente quando a tela cresce.
-Isso cria três regimes, e nenhuma arte cobre os três:
-
-| Peça | Viewport | Largura real da faixa |
+| | **Estreito** (< 512px) | **Largo** (≥ 512px) |
 |---|---|---|
-| Mobile | < 640px | 320–639px (sem sidebar) |
-| Intermediária | 640–1179px | 508–919px (sidebar entra em 768) |
-| Wide | ≥ 1180px | 920px+ |
+| Direção | Empilhado | Duas colunas |
+| Badge | À direita do título, na mesma linha | Acima do título |
+| Parágrafo | Não aparece | Sob o título |
+| Calendário | Glifo solto de 12px | Ladrilho verde de 32px |
+| CTA | Barra de largura cheia | Botão de largura automática |
 
-**Não copiar o breakpoint `md:` da F091.** Lá a arte fica dentro da coluna de
-conteúdo da aula; aqui, em 768px, a faixa tem 508px e a arte wide ficaria
-ilegível. Os cortes são 640px e 1180px.
+O badge **não é duplicado no DOM**: no estreito a `justify-between` o empurra
+para a direita; no largo um `flex-col-reverse` inverte a dupla e ele sobe.
 
-### 6.2 Dimensões
+#### 6.3 Teto de altura: 150px
 
-Todas em **CSS (1x)**; exportar em **@2x**, como as artes atuais.
+A faixa divide o topo com o conteúdo do feed e não pode virar outdoor.
+`max-h-[150px]`, com `overflow-hidden` como rede.
 
-| | **Mobile** | **Intermediária** | **Wide** |
-|---|---|---|---|
-| Canvas (1x) | **640 × 300** | **960 × 260** | **1920 × 300** |
-| Exportar (@2x) | **1280 × 600** | **1920 × 520** | **3840 × 600** |
-| Proporção | 2,13:1 | 3,69:1 | 6,4:1 |
-| Altura renderizada | 150px (320) · 183px (390) · 300px (639) | 138px (508) · 208px (767) · 249px (919) | 144px (920) · 259px (1920) · 359px (2560) |
-| Pior caso de escala | 0,50 (tela de 320) | 0,53 (faixa de 508) | 0,48 (faixa de 920) |
+Alturas reais medidas: **120px** em 390px de faixa, **128px** em 764px,
+**135px** em 1180px.
 
-Só a **wide** mantém o canvas atual (3840×600). As outras duas mudam.
+O teto é apertado e **toda a escala tipográfica está calibrada contra ele**:
 
-### 6.3 Tipografia mínima, por peça
+| Elemento | Estreito | Largo |
+|---|---|---|
+| Título | 16–17px | 20px (23px em ≥ 896px) |
+| Badge | 8px | 8px |
+| Parágrafo | — | 11,5px |
+| Data | 11px | 12px |
+| CTA | 11px | 12px |
 
-Tamanho **no canvas 1x** (dobra no arquivo @2x). Cada número é o mínimo para o
-elemento render legível no **pior caso** da coluna acima.
+**Subir qualquer um desses valores sem remedir estoura a caixa**, e o
+`overflow-hidden` corta o CTA em silêncio. Foi o que aconteceu duas vezes
+durante a implementação.
 
-| Elemento | Mobile (canvas 640) | Intermediária (canvas 960) | Wide (canvas 1920) |
-|---|---|---|---|
-| Título | **60px** | **53px** | **59px** |
-| Parágrafo / apoio | **28px** | **25px** | **28px** |
-| "Toda quinta · às 20h" | **40px** | **34px** | **38px** |
-| Texto do botão | **30px** | **27px** | **32px** |
-| Altura do botão | **88px** | **76px** | **84px** |
-| Margem de segurança | 48px | 38px | 64px |
+#### 6.4 O que o HTML resolveu de graça
 
-A arte wide atual tem título ~52px e parágrafo ~21px no canvas de 1920 — os dois
-abaixo do mínimo. O parágrafo precisa subir ~33%.
+- **Acessibilidade**: o texto é DOM. Sem `alt` espelhando copy, sem risco de
+  os dois saírem de sincronia.
+- **Peso**: −220KB de WebP.
+- **Manutenção**: trocar a copy da campanha é editar `bastidores.ts`. Não passa
+  por editor de imagem nem por novo deploy de asset.
+- **Nitidez**: sem reamostragem em nenhuma densidade de tela.
 
-A altura do botão existe para alvo de toque: 88px no canvas mobile = 44px de
-dedo na tela de 320px.
+#### 6.5 O que ele custou
 
-### 6.4 Zona de segurança
-
-- **Wide**: título, data e botão dentro dos **62% à esquerda**. Em telas muito
-  largas a faixa passa de 350px de altura, e a implementação corta pela direita
-  (`max-h` + `object-position: left`) — o que for essencial não pode estar lá.
-- **Mobile e intermediária**: os dois rostos no terço direito, pelo mesmo
-  motivo.
-
-### 6.5 Regras que valem para as três
-
-1. Entregar **PNG** (viram WebP q90 em `public/banners/`, convenção da F091).
-   Alvo de peso: < 250KB por peça depois da conversão.
-2. **Tema claro**: as artes são escuras e continuam escuras nos dois temas.
-   Consciente, mesma natureza da nota que a F086 deixou sobre o painel do login.
-3. **`alt` obrigatório e completo**: todo o texto está dentro do PNG. O `alt`
-   repete título, "toda quinta às 20h" e o CTA.
-4. Enquanto as peças novas não vierem, a implementação usa as duas artes atuais
-   com crop à esquerda — o texto e o botão sobrevivem, os rostos não.
+- **Os dois rostos saíram.** Eram foto, e foto não vira CSS. A faixa é tipo,
+  cor e um motivo geométrico em SVG.
+- **A faixa é escura nos dois temas**, como as artes eram. Consciente, mesma
+  natureza da nota que a F086 deixou sobre o painel do login. Por isso as cores
+  do componente são literais e não token: `bg-accent` viraria verde-claro no
+  tema claro e mataria o contraste do texto branco.
+- **O parágrafo some abaixo de 512px.** Ali ele competiria com o CTA pelo mesmo
+  espaço vertical, e o CTA é o que precisa sobreviver.
 
 ### 7. Para onde leva
 
@@ -236,23 +222,32 @@ quinta. Sem instrumentação nova nesta entrega.
    ativo, na véspera e pouco antes — sem alteração de regra nem de dedupe.
 5. O FAB verde de WhatsApp não aparece mais, com ou sem env definida.
 6. `/api/nav` não devolve mais `live`, e nenhum `zoomUrl` trafega para o client.
-7. Até 24/09, o Free vê a faixa da Imersão (não a de Bastidores); PRO e Elite
-   veem a de Bastidores. Depois do prazo, todo mundo vê a de Bastidores. Nunca
-   as duas juntas.
-8. Num viewport de 390px, o texto do CTA renderiza a **≥14px**; num de 320px, o
-   botão da arte renderiza com **≥44px de altura** (alvo de toque). A peça
-   mobile atual não cumpre nenhum dos dois (decisão 6.3).
-9. A faixa tem `alt` com título, dia/hora e CTA.
-10. `npm run build` e `npm test` passam; sem import órfão de
+7. Enquanto a Imersão estiver no prazo, o Free vê a faixa dela (não a de
+   Bastidores); PRO e Elite veem a de Bastidores. Depois do prazo, todo mundo
+   vê a de Bastidores. Nunca as duas juntas.
+8. **A faixa nunca passa de 150px de altura**, em nenhuma largura de 320px a
+   2560px, e nada do conteúdo é cortado pelo `overflow-hidden`. Medido em
+   320/390/508/764/1180/1660px de faixa.
+9. **Título, dia, hora e CTA são texto no DOM** — não imagem, não `alt`,
+   não `background-image`. Um leitor de tela lê a faixa sem depender de
+   atributo espelhado.
+10. O arranjo troca pela **largura da faixa**, não pela do viewport: em
+    viewport de 768px (faixa de 508px, sidebar presente) vale o layout
+    estreito, não o largo.
+11. `public/banners/bastidores-*.webp` não existem mais, e nada importa
+    `BASTIDORES_BANNER` nem `BASTIDORES.alt`.
+12. `npm run build` e `npm test` passam; sem import órfão de
     `whatsapp-grupo`/`LiveBanner`.
 
 ## Pendências (dependem do Ricardo)
 
-- **As três peças de arte** nas dimensões e tipografia mínima de 6.2 e 6.3. A
-  wide mantém o canvas atual (3840×600) e só corrige o tipo; mobile e
-  intermediária são peças novas. Sem elas, a faixa sobe com as artes atuais
-  cortadas à esquerda (6.5.4).
 - **Confirmar que o link do Sendflow** é o destino do público Free (e não um
   grupo só de aluno).
 - **A live de terça fica sem aviso nenhum dentro do produto.** Confirmado que o
   e-mail basta por ora.
+- **Os dois rostos não existem mais na faixa** (decisão 6.5). Se a peça precisar
+  deles de volta, é um PNG recortado com fundo transparente, posicionado à
+  direita e só em `@lg+` — não volta a ser a faixa inteira em imagem.
+- **Superfícies deslogadas continuam sem a faixa** (ver Fora de escopo). Agora
+  que ela é um componente que se adapta sozinho à largura do container, o custo
+  de colocá-la em Presente/login caiu bastante.
