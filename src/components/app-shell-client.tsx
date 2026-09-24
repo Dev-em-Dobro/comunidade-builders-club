@@ -546,8 +546,12 @@ function ShellInner({
       ) : null}
 
       <div className="relative flex min-w-0 flex-1 flex-col">
-        {/* F088 — imersão só Free; F079 — live só Elite. Mutuamente exclusivos por tier. */}
-        {!isPaid ? <ClubImersaoBanner /> : null}
+        {/*
+         * F088 — imersão para todo mundo menos Elite (a imersão vende Elite:
+         * convidar quem já é seria vender o que a pessoa tem). F079 — live só
+         * Elite. Continuam mutuamente exclusivos por tier.
+         */}
+        {!isElite ? <ClubImersaoBanner /> : null}
         {isElite && live ? (
           <LiveBanner liveAt={live.liveAt} calendarUrl={live.calendarUrl} />
         ) : null}
