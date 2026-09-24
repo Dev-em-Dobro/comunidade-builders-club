@@ -539,7 +539,7 @@ function ShellInner({
       ) : null}
 
       <div className="relative flex min-w-0 flex-1 flex-col">
-        {/* F099 — uma faixa por vez: a Imersão (F088, só Free) tem precedência
+        {/* F102 — uma faixa por vez: a Imersão (F088, só Free) tem precedência
             enquanto existe; depois disso Bastidores fica com todo mundo. */}
         {faixaDoTopo({ isPaid }) === "imersao" ? (
           <ClubImersaoBanner />
@@ -582,7 +582,7 @@ function ShellInner({
         <main className="flex-1 px-4 py-6 pb-24 md:px-8 md:py-10 md:pb-28">
           {children}
         </main>
-        {/* F099 — o FAB de WhatsApp (F082) saiu daqui: o convite ao grupo
+        {/* F102 — o FAB de WhatsApp (F082) saiu daqui: o convite ao grupo
             agora é o clique da faixa do topo. */}
         <div className="pointer-events-none fixed bottom-5 right-5 z-40 flex flex-col-reverse items-end gap-3 md:bottom-8 md:right-8">
           <div className="pointer-events-auto">

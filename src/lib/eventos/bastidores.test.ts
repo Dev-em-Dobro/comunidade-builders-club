@@ -5,7 +5,7 @@ import { BASTIDORES, faixaDoTopo } from "./bastidores";
 const DURANTE_IMERSAO = new Date("2026-09-22T10:00:00-03:00");
 const DEPOIS_DA_IMERSAO = new Date("2026-09-24T10:00:00-03:00");
 
-describe("faixaDoTopo — uma faixa por vez no topo (F099)", () => {
+describe("faixaDoTopo — uma faixa por vez no topo (F102)", () => {
   it("Free vê a Imersão enquanto ela existe", () => {
     assert.equal(
       faixaDoTopo({ isPaid: false, agora: DURANTE_IMERSAO }),
@@ -38,17 +38,28 @@ describe("faixaDoTopo — uma faixa por vez no topo (F099)", () => {
   });
 });
 
-describe("BASTIDORES — destino e acessibilidade (F099)", () => {
+describe("BASTIDORES — destino e copy (F102)", () => {
   it("o link é https", () => {
     assert.equal(new URL(BASTIDORES.url).protocol, "https:");
   });
 
-  it("o alt descreve dia e hora, que só existem dentro da arte", () => {
-    assert.match(BASTIDORES.alt, /quinta/i);
-    assert.match(BASTIDORES.alt, /20h/);
+  it("dia e hora existem como texto, não dentro de imagem", () => {
+    // A faixa é HTML: estes dois campos viram nós de texto no DOM, e é isso
+    // que um leitor de tela lê. Se voltarem a ser imagem, volta o `alt`.
+    assert.match(BASTIDORES.quando, /quinta/i);
+    assert.match(BASTIDORES.horario, /20h/);
   });
 
-  it("o alt termina no CTA, que é o que o clique faz", () => {
-    assert.ok(BASTIDORES.alt.includes(BASTIDORES.cta));
+  it("as duas linhas do título reconstroem o nome da live", () => {
+    // O título quebra em duas linhas por desenho; juntas têm que dar o nome
+    // canônico, senão a faixa anuncia uma coisa e o domínio chama de outra.
+    assert.equal(
+      `${BASTIDORES.tituloLinha1} ${BASTIDORES.tituloLinha2}`,
+      BASTIDORES.nome,
+    );
+  });
+
+  it("o CTA diz o que o clique faz", () => {
+    assert.match(BASTIDORES.cta, /grupo/i);
   });
 });
