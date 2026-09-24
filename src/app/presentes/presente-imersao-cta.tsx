@@ -5,8 +5,8 @@ import { IMERSAO_IA, imersaoAtiva, imersaoHref } from "@/lib/eventos/imersao-ia"
  *
  * É a única coisa que fica **acima** do artigo. A F063 diz que a oferta nunca
  * vem antes do conteúdo; a exceção aqui é de prazo, não de gosto: evento com
- * data não adianta convidar depois. Passou de `terminaEm`, isto devolve `null`
- * e a página volta a abrir no título.
+ * data não adianta convidar depois. Faltando menos de uma hora para a primeira
+ * noite, isto devolve `null` e a página volta a abrir no título.
  *
  * A oferta do Club (PRO/Elite, cadastro, preço de plano) continua embaixo, no
  * `PresentePromessa`. Nada disso sobe.

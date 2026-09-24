@@ -7,6 +7,9 @@ import { sanitizeUtmValue } from "@/lib/gifts/origem";
  * a faixa é datada e precisa sumir sozinha (decisão 1), e a copy é espelho
  * da landing — quando ela mudar, muda um objeto, num arquivo (decisão 2).
  *
+ * O prazo fecha **uma hora antes da primeira noite** (correção de 24/09/2026):
+ * quem compra com a imersão já no ar perde a aula que pagou.
+ *
  * Superfícies: Presente (`utm_medium=presente`, F077) e banner Free no Club
  * (`utm_medium=club-banner`, F088).
  *
@@ -26,11 +29,25 @@ export const IMERSAO_IA = {
   cta: "Quero minha vaga",
   url: "https://imersao-ia.devemdobro.com/v1",
   /**
-   * Meia-noite depois da segunda aula, no fuso do Brasil. O `-03:00` é
-   * obrigatório: servidor em UTC apagaria a faixa três horas antes da hora.
+   * Início da primeira noite, no fuso do Brasil. O `-03:00` é obrigatório:
+   * servidor em UTC fecharia a faixa três horas antes da hora.
+   *
+   * É o único botão de prazo: a faixa fecha `ANTECEDENCIA_MS` antes disto.
    */
-  terminaEm: new Date("2026-09-24T00:00:00-03:00"),
+  comecaEm: new Date("2026-09-22T19:30:00-03:00"),
 } as const;
+
+/**
+ * A faixa fecha uma hora antes da primeira noite, não depois da última.
+ * Vender no dia 23 é vender uma imersão de duas noites com a primeira
+ * perdida — o convite tem que morrer antes de virar prejuízo.
+ */
+const ANTECEDENCIA_MS = 60 * 60 * 1000;
+
+/** Quando a faixa some. Derivado de `comecaEm`, não escrito à mão. */
+export function imersaoFechaEm(): Date {
+  return new Date(IMERSAO_IA.comecaEm.getTime() - ANTECEDENCIA_MS);
+}
 
 const UTM_SOURCE = "builders-club";
 const UTM_CAMPAIGN = "imersao-ia";
@@ -38,9 +55,9 @@ const UTM_CAMPAIGN = "imersao-ia";
 /** Medium que distingue a superfície: Presente (F077) vs banner do Club (F088). */
 export type ImersaoUtmMedium = "presente" | "club-banner";
 
-/** Passou da segunda aula, a faixa não aparece mais. */
+/** Faltando menos de uma hora para a primeira noite, a faixa não aparece mais. */
 export function imersaoAtiva(agora: Date = new Date()): boolean {
-  return agora.getTime() < IMERSAO_IA.terminaEm.getTime();
+  return agora.getTime() < imersaoFechaEm().getTime();
 }
 
 /**

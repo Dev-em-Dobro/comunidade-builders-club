@@ -1,28 +1,36 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { IMERSAO_IA, imersaoAtiva, imersaoHref } from "./imersao-ia";
+import { IMERSAO_IA, imersaoAtiva, imersaoFechaEm, imersaoHref } from "./imersao-ia";
 
 describe("imersaoAtiva — prazo da faixa (F077)", () => {
-  it("está ativa antes da primeira aula", () => {
+  it("está ativa dias antes da primeira noite", () => {
     assert.equal(imersaoAtiva(new Date("2026-09-02T10:00:00-03:00")), true);
   });
 
-  it("continua ativa durante a segunda aula", () => {
-    assert.equal(imersaoAtiva(new Date("2026-09-23T20:30:00-03:00")), true);
+  it("está ativa até uma hora e um minuto antes da primeira noite", () => {
+    assert.equal(imersaoAtiva(new Date("2026-09-22T18:29:00-03:00")), true);
   });
 
-  it("some depois da meia-noite seguinte à segunda aula", () => {
-    assert.equal(imersaoAtiva(new Date("2026-09-24T00:01:00-03:00")), false);
+  it("fecha exatamente uma hora antes da primeira noite", () => {
+    assert.equal(imersaoAtiva(new Date("2026-09-22T18:30:00-03:00")), false);
+  });
+
+  it("não volta no intervalo entre as duas noites", () => {
+    // Regra de 24/09/2026: quem compra no dia 23 já perdeu a primeira aula.
+    assert.equal(imersaoAtiva(new Date("2026-09-23T12:00:00-03:00")), false);
   });
 
   it("respeita o fuso do Brasil, não o UTC do servidor", () => {
-    // 23/09 22h em Brasília é 24/09 01h em UTC. Sem o -03:00 no literal, a
-    // faixa sumiria com a imersão ainda no ar.
-    assert.equal(imersaoAtiva(new Date("2026-09-24T01:00:00Z")), true);
+    // 22/09 18h em Brasília é 22/09 21h em UTC. Sem o -03:00 no literal, a
+    // faixa fecharia três horas cedo demais.
+    assert.equal(imersaoAtiva(new Date("2026-09-22T21:00:00Z")), true);
   });
 
-  it("o prazo é meia-noite de 24/09 no horário de Brasília", () => {
-    assert.equal(IMERSAO_IA.terminaEm.toISOString(), "2026-09-24T03:00:00.000Z");
+  it("o fechamento é derivado do início, não escrito à mão", () => {
+    assert.equal(
+      imersaoFechaEm().getTime(),
+      IMERSAO_IA.comecaEm.getTime() - 60 * 60 * 1000,
+    );
   });
 });
 

@@ -1,10 +1,10 @@
 import { IMERSAO_IA, imersaoAtiva, imersaoHref } from "@/lib/eventos/imersao-ia";
 
 /**
- * F088 — faixa da Imersão no app shell, só para Free.
+ * F088 — faixa da Imersão no app shell, para todo mundo menos Elite.
  *
- * O gate de tier fica no shell (`!isPaid`). Aqui só o prazo: passou de
- * `terminaEm`, some sozinho (mesma regra da F077).
+ * O gate de tier fica no shell (`!isElite`). Aqui só o prazo: faltando menos de
+ * uma hora para a primeira noite, some sozinho (mesma regra da F077).
  */
 export function ClubImersaoBanner() {
   if (!imersaoAtiva()) return null;
