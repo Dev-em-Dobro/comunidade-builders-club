@@ -1,8 +1,16 @@
 # F082 — Botão flutuante: grupo WhatsApp de avisos das lives
 
 ## Status
-Implementada no código — 2026-09-08 · **só HML / `feature/preview`** até existir o
-link definitivo do grupo.
+**Revogada em 2026-09-21 pela [F102](F102-live-bastidores-publica.md)** — o FAB
+saiu do Club, junto com `src/lib/live/whatsapp-grupo.ts` e a env
+`NEXT_PUBLIC_WHATSAPP_AVISOS_LIVE_URL`. O convite ao grupo virou o clique da
+faixa de Bastidores, com link fixo em `src/lib/eventos/bastidores.ts`.
+
+Nunca chegou a produção: a env só foi definida em HML, como o próprio status
+abaixo previa. O texto fica como histórico do desenho.
+
+_Histórico: implementada no código em 2026-09-08 · **só HML /
+`feature/preview`** até existir o link definitivo do grupo._
 
 ## Objetivo
 Chamar o membro para entrar no grupo/comunidade de WhatsApp onde saem os

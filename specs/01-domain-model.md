@@ -30,7 +30,8 @@ Diagnóstico, Outreach, Entregável — este último só na Fase 2 de migração
 | **Ativação pagante** | Post com link público no Desafio Projetos (`projetos`) em até 7 dias da entrada (F057). |
 | **Ativação Free** | Primeira busca (coleta de Lead) no Orion em até 3 dias da entrada (F057). |
 | **Régua de contato** | E-mail transacional quando o membro some (F075: 48h sem abrir o Club; F084: 7d sem amostra no Desafio Projetos; 14d sem post/comentário/reação/aula). |
-| **Live** | Encontro semanal ao vivo (regra padrão: terça 20h, com exceção pontual). Aviso automático: faixa fixa no Club + lembrete por e-mail na véspera e pouco antes (F079). Convite ao grupo WhatsApp de avisos: FAB F082 (`NEXT_PUBLIC_WHATSAPP_AVISOS_LIVE_URL`). |
+| **Live semanal** | Encontro semanal ao vivo, benefício da oferta **Elite** (regra padrão: terça 20h, com exceção pontual). Tem gravação. Aviso: lembrete por e-mail na véspera e pouco antes (F079). Desde a F102 **não tem faixa no Club** — o aviso é só por e-mail. |
+| **Bastidores** | Live **aberta a qualquer pessoa**, toda quinta às 20h, no Zoom (F102). Não é entrega de plano: é topo de funil. Quem assiste **não leva gravação** — gravação é benefício de aluno pagante. Aviso: faixa no topo do Club, que leva ao grupo de WhatsApp. Não confundir com a Live semanal; "live", sozinho, é ambíguo e não deve ser usado. |
 
 ## Spaces iniciais (seed)
 
