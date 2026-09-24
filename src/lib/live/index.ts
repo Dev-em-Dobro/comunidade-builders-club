@@ -12,4 +12,3 @@ export {
   TRIGGER_VESPERA,
   type RegraLiveSchedule,
 } from "./regras";
-export { urlGrupoWhatsappAvisosLive } from "./whatsapp-grupo";

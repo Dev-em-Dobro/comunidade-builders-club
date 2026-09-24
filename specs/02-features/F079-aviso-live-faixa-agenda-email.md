@@ -6,6 +6,13 @@ Hotfix 2026-09-05: faixa e e-mail restritos a tier pago.
 Hotfix 2026-09-07: restritos de novo, agora só a **Elite** — o PRO não tem a
 reunião semanal na oferta (ver [Quem vê / quem recebe](#quem-vê--quem-recebe)).
 
+**2026-09-21 — a faixa saiu**, por [F102](F102-live-bastidores-publica.md): o
+topo do Club passou a ser da live pública de quinta. Do que esta spec descreve,
+continua valendo **só o lembrete por e-mail** (véspera e pouco antes, mesmas
+regras de elegibilidade). Caíram junto o botão "Marcar na agenda" — que só
+existia na faixa — e o campo `live` de `/api/nav`. O `googleCalendarUrl`
+continua no repositório, sem consumidor, à espera de outra superfície.
+
 > **Era F078 até 04/09/2026.** Duas features nasceram com o mesmo ID, com oito
 > minutos de diferença: esta (spec às 11h31) e a pop-up da aula no Presente
 > (código às 11h39, hoje em [F078](F078-popup-aula-presente.md)). Cada um leu

@@ -13,9 +13,9 @@ import { UpgradeProvider, useUpgrade } from "@/components/upgrade-modal";
 import { UserMenu } from "@/components/user-menu";
 import { isFreeSpaceSlug } from "@/lib/membership/capabilities";
 import { isFreePublishSpace } from "@/lib/spaces/constants";
-import { LiveBanner } from "@/components/live-banner";
 import { ClubImersaoBanner } from "@/components/club-imersao-banner";
-import { WhatsappLiveFab } from "@/components/whatsapp-live-fab";
+import { BastidoresBanner } from "@/components/bastidores-banner";
+import { faixaDoTopo } from "@/lib/eventos/bastidores";
 import {
   ICON_ADMIN,
   ICON_AULAS,
@@ -53,8 +53,6 @@ function OrionIcon() {
 }
 
 type SpaceLink = { id: string; slug: string; name: string };
-/** F079 — resolvido em /api/nav, mesmo request que hidrata os spaces. */
-type LiveInfo = { liveAt: string; calendarUrl: string };
 
 function LockIcon({ className }: { className?: string }) {
   return (
@@ -425,8 +423,6 @@ function ShellInner({
   spaces,
   avatarUrl,
   notifPreview,
-  live,
-  whatsappAvisosLiveUrl,
 }: {
   children: React.ReactNode;
   displayName: string;
@@ -439,9 +435,6 @@ function ShellInner({
   spaces: SpaceLink[];
   avatarUrl?: string | null;
   notifPreview: NotifPreview[];
-  live: LiveInfo | null;
-  /** F082 — null = env vazia, sem FAB. */
-  whatsappAvisosLiveUrl: string | null;
 }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const pathname = usePathname();
@@ -547,14 +540,18 @@ function ShellInner({
 
       <div className="relative flex min-w-0 flex-1 flex-col">
         {/*
-         * F088 — imersão para todo mundo menos Elite (a imersão vende Elite:
-         * convidar quem já é seria vender o que a pessoa tem). F079 — live só
-         * Elite. Continuam mutuamente exclusivos por tier.
+         * F102 — uma faixa por vez no topo, nunca duas empilhadas.
+         *
+         * A Imersão (F088) tem precedência enquanto está no prazo, para todo
+         * mundo menos Elite: é nela que o Elite é vendido, então o PRO
+         * precisa ver. Passado o prazo, ou para quem já é Elite, entra
+         * Bastidores — que é aberta e não tem gate de tier.
          */}
-        {!isElite ? <ClubImersaoBanner /> : null}
-        {isElite && live ? (
-          <LiveBanner liveAt={live.liveAt} calendarUrl={live.calendarUrl} />
-        ) : null}
+        {faixaDoTopo({ isElite }) === "imersao" ? (
+          <ClubImersaoBanner />
+        ) : (
+          <BastidoresBanner />
+        )}
         <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-border/80 bg-background/85 px-4 py-3 backdrop-blur-md md:hidden">
           <button
             type="button"
@@ -591,16 +588,12 @@ function ShellInner({
         <main className="flex-1 px-4 py-6 pb-24 md:px-8 md:py-10 md:pb-28">
           {children}
         </main>
-        {/* F082 — WhatsApp + Nova publicação empilhados no canto inferior direito. */}
+        {/* F102 — o FAB de WhatsApp (F082) saiu daqui: o convite ao grupo
+            agora é o clique da faixa do topo. */}
         <div className="pointer-events-none fixed bottom-5 right-5 z-40 flex flex-col-reverse items-end gap-3 md:bottom-8 md:right-8">
           <div className="pointer-events-auto">
             <NovaPublicacaoFab isAdmin={isAdmin} isPaid={isPaid} />
           </div>
-          {whatsappAvisosLiveUrl ? (
-            <div className="pointer-events-auto">
-              <WhatsappLiveFab url={whatsappAvisosLiveUrl} />
-            </div>
-          ) : null}
         </div>
       </div>
     </div>
@@ -619,7 +612,6 @@ export function AppShellClient({
   spaces: initialSpaces,
   avatarUrl,
   notifPreview,
-  whatsappAvisosLiveUrl = null,
   hydrateNav = false,
 }: {
   children: React.ReactNode;
@@ -633,8 +625,6 @@ export function AppShellClient({
   spaces: SpaceLink[];
   avatarUrl?: string | null;
   notifPreview: NotifPreview[];
-  /** F082 — URL do grupo; null esconde o FAB. */
-  whatsappAvisosLiveUrl?: string | null;
   /** Busca spaces em /api/nav após o paint (não bloqueia o feed no SSR). */
   hydrateNav?: boolean;
 }) {
@@ -642,7 +632,6 @@ export function AppShellClient({
   const search = useSearchParams();
   const autoOpen = search.get("upgrade") === "1";
   const [spaces, setSpaces] = useState(initialSpaces);
-  const [live, setLive] = useState<LiveInfo | null>(null);
 
   useEffect(() => {
     if (initialSpaces.length > 0) {
@@ -659,8 +648,6 @@ export function AppShellClient({
         if (!res.ok || cancelled) return;
         const data = (await res.json()) as {
           spaces?: SpaceLink[];
-          /** F079 — `null` para free: a live não é entrega do plano gratuito. */
-          live?: LiveInfo | null;
         };
         if (
           !cancelled &&
@@ -668,9 +655,6 @@ export function AppShellClient({
           data.spaces.length > 0
         ) {
           setSpaces(data.spaces);
-        }
-        if (!cancelled && data.live) {
-          setLive(data.live);
         }
       } catch {
         /* ignore */
@@ -696,10 +680,8 @@ export function AppShellClient({
         orionUrl={orionUrl}
         unread={unread}
         spaces={spaces}
-        live={live}
         avatarUrl={avatarUrl}
         notifPreview={notifPreview}
-        whatsappAvisosLiveUrl={whatsappAvisosLiveUrl}
       >
         {children}
       </ShellInner>

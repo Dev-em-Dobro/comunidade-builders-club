@@ -1,5 +1,4 @@
 import { urlOrionApp } from "@/lib/membership/checkout";
-import { urlGrupoWhatsappAvisosLive } from "@/lib/live/whatsapp-grupo";
 import { AppShellClient } from "@/components/app-shell-client";
 
 const EMPTY_SPACES: { id: string; slug: string; name: string }[] = [];
@@ -39,7 +38,6 @@ export function AppShell({
       spaces={EMPTY_SPACES}
       avatarUrl={avatarUrl}
       notifPreview={[]}
-      whatsappAvisosLiveUrl={urlGrupoWhatsappAvisosLive()}
       hydrateNav
     >
       {children}
