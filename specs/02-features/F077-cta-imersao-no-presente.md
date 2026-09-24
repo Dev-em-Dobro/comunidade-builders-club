@@ -31,7 +31,7 @@ O que separa os dois casos, e o que mantém a regra da F063 de pé:
 |---|---|---|
 | O que vende | o próprio Club (PRO/Elite) | um evento com data, de fora do app |
 | Onde fica | depois do `</article>` | acima do `<article>` |
-| Prazo | permanente | some sozinho em 24/09/2026 |
+| Prazo | permanente | some sozinho 1h antes da 1ª noite (22/09/2026, 18h30) |
 | Forma | bloco de oferta, dois CTAs | faixa de uma linha e meia, um CTA |
 
 A F063 continua valendo para a oferta do Club: **nada de PRO, Elite, preço de
@@ -46,9 +46,19 @@ validade acima do artigo exige spec nova.
 
 ### 1. A faixa tem prazo e some sozinha
 
-`imersaoAtiva(agora)` compara o relógio com `IMERSAO_IA.terminaEm`
-(`2026-09-24T00:00:00-03:00`, meia-noite depois da segunda aula). Passou da
-data, o componente devolve `null` e a página volta a ser o que era.
+`imersaoAtiva(agora)` compara o relógio com `imersaoFechaEm()` — uma hora antes
+de `IMERSAO_IA.comecaEm` (`2026-09-22T19:30:00-03:00`, a primeira noite).
+Passou da hora, o componente devolve `null` e a página volta a ser o que era.
+
+**Correção de 24/09/2026:** o prazo era meia-noite depois da *segunda* noite.
+Isso deixava a faixa vendendo no dia 23, com a primeira aula já perdida — a
+pessoa pagava por duas noites e recebia uma. O fechamento agora é uma hora
+antes do começo, e a faixa **não volta** no intervalo entre as duas noites.
+A antecedência de 1h é o buffer de inscrição: tempo de comprar, receber o
+e-mail e entrar antes de abrir.
+
+Só existe um botão de prazo: `comecaEm`. O fechamento é derivado dele, nunca
+escrito à mão — na próxima edição muda uma linha.
 
 É a decisão que dispensa alguém lembrar de remover código depois do evento — o
 custo de esquecer é uma página do Presente convidando para uma imersão que já
@@ -144,8 +154,8 @@ cache para envelhecer.
   Mitigação é de forma, não de código: faixa curta, um CTA, o `<h1>` do artigo
   logo abaixo. Se a métrica de leitura do Presente cair durante a imersão, a
   faixa desce para depois do artigo.
-- **Data errada = página envergonhada.** `terminaEm` é a única linha que separa
-  "convite" de "convite para evento que já passou". Está em constante, com
+- **Data errada = página envergonhada.** `comecaEm` é a única linha que separa
+  "convite" de "convite para evento que já começou". Está em constante, com
   teste, e o fuso é explícito.
 - **A landing muda e a faixa mente.** Preço, data ou promessa mudam do lado do
   Dobro sem avisar o código. Conferir `imersao-ia.ts` contra a landing antes de
@@ -155,7 +165,8 @@ cache para envelhecer.
 
 - [x] Spec antes do código
 - [x] Copy, URL e prazo em `src/lib/eventos/imersao-ia.ts`, sem Next
-- [x] `imersaoAtiva` devolve `false` depois de `2026-09-24T00:00:00-03:00`
+- [x] `imersaoAtiva` devolve `false` a partir de 1h antes de `comecaEm` (`2026-09-22T18:30:00-03:00`)
+- [x] `imersaoAtiva` continua `false` no dia 23, entre as duas noites
 - [x] Componente devolve `null` quando `imersaoAtiva` é `false`
 - [x] `imersaoHref` traz as três UTMs fixas e o `utm_content` do path quando existe
 - [x] `utm_content` inválido não entra na URL
