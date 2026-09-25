@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { offerIdsDoEvento } from "./normalizar";
-import { planoDoEventoHubla } from "./produtos";
+import { mapaOfertasHubla, planoDoEventoHubla } from "./produtos";
 
 const CLUB = "prod-club";
 const OFFER_PRO = "offer-pro";
@@ -12,6 +12,57 @@ const offerMap = new Map([
   [OFFER_PRO, "pro" as const],
   [OFFER_ELITE, "elite" as const],
 ]);
+
+describe("mapaOfertasHubla — fallback oficial", () => {
+  it("casa Elite sem HUBLA_OFFER_ID_ELITE", () => {
+    const prevElite = process.env.HUBLA_OFFER_ID_ELITE;
+    const prevPro = process.env.HUBLA_OFFER_ID_PRO;
+    delete process.env.HUBLA_OFFER_ID_ELITE;
+    delete process.env.HUBLA_OFFER_ID_PRO;
+    try {
+      const offerMap = mapaOfertasHubla();
+      assert.equal(
+        planoDoEventoHubla({
+          productId: "VL3e0iDO3A32SyjJWr9S",
+          offerIds: ["v1SsMcVXNip7Mn5A2pNH"],
+          productMap: new Map([["VL3e0iDO3A32SyjJWr9S", "pro"]]),
+          offerMap,
+        }),
+        "elite",
+      );
+      assert.equal(
+        planoDoEventoHubla({
+          productId: "VL3e0iDO3A32SyjJWr9S",
+          offerIds: ["SFykfBk80jkM1sAVJKxV"],
+          productMap: new Map([["VL3e0iDO3A32SyjJWr9S", "pro"]]),
+          offerMap,
+        }),
+        "elite",
+      );
+      assert.equal(
+        planoDoEventoHubla({
+          productId: "VL3e0iDO3A32SyjJWr9S",
+          offerIds: ["1mGgy9MVD11CJdnsLEov"],
+          productMap: new Map([["VL3e0iDO3A32SyjJWr9S", "pro"]]),
+          offerMap,
+        }),
+        "pro",
+      );
+      assert.equal(
+        planoDoEventoHubla({
+          productId: "VL3e0iDO3A32SyjJWr9S",
+          offerIds: ["cXqc4mz6YZFE4GKjGFUz"],
+          productMap: new Map([["VL3e0iDO3A32SyjJWr9S", "pro"]]),
+          offerMap,
+        }),
+        "elite",
+      );
+    } finally {
+      if (prevElite !== undefined) process.env.HUBLA_OFFER_ID_ELITE = prevElite;
+      if (prevPro !== undefined) process.env.HUBLA_OFFER_ID_PRO = prevPro;
+    }
+  });
+});
 
 describe("planoDoEventoHubla — F053", () => {
   it("checkout PRO casa pro", () => {

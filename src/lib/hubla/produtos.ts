@@ -1,6 +1,11 @@
 // F053 — mapa Hubla product/offer id → plano (pro | elite).
 // PRO e Elite são ofertas do mesmo produto Club; o discriminador é offers[].id.
 
+import {
+  HUBLA_OFFER_IDS_ELITE_OFICIAIS,
+  HUBLA_OFFER_IDS_PRO_OFICIAIS,
+} from "@/lib/membership/checkout";
+
 export type PlanoPagoHubla = "pro" | "elite";
 
 function collectIds(raw: string | undefined): string[] {
@@ -31,9 +36,20 @@ export function mapaProdutosHubla(): Map<string, PlanoPagoHubla> {
   return map;
 }
 
-/** Ofertas no mesmo produto Club. Elite sobrescreve se o id coincidir. */
+/**
+ * Ofertas no mesmo produto Club. Elite sobrescreve se o id coincidir.
+ * Sempre inclui os slugs oficiais de `/planos` — o webhook já manda
+ * `offers[].id` igual ao path de pay.hub.la/…; sem isso, falta de env
+ * na Vercel concede PRO para quem comprou Elite.
+ */
 export function mapaOfertasHubla(): Map<string, PlanoPagoHubla> {
   const map = new Map<string, PlanoPagoHubla>();
+  for (const id of HUBLA_OFFER_IDS_PRO_OFICIAIS) {
+    map.set(id, "pro");
+  }
+  for (const id of HUBLA_OFFER_IDS_ELITE_OFICIAIS) {
+    map.set(id, "elite");
+  }
   for (const id of collectIds(process.env.HUBLA_OFFER_ID_PRO)) {
     map.set(id, "pro");
   }

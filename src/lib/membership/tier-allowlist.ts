@@ -1,5 +1,10 @@
 /** F053 hotfix — resolve tier pago a partir da note da allowlist. */
 
+import {
+  HUBLA_OFFER_IDS_ELITE_OFICIAIS,
+  HUBLA_OFFER_IDS_PRO_OFICIAIS,
+} from "@/lib/membership/checkout";
+
 export type TierPagoAllowlist = "pro" | "elite";
 
 function idsEnv(raw: string | undefined): string[] {
@@ -10,11 +15,17 @@ function idsEnv(raw: string | undefined): string[] {
 }
 
 function eliteOfferIds(): Set<string> {
-  return new Set(idsEnv(process.env.HUBLA_OFFER_ID_ELITE));
+  return new Set([
+    ...HUBLA_OFFER_IDS_ELITE_OFICIAIS,
+    ...idsEnv(process.env.HUBLA_OFFER_ID_ELITE),
+  ]);
 }
 
 function proOfferIds(): Set<string> {
-  return new Set(idsEnv(process.env.HUBLA_OFFER_ID_PRO));
+  return new Set([
+    ...HUBLA_OFFER_IDS_PRO_OFICIAIS,
+    ...idsEnv(process.env.HUBLA_OFFER_ID_PRO),
+  ]);
 }
 
 function eliteTmbCodes(): Set<string> {
