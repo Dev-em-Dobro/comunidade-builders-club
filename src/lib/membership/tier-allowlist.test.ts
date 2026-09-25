@@ -48,6 +48,16 @@ describe("tierPagoDaNotaAllowlist — F053 hotfix", () => {
     );
   });
 
+  it("Hubla offer Elite-alunos oficial sem env", () => {
+    delete process.env.HUBLA_OFFER_ID_ELITE;
+    assert.equal(
+      tierPagoDaNotaAllowlist(
+        "product:VL3e0iDO3A32SyjJWr9S offer:SFykfBk80jkM1sAVJKxV",
+      ),
+      "elite",
+    );
+  });
+
   it("Hubla offer PRO via env", () => {
     process.env.HUBLA_OFFER_ID_ELITE = "v1SsMcVXNip7Mn5A2pNH";
     process.env.HUBLA_OFFER_ID_PRO = "XaY8QNfZlOO1XBgjzMfY,6p9QTyJDVj2oAIzHx74E";

@@ -10,7 +10,14 @@ export const PROMESSA_PRIMEIRO_CLIENTE = "Feche o 1º cliente em 90 dias";
 
 /** Slug de checkout Hubla = `offers[].id` no webhook (F053). */
 export const HUBLA_OFFER_ID_PRO_OFICIAL = "XaY8QNfZlOO1XBgjzMfY";
+/** Checkout público Elite em `/planos`. */
 export const HUBLA_OFFER_ID_ELITE_OFICIAL = "v1SsMcVXNip7Mn5A2pNH";
+/** Elite para alunos (checkout próprio, não aparece em `/planos`). */
+export const HUBLA_OFFER_ID_ELITE_ALUNOS = "SFykfBk80jkM1sAVJKxV";
+export const HUBLA_OFFER_IDS_ELITE_OFICIAIS = [
+  HUBLA_OFFER_ID_ELITE_OFICIAL,
+  HUBLA_OFFER_ID_ELITE_ALUNOS,
+] as const;
 
 export const CHECKOUT_PRO_FALLBACK_URL =
   `https://pay.hub.la/${HUBLA_OFFER_ID_PRO_OFICIAL}`;
