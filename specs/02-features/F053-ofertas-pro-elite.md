@@ -100,8 +100,8 @@ Envs:
 | `HUBLA_PRODUCT_ID` | Produto Club — allowlist de `product.id` (legado sem oferta casa **pro**) |
 | `HUBLA_PRODUCT_ID_PRO` | Produto PRO **separado**, se a Hubla criar um |
 | `HUBLA_PRODUCT_ID_ELITE` | Produto Elite **separado**, se a Hubla criar um |
-| `HUBLA_OFFER_ID_PRO` | Offer id(s) do PRO (vírgula se houver cópia + oficial). Preço da oferta na Hubla pode mudar (ex. teste R$ 10) — o id é que conta. |
-| `HUBLA_OFFER_ID_ELITE` | Offer id(s) do Elite. Sem ela, oferta desconhecida no produto Club segue o mapa de produto (`HUBLA_PRODUCT_ID` → **pro**) |
+| `HUBLA_OFFER_ID_PRO` | Offer id(s) do PRO (vírgula se houver cópia + oficiais: BR `XaY8QNfZlOO1XBgjzMfY` e Europa `1mGgy9MVD11CJdnsLEov`). Preço da oferta na Hubla pode mudar — o id é que conta. |
+| `HUBLA_OFFER_ID_ELITE` | Offer id(s) do Elite (vírgula + oficiais: público `v1SsMcVXNip7Mn5A2pNH`, alunos `SFykfBk80jkM1sAVJKxV`, Europa `cXqc4mz6YZFE4GKjGFUz`). Sem ela, oferta desconhecida no produto Club segue o mapa de produto (`HUBLA_PRODUCT_ID` → **pro**) |
 
 Webhook aceita o produto Club (e quaisquer IDs do mapa). Sem nenhum product id
 e sem nenhum offer id → 503 (F021).
@@ -136,9 +136,12 @@ pode forçar `pro` para todo mundo allowlisted.
   1º login lia a `note` `offer:v1SsMcVXNip7Mn5A2pNH` e caía em **pro**.
   Os slugs oficiais de `/planos` passam a ser fallback no mapa de ofertas
   e no `tierPagoDaNotaAllowlist`. A `note` também grava `plan=elite|pro`.
-  Elite tem **duas** ofertas oficiais: checkout público
-  (`v1SsMcVXNip7Mn5A2pNH`) e **Elite — Alunos** (`SFykfBk80jkM1sAVJKxV`,
-  não entra em `/planos`).
+  Elite tem **três** ofertas oficiais: checkout público
+  (`v1SsMcVXNip7Mn5A2pNH`), **Elite — Alunos** (`SFykfBk80jkM1sAVJKxV`)
+  e **Elite Europa** (`cXqc4mz6YZFE4GKjGFUz`, €60). PRO tem **duas**:
+  checkout público (`XaY8QNfZlOO1XBgjzMfY`) e **PRO Europa**
+  (`1mGgy9MVD11CJdnsLEov`, €50). As da Europa e Elite-alunos não entram
+  em `/planos`.
 
 ## UI
 

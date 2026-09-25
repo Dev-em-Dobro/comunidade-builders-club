@@ -2,8 +2,8 @@
 // PRO e Elite são ofertas do mesmo produto Club; o discriminador é offers[].id.
 
 import {
-  HUBLA_OFFER_ID_PRO_OFICIAL,
   HUBLA_OFFER_IDS_ELITE_OFICIAIS,
+  HUBLA_OFFER_IDS_PRO_OFICIAIS,
 } from "@/lib/membership/checkout";
 
 export type PlanoPagoHubla = "pro" | "elite";
@@ -44,7 +44,9 @@ export function mapaProdutosHubla(): Map<string, PlanoPagoHubla> {
  */
 export function mapaOfertasHubla(): Map<string, PlanoPagoHubla> {
   const map = new Map<string, PlanoPagoHubla>();
-  map.set(HUBLA_OFFER_ID_PRO_OFICIAL, "pro");
+  for (const id of HUBLA_OFFER_IDS_PRO_OFICIAIS) {
+    map.set(id, "pro");
+  }
   for (const id of HUBLA_OFFER_IDS_ELITE_OFICIAIS) {
     map.set(id, "elite");
   }
