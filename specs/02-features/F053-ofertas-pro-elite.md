@@ -131,6 +131,11 @@ pode forçar `pro` para todo mundo allowlisted.
 - `addAllowedEmail` recebe `tier` do grant Hubla/TMB e promove conta existente
   sem rebaixar Elite.
 - Exige `HUBLA_OFFER_ID_ELITE` (e `HUBLA_OFFER_ID_PRO`) corretos na Vercel.
+- **Hotfix 2026-09-25:** o `offers[].id` da compra **é** o slug de
+  `pay.hub.la/…` (`v1SsMcVXNip7Mn5A2pNH` = Elite). Sem env na Vercel, o
+  1º login lia a `note` `offer:v1SsMcVXNip7Mn5A2pNH` e caía em **pro**.
+  Os slugs oficiais de `/planos` passam a ser fallback no mapa de ofertas
+  e no `tierPagoDaNotaAllowlist`. A `note` também grava `plan=elite|pro`.
 
 ## UI
 

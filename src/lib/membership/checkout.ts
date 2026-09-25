@@ -8,10 +8,14 @@ import {
 /** Meta de marketing (Presentes / upgrade). Não é garantia de reembolso do Pro. */
 export const PROMESSA_PRIMEIRO_CLIENTE = "Feche o 1º cliente em 90 dias";
 
+/** Slug de checkout Hubla = `offers[].id` no webhook (F053). */
+export const HUBLA_OFFER_ID_PRO_OFICIAL = "XaY8QNfZlOO1XBgjzMfY";
+export const HUBLA_OFFER_ID_ELITE_OFICIAL = "v1SsMcVXNip7Mn5A2pNH";
+
 export const CHECKOUT_PRO_FALLBACK_URL =
-  "https://pay.hub.la/XaY8QNfZlOO1XBgjzMfY";
+  `https://pay.hub.la/${HUBLA_OFFER_ID_PRO_OFICIAL}`;
 export const CHECKOUT_ELITE_FALLBACK_URL =
-  "https://pay.hub.la/v1SsMcVXNip7Mn5A2pNH";
+  `https://pay.hub.la/${HUBLA_OFFER_ID_ELITE_OFICIAL}`;
 
 export type OfferId = "pro" | "elite";
 

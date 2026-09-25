@@ -102,8 +102,8 @@ export async function aplicarAcaoAllowlist(acao: AcaoAllowlist): Promise<void> {
       email: acao.email,
       source: "hubla",
       note: acao.offerId
-        ? `product:${acao.productId} offer:${acao.offerId}`
-        : `product:${acao.productId}`,
+        ? `product:${acao.productId} offer:${acao.offerId}; plan=${acao.plan}`
+        : `product:${acao.productId}; plan=${acao.plan}`,
       tier: acao.plan,
     });
     await concederPago(
