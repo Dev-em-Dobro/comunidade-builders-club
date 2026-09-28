@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 
 const PAID_TIERS = new Set<MembershipTier>(["paid", "pro", "elite"]);
 
-/** Meta de referência: ~40% dos Free-via-presente clicam no grupo das lives. */
+/** Meta de referência: ~40% dos cadastros-via-presente clicam no grupo das lives. */
 export const META_FUNIL_BASTIDORES_PCT = 40;
 
 export type UtmPostPerson = {
@@ -159,8 +159,8 @@ export async function listUtmPostMetrics(): Promise<UtmPostMetric[]> {
 export type BastidoresOrigemMetric = {
   key: string;
   label: string;
-  /** Cadastros Free com essa origem (denominador). */
-  cadastrosFreeComOrigem: number;
+  /** Cadastros com essa origem, qualquer tier (denominador). */
+  cadastrosComOrigem: number;
   /** Cliques no CTA Bastidores com essa origem (numerador). */
   cliquesBastidores: number;
   /** Taxa cliques/cadastros em percentual (null se denominador = 0). */
@@ -168,8 +168,8 @@ export type BastidoresOrigemMetric = {
 };
 
 export type BastidoresFunilSummary = {
-  /** Total de Free com origem (qualquer post). */
-  totalFreeComOrigem: number;
+  /** Total de cadastros com origem, qualquer tier (qualquer post). */
+  totalComOrigem: number;
   /** Total de cliques Bastidores com origem. */
   totalCliquesComOrigem: number;
   /** Taxa geral cliques/cadastros em percentual. */
@@ -188,17 +188,17 @@ function calcTaxa(numerador: number, denominador: number): number | null {
 /**
  * Métricas do funil Presente → Bastidores: taxa de cliques no CTA por origem.
  *
- * Denominador: Free cadastros com origem (Membership origin_*). NÃO usa acessos
- * do GiftVisit (que são aberturas de página, não pessoas).
+ * Denominador: cadastros com origem (Membership origin_*, qualquer tier).
+ * NÃO usa acessos do GiftVisit (que são aberturas de página, não pessoas).
+ * Não filtra por status para consistência com listUtmPostMetrics().
  *
  * Numerador: usuários únicos que clicaram no CTA Bastidores (pessoas, não cliques —
  * o modelo dedupa por dia, mas aqui conta pessoa).
  */
 export async function listBastidoresFunilMetrics(): Promise<BastidoresFunilSummary> {
-  const [freeComOrigem, cliquesComOrigem] = await Promise.all([
+  const [membrosComOrigem, cliquesComOrigem] = await Promise.all([
     prisma.membership.findMany({
       where: {
-        tier: "free",
         OR: [
           { originUtmContent: { not: null } },
           { originGiftSlug: { not: null } },
@@ -246,7 +246,7 @@ export async function listBastidoresFunilMetrics(): Promise<BastidoresFunilSumma
     return b;
   }
 
-  for (const m of freeComOrigem) {
+  for (const m of membrosComOrigem) {
     const k = keyOf(m.originUtmContent, m.originGiftSlug);
     if (k) bucket(k).cadastros.add(m.userId);
   }
@@ -264,17 +264,17 @@ export async function listBastidoresFunilMetrics(): Promise<BastidoresFunilSumma
         : key.startsWith("gift:")
           ? `${key.slice(5)} · sem UTM`
           : key,
-      cadastrosFreeComOrigem: cadastros.size,
+      cadastrosComOrigem: cadastros.size,
       cliquesBastidores: cliques.size,
       taxaPct: calcTaxa(cliques.size, cadastros.size),
     }))
-    .sort((a, b) => b.cadastrosFreeComOrigem - a.cadastrosFreeComOrigem);
+    .sort((a, b) => b.cadastrosComOrigem - a.cadastrosComOrigem);
 
-  const totalCadastros = new Set(freeComOrigem.map((m) => m.userId)).size;
+  const totalCadastros = new Set(membrosComOrigem.map((m) => m.userId)).size;
   const totalCliques = new Set(cliquesComOrigem.map((c) => c.userId)).size;
 
   return {
-    totalFreeComOrigem: totalCadastros,
+    totalComOrigem: totalCadastros,
     totalCliquesComOrigem: totalCliques,
     taxaGeralPct: calcTaxa(totalCliques, totalCadastros),
     metaReferenciaPct: META_FUNIL_BASTIDORES_PCT,
