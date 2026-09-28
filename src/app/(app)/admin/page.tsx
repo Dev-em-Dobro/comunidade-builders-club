@@ -405,9 +405,9 @@ export default async function AdminPage({ searchParams }: Props) {
                 Funil lives (Bastidores)
               </h3>
               <p className="mt-1 text-sm text-muted">
-                Free cadastrados via presente que clicaram no CTA Bastidores.
-                Proxy para quem entrou no grupo das lives — o clique não
-                confirma join no WhatsApp.
+                Cadastros com origem que clicaram no CTA Bastidores. Proxy para
+                quem entrou no grupo das lives — o clique não confirma join no
+                WhatsApp.
               </p>
               <AdminFunilLives data={funilLives} />
             </>
