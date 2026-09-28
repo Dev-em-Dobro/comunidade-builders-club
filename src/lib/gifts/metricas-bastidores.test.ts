@@ -39,19 +39,19 @@ describe("calcTaxa helper — internals via export check", () => {
 describe("BastidoresFunilSummary shape", () => {
   it("tipo exportado tem campos obrigatórios (compile-time check)", () => {
     const summary: {
-      totalFreeComOrigem: number;
+      totalComOrigem: number;
       totalCliquesComOrigem: number;
       taxaGeralPct: number | null;
       metaReferenciaPct: number;
       porOrigem: Array<{
         key: string;
         label: string;
-        cadastrosFreeComOrigem: number;
+        cadastrosComOrigem: number;
         cliquesBastidores: number;
         taxaPct: number | null;
       }>;
     } = {
-      totalFreeComOrigem: 100,
+      totalComOrigem: 100,
       totalCliquesComOrigem: 40,
       taxaGeralPct: 40,
       metaReferenciaPct: 40,
@@ -59,14 +59,14 @@ describe("BastidoresFunilSummary shape", () => {
         {
           key: "utm:test",
           label: "test",
-          cadastrosFreeComOrigem: 50,
+          cadastrosComOrigem: 50,
           cliquesBastidores: 20,
           taxaPct: 40,
         },
       ],
     };
 
-    assert.equal(summary.totalFreeComOrigem, 100);
+    assert.equal(summary.totalComOrigem, 100);
     assert.equal(summary.porOrigem.length, 1);
   });
 });

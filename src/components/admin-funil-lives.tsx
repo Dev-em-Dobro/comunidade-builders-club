@@ -31,15 +31,15 @@ export function AdminFunilLives({ data }: { data: BastidoresFunilSummary }) {
       <div className="post-card !p-4">
         <p className="text-sm font-semibold">Resumo geral</p>
         <p className="mt-1 text-xs text-muted">
-          Free cadastrados via presente que clicaram no CTA Bastidores. Meta de
+          Cadastros via presente que clicaram no CTA Bastidores. Meta de
           referência: ~{data.metaReferenciaPct}%.
         </p>
         <div className="mt-3 flex flex-wrap gap-4 text-sm">
           <div>
             <p className="text-xs uppercase tracking-wide text-muted">
-              Free com origem
+              Com origem
             </p>
-            <p className="text-lg font-bold">{data.totalFreeComOrigem}</p>
+            <p className="text-lg font-bold">{data.totalComOrigem}</p>
           </div>
           <div>
             <p className="text-xs uppercase tracking-wide text-muted">
@@ -67,7 +67,7 @@ export function AdminFunilLives({ data }: { data: BastidoresFunilSummary }) {
               <tr>
                 <th className="py-1.5 pr-3 font-medium">Origem (post)</th>
                 <th className="py-1.5 pr-3 font-medium text-right">
-                  Free cadastros
+                  Cadastros
                 </th>
                 <th className="py-1.5 pr-3 font-medium text-right">
                   Cliques Bastidores
@@ -80,7 +80,7 @@ export function AdminFunilLives({ data }: { data: BastidoresFunilSummary }) {
                 <tr key={r.key} className="border-t border-border">
                   <td className="py-2 pr-3 font-mono text-xs">{r.label}</td>
                   <td className="py-2 pr-3 text-right">
-                    {r.cadastrosFreeComOrigem}
+                    {r.cadastrosComOrigem}
                   </td>
                   <td className="py-2 pr-3 text-right">{r.cliquesBastidores}</td>
                   <td className="py-2 text-right">

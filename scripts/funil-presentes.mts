@@ -120,22 +120,21 @@ function imprimir(titulo: string, linhas: Linha[]): void {
 }
 
 // ---------------------------------------------------------------------------
-// Funil Bastidores: Free-com-origem → clique no CTA "Entrar no grupo"
+// Funil Bastidores: cadastros-com-origem (qualquer tier) → clique no CTA "Entrar no grupo"
 // ---------------------------------------------------------------------------
 
 const META_BASTIDORES_PCT = 40;
 
 type LinhaBastidores = {
   post: string;
-  freeComOrigem: number;
+  cadastrosComOrigem: number;
   cliquesBastidores: number;
 };
 
 async function funilBastidores(prisma: PrismaClient): Promise<LinhaBastidores[]> {
-  const [freeComOrigem, cliques] = await Promise.all([
+  const [membrosComOrigem, cliques] = await Promise.all([
     prisma.membership.findMany({
       where: {
-        tier: "free",
         OR: [
           { originUtmContent: { not: null } },
           { originGiftSlug: { not: null } },
@@ -159,7 +158,7 @@ async function funilBastidores(prisma: PrismaClient): Promise<LinhaBastidores[]>
   const chave = (utm: string | null, slug: string | null) =>
     utm ?? slug ?? "(sem origem)";
 
-  for (const m of freeComOrigem) {
+  for (const m of membrosComOrigem) {
     const k = chave(m.originUtmContent, m.originGiftSlug);
     let bucket = mapa.get(k);
     if (!bucket) {
@@ -182,18 +181,18 @@ async function funilBastidores(prisma: PrismaClient): Promise<LinhaBastidores[]>
   return [...mapa.entries()]
     .map(([post, { cadastros, cliques }]) => ({
       post,
-      freeComOrigem: cadastros.size,
+      cadastrosComOrigem: cadastros.size,
       cliquesBastidores: cliques.size,
     }))
-    .sort((a, b) => b.freeComOrigem - a.freeComOrigem);
+    .sort((a, b) => b.cadastrosComOrigem - a.cadastrosComOrigem);
 }
 
 function imprimirBastidores(linhas: LinhaBastidores[]): void {
-  const totalFree = linhas.reduce((s, l) => s + l.freeComOrigem, 0);
+  const totalCadastros = linhas.reduce((s, l) => s + l.cadastrosComOrigem, 0);
   const totalCliques = linhas.reduce((s, l) => s + l.cliquesBastidores, 0);
-  const taxa = totalFree > 0 ? ((totalCliques / totalFree) * 100).toFixed(1) : "—";
+  const taxa = totalCadastros > 0 ? ((totalCliques / totalCadastros) * 100).toFixed(1) : "—";
 
-  console.log("\n--- Funil Bastidores (Free-com-origem → clique no grupo) ---");
+  console.log("\n--- Funil Bastidores (cadastros-com-origem → clique no grupo) ---");
   console.log(`Meta de referência: ~${META_BASTIDORES_PCT}%`);
   if (linhas.length === 0) {
     console.log("  (sem cliques registrados)");
@@ -202,13 +201,13 @@ function imprimirBastidores(linhas: LinhaBastidores[]): void {
   console.table(
     linhas.map((l) => ({
       post: l.post,
-      freeComOrigem: l.freeComOrigem,
+      cadastrosComOrigem: l.cadastrosComOrigem,
       cliquesBastidores: l.cliquesBastidores,
-      taxa: pct(l.cliquesBastidores, l.freeComOrigem),
+      taxa: pct(l.cliquesBastidores, l.cadastrosComOrigem),
     })),
   );
   console.log(
-    `  TOTAL: ${totalFree} Free-com-origem → ${totalCliques} cliques = ${taxa}%`,
+    `  TOTAL: ${totalCadastros} cadastros-com-origem → ${totalCliques} cliques = ${taxa}%`,
   );
 }
 
