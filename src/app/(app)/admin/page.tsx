@@ -8,7 +8,7 @@ import {
 } from "@/lib/admin/members";
 import { listAllowedEmails } from "@/lib/membership/allowlist";
 import { listAllModulesAdmin } from "@/lib/aulas";
-import { listUtmPostMetrics } from "@/lib/gifts/metricas";
+import { listUtmPostMetrics, listBastidoresFunilMetrics } from "@/lib/gifts/metricas";
 import { listGiftPostsAdmin } from "@/lib/gifts";
 import {
   addAllowedEmailAction,
@@ -24,6 +24,7 @@ import { AdminBulkAllowlist } from "@/components/admin-bulk-allowlist";
 import { AdminAulasPanel } from "@/components/admin-aulas-panel";
 import { AdminGiftLinks } from "@/components/admin-gift-links";
 import { AdminGiftMetrics } from "@/components/admin-gift-metrics";
+import { AdminFunilLives } from "@/components/admin-funil-lives";
 import { AdminEmailMetrics } from "@/components/admin-email-metrics";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import {
@@ -125,7 +126,7 @@ export default async function AdminPage({ searchParams }: Props) {
     sp.categoria && isEmailCategoria(sp.categoria) ? sp.categoria : "all";
   const emailPage = Math.max(1, Number(sp.page) || 1);
 
-  const [spaces, memberships, counts, allowed, modules, utmMetrics, giftPosts, liveRegra, emailMetrics] =
+  const [spaces, memberships, counts, allowed, modules, utmMetrics, giftPosts, funilLives, liveRegra, emailMetrics] =
     await Promise.all([
     tab === "spaces" ? listSpaces() : Promise.resolve([]),
     tab === "membros"
@@ -138,6 +139,7 @@ export default async function AdminPage({ searchParams }: Props) {
     tab === "aulas" ? listAllModulesAdmin() : Promise.resolve([]),
     tab === "presentes" ? listUtmPostMetrics() : Promise.resolve([]),
     tab === "presentes" ? listGiftPostsAdmin() : Promise.resolve([]),
+    tab === "presentes" ? listBastidoresFunilMetrics() : Promise.resolve(null),
     tab === "live" ? obterRegraLiveSchedule() : Promise.resolve(null),
     tab === "emails"
       ? agregarMetricasEmail({
@@ -396,6 +398,20 @@ export default async function AdminPage({ searchParams }: Props) {
             conversão real é melhor do que a que sai desta conta.
           </p>
           <AdminGiftMetrics rows={utmMetrics} />
+
+          {funilLives ? (
+            <>
+              <h3 className="mt-10 text-base font-semibold">
+                Funil lives (Bastidores)
+              </h3>
+              <p className="mt-1 text-sm text-muted">
+                Free cadastrados via presente que clicaram no CTA Bastidores.
+                Proxy para quem entrou no grupo das lives — o clique não
+                confirma join no WhatsApp.
+              </p>
+              <AdminFunilLives data={funilLives} />
+            </>
+          ) : null}
         </section>
       ) : null}
 

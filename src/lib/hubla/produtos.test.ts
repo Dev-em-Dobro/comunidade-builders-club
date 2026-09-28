@@ -46,7 +46,7 @@ describe("mapaOfertasHubla — fallback oficial", () => {
           productMap: new Map([["VL3e0iDO3A32SyjJWr9S", "pro"]]),
           offerMap,
         }),
-        "pro",
+        "elite",
       );
       assert.equal(
         planoDoEventoHubla({

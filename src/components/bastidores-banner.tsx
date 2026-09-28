@@ -1,5 +1,8 @@
 import { BASTIDORES } from "@/lib/eventos/bastidores";
 
+/** Rota de proxy que loga o clique antes de redirecionar para o Sendflow. */
+const BASTIDORES_CTA_HREF = "/r/bastidores";
+
 /**
  * F102 — faixa da live pública de quinta no topo do Club. Quem vê é decidido
  * pelo shell (`faixaDoTopo`); aqui não há regra de membership.
@@ -49,9 +52,7 @@ import { BASTIDORES } from "@/lib/eventos/bastidores";
 export function BastidoresBanner() {
   return (
     <a
-      href={BASTIDORES.url}
-      target="_blank"
-      rel="noopener noreferrer"
+      href={BASTIDORES_CTA_HREF}
       className="group @container relative block max-h-[150px] overflow-hidden border-b border-white/10 bg-[#07201b] px-4 py-2.5 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#2dd4bf] @lg:px-8 @lg:py-3"
     >
       <BastidoresFundo />
