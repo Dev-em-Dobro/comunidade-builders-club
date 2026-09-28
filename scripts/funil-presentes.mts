@@ -1,13 +1,13 @@
 /**
- * Funil dos Presentes: acessos → cadastros, por post de origem (F059).
+ * Funil dos Presentes: acessos → cadastros → cliques Bastidores, por origem.
  *
  *   npm run funil                      # prod, desde sempre
  *   npm run funil -- --target=hml
  *   npm run funil -- --desde=2026-09-04
  *   npm run funil -- --antes-depois    # compara antes/depois da pop-up (F078)
  *
- * Só leitura. A F059 mede em dois degraus:
- *   `gift_visit.utm_content`  →  `membership.origin_utm_content`
+ * Só leitura. A F059 mede em três degraus:
+ *   `gift_visit.utm_content`  →  `membership.origin_utm_content`  →  `bastidores_cta_click`
  *
  * Existe porque a leitura era SQL na mão, e comparar o efeito de uma mudança
  * de funil exige rodar a mesma conta várias vezes, sem reescrevê-la.
@@ -119,6 +119,99 @@ function imprimir(titulo: string, linhas: Linha[]): void {
   );
 }
 
+// ---------------------------------------------------------------------------
+// Funil Bastidores: Free-com-origem → clique no CTA "Entrar no grupo"
+// ---------------------------------------------------------------------------
+
+const META_BASTIDORES_PCT = 40;
+
+type LinhaBastidores = {
+  post: string;
+  freeComOrigem: number;
+  cliquesBastidores: number;
+};
+
+async function funilBastidores(prisma: PrismaClient): Promise<LinhaBastidores[]> {
+  const [freeComOrigem, cliques] = await Promise.all([
+    prisma.membership.findMany({
+      where: {
+        tier: "free",
+        OR: [
+          { originUtmContent: { not: null } },
+          { originGiftSlug: { not: null } },
+        ],
+      },
+      select: { userId: true, originUtmContent: true, originGiftSlug: true },
+    }),
+    prisma.bastidoresCtaClick.findMany({
+      where: {
+        OR: [
+          { originUtmContent: { not: null } },
+          { originGiftSlug: { not: null } },
+        ],
+      },
+      select: { userId: true, originUtmContent: true, originGiftSlug: true },
+      distinct: ["userId"],
+    }),
+  ]);
+
+  const mapa = new Map<string, { cadastros: Set<string>; cliques: Set<string> }>();
+  const chave = (utm: string | null, slug: string | null) =>
+    utm ?? slug ?? "(sem origem)";
+
+  for (const m of freeComOrigem) {
+    const k = chave(m.originUtmContent, m.originGiftSlug);
+    let bucket = mapa.get(k);
+    if (!bucket) {
+      bucket = { cadastros: new Set(), cliques: new Set() };
+      mapa.set(k, bucket);
+    }
+    bucket.cadastros.add(m.userId);
+  }
+
+  for (const c of cliques) {
+    const k = chave(c.originUtmContent, c.originGiftSlug);
+    let bucket = mapa.get(k);
+    if (!bucket) {
+      bucket = { cadastros: new Set(), cliques: new Set() };
+      mapa.set(k, bucket);
+    }
+    bucket.cliques.add(c.userId);
+  }
+
+  return [...mapa.entries()]
+    .map(([post, { cadastros, cliques }]) => ({
+      post,
+      freeComOrigem: cadastros.size,
+      cliquesBastidores: cliques.size,
+    }))
+    .sort((a, b) => b.freeComOrigem - a.freeComOrigem);
+}
+
+function imprimirBastidores(linhas: LinhaBastidores[]): void {
+  const totalFree = linhas.reduce((s, l) => s + l.freeComOrigem, 0);
+  const totalCliques = linhas.reduce((s, l) => s + l.cliquesBastidores, 0);
+  const taxa = totalFree > 0 ? ((totalCliques / totalFree) * 100).toFixed(1) : "—";
+
+  console.log("\n--- Funil Bastidores (Free-com-origem → clique no grupo) ---");
+  console.log(`Meta de referência: ~${META_BASTIDORES_PCT}%`);
+  if (linhas.length === 0) {
+    console.log("  (sem cliques registrados)");
+    return;
+  }
+  console.table(
+    linhas.map((l) => ({
+      post: l.post,
+      freeComOrigem: l.freeComOrigem,
+      cliquesBastidores: l.cliquesBastidores,
+      taxa: pct(l.cliquesBastidores, l.freeComOrigem),
+    })),
+  );
+  console.log(
+    `  TOTAL: ${totalFree} Free-com-origem → ${totalCliques} cliques = ${taxa}%`,
+  );
+}
+
 async function main() {
   const target = (arg("target") ?? "prod") as Target;
   const desde = arg("desde") ? new Date(`${arg("desde")}T00:00:00-03:00`) : null;
@@ -163,6 +256,8 @@ async function main() {
     console.log(
       `\nCadastros vindos de Presente que viraram pagante: ${pagantes}`,
     );
+
+    imprimirBastidores(await funilBastidores(prisma));
   } finally {
     await prisma.$disconnect();
   }

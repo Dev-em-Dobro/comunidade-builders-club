@@ -37,6 +37,7 @@ model User {
   reguaEmailSends        ReguaEmailSend[]
   videoPlays             VideoPlay[]
   liveReminderSends      LiveReminderSend[]
+  bastidoresCtaClicks    BastidoresCtaClick[]
 
   @@unique([email])
   @@map("user")
@@ -486,6 +487,32 @@ model LessonProgress {
   @@unique([userId, lessonId])
   @@index([lessonId])
   @@map("lesson_progress")
+}
+
+/// Funil Presente → Bastidores — clique no CTA "Entrar no grupo" da faixa.
+///
+/// Grava um evento por clique com snapshot da origem do Membership (de onde
+/// veio o cadastro Free) para calcular taxa Free-via-presente → clique no
+/// grupo das lives. Dedupe opcional: 1 clique por usuário por dia (clickedOn).
+///
+/// Usuários sem origem também são logados (originGiftSlug/originUtmContent
+/// ficam null), mas não entram no denominador da meta 30–50%.
+model BastidoresCtaClick {
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// Snapshot: Membership.origin_gift_slug no momento do clique.
+  originGiftSlug   String?  @map("origin_gift_slug")
+  /// Snapshot: Membership.origin_utm_content no momento do clique.
+  originUtmContent String?  @map("origin_utm_content")
+  /// Data do clique (sem hora, para dedupe 1/dia).
+  clickedOn        DateTime @map("clicked_on") @db.Date
+  createdAt        DateTime @default(now())
+
+  @@unique([userId, clickedOn])
+  @@index([originUtmContent, createdAt])
+  @@index([originGiftSlug, createdAt])
+  @@map("bastidores_cta_click")
 }
 
 /// F080 — audiência de vídeo: quem deu play e até onde assistiu.
