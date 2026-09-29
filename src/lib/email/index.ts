@@ -1,7 +1,6 @@
 import nodemailer from "nodemailer";
 import { requireAuthEnv } from "@/lib/auth/env";
 import { NOME_PRODUTO } from "@/lib/produto";
-import { montarCopy48h } from "@/lib/regua/material-48h";
 import {
   RESEND_TAG_CATEGORY,
   type EmailCategoria,
@@ -194,9 +193,8 @@ export async function sendOtpEmail(opts: { to: string; otp: string }): Promise<v
     ``,
     `O código vale por 10 minutos.`,
     ``,
-    `Do outro lado dele: as primeiras aulas da formação, o feed da comunidade`,
-    `fechando clientes — quem fechou, por quanto e como foi — e os presentes`,
-    `liberados.`,
+    `Na comunidade você recebe as primeiras aulas da formação e já começa a se`,
+    `preparar pra fechar o primeiro cliente nas próximas semanas.`,
     ``,
     `Se você não pediu este acesso, ignore este e-mail.`,
     ``,
@@ -208,7 +206,7 @@ export async function sendOtpEmail(opts: { to: string; otp: string }): Promise<v
     "Seu código de acesso",
     `<p style="color:#64748b;font-size:15px;line-height:1.5;">Digite o código na tela em que você parou. Vale por 10 minutos.</p>
     <p style="margin:24px 0;font-size:32px;letter-spacing:0.28em;font-weight:700;color:#0f172a;text-align:center;">${escapeHtml(opts.otp)}</p>
-    <p style="color:#64748b;font-size:14px;line-height:1.6;">Do outro lado dele: as primeiras aulas da formação, o feed da comunidade fechando clientes — quem fechou, por quanto e como foi — e os presentes liberados.</p>
+    <p style="color:#64748b;font-size:14px;line-height:1.6;">Na comunidade você recebe as primeiras aulas da formação e já começa a se preparar pra fechar o primeiro cliente nas próximas semanas.</p>
     ${LIVES_PS_HTML}`,
   );
   await sendMail({ to: opts.to, subject, text, html, category: "login" });
@@ -252,27 +250,46 @@ function primeiroNome(displayName: string): string {
   return parte || "Builder";
 }
 
-/** F075 / F089 — toque aos 48h: entrega o próximo Presente (não cobra ausência). */
+/** F075 / F089 — toque aos 48h: convida para os Bastidores. */
 export async function sendRegua48hEmail(opts: {
   to: string;
   displayName: string;
-  materialUrl: string;
-  material: {
-    path: string;
-    titulo: string;
-    origemTitulo: string | null;
-  } | null;
 }): Promise<void> {
-  const copy = montarCopy48h({
-    displayName: opts.displayName,
-    materialUrl: opts.materialUrl,
-    material: opts.material,
-  });
-  const html = wrapHtml(copy.tituloHtml, `${copy.htmlInner}${LIVES_PS_HTML}`);
+  const nome = primeiroNome(opts.displayName);
+  const subject = `${nome}, seu próximo passo com IA está aqui`;
+  const text = [
+    `Olá, ${nome},`,
+    ``,
+    `Se você quer parar de só observar e brincar com ferramentas de IA, o próximo passo é começar a aplicar isso em empresas e gerar resultado de verdade.`,
+    ``,
+    `Toda terça-feira, às 20h, a gente abre os Bastidores dos 5 Dígitos com IA.`,
+    ``,
+    `É uma live gratuita em que mostramos, na prática, como estruturamos nossa operação pra faturar mais de R$ 10 mil por mês com IA para negócios, sem precisar ser aquele vendedor chato que fica empurrando serviço.`,
+    ``,
+    `Você vai acompanhar o que a gente está fazendo, os erros, os acertos e como pode começar a construir a sua própria operação.`,
+    ``,
+    `Entrar no grupo Bastidores: ${LIVES_URL}`,
+    ``,
+    `A gente se vê lá!`,
+    ``,
+    `Abraço,`,
+    `Beto e Cadu`,
+  ].join("\n");
+  const html = wrapHtml(
+    "Seu próximo passo com IA está aqui",
+    `<p style="color:#64748b;font-size:15px;line-height:1.6;">Olá, ${escapeHtml(nome)},</p>
+    <p style="color:#64748b;font-size:15px;line-height:1.6;">Se você quer parar de só observar e brincar com ferramentas de IA, o próximo passo é começar a aplicar isso em empresas e gerar resultado de verdade.</p>
+    <p style="color:#64748b;font-size:15px;line-height:1.6;">Toda terça-feira, às 20h, a gente abre os Bastidores dos 5 Dígitos com IA.</p>
+    <p style="color:#64748b;font-size:15px;line-height:1.6;">É uma live gratuita em que mostramos, na prática, como estruturamos nossa operação pra faturar mais de R$ 10 mil por mês com IA para negócios, sem precisar ser aquele vendedor chato que fica empurrando serviço.</p>
+    <p style="color:#64748b;font-size:15px;line-height:1.6;">Você vai acompanhar o que a gente está fazendo, os erros, os acertos e como pode começar a construir a sua própria operação.</p>
+    <p style="margin:24px 0;"><a href="${LIVES_URL}" style="display:inline-block;background:#0d9488;color:#fff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:600;">Entrar no grupo Bastidores</a></p>
+    <p style="color:#64748b;font-size:15px;line-height:1.6;">A gente se vê lá!</p>
+    <p style="color:#64748b;font-size:15px;line-height:1.6;">Abraço,<br>Beto e Cadu</p>`,
+  );
   await sendMail({
     to: opts.to,
-    subject: copy.subject,
-    text: `${copy.texto}\n\n${LIVES_PS_TEXT}`,
+    subject,
+    text,
     html,
     category: "regua",
   });
