@@ -142,6 +142,18 @@ function wrapHtml(title: string, inner: string): string {
   </div></body></html>`;
 }
 
+const LIVES_URL = "https://lives.devemdobro.com/";
+const LIVES_PS_TEXT = [
+  `P.S.: Toda quinta, às 20h, abrimos os bastidores do ${NOME_PRODUTO} em uma live gratuita.`,
+  `Você acompanha como estamos construindo, vendendo e entregando soluções de automação e IA para negócios — e leva ideias para criar a sua própria operação.`,
+  ``,
+  `Quero participar gratuitamente: ${LIVES_URL}`,
+].join("\n");
+const LIVES_PS_HTML = `<div style="border-top:1px solid #e2e8e6;margin-top:24px;padding-top:20px;">
+  <p style="color:#64748b;font-size:14px;line-height:1.6;margin:0;"><strong style="color:#0f172a;">P.S.:</strong> Toda quinta, às 20h, abrimos os bastidores do ${escapeHtml(NOME_PRODUTO)} em uma live gratuita. Você acompanha como estamos construindo, vendendo e entregando soluções de automação e IA para negócios — e leva ideias para criar a sua própria operação.</p>
+  <p style="margin:20px 0 0;"><a href="${LIVES_URL}" style="display:inline-block;background:#0d9488;color:#fff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:600;">Quero participar gratuitamente</a></p>
+</div>`;
+
 export async function sendMagicLinkEmail(opts: {
   to: string;
   url: string;
@@ -189,12 +201,15 @@ export async function sendOtpEmail(opts: { to: string; otp: string }): Promise<v
     `Se você não pediu este acesso, ignore este e-mail.`,
     ``,
     `— ${NOME_PRODUTO}`,
+    ``,
+    LIVES_PS_TEXT,
   ].join("\n");
   const html = wrapHtml(
     "Seu código de acesso",
     `<p style="color:#64748b;font-size:15px;line-height:1.5;">Digite o código na tela em que você parou. Vale por 10 minutos.</p>
     <p style="margin:24px 0;font-size:32px;letter-spacing:0.28em;font-weight:700;color:#0f172a;text-align:center;">${escapeHtml(opts.otp)}</p>
-    <p style="color:#64748b;font-size:14px;line-height:1.6;">Do outro lado dele: as primeiras aulas da formação, o feed da comunidade fechando clientes — quem fechou, por quanto e como foi — e os presentes liberados.</p>`,
+    <p style="color:#64748b;font-size:14px;line-height:1.6;">Do outro lado dele: as primeiras aulas da formação, o feed da comunidade fechando clientes — quem fechou, por quanto e como foi — e os presentes liberados.</p>
+    ${LIVES_PS_HTML}`,
   );
   await sendMail({ to: opts.to, subject, text, html, category: "login" });
 }
@@ -253,11 +268,11 @@ export async function sendRegua48hEmail(opts: {
     materialUrl: opts.materialUrl,
     material: opts.material,
   });
-  const html = wrapHtml(copy.tituloHtml, copy.htmlInner);
+  const html = wrapHtml(copy.tituloHtml, `${copy.htmlInner}${LIVES_PS_HTML}`);
   await sendMail({
     to: opts.to,
     subject: copy.subject,
-    text: copy.texto,
+    text: `${copy.texto}\n\n${LIVES_PS_TEXT}`,
     html,
     category: "regua",
   });
