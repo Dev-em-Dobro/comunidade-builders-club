@@ -53,6 +53,8 @@ export function BastidoresBanner() {
   return (
     <a
       href={BASTIDORES_CTA_HREF}
+      target="_blank"
+      rel="noopener noreferrer"
       className="group @container relative block max-h-[150px] overflow-hidden border-b border-white/10 bg-[#07201b] px-4 py-2.5 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#2dd4bf] @lg:px-8 @lg:py-3"
     >
       <BastidoresFundo />
