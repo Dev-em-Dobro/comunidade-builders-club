@@ -11,9 +11,8 @@ para cumprir no primeiro dia.
 
 ## Condição (conteúdo, fora desta PR de UI)
 
-A **primeira aula** da jornada (M01 Comece por aqui) é o **tutorial da
-comunidade** — o mesmo vídeo desta tela. O tutorial fala do space
-**Conquistas**. No primeiro módulo entra uma aula/desafio: landing page
+A **primeira aula** da jornada (M01 Comece por aqui) é o **desafio de 7 dias
+com Lovable**. O tutorial da comunidade fala do space **Conquistas**. O desafio é: landing page
 para um estabelecimento de alguém que o aluno conhece, postar em
 Conquistas para a equipe avaliar. Ativação de 7 dias, primeiro projeto
 próprio, ainda sem venda.
@@ -69,6 +68,4 @@ Comentários no space Boas-vindas continuam desligados (F023).
 - Recusar login (F054)
 - Vídeo distinto por plano — [F058](F058-boas-vindas-video-por-tier.md)
 
-O seed de aulas (F051) agora lista o tutorial como 1ª aula do M01.
-Registros já no HML **não** mudam sozinhos (o seed não sobrescreve
-`sortOrder`). Reordenar no admin se a Introdução ainda aparecer primeiro.
+O seed de aulas (F051/F060) força o desafio como 1ª aula do M01.

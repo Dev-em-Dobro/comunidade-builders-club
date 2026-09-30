@@ -62,17 +62,25 @@ const CATALOG: ModuleSeed[] = [
         slug: "fase-1-m01-comece-por-aqui",
         title: "Comece por aqui",
         description:
-          "Introdução ao clube, tutorial da comunidade, desafio quick win no Lovable, mapa da formação e o que você vai construir e vender com IA.\n\nEntregável: apresentar-se no grupo, definir um nicho inicial e postar o quick win no Desafio Projetos.",
+          "Desafio quick win no Lovable, introdução ao clube, tutorial da comunidade, mapa da formação e o que você vai construir e vender com IA.\n\nEntregável: apresentar-se no grupo, definir um nicho inicial e postar o quick win no Desafio Projetos.",
         sortOrder: 0,
         forceLessonSort: true,
         lessons: [
+          {
+            slug: "desafio-quick-win-lovable",
+            title: "Desafio primeiro projeto em 7 dias com Lovable",
+            description:
+              "Primeiro projeto do desafio de 7 dias: montar uma landing no Lovable para um estabelecimento da sua rede quente e postar no space Desafio Projetos.",
+            pandaVideoExternalId: "f32d7741-a581-4904-a8cf-e9fc4de2b018",
+            sortOrder: 0,
+          },
           {
             slug: "aula-introducao-builders-club",
             title: "Introdução ao Builders Club",
             description:
               "Aula de abertura: o que é o Builders Club, para quem é e como você entra na jornada.",
             pandaVideoExternalId: "19fad82c-70df-4dd1-ab5d-a6b44b18a58f",
-            sortOrder: 0,
+            sortOrder: 1,
           },
           {
             slug: "tutorial-intro-comunidade",
@@ -82,14 +90,6 @@ const CATALOG: ModuleSeed[] = [
             description:
               "Tour completo da plataforma: o Feed, os Spaces, as Aulas e como circular na comunidade. É o tutorial do Club completo — tudo o que aparece aqui está aberto nos planos PRO e Elite.",
             pandaVideoExternalId: WELCOME_TUTORIAL_VIDEO.paidVideoExternalId,
-            sortOrder: 1,
-          },
-          {
-            slug: "desafio-quick-win-lovable",
-            title: "Desafio primeiro projeto em 7 dias com Lovable",
-            description:
-              "Primeiro projeto do desafio de 7 dias: montar uma landing no Lovable para um estabelecimento da sua rede quente e postar no space Desafio Projetos.",
-            pandaVideoExternalId: "f32d7741-a581-4904-a8cf-e9fc4de2b018",
             sortOrder: 2,
           },
           {

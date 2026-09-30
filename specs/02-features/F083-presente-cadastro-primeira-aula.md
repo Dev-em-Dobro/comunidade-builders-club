@@ -22,7 +22,7 @@ rodapé não pode continuar trocando o prêmio.
 
 No `GiftSignupForm` do rodapé do Presente (`presente-publico.tsx`),
 passar `redirectTo={AULA_ABERTURA_HREF}` — o mesmo href da pop-up
-(`/aulas/fase-1-m01-comece-por-aqui/aula-introducao-builders-club`).
+(`/aulas/fase-1-m01-comece-por-aqui/desafio-quick-win-lovable`).
 
 `/cadastro` genérico continua com o default (Boas-vindas). Só o
 Presente público.

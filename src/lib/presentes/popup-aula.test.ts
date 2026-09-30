@@ -38,7 +38,7 @@ describe("destino do cadastro pela modal (F078)", () => {
   it("aponta para a aula de abertura do módulo gratuito", () => {
     assert.equal(
       AULA_ABERTURA_HREF,
-      "/aulas/fase-1-m01-comece-por-aqui/aula-introducao-builders-club",
+      "/aulas/fase-1-m01-comece-por-aqui/desafio-quick-win-lovable",
     );
   });
 });

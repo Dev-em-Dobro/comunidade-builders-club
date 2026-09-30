@@ -4,9 +4,9 @@
 export const FASE_1_M01_SLUG = "fase-1-m01-comece-por-aqui";
 
 /** Primeira aula do M01 — destino do Free (presente, cadastro, aula paga). */
-export const AULA_INTRO_SLUG = "aula-introducao-builders-club";
+export const AULA_ABERTURA_SLUG = "desafio-quick-win-lovable";
 
-export const AULAS_FREE_HREF = `/aulas/${FASE_1_M01_SLUG}/${AULA_INTRO_SLUG}`;
+export const AULAS_FREE_HREF = `/aulas/${FASE_1_M01_SLUG}/${AULA_ABERTURA_SLUG}`;
 
 export type ModuleAccessNode = {
   freeAccess: boolean;
