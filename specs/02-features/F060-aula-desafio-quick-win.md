@@ -71,6 +71,7 @@ produção com `--target=prod --confirm`.
 ## Critérios
 
 - [x] M01 tem a aula do desafio como 1ª
+- [x] Descrição leva ao PRO em `/planos?motivo=aula-descricao`
 
 > **Renomeada em 27/08/2026.** "Quick win no Lovable" →
 > **"Desafio primeiro projeto em 7 dias com Lovable"**. O título antigo não

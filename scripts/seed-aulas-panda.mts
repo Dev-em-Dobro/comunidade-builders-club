@@ -69,8 +69,9 @@ const CATALOG: ModuleSeed[] = [
           {
             slug: "desafio-quick-win-lovable",
             title: "Desafio primeiro projeto em 7 dias com Lovable",
-            description:
-              "Primeiro projeto do desafio de 7 dias: montar uma landing no Lovable para um estabelecimento da sua rede quente e postar no space Desafio Projetos.",
+            description: `Primeiro projeto do desafio de 7 dias: montar uma landing no Lovable para um estabelecimento da sua rede quente e postar no space **Desafio Projetos**.
+
+Quer transformar este primeiro projeto em uma oferta que você consiga vender? [Conheça o Builders Club PRO e veja os planos](/planos?motivo=aula-descricao).`,
             pandaVideoExternalId: "f32d7741-a581-4904-a8cf-e9fc4de2b018",
             sortOrder: 0,
           },

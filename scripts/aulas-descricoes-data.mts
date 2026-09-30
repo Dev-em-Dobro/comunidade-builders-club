@@ -490,7 +490,9 @@ Vamos acessar o Google AI Studio, criar um projeto, gerar a chave de API e enten
 
   "fase-1-m01-comece-por-aqui/desafio-quick-win-lovable": `Primeiro projeto do desafio de 7 dias: montar uma landing no Lovable para um estabelecimento da sua rede quente.
 
-Poste o resultado no space **Desafio Projetos**. Pode ser um site de amostra — o importante é dar o primeiro passo.`,
+Poste o resultado no space **Desafio Projetos**. Pode ser um site de amostra — o importante é dar o primeiro passo.
+
+Quer transformar este primeiro projeto em uma oferta que você consiga vender? [Conheça o Builders Club PRO e veja os planos](/planos?motivo=aula-descricao).`,
 
   "fase-1-m01-comece-por-aqui/bem-vindo-e-mapa-da-jornada": `Boas-vindas à formação: como ela funciona, o mapa das fases, como usar a plataforma, as regras e a primeira ação do aluno.`,
 
