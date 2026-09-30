@@ -151,9 +151,9 @@ em 04/09/2026) ele tem **cinco**:
 
 | # | Aula |
 |---|---|
-| 1 | Introdução ao Builders Club |
-| 2 | Como usar a comunidade |
-| 3 | Desafio primeiro projeto em 7 dias com Lovable |
+| 1 | Desafio primeiro projeto em 7 dias com Lovable |
+| 2 | Introdução ao Builders Club |
+| 3 | Como usar a comunidade |
 | 4 | Bem-vindo e mapa da jornada |
 | 5 | O que você vai construir e vender com IA |
 
@@ -290,7 +290,7 @@ depende de navegador fica aberto até a validação em Preview.
 - [x] `npm run build` compila
 - [x] Modal abre depois do delay e captura o e-mail
 - [x] OTP chega no e-mail informado dentro da modal
-- [x] Cadastro novo pela modal cai em `/aulas/fase-1-m01-comece-por-aqui/aula-introducao-builders-club`
+- [x] Cadastro novo pela modal cai em `/aulas/fase-1-m01-comece-por-aqui/desafio-quick-win-lovable`
 - [x] Origem do Presente (`origin_gift_slug`) gravada pelo cadastro da modal
 - [x] `POPUP_DELAY_MS` em `0` — abre na hidratação (era 60.000; 10.000 no QA)
 - [ ] Conferir se a modal não aparece antes de o `<article>` pintar
@@ -316,14 +316,13 @@ depende de navegador fica aberto até a validação em Preview.
 
   | # | Aula |
   |---|---|
-  | 1 | Introdução ao Builders Club |
-  | 2 | Como usar a comunidade |
-  | 3 | Desafio primeiro projeto em 7 dias com Lovable |
+  | 1 | Desafio primeiro projeto em 7 dias com Lovable |
+  | 2 | Introdução ao Builders Club |
+  | 3 | Como usar a comunidade |
   | 4 | Bem-vindo e mapa da jornada |
   | 5 | O que você vai construir e vender com IA |
 
-  O seed (`scripts/seed-aulas-panda.mts`) tem só 3 — está defasado em relação à
-  produção. A contagem em runtime existe justamente para não depender disso.
+  A contagem em runtime existe para não depender do catálogo fixo do seed.
 
 ### Cadastro ponta a ponta em HML — 04/09/2026
 

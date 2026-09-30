@@ -109,7 +109,7 @@ describe("AULAS_FREE_HREF — F099", () => {
   it("é a aula de abertura do Comece por aqui", () => {
     assert.equal(
       AULAS_FREE_HREF,
-      "/aulas/fase-1-m01-comece-por-aqui/aula-introducao-builders-club",
+      "/aulas/fase-1-m01-comece-por-aqui/desafio-quick-win-lovable",
     );
   });
 });

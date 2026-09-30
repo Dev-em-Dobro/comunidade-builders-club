@@ -12,11 +12,11 @@ Boas-vindas (F058).
 
 A ordem no catálogo (e no seed, com `forceLessonSort` neste módulo):
 
-1. Introdução ao Builders Club
-2. Como usar a comunidade — vídeo **pago** das Boas-vindas
+1. **Desafio primeiro projeto em 7 dias com Lovable**
+2. Introdução ao Builders Club
+3. Como usar a comunidade — vídeo **pago** das Boas-vindas
    (`c8ec857d-4d78-4516-921a-2fee9c35b590` · F058, regravado em 31/08/2026;
    o anterior era `d3b5019d-49b8-479e-a150-7ea654dc7cf6`)
-3. **Desafio primeiro projeto em 7 dias com Lovable** — nova (depois do tutorial)
 4. Bem-vindo e mapa da jornada
 5. O que você vai construir e vender com IA
 
@@ -70,7 +70,8 @@ produção com `--target=prod --confirm`.
 
 ## Critérios
 
-- [x] M01 tem a aula do desafio como 3ª, depois do tutorial
+- [x] M01 tem a aula do desafio como 1ª
+- [x] Descrição leva ao PRO em `/planos?motivo=aula-descricao`
 
 > **Renomeada em 27/08/2026.** "Quick win no Lovable" →
 > **"Desafio primeiro projeto em 7 dias com Lovable"**. O título antigo não
