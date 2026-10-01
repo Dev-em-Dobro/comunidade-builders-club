@@ -537,4 +537,13 @@ Conferir se a régua de preços citada no vídeo é a versão atual aprovada.`,
   "fase-2-m07-entregue-o-agente/o-agente-que-agenda-sozinho": `Aula principal de construção: configuração, Google Calendar, agendamento e testes.`,
 
   "fase-2-m07-entregue-o-agente/intencoes-webhook-e-integracoes": `Conexões, intenções, webhook, n8n e integração com outros sistemas.`,
+
+  "gravacoes-das-lives-semanais/raas-como-cobrar-pelo-resultado-do-cliente": `RaaS (Result as a Service) é cobrar pelo que o cliente ganha — agenda cheia, leads, recorrência — e não pelo tempo que você passou no projeto.
+
+Nesta live a gente abre o modelo: o que entra no pacote, como explicar o valor sem parecer "eu cobro caro", e como transformar a entrega em uma mensalidade que o cliente quer continuar pagando.
+
+## O que você leva
+- Uma definição clara de RaaS na prática do builder
+- Como estruturar a oferta em cima do resultado, não da hora
+- Argumentos para a conversa de preço com o cliente local`,
 };

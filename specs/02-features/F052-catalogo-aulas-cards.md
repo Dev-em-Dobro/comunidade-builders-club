@@ -15,7 +15,7 @@ acordeão). Sem trava por “nível”, sem favoritar/avaliar neste recorte.
 
 - `/aulas` — grid de módulos **publicados** na raiz (`parentId` null).
 - Card: capa do módulo raiz (`coverImageUrl` em `/public`, série
-  `1-renda-extra.png` … `4-fundamentos-builder.png`). A área da capa é
+  `1-renda-extra.png` … `5-lives-semanais.png`). A área da capa é
   16:9; a imagem preenche com `object-cover` (pode recortar, não
   distorce). `1-renda-extra.png` é quadrada — `object-fill` a achatava.
   Sem capa, cai para a thumb da primeira aula. Título, resumo da

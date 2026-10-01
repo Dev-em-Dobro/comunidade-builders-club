@@ -10,6 +10,8 @@ export const PROMESSA_PRIMEIRO_CLIENTE = "Feche o 1º cliente em 90 dias";
 
 /** Slug de checkout Hubla = `offers[].id` no webhook (F053). */
 export const HUBLA_OFFER_ID_PRO_OFICIAL = "XaY8QNfZlOO1XBgjzMfY";
+/** PRO Mensal (assinatura) — checkout em `/planos`. */
+export const HUBLA_OFFER_ID_PRO_MENSAL = "drj7n2oUUYP5CBvzu7b7";
 /** Checkout público Elite em `/planos`. */
 export const HUBLA_OFFER_ID_ELITE_OFICIAL = "v1SsMcVXNip7Mn5A2pNH";
 /** Elite para alunos (checkout próprio, não aparece em `/planos`). */
@@ -20,6 +22,7 @@ export const HUBLA_OFFER_ID_ELITE_EUROPA_50 = "1mGgy9MVD11CJdnsLEov";
 export const HUBLA_OFFER_ID_ELITE_EUROPA_60 = "cXqc4mz6YZFE4GKjGFUz";
 export const HUBLA_OFFER_IDS_PRO_OFICIAIS = [
   HUBLA_OFFER_ID_PRO_OFICIAL,
+  HUBLA_OFFER_ID_PRO_MENSAL,
 ] as const;
 export const HUBLA_OFFER_IDS_ELITE_OFICIAIS = [
   HUBLA_OFFER_ID_ELITE_OFICIAL,
@@ -30,10 +33,14 @@ export const HUBLA_OFFER_IDS_ELITE_OFICIAIS = [
 
 export const CHECKOUT_PRO_FALLBACK_URL =
   `https://pay.hub.la/${HUBLA_OFFER_ID_PRO_OFICIAL}`;
+export const CHECKOUT_PRO_MENSAL_FALLBACK_URL =
+  `https://pay.hub.la/${HUBLA_OFFER_ID_PRO_MENSAL}`;
 export const CHECKOUT_ELITE_FALLBACK_URL =
   `https://pay.hub.la/${HUBLA_OFFER_ID_ELITE_OFICIAL}`;
 
 export type OfferId = "pro" | "elite";
+/** Como o card mostra o preço: parcelado à vista ou assinatura mensal. */
+export type OfferBilling = "installments" | "monthly";
 
 /**
  * F093 — item de plano é **uma linha só**, que se explica sozinha.
@@ -145,12 +152,16 @@ export type BoletoCheckout = {
  * Preço da oferta com a parcela separada do à vista: o card destaca o
  * parcelado (`installments`x de `installmentPrice`) e deixa o à vista como
  * linha secundária. O parcelado tem acréscimo — não anunciar "sem juros".
+ * Assinatura mensal (`billing: "monthly"`) usa só `monthlyPrice`.
  */
 export type OfferPricing = {
+  billing?: OfferBilling;
   installments: number;
   installmentPrice: string;
   fullPrice: string;
   boletoPrice?: string;
+  /** Destaque do card quando `billing === "monthly"`. */
+  monthlyPrice?: string;
 };
 
 export type ClubOffer = {
@@ -183,12 +194,23 @@ export const CHECKOUT_ELITE_BOLETO_URLS = [
  * no script de auditoria.
  */
 export const PRICING_PRO: OfferPricing = {
+  billing: "installments",
   installments: 12,
   installmentPrice: "R$ 30,18",
   fullPrice: "R$ 297",
 };
 
+/** Preço exibido na Hubla para `drj7n2oUUYP5CBvzu7b7` (assinatura). */
+export const PRICING_PRO_MENSAL: OfferPricing = {
+  billing: "monthly",
+  installments: 1,
+  installmentPrice: "R$ 87",
+  fullPrice: "R$ 87",
+  monthlyPrice: "R$ 87",
+};
+
 export const PRICING_ELITE: OfferPricing = {
+  billing: "installments",
   installments: 12,
   installmentPrice: "R$ 101,30",
   fullPrice: "R$ 997",
@@ -202,6 +224,10 @@ function envUrl(name: string): string | null {
 
 export function checkoutUrlPro(): string {
   return envUrl("HUBLA_CHECKOUT_URL_PRO") || CHECKOUT_PRO_FALLBACK_URL;
+}
+
+export function checkoutUrlProMensal(): string {
+  return envUrl("HUBLA_CHECKOUT_URL_PRO_MENSAL") || CHECKOUT_PRO_MENSAL_FALLBACK_URL;
 }
 
 export function checkoutUrlElite(): string {
@@ -227,6 +253,21 @@ export function ofertaPro(): ClubOffer {
   };
 }
 
+/** Mesmos benefícios do PRO; cobrança recorrente na Hubla. */
+export function ofertaProMensal(): ClubOffer {
+  return {
+    id: "pro",
+    name: "PRO Mensal",
+    pricing: PRICING_PRO_MENSAL,
+    paymentHint: "Assinatura mensal · cancele quando quiser",
+    promise: PROMESSA_PRO,
+    highlights: filtrarItens(ITENS_PRO),
+    notaFinal:
+      "Mesmo acesso do PRO à vista. A cobrança renova todo mês na Hubla; cancele quando quiser. Prefere pagar uma vez? Use o card PRO.",
+    checkoutUrl: checkoutUrlProMensal(),
+  };
+}
+
 export function ofertaElite(): ClubOffer {
   return {
     id: "elite",
@@ -247,8 +288,16 @@ export function ofertaElite(): ClubOffer {
   };
 }
 
-export function ofertasBuildersClub(): { pro: ClubOffer; elite: ClubOffer } {
-  return { pro: ofertaPro(), elite: ofertaElite() };
+export function ofertasBuildersClub(): {
+  pro: ClubOffer;
+  proMensal: ClubOffer;
+  elite: ClubOffer;
+} {
+  return {
+    pro: ofertaPro(),
+    proMensal: ofertaProMensal(),
+    elite: ofertaElite(),
+  };
 }
 
 export function urlOrionApp(): string {

@@ -39,11 +39,16 @@ Identidade (sidebar e `/perfil`):
 - Free: texto “Plano gratuito”, sem destaque
 - PRO / Elite: badge (bandeirinha) com o nome do plano — Elite mais forte que PRO
 
-## PRO — R$ 297
+## PRO — R$ 297 (à vista) e assinatura mensal
 
-Checkout: [https://pay.hub.la/XaY8QNfZlOO1XBgjzMfY](https://pay.hub.la/XaY8QNfZlOO1XBgjzMfY)
+Checkouts Hubla (mesmo `tier=pro`, mesmos benefícios):
 
-Libera no Club:
+| Oferta | Checkout | Preço na Hubla |
+|--------|----------|----------------|
+| PRO à vista | [pay.hub.la/XaY8QNfZlOO1XBgjzMfY](https://pay.hub.la/XaY8QNfZlOO1XBgjzMfY) | R$ 297 (parcelado na vitrine) |
+| **PRO Mensal** | [pay.hub.la/drj7n2oUUYP5CBvzu7b7](https://pay.hub.la/drj7n2oUUYP5CBvzu7b7) | **R$ 87 / mês** (assinatura; vitrine espelha o card PRO com copy de recorrência) |
+
+Libera no Club (qualquer uma das ofertas PRO):
 
 - Comunidade (todos os spaces + publicar, comentar, reagir)
 - Aulas gravadas
@@ -56,6 +61,16 @@ Libera no Club:
 
 **Promessa (card):** formação e comunidade pra fechar o 1º cliente.
 **Não** inclui garantia de resultado em 90 dias (só 7 dias CDC).
+
+Webhook e 1º login tratam `drj7n2oUUYP5CBvzu7b7` como **pro** (igual ao à vista).
+Eventos de assinatura (`subscription.activated`, `invoice.payment_succeeded`,
+`customer.member_added`) concedem o mesmo tier — renovação mensal não muda o
+mapa. Cancelamento / `member_removed` → `tier=free`.
+
+Onboarding pós-compra (WhatsApp + e-mail de boas-vindas) segue o **mesmo
+processo da oferta PRO à vista** configurado na Hubla / operação (Dobro OS
+`bc-onboarding-aluno`). O app só garante allowlist + membership `pro` +
+entitlement Orion Free; não dispara WA/e-mail no webhook.
 
 ## Elite — R$ 997 (boleto R$ 1.297)
 
@@ -100,7 +115,7 @@ Envs:
 | `HUBLA_PRODUCT_ID` | Produto Club — allowlist de `product.id` (legado sem oferta casa **pro**) |
 | `HUBLA_PRODUCT_ID_PRO` | Produto PRO **separado**, se a Hubla criar um |
 | `HUBLA_PRODUCT_ID_ELITE` | Produto Elite **separado**, se a Hubla criar um |
-| `HUBLA_OFFER_ID_PRO` | Offer id(s) do PRO (vírgula se houver cópia + oficial BR `XaY8QNfZlOO1XBgjzMfY`). Preço da oferta na Hubla pode mudar — o id é que conta. |
+| `HUBLA_OFFER_ID_PRO` | Offer id(s) do PRO (vírgula + oficiais: à vista `XaY8QNfZlOO1XBgjzMfY` e mensal `drj7n2oUUYP5CBvzu7b7`). Preço na Hubla pode mudar — o id é que conta. |
 | `HUBLA_OFFER_ID_ELITE` | Offer id(s) do Elite (vírgula + oficiais: público `v1SsMcVXNip7Mn5A2pNH`, alunos `SFykfBk80jkM1sAVJKxV`, Europa €50 `1mGgy9MVD11CJdnsLEov`, Europa €60 `cXqc4mz6YZFE4GKjGFUz`). Sem ela, oferta desconhecida no produto Club segue o mapa de produto (`HUBLA_PRODUCT_ID` → **pro**) |
 
 Webhook aceita o produto Club (e quaisquer IDs do mapa). Sem nenhum product id
@@ -139,9 +154,9 @@ pode forçar `pro` para todo mundo allowlisted.
   Elite tem **quatro** ofertas oficiais: checkout público
   (`v1SsMcVXNip7Mn5A2pNH`), **Elite — Alunos** (`SFykfBk80jkM1sAVJKxV`),
   **Elite Europa €50** (`1mGgy9MVD11CJdnsLEov`) e **Elite Europa €60**
-  (`cXqc4mz6YZFE4GKjGFUz`). PRO oficial: só o checkout público
-  (`XaY8QNfZlOO1XBgjzMfY`). As da Europa e Elite-alunos não entram
-  em `/planos`.
+  (`cXqc4mz6YZFE4GKjGFUz`). PRO tem **duas** oficiais em `/planos`: à vista
+  (`XaY8QNfZlOO1XBgjzMfY`) e **PRO Mensal** (`drj7n2oUUYP5CBvzu7b7`).
+  Europa e Elite-alunos não entram em `/planos`.
 
 ## UI
 
@@ -149,13 +164,17 @@ Página **`/planos`** (liberada para free e PRO):
 
 - Título “Ver planos”
 - Subtítulo profissional (formação, comunidade, 1º cliente em 90 dias)
-- Dois cards lado a lado (empilhados no mobile): PRO vs Elite
+- Três cards (empilhados no mobile): PRO à vista, **PRO Mensal**, Elite
+- PRO Mensal espelha a lista do PRO; preço e copy falam em assinatura
+  (sem “Parcele em até” / à vista)
 - Cards com destaque, hover (elevação/sombra) e lista de entregas em título + detalhe
 - Elite em destaque (recomendado)
-- **Preço com o parcelamento em destaque** — o número grande do card é a parcela
-  (`12x de R$ 30,18` no PRO, `12x de R$ 101,30` no Elite), com rótulo
-  “Parcele em até”. O valor à vista vira linha secundária (`ou R$ 297 à vista`),
-  e o boleto Elite (`R$ 1.297`) segue como nota menor.
+- **Preço (PRO à vista / Elite):** parcelamento em destaque — o número grande
+  é a parcela (`12x de R$ 30,18` no PRO, `12x de R$ 101,30` no Elite), com
+  rótulo “Parcele em até”. O valor à vista vira linha secundária
+  (`ou R$ 297 à vista`), e o boleto Elite (`R$ 1.297`) segue como nota menor.
+- **Preço (PRO Mensal):** **R$ 87 / mês** em destaque; CTA “Assinar PRO
+  mensal” → `pay.hub.la/drj7n2oUUYP5CBvzu7b7`
 - **Não** afirmar “sem juros”: o parcelado tem acréscimo (PRO 12x → R$ 362,16,
   22% sobre o à vista; Elite 12x → R$ 1.215,60)
 
@@ -190,7 +209,7 @@ redirecionam para `/planos`. Links antigos `/?upgrade=1` também caem em `/plano
 - [x] Enum `pro` / `elite`; `paid` legado = PRO
 - [x] Free: só Feed, Boas-vindas, Geral (+ perfil/notificações)
 - [x] Avisos e demais spaces exigem PRO
-- [x] Página `/planos` compara as duas ofertas com os links oficiais
+- [x] Página `/planos` compara PRO à vista, PRO Mensal e Elite com os links oficiais
 - [x] Sidebar e `/perfil` mostram badge PRO/Elite para quem fez upgrade
 - [x] Modal de bloqueio leva a `/planos` (CTA Ver planos)
 - [x] PRO vê Orion liberado (plano Free no app; F058)

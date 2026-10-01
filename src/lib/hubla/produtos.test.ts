@@ -57,6 +57,24 @@ describe("mapaOfertasHubla — fallback oficial", () => {
         }),
         "elite",
       );
+      assert.equal(
+        planoDoEventoHubla({
+          productId: "VL3e0iDO3A32SyjJWr9S",
+          offerIds: ["XaY8QNfZlOO1XBgjzMfY"],
+          productMap: new Map([["VL3e0iDO3A32SyjJWr9S", "pro"]]),
+          offerMap,
+        }),
+        "pro",
+      );
+      assert.equal(
+        planoDoEventoHubla({
+          productId: "VL3e0iDO3A32SyjJWr9S",
+          offerIds: ["drj7n2oUUYP5CBvzu7b7"],
+          productMap: new Map([["VL3e0iDO3A32SyjJWr9S", "pro"]]),
+          offerMap,
+        }),
+        "pro",
+      );
     } finally {
       if (prevElite !== undefined) process.env.HUBLA_OFFER_ID_ELITE = prevElite;
       if (prevPro !== undefined) process.env.HUBLA_OFFER_ID_PRO = prevPro;

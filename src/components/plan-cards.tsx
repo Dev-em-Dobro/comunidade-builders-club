@@ -86,29 +86,48 @@ function OfferCard({
           </span>
         ) : null}
       </div>
-      <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-muted">
-        Parcele em até
-      </p>
-      <p className="mt-1 flex flex-wrap items-baseline gap-x-1.5 font-[family-name:var(--font-outfit)] leading-none">
-        <span className="text-lg font-semibold text-foreground">
-          {offer.pricing.installments}x de
-        </span>
-        <span className="text-4xl font-bold tracking-tight text-foreground">
-          {offer.pricing.installmentPrice}
-        </span>
-      </p>
-      <p className="mt-2 text-sm text-muted">
-        ou{" "}
-        <span className="font-semibold text-foreground">
-          {offer.pricing.fullPrice}
-        </span>{" "}
-        à vista
-      </p>
-      {offer.pricing.boletoPrice ? (
-        <p className="mt-0.5 text-xs text-muted">
-          ou boleto de {offer.pricing.boletoPrice}
-        </p>
-      ) : null}
+      {offer.pricing.billing === "monthly" ? (
+        <>
+          <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-muted">
+            Assinatura mensal
+          </p>
+          <p className="mt-1 flex flex-wrap items-baseline gap-x-1.5 font-[family-name:var(--font-outfit)] leading-none">
+            <span className="text-4xl font-bold tracking-tight text-foreground">
+              {offer.pricing.monthlyPrice ?? offer.pricing.installmentPrice}
+            </span>
+            <span className="text-lg font-semibold text-foreground">/ mês</span>
+          </p>
+          <p className="mt-2 text-sm text-muted">
+            Cobrança recorrente · cancele quando quiser
+          </p>
+        </>
+      ) : (
+        <>
+          <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-muted">
+            Parcele em até
+          </p>
+          <p className="mt-1 flex flex-wrap items-baseline gap-x-1.5 font-[family-name:var(--font-outfit)] leading-none">
+            <span className="text-lg font-semibold text-foreground">
+              {offer.pricing.installments}x de
+            </span>
+            <span className="text-4xl font-bold tracking-tight text-foreground">
+              {offer.pricing.installmentPrice}
+            </span>
+          </p>
+          <p className="mt-2 text-sm text-muted">
+            ou{" "}
+            <span className="font-semibold text-foreground">
+              {offer.pricing.fullPrice}
+            </span>{" "}
+            à vista
+          </p>
+          {offer.pricing.boletoPrice ? (
+            <p className="mt-0.5 text-xs text-muted">
+              ou boleto de {offer.pricing.boletoPrice}
+            </p>
+          ) : null}
+        </>
+      )}
       {/* F093 — item é uma linha só; ver `OfferHighlight` em checkout.ts. */}
       <ul className="mt-5 flex flex-col gap-3">
         {offer.highlights.map((item) => (
@@ -204,17 +223,25 @@ export function PlanCards({
   loggedIn,
   garantiaJaAceita,
 }: {
-  offers: { pro: ClubOffer; elite: ClubOffer };
+  offers: { pro: ClubOffer; proMensal: ClubOffer; elite: ClubOffer };
   currentPlan: "none" | "pro" | "elite";
   loggedIn: boolean;
   garantiaJaAceita: boolean;
 }) {
+  const proAtual = currentPlan === "pro" || currentPlan === "elite";
   return (
-    <div className="grid items-stretch gap-4 sm:grid-cols-2 sm:gap-5">
+    <div className="grid items-stretch gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
       <OfferCard
         offer={offers.pro}
         cta="Quero o PRO"
-        current={currentPlan === "pro" || currentPlan === "elite"}
+        current={proAtual}
+        loggedIn={loggedIn}
+        garantiaJaAceita={garantiaJaAceita}
+      />
+      <OfferCard
+        offer={offers.proMensal}
+        cta="Assinar PRO mensal"
+        current={proAtual}
         loggedIn={loggedIn}
         garantiaJaAceita={garantiaJaAceita}
       />

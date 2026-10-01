@@ -1,12 +1,13 @@
 /**
- * F050 / F051 — Seed dos módulos rascunho (jornada Fase 1–2, n8n, IA Aplicada).
+ * F050 / F051 / F103 — Seed dos módulos (jornada Fase 1–2, n8n, IA,
+ * Fundamentos, gravações das lives semanais).
  *
  *   npm run db:seed:aulas-panda -- --target=hml
  *   npm run db:seed:aulas-panda -- --target=prod --confirm
  *
  * Idempotente por slug. Não altera `published` nem `sortOrder` se o
- * registro já existir (ordem do admin prevalece), **exceto** o M01
- * Comece por aqui (F060: `forceLessonSort`).
+ * registro já existir (ordem do admin prevalece), **exceto** módulos
+ * com `forceLessonSort` (F060 M01, F103 lives).
  * Títulos da jornada e da formação IA/n8n: amigáveis (sem Mxx-Lxx
  * nem prefixo `Aula N —`).
  */
@@ -40,7 +41,7 @@ type ModuleSeed = {
   sortOrder: number;
   lessons: LessonSeed[];
   children?: ModuleSeed[];
-  /** F060 — regrava sortOrder das aulas deste módulo. */
+  /** F060 / F103 — regrava sortOrder das aulas deste módulo. */
   forceLessonSort?: boolean;
 };
 
@@ -850,6 +851,32 @@ A tabela (site, bot, manutenção) está no material:
             sortOrder: 4,
           },
         ],
+      },
+    ],
+  },
+  {
+    // F103 — arquivo das lives semanais. Pago (freeAccess default false).
+    slug: "gravacoes-das-lives-semanais",
+    title: "Gravações das Lives Semanais",
+    description:
+      "Arquivo das lives semanais do Club — só PRO e Elite. A primeira gravação é RaaS: como sair da cobrança por hora e vender pelo resultado que o cliente leva.",
+    coverImageUrl: "/5-lives-semanais.png",
+    sortOrder: 12,
+    forceLessonSort: true,
+    lessons: [
+      {
+        slug: "raas-como-cobrar-pelo-resultado-do-cliente",
+        title: "RaaS — Como cobrar pelo resultado do cliente",
+        description: `RaaS (Result as a Service) é cobrar pelo que o cliente ganha — agenda cheia, leads, recorrência — e não pelo tempo que você passou no projeto.
+
+Nesta live a gente abre o modelo: o que entra no pacote, como explicar o valor sem parecer "eu cobro caro", e como transformar a entrega em uma mensalidade que o cliente quer continuar pagando.
+
+## O que você leva
+- Uma definição clara de RaaS na prática do builder
+- Como estruturar a oferta em cima do resultado, não da hora
+- Argumentos para a conversa de preço com o cliente local`,
+        pandaVideoExternalId: "fe436016-92cc-487e-986e-651d31e79fcb",
+        sortOrder: 0,
       },
     ],
   },
