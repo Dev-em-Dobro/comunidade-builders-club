@@ -107,7 +107,7 @@ describe("detectarCtaNoCorpo — preço e promessa do produto", () => {
   });
 
   it("pega o preço do Elite", () => {
-    assert.deepEqual(regras("O Elite custa R$ 997"), ["preco-do-produto"]);
+    assert.deepEqual(regras("O Elite custa R$ 1.297"), ["preco-do-produto"]);
   });
 
   it("não pega número maior que só começa igual", () => {
