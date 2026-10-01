@@ -1,6 +1,12 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { canWatchLesson, moduleAllowsFree, AULAS_FREE_HREF } from "./access";
+import {
+  AULA_ABERTURA_FREE_VIDEO_ID,
+  AULAS_FREE_HREF,
+  canWatchLesson,
+  lessonVideoId,
+  moduleAllowsFree,
+} from "./access";
 
 describe("moduleAllowsFree — F065", () => {
   it("libera quando o próprio módulo tem a flag", () => {
@@ -110,6 +116,30 @@ describe("AULAS_FREE_HREF — F099", () => {
     assert.equal(
       AULAS_FREE_HREF,
       "/aulas/fase-1-m01-comece-por-aqui/desafio-quick-win-lovable",
+    );
+  });
+});
+
+describe("lessonVideoId", () => {
+  it("usa a versão com CTA só para Free na aula de abertura", () => {
+    const aula = {
+      moduleSlug: "fase-1-m01-comece-por-aqui",
+      lessonSlug: "desafio-quick-win-lovable",
+      defaultVideoId: "video-sem-cta",
+    };
+
+    assert.equal(
+      lessonVideoId({ ...aula, isPaid: false }),
+      AULA_ABERTURA_FREE_VIDEO_ID,
+    );
+    assert.equal(lessonVideoId({ ...aula, isPaid: true }), "video-sem-cta");
+    assert.equal(
+      lessonVideoId({
+        ...aula,
+        isPaid: false,
+        lessonSlug: "outra-aula",
+      }),
+      "video-sem-cta",
     );
   });
 });

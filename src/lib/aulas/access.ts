@@ -6,7 +6,24 @@ export const FASE_1_M01_SLUG = "fase-1-m01-comece-por-aqui";
 /** Primeira aula do M01 — destino do Free (presente, cadastro, aula paga). */
 export const AULA_ABERTURA_SLUG = "desafio-quick-win-lovable";
 
+/** Versão com CTA de venda, exibida só para o Free. */
+export const AULA_ABERTURA_FREE_VIDEO_ID =
+  "8f03bab7-9159-4d65-abcc-674bd650523b";
+
 export const AULAS_FREE_HREF = `/aulas/${FASE_1_M01_SLUG}/${AULA_ABERTURA_SLUG}`;
+
+export function lessonVideoId(opts: {
+  isPaid: boolean;
+  moduleSlug: string;
+  lessonSlug: string;
+  defaultVideoId: string | null;
+}): string | null {
+  return !opts.isPaid &&
+    opts.moduleSlug === FASE_1_M01_SLUG &&
+    opts.lessonSlug === AULA_ABERTURA_SLUG
+    ? AULA_ABERTURA_FREE_VIDEO_ID
+    : opts.defaultVideoId;
+}
 
 export type ModuleAccessNode = {
   freeAccess: boolean;

@@ -7,7 +7,11 @@ import {
   hrefPlanos,
   isPaidMembership,
 } from "@/lib/membership/capabilities";
-import { canWatchLesson, AULAS_FREE_HREF } from "@/lib/aulas/access";
+import {
+  AULAS_FREE_HREF,
+  canWatchLesson,
+  lessonVideoId,
+} from "@/lib/aulas/access";
 import { shouldShowLessonUpgradeCta } from "@/lib/aulas/upgrade-cta";
 import {
   ensureLessonDiscussionPost,
@@ -51,15 +55,19 @@ export default async function LessonPage({ params }: Props) {
 
   const canWatch = canWatchLesson(isPaid, lesson.module);
   if (!canWatch) redirect(AULAS_FREE_HREF);
-  const hasVideo = Boolean(
-    lesson.pandaLibraryId && lesson.pandaVideoExternalId,
-  );
+  const videoId = lessonVideoId({
+    isPaid,
+    moduleSlug,
+    lessonSlug,
+    defaultVideoId: lesson.pandaVideoExternalId,
+  });
+  const hasVideo = Boolean(lesson.pandaLibraryId && videoId);
   let embed: string | null = null;
   if (canWatch && hasVideo) {
     try {
       embed = pandaEmbedUrl(
         lesson.pandaLibraryId!,
-        lesson.pandaVideoExternalId!,
+        videoId!,
       );
     } catch {
       notFound();
@@ -107,7 +115,7 @@ export default async function LessonPage({ params }: Props) {
                    * rastreador monta e nunca recebe nada.
                    */}
                   <iframe
-                    id={`panda-${lesson.pandaVideoExternalId}`}
+                    id={`panda-${videoId}`}
                     src={embed}
                     title={lesson.title}
                     className="absolute inset-0 h-full w-full"
@@ -122,7 +130,7 @@ export default async function LessonPage({ params }: Props) {
                    */}
                   {moduloMedido(moduleSlug) ? (
                     <VideoPlayTracker
-                      videoId={lesson.pandaVideoExternalId!}
+                      videoId={videoId!}
                       fonte="aula"
                       lessonId={lesson.id}
                     />
