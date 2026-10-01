@@ -204,9 +204,9 @@ export const PRICING_PRO: OfferPricing = {
 export const PRICING_PRO_MENSAL: OfferPricing = {
   billing: "monthly",
   installments: 1,
-  installmentPrice: "R$ 16,67",
-  fullPrice: "R$ 16,67",
-  monthlyPrice: "R$ 16,67",
+  installmentPrice: "R$ 87",
+  fullPrice: "R$ 87",
+  monthlyPrice: "R$ 87",
 };
 
 export const PRICING_ELITE: OfferPricing = {

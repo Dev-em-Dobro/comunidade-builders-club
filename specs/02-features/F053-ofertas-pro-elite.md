@@ -46,7 +46,7 @@ Checkouts Hubla (mesmo `tier=pro`, mesmos benefícios):
 | Oferta | Checkout | Preço na Hubla |
 |--------|----------|----------------|
 | PRO à vista | [pay.hub.la/XaY8QNfZlOO1XBgjzMfY](https://pay.hub.la/XaY8QNfZlOO1XBgjzMfY) | R$ 297 (parcelado na vitrine) |
-| **PRO Mensal** | [pay.hub.la/drj7n2oUUYP5CBvzu7b7](https://pay.hub.la/drj7n2oUUYP5CBvzu7b7) | assinatura mensal (preço na Hubla; vitrine espelha o card PRO com copy de recorrência) |
+| **PRO Mensal** | [pay.hub.la/drj7n2oUUYP5CBvzu7b7](https://pay.hub.la/drj7n2oUUYP5CBvzu7b7) | **R$ 87 / mês** (assinatura; vitrine espelha o card PRO com copy de recorrência) |
 
 Libera no Club (qualquer uma das ofertas PRO):
 
