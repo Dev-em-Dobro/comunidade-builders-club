@@ -173,8 +173,8 @@ Página **`/planos`** (liberada para free e PRO):
   é a parcela (`12x de R$ 30,18` no PRO, `12x de R$ 101,30` no Elite), com
   rótulo “Parcele em até”. O valor à vista vira linha secundária
   (`ou R$ 297 à vista`), e o boleto Elite (`R$ 1.297`) segue como nota menor.
-- **Preço (PRO Mensal):** valor mensal em destaque + rótulo “por mês”; CTA
-  “Assinar PRO mensal” → `pay.hub.la/drj7n2oUUYP5CBvzu7b7`
+- **Preço (PRO Mensal):** **R$ 87 / mês** em destaque; CTA “Assinar PRO
+  mensal” → `pay.hub.la/drj7n2oUUYP5CBvzu7b7`
 - **Não** afirmar “sem juros”: o parcelado tem acréscimo (PRO 12x → R$ 362,16,
   22% sobre o à vista; Elite 12x → R$ 1.215,60)
 
