@@ -212,9 +212,8 @@ export const PRICING_PRO_MENSAL: OfferPricing = {
 export const PRICING_ELITE: OfferPricing = {
   billing: "installments",
   installments: 12,
-  installmentPrice: "R$ 101,30",
-  fullPrice: "R$ 997",
-  boletoPrice: "R$ 1.297",
+  installmentPrice: "R$ 131,79",
+  fullPrice: "R$ 1.297",
 };
 
 function envUrl(name: string): string | null {
@@ -278,12 +277,6 @@ export function ofertaElite(): ClubOffer {
     notaFinal:
       "Pagamento pela Hubla. O acesso é liberado no seu primeiro login com o mesmo e-mail da compra.",
     checkoutUrl: checkoutUrlElite(),
-    boletoCheckouts: [
-      {
-        label: "Opção para boleto",
-        url: envUrl("TMB_CHECKOUT_ELITE_BOLETO_1") || CHECKOUT_ELITE_BOLETO_URL,
-      },
-    ],
     recommended: true,
   };
 }
