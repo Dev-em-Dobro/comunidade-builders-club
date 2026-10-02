@@ -898,6 +898,24 @@ Nesta live a gente abre o modelo: o que entra no pacote, como explicar o valor s
     sortOrder: 14,
     lessons: [],
   },
+  {
+    // F108 — Em breve. Pago.
+    slug: "claude-code",
+    title: "Claude Code",
+    description:
+      "Agente da Anthropic do primeiro projeto ao app em produção. Em breve no Club.",
+    sortOrder: 15,
+    lessons: [],
+  },
+  {
+    // F108 — Em breve. Pago.
+    slug: "codex",
+    title: "Codex",
+    description:
+      "Agente da OpenAI: instalação, AGENTS.md, plugins e uso no dia a dia. Em breve no Club.",
+    sortOrder: 16,
+    lessons: [],
+  },
 ];
 
 function resolveUrl(target: Target): string {

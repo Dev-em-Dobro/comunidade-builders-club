@@ -393,6 +393,11 @@ export function AulasCatalog({
                  * não a ausência de um. O sr-only mantém o sentido para
                  * quem não vê a imagem.
                  */}
+                {total === 0 ? (
+                  <span className="absolute left-3 top-3 rounded-full bg-accent px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-accent-foreground shadow-sm">
+                    Em breve
+                  </span>
+                ) : null}
                 {locked ? (
                   <span className="absolute right-3 top-3 inline-flex items-center justify-center rounded-full bg-background/90 p-2 text-foreground shadow-sm">
                     <LockMark className="h-5 w-5" />
@@ -410,18 +415,23 @@ export function AulasCatalog({
                   </p>
                 ) : null}
                 <div className="mt-auto pt-4">
-                  <div className="h-1.5 overflow-hidden rounded-full bg-surface">
-                    <div
-                      className="h-full rounded-full bg-accent"
-                      style={{ width: `${pct}%` }}
-                    />
-                  </div>
-                  <p className="mt-1.5 text-xs font-medium text-muted">
-                    {pct}%
-                    {total > 0
-                      ? ` · ${total} ${total === 1 ? "aula" : "aulas"}`
-                      : " · em breve"}
-                  </p>
+                  {total > 0 ? (
+                    <>
+                      <div className="h-1.5 overflow-hidden rounded-full bg-surface">
+                        <div
+                          className="h-full rounded-full bg-accent"
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                      <p className="mt-1.5 text-xs font-medium text-muted">
+                        {pct}% · {total} {total === 1 ? "aula" : "aulas"}
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-xs font-semibold uppercase tracking-wide text-accent">
+                      Em breve
+                    </p>
+                  )}
                 </div>
               </div>
             </Link>
