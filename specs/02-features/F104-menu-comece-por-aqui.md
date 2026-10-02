@@ -10,7 +10,7 @@ F103 já é gravações de lives — este ID é F104.
 Colocar no topo do menu lateral dois itens de jornada, **antes de Aulas**, para o aluno não se perder:
 
 1. **Como usar a comunidade** → `/spaces/boas-vindas` (rótulo novo; rota igual)
-2. **Método: Comece por aqui** → módulo M01 (`/aulas/fase-1-m01-comece-por-aqui`)
+2. **Método: Comece por aqui** → `/metodo` ([F105](F105-tela-metodo.md); antes apontava pro M01)
 
 O space `boas-vindas` deixa de aparecer na lista flat de Spaces (evita duplicata).
 

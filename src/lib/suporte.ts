@@ -30,3 +30,12 @@ export function whatsappSuporteUrl(mensagem = MENSAGEM_PADRAO): string | null {
 export function emailSuporteUrl(assunto = "Ajuda com minha assinatura"): string {
   return `mailto:${EMAIL_SUPORTE}?subject=${encodeURIComponent(assunto)}`;
 }
+
+/**
+ * F105 — convite do grupo WhatsApp Elite (tela Método).
+ * Vazio = Elite vê o passo sem link clicável até configurar a env.
+ */
+export function whatsappEliteUrl(): string | null {
+  const url = (process.env.NEXT_PUBLIC_WHATSAPP_ELITE_URL ?? "").trim();
+  return url || null;
+}
