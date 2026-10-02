@@ -58,8 +58,7 @@ export default function PlanosPage() {
             Escolha como quer entrar
           </h1>
           <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">
-            Escolha o PRO para seguir com o arsenal completo ou o Elite para
-            ter acompanhamento mais próximo.
+            Pare de brincar com IA, feche o primeiro cliente em 90 dias
           </p>
         </header>
 
