@@ -1,6 +1,6 @@
 /**
- * F050 / F051 / F103 — Seed dos módulos (jornada Fase 1–2, n8n, IA,
- * Fundamentos, gravações das lives semanais).
+ * F050 / F051 / F103 / F107 — Seed dos módulos (jornada Fase 1–2, n8n, IA,
+ * Fundamentos, gravações das lives, Grok Bots, JEV).
  *
  *   npm run db:seed:aulas-panda -- --target=hml
  *   npm run db:seed:aulas-panda -- --target=prod --confirm
@@ -879,6 +879,24 @@ Nesta live a gente abre o modelo: o que entra no pacote, como explicar o valor s
         sortOrder: 0,
       },
     ],
+  },
+  {
+    // F107 — agentes Grok. Pago (freeAccess default false). Aulas entram depois.
+    slug: "grok-bots-agentes-que-fazem-trabalho-por-voce",
+    title: "Grok Bots — Agentes que fazem trabalho por você",
+    description:
+      "Agentes no Grok que executam tarefas de verdade: do setup ao fluxo rodando sem você no meio de cada passo.",
+    sortOrder: 13,
+    lessons: [],
+  },
+  {
+    // F107 — JEV na prática. Pago (freeAccess default false). Aulas entram depois.
+    slug: "jev-aplicado-ao-mundo-real",
+    title: "JEV aplicado ao mundo real",
+    description:
+      "JEV fora da teoria: como aplicar no dia a dia do builder — prospecção, entrega e operação com IA.",
+    sortOrder: 14,
+    lessons: [],
   },
 ];
 
