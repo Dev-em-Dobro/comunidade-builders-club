@@ -12,13 +12,18 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { UpgradeProvider, useUpgrade } from "@/components/upgrade-modal";
 import { UserMenu } from "@/components/user-menu";
 import { isFreeSpaceSlug } from "@/lib/membership/capabilities";
-import { isFreePublishSpace } from "@/lib/spaces/constants";
+import { METODO_HREF } from "@/lib/metodo/copy";
+import {
+  isFreePublishSpace,
+  WELCOME_SPACE_SLUG,
+} from "@/lib/spaces/constants";
 import { ClubImersaoBanner } from "@/components/club-imersao-banner";
 import { BastidoresBanner } from "@/components/bastidores-banner";
 import { faixaDoTopo } from "@/lib/eventos/bastidores";
 import {
   ICON_ADMIN,
   ICON_AULAS,
+  ICON_BOAS_VINDAS,
   ICON_BUSCA,
   ICON_MATERIAIS,
   ICON_NOVA,
@@ -26,6 +31,9 @@ import {
   ICON_TODOS,
   iconForSpace,
 } from "@/components/nav-icons";
+
+/** F104 / F105 — jornada no menu. */
+const COMO_USAR_HREF = `/spaces/${WELCOME_SPACE_SLUG}`;
 
 function OrionIcon() {
   return (
@@ -83,6 +91,39 @@ function FeedLink({ onNavigate }: { onNavigate?: () => void }) {
       {ICON_TODOS}
       <span className="truncate">Feed</span>
     </Link>
+  );
+}
+
+/**
+ * F104 — bloco de jornada no topo: plataforma + método, antes de Aulas/Feed.
+ */
+function ComecePorAquiNav({ onNavigate }: { onNavigate?: () => void }) {
+  const pathname = usePathname();
+  const comoUsarActive = pathname.startsWith(COMO_USAR_HREF);
+  const metodoActive = pathname.startsWith(METODO_HREF);
+
+  return (
+    <nav className="flex flex-col gap-0.5" aria-label="Comece por aqui">
+      <p className="mb-1.5 px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">
+        Comece por aqui
+      </p>
+      <Link
+        href={COMO_USAR_HREF}
+        onClick={onNavigate}
+        className={`nav-space flex items-center gap-2 ${comoUsarActive ? "nav-space-active" : ""}`}
+      >
+        {ICON_BOAS_VINDAS}
+        <span className="truncate">Como usar a comunidade</span>
+      </Link>
+      <Link
+        href={METODO_HREF}
+        onClick={onNavigate}
+        className={`nav-space flex items-center gap-2 ${metodoActive ? "nav-space-active" : ""}`}
+      >
+        {ICON_AULAS}
+        <span className="truncate">Método: Comece por aqui</span>
+      </Link>
+    </nav>
   );
 }
 
@@ -161,13 +202,15 @@ function SpaceNav({
 }) {
   const pathname = usePathname();
   const { openUpgrade } = useUpgrade();
+  // F104 — boas-vindas sobe pro bloco "Comece por aqui"; some da lista flat.
+  const spacesNoMenu = spaces.filter((s) => s.slug !== WELCOME_SPACE_SLUG);
 
   return (
     <nav className="flex flex-col gap-0.5">
       <p className="mb-1.5 px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">
         Spaces
       </p>
-      {spaces.map((s) => {
+      {spacesNoMenu.map((s) => {
         const href = `/spaces/${s.slug}`;
         const active = pathname === href;
         const locked = !isPaid && !isFreeSpaceSlug(s.slug);
@@ -462,6 +505,8 @@ function ShellInner({
           {NOME_PRODUTO}
         </Link>
         <div className="sidebar-scroll mt-5 flex min-h-0 flex-1 flex-col overflow-y-auto">
+          <ComecePorAquiNav />
+          <div className="my-3 border-t border-border" />
           <FeedLink />
           <AulasLink />
           <div className="my-3 border-t border-border" />
@@ -508,6 +553,8 @@ function ShellInner({
               </button>
             </div>
             <div className="sidebar-scroll flex min-h-0 flex-1 flex-col overflow-y-auto">
+              <ComecePorAquiNav onNavigate={() => setDrawerOpen(false)} />
+              <div className="my-3 border-t border-border" />
               <FeedLink onNavigate={() => setDrawerOpen(false)} />
               <AulasLink onNavigate={() => setDrawerOpen(false)} />
               <div className="my-3 border-t border-border" />

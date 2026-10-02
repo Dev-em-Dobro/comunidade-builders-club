@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { WelcomeTutorialPlayer } from "@/components/welcome-tutorial-player";
 import { WelcomeUpgradeBanner } from "@/components/welcome-upgrade-banner";
+import { METODO_HREF } from "@/lib/metodo/copy";
 
 type Step = {
   n: string;
@@ -20,9 +21,9 @@ const STEPS_PAGO: Step[] = [
   },
   {
     n: "2",
-    href: "/aulas",
-    label: "Assistir as aulas",
-    hint: "Comece pelo tutorial. A primeira aula é este vídeo, com o passo a passo da plataforma.",
+    href: METODO_HREF,
+    label: "Ler o Método: Comece por aqui",
+    hint: "O manifesto e o passo a passo do caminho até o primeiro cliente.",
   },
   {
     n: "3",
@@ -35,8 +36,7 @@ const STEPS_PAGO: Step[] = [
 
 /**
  * F063 / F065 — a trilha do free só pode ter o que ele consegue fazer.
- * Publicar fora de projetos continua PRO+. O Comece por aqui (F065) entra
- * como passo 2.
+ * F106 — depois do vídeo, o próximo passo explícito é o Método.
  */
 const STEPS_FREE: Step[] = [
   {
@@ -47,11 +47,9 @@ const STEPS_FREE: Step[] = [
   },
   {
     n: "2",
-    href: "/aulas",
-    label: "Assistir as primeiras aulas",
-    // F067 — a trilha é onboarding, não pitch: sai a menção ao plano pago,
-    // que fechava o passo na tranca em vez do próximo movimento dela.
-    hint: "O Comece por aqui está liberado. Assista e conheça o método — é a base de tudo o que vem depois.",
+    href: METODO_HREF,
+    label: "Ler o Método: Comece por aqui",
+    hint: "O manifesto e o passo a passo — assista as aulas do método a partir daí.",
   },
   {
     n: "3",
@@ -68,15 +66,14 @@ const STEPS_FREE: Step[] = [
 ];
 
 export function WelcomeSpaceView({
-  spaceName,
-  spaceDescription,
   tutorialEmbedUrl,
   tutorialVideoId,
   tutorialTitle,
   isPaid,
 }: {
-  spaceName: string;
-  spaceDescription: string | null;
+  /** Mantido na API da página; o título da tela é fixo (F106). */
+  spaceName?: string;
+  spaceDescription?: string | null;
   tutorialEmbedUrl?: string | null;
   tutorialVideoId?: string;
   tutorialTitle?: string;
@@ -88,13 +85,27 @@ export function WelcomeSpaceView({
   return (
     <div className="feed-wrap-wide">
       <div>
-        <h1 className="page-title">{spaceName}</h1>
-        {/* F067 — "passo a passo" cobre as duas trilhas (3 no pago, 4 no
-            free) e não quebra quando a lista muda de tamanho. */}
-        <p className="mt-1.5 max-w-2xl text-sm text-muted">
-          {spaceDescription?.trim() ||
-            "Assista o tutorial e siga o passo a passo. Um caminho só — o suficiente para o primeiro dia."}
-        </p>
+        <h1 className="page-title">Como usar a comunidade</h1>
+        {/* F106 — copy revisada: assista antes de começar, depois Método. */}
+        <div className="mt-3 max-w-2xl space-y-3 text-[15px] leading-relaxed text-muted md:text-base">
+          <p>Olá.</p>
+          <p>
+            Temos um vídeo curto de como a comunidade funciona: onde postar,
+            como achar as aulas e os materiais.
+          </p>
+          <p>É direto. Assista antes de começar.</p>
+          <p>
+            Depois disso, vá em{" "}
+            <Link
+              href={METODO_HREF}
+              className="font-medium text-foreground underline-offset-2 hover:text-accent hover:underline"
+            >
+              Método: Comece por aqui
+            </Link>{" "}
+            e siga o passo a passo.
+          </p>
+          <p>Boa jornada.</p>
+        </div>
       </div>
 
       {tutorialEmbedUrl ? (
@@ -105,9 +116,6 @@ export function WelcomeSpaceView({
           >
             {tutorialTitle ?? "Como usar a comunidade"}
           </h2>
-          <p className="mt-1 text-sm text-muted">
-            Quer saber quem são os builders? Assista o vídeo abaixo.
-          </p>
         </div>
       ) : null}
 

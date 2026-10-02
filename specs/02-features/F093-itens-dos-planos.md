@@ -59,9 +59,8 @@ página — deixa de ser vendida como benefício.
 
 ### 4. Elite se diferencia por gente, não por volume de arquivo
 
-"Skills extras" e "Templates extras" saem. Entram plantão semanal ao vivo,
-Orion PRO nos 90 dias, mapa de execução semana a semana, revisão de proposta
-e resposta em 24h úteis.
+"Skills extras" e "Templates extras" saem. Entram lives exclusivas semanais,
+Orion PRO nos 90 dias, revisão de proposta e resposta garantida em 24h.
 
 ### 5. `checkout.ts` é a fonte única dos itens
 
@@ -78,7 +77,7 @@ Itens que a operação ainda **não** entrega carregam `novo: true`. A flag
 | Item | Plano | O que passa a ser obrigação |
 |------|-------|------------------------------|
 | Revisão da proposta (1x) | Elite | Alguém revisa e devolve a proposta do membro |
-| Resposta em 24h úteis | Elite | SLA de suporte enquanto a garantia corre |
+| Resposta garantida em 24h | Elite | SLA de suporte |
 | CMS incluso (só Elite) | Elite | Já no catálogo com gate ([F097](F097-cms-crm-elite-only.md)) |
 | CRM e agente de WhatsApp inclusos | Elite | Entregar os "Em breve" sem cobrar à parte |
 | Upgrade pagando a diferença | PRO→Elite | Regra de cobrança na Hubla (citada na nota do card PRO) |
