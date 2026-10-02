@@ -78,7 +78,7 @@ const ITENS_PRO: OfferHighlight[] = [
   },
   {
     texto:
-      "Orion: as empresas da sua cidade que estão sem site (ou com site quebrado), com telefone, prioridade e a abordagem pronta",
+      "Orion: a máquina pra prospectar clientes qualificados em minutos, com telefone, prioridade e a abordagem pronta (40 por mês no plano Free)",
   },
   {
     texto:
@@ -108,15 +108,11 @@ const ITENS_ELITE: OfferHighlight[] = [
   },
   {
     texto:
-      "Plantão ao vivo toda semana pra você abrir a tela e destravar o SEU caso: o orçamento que travou, o cliente que sumiu",
+      "Lives exclusivas toda semana onde mostramos o que estamos fazendo na nossa empresa e ajudamos na sua operação",
   },
   {
     texto:
-      "Orion no plano PRO por 90 dias: prospecção sem o teto do Free, justo nos meses que valem a garantia",
-  },
-  {
-    texto:
-      "Seu mapa de 90 dias semana a semana — você nunca abre a plataforma sem saber o que fazer hoje",
+      "Orion no plano PRO por 90 dias: prospecção sem o teto do Free",
   },
   {
     texto:
@@ -124,8 +120,7 @@ const ITENS_ELITE: OfferHighlight[] = [
     novo: true,
   },
   {
-    texto:
-      "Resposta garantida em 24h úteis enquanto a sua garantia estiver correndo",
+    texto: "Resposta garantida em 24h",
     novo: true,
   },
   {
