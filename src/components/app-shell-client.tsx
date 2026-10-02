@@ -11,14 +11,19 @@ import {
 import { ThemeToggle } from "@/components/theme-toggle";
 import { UpgradeProvider, useUpgrade } from "@/components/upgrade-modal";
 import { UserMenu } from "@/components/user-menu";
+import { FASE_1_M01_SLUG } from "@/lib/aulas/access";
 import { isFreeSpaceSlug } from "@/lib/membership/capabilities";
-import { isFreePublishSpace } from "@/lib/spaces/constants";
+import {
+  isFreePublishSpace,
+  WELCOME_SPACE_SLUG,
+} from "@/lib/spaces/constants";
 import { ClubImersaoBanner } from "@/components/club-imersao-banner";
 import { BastidoresBanner } from "@/components/bastidores-banner";
 import { faixaDoTopo } from "@/lib/eventos/bastidores";
 import {
   ICON_ADMIN,
   ICON_AULAS,
+  ICON_BOAS_VINDAS,
   ICON_BUSCA,
   ICON_MATERIAIS,
   ICON_NOVA,
@@ -26,6 +31,10 @@ import {
   ICON_TODOS,
   iconForSpace,
 } from "@/components/nav-icons";
+
+/** F104 — módulo do método no menu (trilha M01). */
+const METODO_HREF = `/aulas/${FASE_1_M01_SLUG}`;
+const COMO_USAR_HREF = `/spaces/${WELCOME_SPACE_SLUG}`;
 
 function OrionIcon() {
   return (
@@ -87,18 +96,54 @@ function FeedLink({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 /**
+ * F104 — bloco de jornada no topo: plataforma + método, antes de Aulas/Feed.
+ */
+function ComecePorAquiNav({ onNavigate }: { onNavigate?: () => void }) {
+  const pathname = usePathname();
+  const comoUsarActive = pathname.startsWith(COMO_USAR_HREF);
+  const metodoActive = pathname.startsWith(METODO_HREF);
+
+  return (
+    <nav className="flex flex-col gap-0.5" aria-label="Comece por aqui">
+      <p className="mb-1.5 px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">
+        Comece por aqui
+      </p>
+      <Link
+        href={COMO_USAR_HREF}
+        onClick={onNavigate}
+        className={`nav-space flex items-center gap-2 ${comoUsarActive ? "nav-space-active" : ""}`}
+      >
+        {ICON_BOAS_VINDAS}
+        <span className="truncate">Como usar a comunidade</span>
+      </Link>
+      <Link
+        href={METODO_HREF}
+        onClick={onNavigate}
+        className={`nav-space flex items-center gap-2 ${metodoActive ? "nav-space-active" : ""}`}
+      >
+        {ICON_AULAS}
+        <span className="truncate">Método: Comece por aqui</span>
+      </Link>
+    </nav>
+  );
+}
+
+/**
  * F092 — Aulas sobe do rodapé para junto do Feed. O rodapé é zona de conta e
  * ferramentas; a formação é destino principal e estava enterrada lá embaixo.
  * Sem cadeado: o catálogo é sempre visível e a F065 libera o M01 no gratuito —
  * quem é free precisa chegar até a página para ver o que já pode assistir.
+ * F104 — ativo só no catálogo geral; o M01 fica com o item Método.
  */
 function AulasLink({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
+  const onMetodo = pathname.startsWith(METODO_HREF);
+  const active = pathname.startsWith("/aulas") && !onMetodo;
   return (
     <Link
       href="/aulas"
       onClick={onNavigate}
-      className={`nav-space flex items-center gap-2 ${pathname.startsWith("/aulas") ? "nav-space-active" : ""}`}
+      className={`nav-space flex items-center gap-2 ${active ? "nav-space-active" : ""}`}
     >
       {ICON_AULAS}
       <span className="truncate">Aulas</span>
@@ -161,13 +206,15 @@ function SpaceNav({
 }) {
   const pathname = usePathname();
   const { openUpgrade } = useUpgrade();
+  // F104 — boas-vindas sobe pro bloco "Comece por aqui"; some da lista flat.
+  const spacesNoMenu = spaces.filter((s) => s.slug !== WELCOME_SPACE_SLUG);
 
   return (
     <nav className="flex flex-col gap-0.5">
       <p className="mb-1.5 px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">
         Spaces
       </p>
-      {spaces.map((s) => {
+      {spacesNoMenu.map((s) => {
         const href = `/spaces/${s.slug}`;
         const active = pathname === href;
         const locked = !isPaid && !isFreeSpaceSlug(s.slug);
@@ -462,6 +509,8 @@ function ShellInner({
           {NOME_PRODUTO}
         </Link>
         <div className="sidebar-scroll mt-5 flex min-h-0 flex-1 flex-col overflow-y-auto">
+          <ComecePorAquiNav />
+          <div className="my-3 border-t border-border" />
           <FeedLink />
           <AulasLink />
           <div className="my-3 border-t border-border" />
@@ -508,6 +557,8 @@ function ShellInner({
               </button>
             </div>
             <div className="sidebar-scroll flex min-h-0 flex-1 flex-col overflow-y-auto">
+              <ComecePorAquiNav onNavigate={() => setDrawerOpen(false)} />
+              <div className="my-3 border-t border-border" />
               <FeedLink onNavigate={() => setDrawerOpen(false)} />
               <AulasLink onNavigate={() => setDrawerOpen(false)} />
               <div className="my-3 border-t border-border" />
