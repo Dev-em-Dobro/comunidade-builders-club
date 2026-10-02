@@ -63,6 +63,10 @@ function LockIcon() {
   );
 }
 
+/** Mesmo corpo de leitura dos posts abertos (MarkdownBody variant=reading). */
+const CORPO_LEITURA =
+  "space-y-5 text-[1.0625rem] leading-[1.7] text-foreground/90 md:text-[1.1875rem]";
+
 export function MetodoView({
   isElite,
   whatsappUrl,
@@ -71,34 +75,38 @@ export function MetodoView({
   whatsappUrl: string | null;
 }) {
   const { openUpgrade } = useUpgrade();
-  const steps = [...STEPS_BASE, { ...STEP_WHATSAPP, n: String(STEPS_BASE.length + 1) }];
+  const steps = [
+    ...STEPS_BASE,
+    { ...STEP_WHATSAPP, n: String(STEPS_BASE.length + 1) },
+  ];
 
   return (
-    <div className="feed-wrap-wide">
-      <header>
+    <div className="reading-wrap">
+      {/*
+        F106 — um card no estilo de post aberto: título grande + corpo reading.
+        Sem hover de feed (já está “aberto”).
+      */}
+      <article className="post-card !shadow-none hover:!shadow-none p-5 sm:p-8 md:p-10">
         <p className="text-xs font-semibold uppercase tracking-[0.08em] text-accent">
           Leia com atenção
         </p>
-        <h1 className="page-title mt-2">{MANIFESTO_TITULO}</h1>
-      </header>
-
-      <article className="post-card mt-6 space-y-4 p-5 sm:p-6">
-        {MANIFESTO_PARAGRAFOS.map((p) => (
-          <p key={p.slice(0, 40)} className="text-[15px] leading-relaxed text-foreground/90">
-            {p}
-          </p>
-        ))}
+        <h1 className="reading-title mt-3">{MANIFESTO_TITULO}</h1>
+        <div className={`mt-8 ${CORPO_LEITURA}`}>
+          {MANIFESTO_PARAGRAFOS.map((p) => (
+            <p key={p.slice(0, 48)}>{p}</p>
+          ))}
+        </div>
       </article>
 
-      <section className="post-card mt-6 p-5 sm:p-6">
-        <h2 className="font-[family-name:var(--font-outfit)] text-base font-semibold tracking-tight">
+      <section className="post-card mt-6 !shadow-none hover:!shadow-none p-5 sm:p-8">
+        <h2 className="font-[family-name:var(--font-outfit)] text-xl font-bold tracking-tight md:text-2xl">
           Passo a passo
         </h2>
-        <ol className="mt-4 space-y-4">
+        <ol className="mt-6 space-y-5">
           {steps.map((step) => (
             <li key={step.n} className="flex gap-3">
               <span
-                className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent/15 text-xs font-semibold text-accent"
+                className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent/15 text-sm font-semibold text-accent"
                 aria-hidden
               >
                 {step.n}
@@ -110,17 +118,19 @@ export function MetodoView({
                       href={whatsappUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-medium text-foreground underline-offset-2 hover:text-accent hover:underline"
+                      className="text-[1.0625rem] font-semibold text-foreground underline-offset-2 hover:text-accent hover:underline md:text-[1.125rem]"
                     >
                       {step.label}
                     </a>
                   ) : isElite ? (
-                    <span className="font-medium text-foreground">{step.label}</span>
+                    <span className="text-[1.0625rem] font-semibold text-foreground md:text-[1.125rem]">
+                      {step.label}
+                    </span>
                   ) : (
                     <button
                       type="button"
                       onClick={() => openUpgrade("whatsapp-elite")}
-                      className="inline-flex items-center gap-2 font-medium text-foreground underline-offset-2 hover:text-accent hover:underline"
+                      className="inline-flex items-center gap-2 text-[1.0625rem] font-semibold text-foreground underline-offset-2 hover:text-accent hover:underline md:text-[1.125rem]"
                     >
                       {step.label}
                       <LockIcon />
@@ -129,12 +139,12 @@ export function MetodoView({
                 ) : (
                   <Link
                     href={step.href!}
-                    className="font-medium text-foreground underline-offset-2 hover:text-accent hover:underline"
+                    className="text-[1.0625rem] font-semibold text-foreground underline-offset-2 hover:text-accent hover:underline md:text-[1.125rem]"
                   >
                     {step.label}
                   </Link>
                 )}
-                <p className="mt-0.5 text-sm leading-snug text-muted">
+                <p className="mt-1 text-[15px] leading-snug text-muted md:text-base">
                   {step.whatsappElite && isElite && !whatsappUrl
                     ? "Peça o link do grupo no plantão ou no suporte Elite."
                     : step.hint}
