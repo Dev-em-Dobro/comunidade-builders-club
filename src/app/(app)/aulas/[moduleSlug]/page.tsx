@@ -44,8 +44,8 @@ export default async function AulasModulePage({ params }: Props) {
       <h1 className="page-title mt-4">{mod.title}</h1>
       <div className="mt-8">
         <EmptyState
-          title="Nenhuma aula neste módulo"
-          description="O conteúdo ainda está sendo preparado."
+          title="Em breve"
+          description="Este módulo ainda não tem aulas publicadas. Volte quando o conteúdo estiver no ar."
         />
       </div>
     </div>
