@@ -79,6 +79,7 @@ export function isFreeAppPath(pathname: string): boolean {
   if (pathname.startsWith("/planos")) return true;
   if (pathname.startsWith("/posts/")) return true; // detalhe: gate por space do post
   if (pathname.startsWith("/aulas")) return true;
+  if (pathname.startsWith("/metodo")) return true; // F105
   if (pathname.startsWith("/nova")) return true;
   if (pathname.startsWith("/spaces/")) {
     const slug = pathname.split("/")[2] ?? "";
@@ -107,6 +108,8 @@ export type UpgradeReason =
   | "boas-vindas"
   /** F091 — origem: CTA na descrição da aula gratuita. Nunca abre modal. */
   | "aula-descricao"
+  /** F105 — passo WhatsApp na tela Método (só Elite). */
+  | "whatsapp-elite"
   | "geral";
 
 const UPGRADE_REASONS: readonly UpgradeReason[] = [
@@ -121,6 +124,7 @@ const UPGRADE_REASONS: readonly UpgradeReason[] = [
   "orion",
   "boas-vindas",
   "aula-descricao",
+  "whatsapp-elite",
   "geral",
 ];
 
@@ -197,6 +201,10 @@ export const UPGRADE_REASON_COPY: Record<
   "aula-descricao": {
     title: "Tenha acesso ao arsenal completo",
     body: "Você já assiste as aulas gratuitas. O PRO libera o Arsenal — sites prontos, propostas e contratos — a partir de 12× R$ 30,18.",
+  },
+  "whatsapp-elite": {
+    title: "Grupo de WhatsApp",
+    body: "O grupo é exclusivo do plano Elite. No Elite você entra no grupo com acompanhamento mais próximo. Se quiser, veja o Elite na página de planos.",
   },
   geral: {
     title: PROMESSA_PRIMEIRO_CLIENTE,

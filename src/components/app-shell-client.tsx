@@ -11,8 +11,8 @@ import {
 import { ThemeToggle } from "@/components/theme-toggle";
 import { UpgradeProvider, useUpgrade } from "@/components/upgrade-modal";
 import { UserMenu } from "@/components/user-menu";
-import { FASE_1_M01_SLUG } from "@/lib/aulas/access";
 import { isFreeSpaceSlug } from "@/lib/membership/capabilities";
+import { METODO_HREF } from "@/lib/metodo/copy";
 import {
   isFreePublishSpace,
   WELCOME_SPACE_SLUG,
@@ -32,8 +32,7 @@ import {
   iconForSpace,
 } from "@/components/nav-icons";
 
-/** F104 — módulo do método no menu (trilha M01). */
-const METODO_HREF = `/aulas/${FASE_1_M01_SLUG}`;
+/** F104 / F105 — jornada no menu. */
 const COMO_USAR_HREF = `/spaces/${WELCOME_SPACE_SLUG}`;
 
 function OrionIcon() {
@@ -133,17 +132,14 @@ function ComecePorAquiNav({ onNavigate }: { onNavigate?: () => void }) {
  * ferramentas; a formação é destino principal e estava enterrada lá embaixo.
  * Sem cadeado: o catálogo é sempre visível e a F065 libera o M01 no gratuito —
  * quem é free precisa chegar até a página para ver o que já pode assistir.
- * F104 — ativo só no catálogo geral; o M01 fica com o item Método.
  */
 function AulasLink({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
-  const onMetodo = pathname.startsWith(METODO_HREF);
-  const active = pathname.startsWith("/aulas") && !onMetodo;
   return (
     <Link
       href="/aulas"
       onClick={onNavigate}
-      className={`nav-space flex items-center gap-2 ${active ? "nav-space-active" : ""}`}
+      className={`nav-space flex items-center gap-2 ${pathname.startsWith("/aulas") ? "nav-space-active" : ""}`}
     >
       {ICON_AULAS}
       <span className="truncate">Aulas</span>

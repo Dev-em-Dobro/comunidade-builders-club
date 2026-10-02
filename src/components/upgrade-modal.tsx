@@ -104,6 +104,8 @@ export function UpgradeProvider({
 
   const copy = UPGRADE_REASON_COPY[reason];
   const eliteOnly = isPaid && !isElite;
+  /** F105 — WhatsApp Elite usa a copy do motivo mesmo para quem já é PRO. */
+  const usarCopyMotivo = !eliteOnly || reason === "whatsapp-elite";
   const planosHref = hrefPlanos({
     motivo: reason,
     destaque: eliteOnly ? "elite" : undefined,
@@ -133,12 +135,12 @@ export function UpgradeProvider({
               id="upgrade-title"
               className="mt-2 font-[family-name:var(--font-outfit)] text-xl font-bold sm:text-2xl"
             >
-              {eliteOnly ? "Evolua para o Elite" : copy.title}
+              {usarCopyMotivo ? copy.title : "Evolua para o Elite"}
             </h2>
             <p className="mt-2 text-[15px] leading-relaxed text-muted">
-              {eliteOnly
-                ? "Você já tem o PRO. O Elite libera Orion, reunião semanal em grupo e material extra."
-                : copy.body}
+              {usarCopyMotivo
+                ? copy.body
+                : "Você já tem o PRO. O Elite libera Orion, reunião semanal em grupo e material extra."}
             </p>
 
             <div className="mt-6 flex items-center justify-between gap-3">
