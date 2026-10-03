@@ -6,7 +6,7 @@ Em implementação
 Depende de: [F104](F104-menu-comece-por-aqui.md) (item de menu).
 
 ## Objetivo
-O item **Método: Comece por aqui** abre uma página própria (`/metodo`), não a aula do M01.
+O item **Comece por aqui** no menu abre uma página própria (`/metodo`), não a aula do M01.
 
 Conteúdo:
 
@@ -16,6 +16,6 @@ Conteúdo:
 
 ## Critérios
 - [x] `/metodo` autenticado renderiza manifesto + passos
-- [x] Menu “Método: Comece por aqui” → `/metodo` (não redireciona pra aula)
+- [x] Menu “Comece por aqui” → `/metodo` (não redireciona pra aula)
 - [x] Não-Elite: passo WhatsApp com cadeado; clique abre upgrade Elite
-- [x] Elite: passo WhatsApp com link (`NEXT_PUBLIC_WHATSAPP_ELITE_URL`) quando configurado
+- [x] Elite: passo WhatsApp com link (`WHATSAPP_ELITE_URL` ou `NEXT_PUBLIC_WHATSAPP_ELITE_URL`) quando configurado; exige redeploy após setar a env
