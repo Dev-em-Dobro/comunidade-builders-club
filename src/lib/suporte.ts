@@ -33,9 +33,15 @@ export function emailSuporteUrl(assunto = "Ajuda com minha assinatura"): string 
 
 /**
  * F105 — convite do grupo WhatsApp Elite (tela Método).
- * Vazio = Elite vê o passo sem link clicável até configurar a env.
+ * Prefere `WHATSAPP_ELITE_URL` (só servidor — não é inlined no build).
+ * Aceita `NEXT_PUBLIC_WHATSAPP_ELITE_URL` como fallback.
+ * Vazio = Elite vê o passo sem link clicável.
  */
 export function whatsappEliteUrl(): string | null {
-  const url = (process.env.NEXT_PUBLIC_WHATSAPP_ELITE_URL ?? "").trim();
+  const url = (
+    process.env.WHATSAPP_ELITE_URL ??
+    process.env.NEXT_PUBLIC_WHATSAPP_ELITE_URL ??
+    ""
+  ).trim();
   return url || null;
 }

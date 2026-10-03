@@ -121,7 +121,7 @@ function ComecePorAquiNav({ onNavigate }: { onNavigate?: () => void }) {
         className={`nav-space flex items-center gap-2 ${metodoActive ? "nav-space-active" : ""}`}
       >
         {ICON_AULAS}
-        <span className="truncate">Método: Comece por aqui</span>
+        <span className="truncate">Comece por aqui</span>
       </Link>
     </nav>
   );
