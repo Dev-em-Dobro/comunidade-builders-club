@@ -22,7 +22,7 @@ const STEPS_PAGO: Step[] = [
   {
     n: "2",
     href: METODO_HREF,
-    label: "Ler o Método: Comece por aqui",
+    label: "Ler Comece por aqui",
     hint: "O manifesto e o passo a passo do caminho até o primeiro cliente.",
   },
   {
@@ -36,7 +36,7 @@ const STEPS_PAGO: Step[] = [
 
 /**
  * F063 / F065 — a trilha do free só pode ter o que ele consegue fazer.
- * F106 — depois do vídeo, o próximo passo explícito é o Método.
+ * F106 — depois do vídeo, o próximo passo explícito é Comece por aqui.
  */
 const STEPS_FREE: Step[] = [
   {
@@ -48,7 +48,7 @@ const STEPS_FREE: Step[] = [
   {
     n: "2",
     href: METODO_HREF,
-    label: "Ler o Método: Comece por aqui",
+    label: "Ler Comece por aqui",
     hint: "O manifesto e o passo a passo — assista as aulas do método a partir daí.",
   },
   {
@@ -86,12 +86,13 @@ export function WelcomeSpaceView({
     <div className="feed-wrap-wide">
       <div>
         <h1 className="page-title">Como usar a comunidade</h1>
-        {/* F106 — copy revisada: assista antes de começar, depois Método. */}
-        <div className="mt-3 max-w-2xl space-y-3 text-[15px] leading-relaxed text-muted md:text-base">
+        {/* F106 — copy revisada: assista antes de começar, depois Comece por aqui. */}
+        <div className="mt-3 max-w-3xl space-y-3 text-[15px] leading-relaxed text-pretty text-muted md:text-base">
           <p>Olá.</p>
           <p>
-            Temos um vídeo curto de como a comunidade funciona: onde postar,
-            como achar as aulas e os materiais.
+            {
+              "Temos um vídeo curto de como a comunidade funciona: onde postar, como achar as aulas e os materiais."
+            }
           </p>
           <p>É direto. Assista antes de começar.</p>
           <p>
@@ -100,7 +101,7 @@ export function WelcomeSpaceView({
               href={METODO_HREF}
               className="font-medium text-foreground underline-offset-2 hover:text-accent hover:underline"
             >
-              Método: Comece por aqui
+              Comece por aqui
             </Link>{" "}
             e siga o passo a passo.
           </p>
