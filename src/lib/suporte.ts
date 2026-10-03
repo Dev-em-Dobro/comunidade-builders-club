@@ -36,12 +36,16 @@ export function emailSuporteUrl(assunto = "Ajuda com minha assinatura"): string 
  * Prefere `WHATSAPP_ELITE_URL` (só servidor — não é inlined no build).
  * Aceita `NEXT_PUBLIC_WHATSAPP_ELITE_URL` como fallback.
  * Vazio = Elite vê o passo sem link clicável.
+ * Tira `<>` de colagem (Slack/Markdown) — senão o href vira path relativo no domínio.
  */
 export function whatsappEliteUrl(): string | null {
-  const url = (
+  const raw = (
     process.env.WHATSAPP_ELITE_URL ??
     process.env.NEXT_PUBLIC_WHATSAPP_ELITE_URL ??
     ""
   ).trim();
-  return url || null;
+  const url = raw.replace(/^<|>$/g, "").trim();
+  if (!url) return null;
+  if (!/^https?:\/\//i.test(url)) return null;
+  return url;
 }
