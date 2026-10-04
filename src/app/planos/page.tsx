@@ -8,6 +8,10 @@ import {
   PROMESSA_PRIMEIRO_CLIENTE,
 } from "@/lib/membership/checkout";
 import { NOME_PRODUTO } from "@/lib/produto";
+import {
+  PlanosViewTracker,
+  TrackedCheckoutLink,
+} from "@/components/upgrade-funnel-tracker";
 
 /**
  * F063 — `/planos` é rota pública.
@@ -45,6 +49,7 @@ export default function PlanosPage() {
 
   return (
     <main className="relative min-h-dvh px-4 py-10 md:py-16">
+      <PlanosViewTracker />
       <div className="absolute right-4 top-4">
         <ThemeToggle variant="icon" />
       </div>
@@ -104,14 +109,13 @@ export default function PlanosPage() {
                 <p className="mt-1 text-xs leading-relaxed text-muted">
                   Pagamento recorrente mensal sem comprometer o limite do cartão
                 </p>
-                <a
+                <TrackedCheckoutLink
                   href={proMensal.checkoutUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  plan="pro_mensal"
                   className="btn-primary mt-3 w-full active:scale-[0.98]"
                 >
                   Assinar mensal
-                </a>
+                </TrackedCheckoutLink>
               </div>
 
               <p className="mt-5 text-xs font-semibold uppercase tracking-wide text-muted">
@@ -135,14 +139,13 @@ export default function PlanosPage() {
                 </span>{" "}
                 à vista
               </p>
-              <a
+              <TrackedCheckoutLink
                 href={pro.checkoutUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+                plan="pro_anual"
                 className="btn-outline mt-4 w-full active:scale-[0.98]"
               >
                 Entrar no PRO anual
-              </a>
+              </TrackedCheckoutLink>
             </div>
           </article>
 
@@ -187,14 +190,13 @@ export default function PlanosPage() {
                 </span>{" "}
                 à vista
               </p>
-              <a
+              <TrackedCheckoutLink
                 href={elite.checkoutUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+                plan="elite"
                 className="btn-primary mt-4 w-full active:scale-[0.98]"
               >
                 Escolher o Elite
-              </a>
+              </TrackedCheckoutLink>
               <p className="mt-4 text-sm text-muted">
                 Veja as condições da garantia de 90 dias na{" "}
                 <Link

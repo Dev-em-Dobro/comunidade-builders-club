@@ -38,6 +38,7 @@ model User {
   videoPlays             VideoPlay[]
   liveReminderSends      LiveReminderSend[]
   bastidoresCtaClicks    BastidoresCtaClick[]
+  upgradeFunnelEvents    UpgradeFunnelEvent[]
 
   @@unique([email])
   @@map("user")
@@ -543,4 +544,30 @@ model VideoPlay {
   @@unique([userId, videoId])
   @@index([fonte, createdAt])
   @@map("video_play")
+}
+
+/// F109 — etapas mensuráveis do upgrade depois da aula gratuita.
+///
+/// O snapshot do membership preserva quem era Free no momento do evento,
+/// mesmo que a compra mude o tier depois. O play da aula continua em
+/// `video_play`; aqui entram a abertura real de `/planos` e o clique externo.
+model UpgradeFunnelEvent {
+  id               String           @id @default(cuid())
+  userId           String
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// `planos_view` | `checkout_click`
+  step             String
+  /// `pro_mensal` | `pro_anual` | `elite`; null em `planos_view`.
+  plan             String?
+  /// Mesmo `motivo` da URL de `/planos`, quando existir.
+  motivo           String?
+  membershipTier   MembershipTier   @map("membership_tier")
+  membershipStatus MembershipStatus @map("membership_status")
+  membershipRole   Role             @map("membership_role")
+  createdAt        DateTime         @default(now())
+
+  @@index([userId, createdAt])
+  @@index([step, createdAt])
+  @@index([motivo, createdAt])
+  @@map("upgrade_funnel_event")
 }
