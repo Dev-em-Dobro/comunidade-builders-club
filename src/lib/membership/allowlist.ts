@@ -34,12 +34,28 @@ export async function tierPagoDoEmailAllowlist(
   return tierPagoDaNotaAllowlist(row?.note);
 }
 
+/** Dados da allowlist para o bootstrap: tier e data do pagamento. */
+export async function dadosPagosDoEmailAllowlist(
+  email: string,
+): Promise<{ tier: TierPagoAllowlist; paidAt: Date | null }> {
+  const row = await prisma.allowedEmail.findUnique({
+    where: { email: normalizarEmail(email) },
+    select: { note: true, paidAt: true },
+  });
+  return {
+    tier: tierPagoDaNotaAllowlist(row?.note),
+    paidAt: row?.paidAt ?? null,
+  };
+}
+
 export async function addAllowedEmail(opts: {
   email: string;
   source?: string;
   note?: string | null;
   /** Plano do grant Hubla/TMB. Sem isso, deriva da `note`. */
   tier?: TierPagoAllowlist;
+  /** Data do pagamento (para preencher convertedToPaidAt no bootstrap). */
+  paidAt?: Date;
 }) {
   const email = normalizarEmail(opts.email);
   const row = await prisma.allowedEmail.upsert({
@@ -48,10 +64,12 @@ export async function addAllowedEmail(opts: {
       email,
       source: opts.source ?? "manual",
       note: opts.note ?? null,
+      paidAt: opts.paidAt ?? null,
     },
     update: {
       ...(opts.source ? { source: opts.source } : {}),
       ...(opts.note !== undefined ? { note: opts.note } : {}),
+      ...(opts.paidAt ? { paidAt: opts.paidAt } : {}),
     },
   });
 
