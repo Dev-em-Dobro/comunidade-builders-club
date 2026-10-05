@@ -172,11 +172,15 @@ model Membership {
   planoPago        String?          @map("plano_pago")
   moeda            String?
   ultimaCobrancaEm DateTime?        @map("ultima_cobranca_em")
+  /// Data em que o membro virou pagante (Free/novo → pro/elite). Gravado só
+  /// na primeira conversão, não atualiza em renovações. Null em membros legados.
+  convertedToPaidAt DateTime?       @map("converted_to_paid_at")
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
 
   @@index([status])
   @@index([tier])
+  @@index([convertedToPaidAt])
   @@map("membership")
 }
 
@@ -229,8 +233,18 @@ model HublaWebhookDelivery {
   eventType      String   @map("event_type")
   /// F081 — JSON completo do POST (achar campos de valor; auditar cancelamentos).
   payload        Json?
+  /// Product ID do evento Hubla.
+  productId      String?  @map("product_id")
+  /// Offer ID do evento Hubla (quando presente).
+  offerId        String?  @map("offer_id")
+  /// E-mail principal do evento.
+  email          String?
+  /// Membership vinculada (se existir usuário no momento do evento).
+  membershipId   String?  @map("membership_id")
   processedAt    DateTime @default(now()) @map("processed_at")
 
+  @@index([email])
+  @@index([processedAt])
   @@map("hubla_webhook_delivery")
 }
 

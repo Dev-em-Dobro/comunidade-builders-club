@@ -29,49 +29,83 @@ export async function jaProcessouIdempotency(key: string): Promise<boolean> {
   return row !== null;
 }
 
-export async function registrarEntrega(
-  idempotencyKey: string,
-  eventType: string,
-  payload?: unknown,
-): Promise<void> {
+export type DadosEntregaWebhook = {
+  idempotencyKey: string;
+  eventType: string;
+  payload?: unknown;
+  productId?: string;
+  offerId?: string;
+  email?: string;
+  membershipId?: string;
+};
+
+export async function registrarEntrega(dados: DadosEntregaWebhook): Promise<void> {
   await prisma.hublaWebhookDelivery.create({
     data: {
-      idempotencyKey,
-      eventType,
-      ...(payload !== undefined
-        ? { payload: payload as Prisma.InputJsonValue }
+      idempotencyKey: dados.idempotencyKey,
+      eventType: dados.eventType,
+      ...(dados.payload !== undefined
+        ? { payload: dados.payload as Prisma.InputJsonValue }
         : {}),
+      ...(dados.productId ? { productId: dados.productId } : {}),
+      ...(dados.offerId ? { offerId: dados.offerId } : {}),
+      ...(dados.email ? { email: dados.email } : {}),
+      ...(dados.membershipId ? { membershipId: dados.membershipId } : {}),
     },
   });
 }
+
+function isPago(tier: MembershipTier | PlanoPagoHubla): boolean {
+  return tier === "pro" || tier === "elite" || tier === "paid";
+}
+
+type ResultadoConcessao = {
+  membershipId: string | null;
+  conversao: boolean;
+};
 
 async function concederPago(
   emails: string[],
   plan: PlanoPagoHubla,
   cobranca: CobrancaHubla,
-): Promise<void> {
+): Promise<ResultadoConcessao> {
   const user = await findUserPorEmails(emails);
-  if (!user) return;
+  if (!user) return { membershipId: null, conversao: false };
+
   const dinheiro = dadosCobrancaMembership(cobranca, plan);
   const m = await prisma.membership.findUnique({ where: { userId: user.id } });
+
   if (!m) {
-    await prisma.membership.create({
+    const created = await prisma.membership.create({
       data: {
         userId: user.id,
         status: "active",
         tier: plan,
         role: "member",
+        convertedToPaidAt: new Date(),
         ...dinheiro,
       },
     });
-    return;
+    return { membershipId: created.id, conversao: true };
   }
-  const nextTier =
-    rankPago(plan) >= rankPago(m.tier) ? plan : m.tier;
+
+  const eraGratuito = !isPago(m.tier);
+  const jaTinhaConversao = m.convertedToPaidAt !== null;
+  const deveMarcarConversao = eraGratuito && !jaTinhaConversao;
+
+  const nextTier = rankPago(plan) >= rankPago(m.tier) ? plan : m.tier;
+
   await prisma.membership.update({
     where: { userId: user.id },
-    data: { status: "active", tier: nextTier, ...dinheiro },
+    data: {
+      status: "active",
+      tier: nextTier,
+      ...dinheiro,
+      ...(deveMarcarConversao ? { convertedToPaidAt: new Date() } : {}),
+    },
   });
+
+  return { membershipId: m.id, conversao: deveMarcarConversao };
 }
 
 async function findUserPorEmails(emails: string[]) {
@@ -94,8 +128,13 @@ async function downgradeParaFree(email: string): Promise<void> {
   });
 }
 
-export async function aplicarAcaoAllowlist(acao: AcaoAllowlist): Promise<void> {
-  if (acao.acao === "ignorar") return;
+export type ResultadoAcaoAllowlist = {
+  membershipId: string | null;
+  conversao: boolean;
+};
+
+export async function aplicarAcaoAllowlist(acao: AcaoAllowlist): Promise<ResultadoAcaoAllowlist> {
+  if (acao.acao === "ignorar") return { membershipId: null, conversao: false };
 
   if (acao.acao === "conceder") {
     await addAllowedEmail({
@@ -106,12 +145,12 @@ export async function aplicarAcaoAllowlist(acao: AcaoAllowlist): Promise<void> {
         : `product:${acao.productId}; plan=${acao.plan}`,
       tier: acao.plan,
     });
-    await concederPago(
+    const resultado = await concederPago(
       acao.emails.length > 0 ? acao.emails : [acao.email],
       acao.plan,
       acao.cobranca,
     );
-    return;
+    return resultado;
   }
 
   try {
@@ -120,6 +159,7 @@ export async function aplicarAcaoAllowlist(acao: AcaoAllowlist): Promise<void> {
     // já ausente — ok
   }
   await downgradeParaFree(acao.email);
+  return { membershipId: null, conversao: false };
 }
 
 export async function processarWebhookHubla(
@@ -130,7 +170,7 @@ export async function processarWebhookHubla(
     idempotencyKey?: string | null;
     eventType: string;
   },
-): Promise<{ ignorado: boolean; motivo?: string }> {
+): Promise<{ ignorado: boolean; motivo?: string; conversao?: boolean }> {
   if (opts.idempotencyKey) {
     if (await jaProcessouIdempotency(opts.idempotencyKey)) {
       return { ignorado: true, motivo: "idempotency duplicada" };
@@ -144,16 +184,28 @@ export async function processarWebhookHubla(
 
   if (acao.acao === "ignorar") {
     if (opts.idempotencyKey) {
-      await registrarEntrega(opts.idempotencyKey, opts.eventType, payload);
+      await registrarEntrega({
+        idempotencyKey: opts.idempotencyKey,
+        eventType: opts.eventType,
+        payload,
+      });
     }
     return { ignorado: true, motivo: acao.motivo };
   }
 
-  await aplicarAcaoAllowlist(acao);
+  const resultado = await aplicarAcaoAllowlist(acao);
 
   if (opts.idempotencyKey) {
-    await registrarEntrega(opts.idempotencyKey, opts.eventType, payload);
+    await registrarEntrega({
+      idempotencyKey: opts.idempotencyKey,
+      eventType: opts.eventType,
+      payload,
+      productId: acao.acao === "conceder" ? acao.productId : undefined,
+      offerId: acao.acao === "conceder" ? acao.offerId : undefined,
+      email: acao.email,
+      membershipId: resultado.membershipId ?? undefined,
+    });
   }
 
-  return { ignorado: false };
+  return { ignorado: false, conversao: resultado.conversao };
 }

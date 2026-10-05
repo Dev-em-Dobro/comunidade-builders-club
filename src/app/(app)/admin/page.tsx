@@ -9,6 +9,7 @@ import {
 import { listAllowedEmails } from "@/lib/membership/allowlist";
 import { listAllModulesAdmin } from "@/lib/aulas";
 import { listUtmPostMetrics, listBastidoresFunilMetrics } from "@/lib/gifts/metricas";
+import { listarConversoesUltimos7Dias } from "@/lib/admin/conversoes";
 import { listGiftPostsAdmin } from "@/lib/gifts";
 import {
   addAllowedEmailAction,
@@ -25,6 +26,7 @@ import { AdminAulasPanel } from "@/components/admin-aulas-panel";
 import { AdminGiftLinks } from "@/components/admin-gift-links";
 import { AdminGiftMetrics } from "@/components/admin-gift-metrics";
 import { AdminFunilLives } from "@/components/admin-funil-lives";
+import { AdminConversoes } from "@/components/admin-conversoes";
 import { AdminEmailMetrics } from "@/components/admin-email-metrics";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import {
@@ -126,7 +128,7 @@ export default async function AdminPage({ searchParams }: Props) {
     sp.categoria && isEmailCategoria(sp.categoria) ? sp.categoria : "all";
   const emailPage = Math.max(1, Number(sp.page) || 1);
 
-  const [spaces, memberships, counts, allowed, modules, utmMetrics, giftPosts, funilLives, liveRegra, emailMetrics] =
+  const [spaces, memberships, counts, allowed, modules, utmMetrics, giftPosts, funilLives, conversoesMetrics, liveRegra, emailMetrics] =
     await Promise.all([
     tab === "spaces" ? listSpaces() : Promise.resolve([]),
     tab === "membros"
@@ -140,6 +142,7 @@ export default async function AdminPage({ searchParams }: Props) {
     tab === "presentes" ? listUtmPostMetrics() : Promise.resolve([]),
     tab === "presentes" ? listGiftPostsAdmin() : Promise.resolve([]),
     tab === "presentes" ? listBastidoresFunilMetrics() : Promise.resolve(null),
+    tab === "presentes" ? listarConversoesUltimos7Dias() : Promise.resolve(null),
     tab === "live" ? obterRegraLiveSchedule() : Promise.resolve(null),
     tab === "emails"
       ? agregarMetricasEmail({
@@ -410,6 +413,19 @@ export default async function AdminPage({ searchParams }: Props) {
                 WhatsApp.
               </p>
               <AdminFunilLives data={funilLives} />
+            </>
+          ) : null}
+
+          {conversoesMetrics ? (
+            <>
+              <h3 className="mt-10 text-base font-semibold">
+                Conversões Free → Pago
+              </h3>
+              <p className="mt-1 text-sm text-muted">
+                Membros que passaram de Free (ou novo) para plano pago via Hubla
+                nos últimos 7 dias. Dados a partir da ativação desta feature.
+              </p>
+              <AdminConversoes data={conversoesMetrics} />
             </>
           ) : null}
         </section>
