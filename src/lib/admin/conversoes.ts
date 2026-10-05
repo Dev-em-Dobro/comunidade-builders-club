@@ -94,7 +94,10 @@ export async function listarConversoesUltimos7Dias(): Promise<MetricasConversao>
   let total7dias = 0;
 
   for (const [key, total] of contagemPorDia.entries()) {
-    const [year, month, day] = key.split("-").map(Number);
+    const parts = key.split("-").map(Number);
+    const year = parts[0] ?? 2026;
+    const month = parts[1] ?? 1;
+    const day = parts[2] ?? 1;
     const date = new Date(year, month - 1, day);
     conversoesPorDia.push({
       data: formatarDataBR(date),
