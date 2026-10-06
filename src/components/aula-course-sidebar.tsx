@@ -107,7 +107,7 @@ export function AulaCourseSidebar({
                             }`}
                           >
                             <span
-                              className={`relative z-[1] mt-[0.3em] box-border size-3 shrink-0 rounded-full ${
+                              className={`relative z-[1] mt-[0.3em] flex size-3 shrink-0 items-center justify-center rounded-full ${
                                 l.completed
                                   ? "border-2 border-accent bg-accent"
                                   : active
@@ -115,7 +115,11 @@ export function AulaCourseSidebar({
                                     : "border border-muted bg-transparent"
                               }`}
                               aria-hidden
-                            />
+                            >
+                              {l.completed ? (
+                                <span className="-mt-px h-1.5 w-1 rotate-45 border-b border-r border-accent-foreground" />
+                              ) : null}
+                            </span>
                             <span className="min-w-0 flex-1">{l.title}</span>
                             {locked ? (
                               <LockMark className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted" />

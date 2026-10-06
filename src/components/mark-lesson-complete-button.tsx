@@ -24,7 +24,7 @@ export function MarkLessonCompleteButton({
     <div>
       <button
         type="button"
-        className={`${completed ? "btn-outline text-muted hover:text-foreground" : "btn-primary"} min-w-[7.5rem] px-3 py-2 text-sm active:scale-[0.98]`}
+        className={`${completed ? "btn-outline text-muted hover:text-foreground" : "btn-primary"} min-w-[7.5rem] gap-2 px-3 py-2 text-sm active:scale-[0.98]`}
         disabled={pending}
         aria-busy={pending}
         aria-pressed={completed}
@@ -57,6 +57,12 @@ export function MarkLessonCompleteButton({
           });
         }}
       >
+        {completed && !pending ? (
+          <span
+            className="h-2 w-1.5 rotate-45 border-b-2 border-r-2 border-accent"
+            aria-hidden
+          />
+        ) : null}
         {pending ? "Salvando…" : completed ? "Concluída" : "Concluir aula"}
       </button>
       {error ? (
