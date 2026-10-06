@@ -167,6 +167,26 @@ export default async function LessonPage({ params }: Props) {
               )}
             </div>
           </div>
+          {canWatch ? (
+            progress?.completedAt ? (
+              <p className="mt-3 inline-flex items-center gap-2 rounded-xl border border-accent/30 bg-accent/10 px-4 py-2 text-[15px] font-semibold text-accent">
+                <span aria-hidden>✓</span>
+                Concluída
+              </p>
+            ) : (
+              <div className="mt-3 w-full rounded-2xl border border-accent/30 bg-accent/10 p-3 sm:w-fit">
+                <p className="mb-2 text-sm font-medium text-foreground">
+                  Terminou esta aula? Atualize seu progresso.
+                </p>
+                <MarkLessonCompleteButton
+                  lessonId={lesson.id}
+                  moduleSlug={moduleSlug}
+                  lessonSlug={lessonSlug}
+                  className="btn-primary w-full"
+                />
+              </div>
+            )
+          ) : null}
           <div className="mt-3 flex items-center justify-between gap-3">
             {prev ? (
               <Link
@@ -204,29 +224,11 @@ export default async function LessonPage({ params }: Props) {
       </div>
 
       <div className="mt-8">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="min-w-0">
-            <p className="text-xs font-medium uppercase tracking-wide text-muted">
-              {lesson.module.title}
-            </p>
-            <h1 className="page-title mt-1">{lesson.title}</h1>
-          </div>
-          {canWatch ? (
-            progress?.completedAt ? (
-              <p className="inline-flex items-center gap-2 rounded-xl border border-accent/30 bg-accent/10 px-4 py-2 text-[15px] font-semibold text-accent">
-                <span aria-hidden>✓</span>
-                Concluída
-              </p>
-            ) : (
-              <MarkLessonCompleteButton
-                lessonId={lesson.id}
-                moduleSlug={moduleSlug}
-                lessonSlug={lessonSlug}
-                label="Concluir"
-                className="rounded-xl border border-border bg-card px-4 py-2 text-[15px] font-semibold hover:border-accent/40"
-              />
-            )
-          ) : null}
+        <div className="min-w-0">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted">
+            {lesson.module.title}
+          </p>
+          <h1 className="page-title mt-1">{lesson.title}</h1>
         </div>
 
         <div className="mt-6">
