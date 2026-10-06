@@ -180,19 +180,12 @@ export default async function LessonPage({ params }: Props) {
             )}
             <div className="ml-auto flex items-center gap-2">
               {canWatch ? (
-                progress?.completedAt ? (
-                  <p className="text-sm font-semibold text-accent">
-                    Concluída
-                  </p>
-                ) : (
-                  <MarkLessonCompleteButton
-                    lessonId={lesson.id}
-                    moduleSlug={moduleSlug}
-                    lessonSlug={lessonSlug}
-                    label="Concluir aula"
-                    className="btn-primary px-3 py-2 text-sm active:scale-[0.98]"
-                  />
-                )
+                <MarkLessonCompleteButton
+                  lessonId={lesson.id}
+                  moduleSlug={moduleSlug}
+                  lessonSlug={lessonSlug}
+                  initiallyCompleted={Boolean(progress?.completedAt)}
+                />
               ) : null}
               {next ? (
                 <Link

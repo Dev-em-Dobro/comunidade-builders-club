@@ -2,59 +2,50 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { markLessonCompletedAction } from "@/actions/aulas";
+import { setLessonCompletedAction } from "@/actions/aulas";
 
 export function MarkLessonCompleteButton({
   lessonId,
   moduleSlug,
   lessonSlug,
-  onCompleted,
-  label = "Marcar como concluída",
-  className = "btn-primary min-w-[12rem]",
+  initiallyCompleted,
 }: {
   lessonId: string;
   moduleSlug: string;
   lessonSlug: string;
-  onCompleted?: () => void;
-  label?: string;
-  className?: string;
+  initiallyCompleted: boolean;
 }) {
   const router = useRouter();
   const [pending, start] = useTransition();
-  const [done, setDone] = useState(false);
+  const [completed, setCompleted] = useState(initiallyCompleted);
   const [error, setError] = useState<string | null>(null);
-
-  if (done) {
-    return (
-      <p
-        className="inline-flex items-center gap-2 rounded-xl bg-accent/10 px-4 py-2.5 text-[15px] font-semibold text-accent"
-        role="status"
-      >
-        <span aria-hidden>✓</span>
-        Aula marcada como concluída
-      </p>
-    );
-  }
 
   return (
     <div>
       <button
         type="button"
-        className={className}
+        className="btn-primary min-w-[7.5rem] px-3 py-2 text-sm active:scale-[0.98]"
         disabled={pending}
         aria-busy={pending}
+        aria-pressed={completed}
+        aria-label={
+          completed
+            ? "Aula concluída. Clique para desfazer"
+            : "Concluir aula"
+        }
         onClick={() => {
           if (pending) return;
           setError(null);
           start(async () => {
             try {
-              await markLessonCompletedAction(
+              const nextCompleted = !completed;
+              await setLessonCompletedAction(
                 lessonId,
                 moduleSlug,
                 lessonSlug,
+                nextCompleted,
               );
-              setDone(true);
-              onCompleted?.();
+              setCompleted(nextCompleted);
               router.refresh();
             } catch (e) {
               setError(
@@ -66,7 +57,7 @@ export function MarkLessonCompleteButton({
           });
         }}
       >
-        {pending ? "Marcando…" : label}
+        {pending ? "Salvando…" : completed ? "Concluída" : "Concluir aula"}
       </button>
       {error ? (
         <p className="mt-2 text-sm text-red-600" role="alert">
