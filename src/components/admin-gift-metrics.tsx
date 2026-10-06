@@ -50,6 +50,7 @@ export function AdminGiftMetrics({ rows }: { rows: UtmPostMetric[] }) {
                   <tr>
                     <th className="py-1.5 pr-3 font-medium">Pessoa</th>
                     <th className="py-1.5 pr-3 font-medium">Cadastro</th>
+                    <th className="py-1.5 pr-3 font-medium">Presentes pegos</th>
                     <th className="py-1.5 pr-3 font-medium">Plano</th>
                     <th className="py-1.5 font-medium">
                       assinou_plano_veio_de_uma_postagem
@@ -68,6 +69,7 @@ export function AdminGiftMetrics({ rows }: { rows: UtmPostMetric[] }) {
                       <td className="py-2 pr-3 text-xs text-muted">
                         {formatWhen(p.originAt)}
                       </td>
+                      <td className="py-2 pr-3">{p.presentesPegos}</td>
                       <td className="py-2 pr-3">{tierLabel(p.tier)}</td>
                       <td className="py-2">
                         {p.assinouPlano ? (
