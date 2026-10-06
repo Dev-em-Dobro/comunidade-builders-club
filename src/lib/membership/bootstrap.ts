@@ -91,10 +91,12 @@ async function resolverBootstrap(
   // F053 hotfix — allowlist Elite não pode nascer como PRO no 1º login.
   let tierAllowlist: TierPagoAllowlist = "pro";
   let paidAtAllowlist: Date | null = null;
+  let sourceAllowlist: string | null = null;
   if (allowed && !isBootstrapAdmin) {
     const dados = await dadosPagosDoEmailAllowlist(email);
     tierAllowlist = dados.tier;
     paidAtAllowlist = dados.paidAt;
+    sourceAllowlist = dados.source;
   }
 
   let nextProfile = profile;
@@ -112,7 +114,8 @@ async function resolverBootstrap(
 
   if (!existing) {
     const origin = await readOrigemFromCookie();
-    const isPagante = allowed && !isBootstrapAdmin;
+    const isHublaOrTmb = sourceAllowlist === "hubla" || sourceAllowlist === "tmb";
+    const deveMarcarConversao = allowed && !isBootstrapAdmin && isHublaOrTmb && paidAtAllowlist !== null;
     const membership = await prisma.membership.create({
       data: {
         userId,
@@ -126,7 +129,7 @@ async function resolverBootstrap(
               originAt: new Date(),
             }
           : {}),
-        ...(isPagante ? { convertedToPaidAt: paidAtAllowlist ?? new Date() } : {}),
+        ...(deveMarcarConversao ? { convertedToPaidAt: paidAtAllowlist } : {}),
       },
     });
     return { membership, profile: nextProfile };

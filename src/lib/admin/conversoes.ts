@@ -38,28 +38,11 @@ export function formatarRotuloDaChave(key: string): string {
 
 /**
  * Retorna o início do dia (00:00:00) em São Paulo como UTC timestamp.
- * Ex: 00:00 SP no horário de verão = 03:00 UTC; no horário padrão = 03:00 UTC.
+ * B1: Usa formato ISO com offset explícito (-03:00) para não depender do TZ do processo.
+ * São Paulo não tem horário de verão desde 2019, então -03:00 é fixo.
  */
-export function inicioDodiaSaoPaulo(date: Date): Date {
-  const key = getDateKeySaoPaulo(date);
-  const localMidnight = new Date(`${key}T00:00:00`);
-  const formatter = new Intl.DateTimeFormat("en-US", {
-    timeZone: SAO_PAULO_TZ,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,
-  });
-  const utcParts = formatter.formatToParts(date);
-  const getP = (t: string) => utcParts.find((p) => p.type === t)?.value ?? "00";
-  const spNow = new Date(
-    `${getP("year")}-${getP("month")}-${getP("day")}T${getP("hour")}:${getP("minute")}:${getP("second")}Z`,
-  );
-  const diff = date.getTime() - spNow.getTime();
-  return new Date(localMidnight.getTime() + diff);
+export function inicioDodiaSaoPaulo(key: string): Date {
+  return new Date(`${key}T00:00:00-03:00`);
 }
 
 /**
@@ -86,7 +69,7 @@ export async function listarConversoesUltimos7Dias(): Promise<MetricasConversao>
   const agora = new Date();
   const chaves = gerarChaves7Dias(agora);
   const primeiraChave = chaves[0]!;
-  const inicioPeriodo = inicioDodiaSaoPaulo(new Date(`${primeiraChave}T12:00:00Z`));
+  const inicioPeriodo = inicioDodiaSaoPaulo(primeiraChave);
 
   const conversoes = await prisma.membership.findMany({
     where: {
