@@ -24,7 +24,7 @@ export function MarkLessonCompleteButton({
     <div>
       <button
         type="button"
-        className="btn-primary min-w-[7.5rem] px-3 py-2 text-sm active:scale-[0.98]"
+        className={`${completed ? "btn-outline text-muted hover:text-foreground" : "btn-primary"} min-w-[7.5rem] px-3 py-2 text-sm active:scale-[0.98]`}
         disabled={pending}
         aria-busy={pending}
         aria-pressed={completed}
