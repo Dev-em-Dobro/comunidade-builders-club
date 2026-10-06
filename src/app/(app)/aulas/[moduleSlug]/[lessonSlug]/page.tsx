@@ -104,7 +104,7 @@ export default async function LessonPage({ params }: Props) {
       <AulaBreadcrumb path={breadcrumbPath} lessonTitle={lesson.title} />
 
       <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
-        <div>
+        <div className="order-1">
           <div className="overflow-hidden rounded-2xl border border-border bg-black shadow-sm">
             <div className="relative aspect-video w-full">
               {canWatch && embed ? (
@@ -199,19 +199,7 @@ export default async function LessonPage({ params }: Props) {
           </div>
         </div>
 
-        {root ? (
-          <div className="min-h-0 lg:h-0 lg:min-h-full">
-            <AulaCourseSidebar
-              root={root}
-              currentModuleSlug={moduleSlug}
-              currentLessonSlug={lessonSlug}
-              isPaid={isPaid}
-            />
-          </div>
-        ) : null}
-      </div>
-
-      <div className="mt-8">
+      <div className="order-2 mt-4 lg:order-3 lg:col-span-2">
         <div className="min-w-0">
           <p className="text-xs font-medium uppercase tracking-wide text-muted">
             {lesson.module.title}
@@ -348,6 +336,18 @@ export default async function LessonPage({ params }: Props) {
             }
           />
         </div>
+      </div>
+
+        {root ? (
+          <div className="order-3 min-h-0 lg:order-2 lg:h-0 lg:min-h-full">
+            <AulaCourseSidebar
+              root={root}
+              currentModuleSlug={moduleSlug}
+              currentLessonSlug={lessonSlug}
+              isPaid={isPaid}
+            />
+          </div>
+        ) : null}
       </div>
     </div>
   );
