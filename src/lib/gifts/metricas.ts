@@ -1,5 +1,6 @@
 import type { MembershipTier, Role, MembershipStatus } from "@prisma/client";
 import { prisma } from "@/lib/db";
+import { PRESENTES_SPACE_SLUG } from "@/lib/spaces/constants";
 
 const PAID_TIERS = new Set<MembershipTier>(["paid", "pro", "elite"]);
 
@@ -14,6 +15,7 @@ export type UtmPostPerson = {
   status: MembershipStatus;
   originAt: Date | null;
   assinouPlano: boolean;
+  presentesPegos: number;
 };
 
 export type UtmPostMetric = {
@@ -59,8 +61,18 @@ function metricLabel(utmContent: string | null, giftSlug: string | null): string
   return "sem origem";
 }
 
+export function contarPresentesPegos(
+  originGiftSlug: string | null,
+  slugsLidos: string[],
+): number {
+  return new Set(
+    originGiftSlug ? [originGiftSlug, ...slugsLidos] : slugsLidos,
+  ).size;
+}
+
 export async function listUtmPostMetrics(): Promise<UtmPostMetric[]> {
-  const [visitsWithUtm, visitsGiftOnly, memberships] = await Promise.all([
+  const [visitsWithUtm, visitsGiftOnly, memberships, giftViews] =
+    await Promise.all([
     prisma.giftVisit.groupBy({
       by: ["utmContent"],
       where: { utmContent: { not: null } },
@@ -79,6 +91,7 @@ export async function listUtmPostMetrics(): Promise<UtmPostMetric[]> {
         ],
       },
       select: {
+        userId: true,
         originUtmContent: true,
         originGiftSlug: true,
         originAt: true,
@@ -94,9 +107,29 @@ export async function listUtmPostMetrics(): Promise<UtmPostMetric[]> {
       },
       orderBy: { originAt: "desc" },
     }),
-  ]);
+    prisma.postView.findMany({
+      where: {
+        post: {
+          slug: { not: null },
+          space: { slug: PRESENTES_SPACE_SLUG },
+        },
+      },
+      select: {
+        userId: true,
+        post: { select: { slug: true } },
+      },
+    }),
+    ]);
 
   const byPost = new Map<string, UtmPostMetric>();
+  const giftSlugsByUser = new Map<string, string[]>();
+
+  for (const view of giftViews) {
+    if (!view.post.slug) continue;
+    const slugs = giftSlugsByUser.get(view.userId) ?? [];
+    slugs.push(view.post.slug);
+    giftSlugsByUser.set(view.userId, slugs);
+  }
 
   function row(utmContent: string | null, giftSlug: string | null): UtmPostMetric | null {
     const key = metricKey(utmContent, giftSlug);
@@ -140,6 +173,10 @@ export async function listUtmPostMetrics(): Promise<UtmPostMetric[]> {
       status: m.status,
       originAt: m.originAt,
       assinouPlano: paid,
+      presentesPegos: contarPresentesPegos(
+        m.originGiftSlug,
+        giftSlugsByUser.get(m.userId) ?? [],
+      ),
     });
   }
 

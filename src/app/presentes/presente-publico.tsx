@@ -11,6 +11,7 @@ import { previewFromBody } from "@/lib/posts/title";
 import { getOptionalUser } from "@/lib/auth/require-user";
 import { prisma } from "@/lib/db";
 import { isPaidMembership } from "@/lib/membership/capabilities";
+import { recordPostView } from "@/lib/posts";
 import { getPublicGift, recordGiftVisit } from "@/lib/gifts";
 import { giftLinkView } from "@/lib/gifts/link";
 import { GIFT_UTM_DEFAULTS, sanitizeUtmValue } from "@/lib/gifts/origem";
@@ -81,6 +82,7 @@ export async function PresentePublico({
   });
 
   const user = await getOptionalUser();
+  if (user) await recordPostView(gift.id, user.id);
   const profile = user
     ? await prisma.profile.findUnique({
         where: { userId: user.id },
