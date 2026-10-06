@@ -318,9 +318,10 @@ const lessonModuleAncestors = {
   include: { parent: { include: { parent: true } } },
 } as const;
 
-export async function markLessonCompleted(
+export async function setLessonCompleted(
   userId: string,
   lessonId: string,
+  completed: boolean,
   opts: { isPaid: boolean },
 ) {
   const lesson = await prisma.lesson.findFirst({
@@ -337,15 +338,16 @@ export async function markLessonCompleted(
   if (!canWatchLesson(opts.isPaid, lesson.module)) {
     throw new ForbiddenError(UPGRADE_REQUIRED);
   }
+  const completedAt = completed ? new Date() : null;
   return prisma.lessonProgress.upsert({
     where: { userId_lessonId: { userId, lessonId } },
     create: {
       userId,
       lessonId,
-      completedAt: new Date(),
+      completedAt,
     },
     update: {
-      completedAt: new Date(),
+      completedAt,
     },
   });
 }

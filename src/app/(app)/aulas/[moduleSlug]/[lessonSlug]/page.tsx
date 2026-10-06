@@ -101,10 +101,10 @@ export default async function LessonPage({ params }: Props) {
 
   return (
     <div className="mx-auto w-full max-w-7xl">
-      <AulaBreadcrumb path={breadcrumbPath} lessonTitle={lesson.title} />
+      <AulaBreadcrumb path={breadcrumbPath} />
 
       <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
-        <div>
+        <div className="order-1">
           <div className="overflow-hidden rounded-2xl border border-border bg-black shadow-sm">
             <div className="relative aspect-video w-full">
               {canWatch && embed ? (
@@ -167,7 +167,7 @@ export default async function LessonPage({ params }: Props) {
               )}
             </div>
           </div>
-          <div className="mt-3 flex items-center justify-between gap-3">
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
             {prev ? (
               <Link
                 href={`/aulas/${prev.moduleSlug}/${prev.slug}`}
@@ -178,55 +178,33 @@ export default async function LessonPage({ params }: Props) {
             ) : (
               <span />
             )}
-            {next ? (
-              <Link
-                href={`/aulas/${next.moduleSlug}/${next.slug}`}
-                className="text-sm font-medium text-muted hover:text-accent"
-              >
-                Próxima aula →
-              </Link>
-            ) : (
-              <span />
-            )}
+            <div className="ml-auto flex items-center gap-2">
+              {canWatch ? (
+                <MarkLessonCompleteButton
+                  lessonId={lesson.id}
+                  moduleSlug={moduleSlug}
+                  lessonSlug={lessonSlug}
+                  initiallyCompleted={Boolean(progress?.completedAt)}
+                />
+              ) : null}
+              {next ? (
+                <Link
+                  href={`/aulas/${next.moduleSlug}/${next.slug}`}
+                  className="text-sm font-medium text-muted hover:text-accent"
+                >
+                  Próxima aula →
+                </Link>
+              ) : null}
+            </div>
           </div>
         </div>
 
-        {root ? (
-          <div className="min-h-0 lg:h-0 lg:min-h-full">
-            <AulaCourseSidebar
-              root={root}
-              currentModuleSlug={moduleSlug}
-              currentLessonSlug={lessonSlug}
-              isPaid={isPaid}
-            />
-          </div>
-        ) : null}
-      </div>
-
-      <div className="mt-8">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="min-w-0">
-            <p className="text-xs font-medium uppercase tracking-wide text-muted">
-              {lesson.module.title}
-            </p>
-            <h1 className="page-title mt-1">{lesson.title}</h1>
-          </div>
-          {canWatch ? (
-            progress?.completedAt ? (
-              <p className="inline-flex items-center gap-2 rounded-xl border border-accent/30 bg-accent/10 px-4 py-2 text-[15px] font-semibold text-accent">
-                <span aria-hidden>✓</span>
-                Concluída
-              </p>
-            ) : (
-              <MarkLessonCompleteButton
-                lessonId={lesson.id}
-                moduleSlug={moduleSlug}
-                lessonSlug={lessonSlug}
-                label="Concluir"
-                className="rounded-xl border border-border bg-card px-4 py-2 text-[15px] font-semibold hover:border-accent/40"
-              />
-            )
-          ) : null}
+      <div className="order-2 mt-4 lg:order-3 lg:col-span-2">
+        <div className="min-w-0">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted">
+            {lesson.module.title}
+          </p>
+          <h1 className="page-title mt-1">{lesson.title}</h1>
         </div>
 
         <div className="mt-6">
@@ -358,6 +336,18 @@ export default async function LessonPage({ params }: Props) {
             }
           />
         </div>
+      </div>
+
+        {root ? (
+          <div className="order-3 min-h-0 lg:order-2 lg:h-0 lg:min-h-full">
+            <AulaCourseSidebar
+              root={root}
+              currentModuleSlug={moduleSlug}
+              currentLessonSlug={lessonSlug}
+              isPaid={isPaid}
+            />
+          </div>
+        ) : null}
       </div>
     </div>
   );
