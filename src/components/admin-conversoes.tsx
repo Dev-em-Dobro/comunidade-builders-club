@@ -19,9 +19,9 @@ export function AdminConversoes({ data }: { data: MetricasConversao }) {
         </div>
       </div>
 
-      {data.conversoesPorDia.length === 0 ? (
+      {data.total7dias === 0 ? (
         <p className="text-sm text-muted">
-          Ainda não há conversões registradas.
+          Nenhuma conversão nos últimos 7 dias.
         </p>
       ) : (
         <div className="overflow-x-auto">

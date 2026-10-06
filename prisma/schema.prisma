@@ -186,11 +186,14 @@ model Membership {
 
 /// F012 — e-mails com acesso pré-aprovado (login → membership active).
 model AllowedEmail {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  source    String   @default("manual")
+  id        String    @id @default(cuid())
+  email     String    @unique
+  source    String    @default("manual")
   note      String?
-  createdAt DateTime @default(now())
+  /// Data do pagamento Hubla/TMB que gerou esta entrada. Usado no bootstrap
+  /// para preencher convertedToPaidAt quando o usuário ainda não tinha conta.
+  paidAt    DateTime? @map("paid_at")
+  createdAt DateTime  @default(now())
 
   @@map("allowed_email")
 }
@@ -241,6 +244,10 @@ model HublaWebhookDelivery {
   email          String?
   /// Membership vinculada (se existir usuário no momento do evento).
   membershipId   String?  @map("membership_id")
+  /// Status do processamento: pending | processed | ignored | error.
+  status         String   @default("pending")
+  /// Mensagem de erro ou motivo de ignorar.
+  erro           String?
   processedAt    DateTime @default(now()) @map("processed_at")
 
   @@index([email])

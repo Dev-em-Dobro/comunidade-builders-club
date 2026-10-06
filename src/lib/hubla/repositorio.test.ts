@@ -1,11 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
+import { isPago } from "./repositorio";
 import type { MembershipTier } from "@prisma/client";
-import type { PlanoPagoHubla } from "./produtos";
-
-function isPago(tier: MembershipTier | PlanoPagoHubla): boolean {
-  return tier === "pro" || tier === "elite" || tier === "paid";
-}
 
 describe("isPago — lógica de conversão", () => {
   it("free não é pago", () => {
@@ -68,18 +64,41 @@ describe("lógica de conversão Free→Pago", () => {
   });
 });
 
+describe("B7: ex-pagante que volta a pagar", () => {
+  function deveMarcarConversaoExPagante(tierAtual: MembershipTier, convertedToPaidAt: Date | null): boolean {
+    const eraGratuito = !isPago(tierAtual);
+    if (!eraGratuito) return false;
+    return convertedToPaidAt === null;
+  }
+
+  it("ex-Elite que foi para Free e volta a pagar: NÃO marca se já tinha conversão", () => {
+    const tinhaConversao = new Date("2026-01-15");
+    assert.equal(deveMarcarConversaoExPagante("free", tinhaConversao), false);
+  });
+
+  it("Free que nunca pagou: marca conversão", () => {
+    assert.equal(deveMarcarConversaoExPagante("free", null), true);
+  });
+
+  it("Pro atual: não marca (já é pago)", () => {
+    assert.equal(deveMarcarConversaoExPagante("pro", null), false);
+  });
+});
+
 describe("DadosEntregaWebhook — estrutura de dados", () => {
   type DadosEntregaWebhook = {
     idempotencyKey: string;
     eventType: string;
-    payload?: unknown;
-    productId?: string;
-    offerId?: string;
-    email?: string;
-    membershipId?: string;
+    payload: unknown;
+    productId?: string | null;
+    offerId?: string | null;
+    email?: string | null;
+    membershipId?: string | null;
+    status: "pending" | "processed" | "ignored" | "error";
+    erro?: string | null;
   };
 
-  it("aceita dados completos", () => {
+  it("aceita dados completos para evento processado", () => {
     const dados: DadosEntregaWebhook = {
       idempotencyKey: "key-123",
       eventType: "invoice.payment_succeeded",
@@ -88,36 +107,36 @@ describe("DadosEntregaWebhook — estrutura de dados", () => {
       offerId: "offer-123",
       email: "test@example.com",
       membershipId: "mem-xyz",
+      status: "processed",
+      erro: null,
     };
-    assert.equal(dados.idempotencyKey, "key-123");
+    assert.equal(dados.status, "processed");
     assert.equal(dados.productId, "prod-abc");
-    assert.equal(dados.email, "test@example.com");
   });
 
-  it("aceita dados mínimos (só obrigatórios)", () => {
+  it("aceita dados para evento ignorado com motivo", () => {
     const dados: DadosEntregaWebhook = {
       idempotencyKey: "key-456",
-      eventType: "customer.member_removed",
+      eventType: "invoice.created",
+      payload: { type: "invoice.created" },
+      productId: null,
+      email: null,
+      status: "ignored",
+      erro: "tipo não tratado: invoice.created",
     };
-    assert.equal(dados.idempotencyKey, "key-456");
-    assert.equal(dados.productId, undefined);
-    assert.equal(dados.email, undefined);
+    assert.equal(dados.status, "ignored");
+    assert.equal(dados.erro, "tipo não tratado: invoice.created");
   });
 
-  it("payload pode conter dados sensíveis filtrados", () => {
-    const payloadOriginal = {
-      type: "invoice.payment_succeeded",
-      event: {
-        user: { email: "test@example.com", cardNumber: "4111111111111111" },
-      },
+  it("aceita dados para evento com erro", () => {
+    const dados: DadosEntregaWebhook = {
+      idempotencyKey: "key-789",
+      eventType: "customer.member_added",
+      payload: { type: "customer.member_added" },
+      status: "error",
+      erro: "Falha de conexão",
     };
-    const { cardNumber, ...userSafe } = payloadOriginal.event.user;
-    const payloadFiltrado = {
-      ...payloadOriginal,
-      event: { user: userSafe },
-    };
-    assert.equal("cardNumber" in payloadFiltrado.event.user, false);
-    assert.equal(payloadFiltrado.event.user.email, "test@example.com");
-    void cardNumber;
+    assert.equal(dados.status, "error");
+    assert.ok(dados.erro?.includes("Falha"));
   });
 });

@@ -14,36 +14,11 @@ export type MetricasConversao = {
   total7dias: number;
 };
 
-function formatarDataBR(date: Date): string {
-  return new Intl.DateTimeFormat("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    timeZone: SAO_PAULO_TZ,
-  }).format(date);
-}
-
-function inicioDodia(date: Date, tz: string): Date {
-  const formatter = new Intl.DateTimeFormat("en-CA", {
-    timeZone: tz,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
-  const parts = formatter.formatToParts(date);
-  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "01";
-  const isoDate = `${get("year")}-${get("month")}-${get("day")}T00:00:00`;
-  const offset = getTimezoneOffset(tz, date);
-  return new Date(new Date(isoDate).getTime() - offset);
-}
-
-function getTimezoneOffset(tz: string, date: Date): number {
-  const utcDate = new Date(date.toLocaleString("en-US", { timeZone: "UTC" }));
-  const tzDate = new Date(date.toLocaleString("en-US", { timeZone: tz }));
-  return tzDate.getTime() - utcDate.getTime();
-}
-
-function getDateKeyBR(date: Date): string {
+/**
+ * Retorna a data no formato YYYY-MM-DD no fuso America/Sao_Paulo.
+ * Usa Intl.DateTimeFormat para não depender do TZ do processo.
+ */
+export function getDateKeySaoPaulo(date: Date): string {
   const formatter = new Intl.DateTimeFormat("en-CA", {
     timeZone: SAO_PAULO_TZ,
     year: "numeric",
@@ -53,10 +28,65 @@ function getDateKeyBR(date: Date): string {
   return formatter.format(date);
 }
 
+/**
+ * Converte uma chave YYYY-MM-DD para rótulo DD/MM/YYYY (sem depender do TZ do processo).
+ */
+export function formatarRotuloDaChave(key: string): string {
+  const [year, month, day] = key.split("-");
+  return `${day}/${month}/${year}`;
+}
+
+/**
+ * Retorna o início do dia (00:00:00) em São Paulo como UTC timestamp.
+ * Ex: 00:00 SP no horário de verão = 03:00 UTC; no horário padrão = 03:00 UTC.
+ */
+export function inicioDodiaSaoPaulo(date: Date): Date {
+  const key = getDateKeySaoPaulo(date);
+  const localMidnight = new Date(`${key}T00:00:00`);
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: SAO_PAULO_TZ,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+  const utcParts = formatter.formatToParts(date);
+  const getP = (t: string) => utcParts.find((p) => p.type === t)?.value ?? "00";
+  const spNow = new Date(
+    `${getP("year")}-${getP("month")}-${getP("day")}T${getP("hour")}:${getP("minute")}:${getP("second")}Z`,
+  );
+  const diff = date.getTime() - spNow.getTime();
+  return new Date(localMidnight.getTime() + diff);
+}
+
+/**
+ * Gera array de 7 chaves YYYY-MM-DD (últimos 7 dias incluindo hoje em SP).
+ * Usa a chave de hoje como base e subtrai dias diretamente.
+ */
+export function gerarChaves7Dias(agora: Date): string[] {
+  const hojeKey = getDateKeySaoPaulo(agora);
+  const [y, m, d] = hojeKey.split("-").map(Number);
+  const hoje = new Date(y!, m! - 1, d!);
+  const keys: string[] = [];
+  for (let i = 6; i >= 0; i--) {
+    const dt = new Date(hoje);
+    dt.setDate(dt.getDate() - i);
+    const year = dt.getFullYear();
+    const month = String(dt.getMonth() + 1).padStart(2, "0");
+    const day = String(dt.getDate()).padStart(2, "0");
+    keys.push(`${year}-${month}-${day}`);
+  }
+  return keys;
+}
+
 export async function listarConversoesUltimos7Dias(): Promise<MetricasConversao> {
   const agora = new Date();
-  const inicioPeriodo = inicioDodia(agora, SAO_PAULO_TZ);
-  inicioPeriodo.setDate(inicioPeriodo.getDate() - 6);
+  const chaves = gerarChaves7Dias(agora);
+  const primeiraChave = chaves[0]!;
+  const inicioPeriodo = inicioDodiaSaoPaulo(new Date(`${primeiraChave}T12:00:00Z`));
 
   const conversoes = await prisma.membership.findMany({
     where: {
@@ -67,23 +97,16 @@ export async function listarConversoesUltimos7Dias(): Promise<MetricasConversao>
     select: {
       convertedToPaidAt: true,
     },
-    orderBy: {
-      convertedToPaidAt: "asc",
-    },
   });
 
   const contagemPorDia = new Map<string, number>();
-
-  for (let i = 0; i < 7; i++) {
-    const dia = new Date(inicioPeriodo);
-    dia.setDate(dia.getDate() + i);
-    const key = getDateKeyBR(dia);
+  for (const key of chaves) {
     contagemPorDia.set(key, 0);
   }
 
   for (const c of conversoes) {
     if (c.convertedToPaidAt) {
-      const key = getDateKeyBR(c.convertedToPaidAt);
+      const key = getDateKeySaoPaulo(c.convertedToPaidAt);
       if (contagemPorDia.has(key)) {
         contagemPorDia.set(key, (contagemPorDia.get(key) ?? 0) + 1);
       }
@@ -93,14 +116,10 @@ export async function listarConversoesUltimos7Dias(): Promise<MetricasConversao>
   const conversoesPorDia: ConversaoDiaria[] = [];
   let total7dias = 0;
 
-  for (const [key, total] of contagemPorDia.entries()) {
-    const parts = key.split("-").map(Number);
-    const year = parts[0] ?? 2026;
-    const month = parts[1] ?? 1;
-    const day = parts[2] ?? 1;
-    const date = new Date(year, month - 1, day);
+  for (const key of chaves) {
+    const total = contagemPorDia.get(key) ?? 0;
     conversoesPorDia.push({
-      data: formatarDataBR(date),
+      data: formatarRotuloDaChave(key),
       total,
     });
     total7dias += total;
