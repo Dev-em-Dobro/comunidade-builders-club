@@ -5,6 +5,7 @@ import {
   formatarRotuloDaChave,
   gerarChaves7Dias,
   inicioDodiaSaoPaulo,
+  contarPorDia,
 } from "./conversoes";
 
 describe("getDateKeySaoPaulo — B1: não depende do TZ do processo", () => {
@@ -99,26 +100,7 @@ describe("inicioDodiaSaoPaulo — B1: meia-noite de SP com offset explícito", (
   });
 });
 
-describe("contagem de conversões por dia — importa getDateKeySaoPaulo", () => {
-  type ConversaoMock = { convertedToPaidAt: Date };
-
-  function contarPorDia(
-    conversoes: ConversaoMock[],
-    diasValidos: Set<string>,
-  ): Map<string, number> {
-    const contagem = new Map<string, number>();
-    for (const key of diasValidos) {
-      contagem.set(key, 0);
-    }
-    for (const c of conversoes) {
-      const key = getDateKeySaoPaulo(c.convertedToPaidAt);
-      if (diasValidos.has(key)) {
-        contagem.set(key, (contagem.get(key) ?? 0) + 1);
-      }
-    }
-    return contagem;
-  }
-
+describe("contarPorDia — B5: importado do código de produção", () => {
   it("conta conversões no mesmo dia", () => {
     const diasValidos = new Set(["2026-10-05"]);
     const conversoes: ConversaoMock[] = [

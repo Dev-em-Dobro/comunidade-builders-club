@@ -2,14 +2,27 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   isPago,
+  deveMarcarConversao,
+  deveMarcarConversaoBootstrap,
+  deveAtualizarPaidAtAllowlist,
+  buildUpdatePaidAt,
+  statusEhReprocessavel,
+  statusEhFinal,
+  podeSerClaimado,
+  processingEstaTravado,
+  calcularProximoTier,
+  rankPago,
+  TIMEOUT_PROCESSING_MS,
+  type StatusWebhook,
+} from "./regras-conversao";
+import {
   dataConversaoSegura,
   escolherOfferIdOficial,
-  type DadosEntregaWebhook,
 } from "./repositorio";
 import type { MembershipTier } from "@prisma/client";
 import type { PlanoPagoHubla } from "./produtos";
 
-describe("isPago — lógica de conversão", () => {
+describe("isPago — lógica de conversão (B5: importado de regras-conversao)", () => {
   it("free não é pago", () => {
     assert.equal(isPago("free"), false);
   });
@@ -27,75 +40,105 @@ describe("isPago — lógica de conversão", () => {
   });
 });
 
-describe("lógica de conversão Free→Pago (usando isPago exportado)", () => {
-  type MembershipMock = {
-    tier: MembershipTier;
-    convertedToPaidAt: Date | null;
-  };
+describe("rankPago — hierarquia de tiers (B5: importado)", () => {
+  it("elite > pro > free", () => {
+    assert.ok(rankPago("elite") > rankPago("pro"));
+    assert.ok(rankPago("pro") > rankPago("free"));
+  });
 
-  function deveMarcarConversao(m: MembershipMock | null): boolean {
-    if (!m) return true;
-    const eraGratuito = !isPago(m.tier);
-    const jaTinhaConversao = m.convertedToPaidAt !== null;
-    return eraGratuito && !jaTinhaConversao;
-  }
+  it("paid == pro (legado)", () => {
+    assert.equal(rankPago("paid"), rankPago("pro"));
+  });
+});
 
+describe("deveMarcarConversao — lógica de conversão Free→Pago (B5: importado)", () => {
   it("sem membership existente → marca conversão", () => {
     assert.equal(deveMarcarConversao(null), true);
   });
 
   it("free sem conversão prévia → marca conversão", () => {
-    const m: MembershipMock = { tier: "free", convertedToPaidAt: null };
+    const m = { tier: "free" as MembershipTier, convertedToPaidAt: null };
     assert.equal(deveMarcarConversao(m), true);
   });
 
   it("free COM conversão prévia → NÃO marca (idempotente)", () => {
-    const m: MembershipMock = { tier: "free", convertedToPaidAt: new Date() };
+    const m = { tier: "free" as MembershipTier, convertedToPaidAt: new Date() };
     assert.equal(deveMarcarConversao(m), false);
   });
 
   it("pro sem conversão prévia → NÃO marca (já era pago)", () => {
-    const m: MembershipMock = { tier: "pro", convertedToPaidAt: null };
+    const m = { tier: "pro" as MembershipTier, convertedToPaidAt: null };
     assert.equal(deveMarcarConversao(m), false);
   });
 
   it("elite com conversão prévia → NÃO marca", () => {
-    const m: MembershipMock = { tier: "elite", convertedToPaidAt: new Date() };
+    const m = { tier: "elite" as MembershipTier, convertedToPaidAt: new Date() };
     assert.equal(deveMarcarConversao(m), false);
   });
 
   it("paid (legado) sem conversão → NÃO marca (já era pago)", () => {
-    const m: MembershipMock = { tier: "paid", convertedToPaidAt: null };
+    const m = { tier: "paid" as MembershipTier, convertedToPaidAt: null };
     assert.equal(deveMarcarConversao(m), false);
   });
 });
 
-describe("B7: ex-pagante que volta a pagar (usando isPago exportado)", () => {
-  function deveMarcarConversaoExPagante(tierAtual: MembershipTier, convertedToPaidAt: Date | null): boolean {
-    const eraGratuito = !isPago(tierAtual);
-    if (!eraGratuito) return false;
-    return convertedToPaidAt === null;
-  }
-
+describe("B7: ex-pagante que volta a pagar (usa deveMarcarConversao)", () => {
   it("ex-Elite que foi para Free e volta a pagar: NÃO marca se já tinha conversão", () => {
-    const tinhaConversao = new Date("2026-01-15");
-    assert.equal(deveMarcarConversaoExPagante("free", tinhaConversao), false);
+    const m = { tier: "free" as MembershipTier, convertedToPaidAt: new Date("2026-01-15") };
+    assert.equal(deveMarcarConversao(m), false);
   });
 
   it("Free que nunca pagou: marca conversão", () => {
-    assert.equal(deveMarcarConversaoExPagante("free", null), true);
+    const m = { tier: "free" as MembershipTier, convertedToPaidAt: null };
+    assert.equal(deveMarcarConversao(m), true);
   });
 
   it("Pro atual: não marca (já é pago)", () => {
-    assert.equal(deveMarcarConversaoExPagante("pro", null), false);
+    const m = { tier: "pro" as MembershipTier, convertedToPaidAt: null };
+    assert.equal(deveMarcarConversao(m), false);
   });
 
-  it("ex-pagante de ANTES da feature (sem conversão prévia) que volta: marca conversão", () => {
-    assert.equal(deveMarcarConversaoExPagante("free", null), true);
+  it("ex-pagante de ANTES da feature (sem conversão prévia) que volta: marca", () => {
+    const m = { tier: "free" as MembershipTier, convertedToPaidAt: null };
+    assert.equal(deveMarcarConversao(m), true);
   });
 });
 
-describe("N4: dataConversaoSegura — prefere paidAt da fatura", () => {
+describe("N2: deveMarcarConversaoBootstrap — só hubla/tmb com paidAt (B5: importado)", () => {
+  it("source='hubla' com paidAt → marca", () => {
+    assert.equal(deveMarcarConversaoBootstrap({ source: "hubla", paidAt: new Date() }), true);
+  });
+
+  it("source='tmb' com paidAt → marca", () => {
+    assert.equal(deveMarcarConversaoBootstrap({ source: "tmb", paidAt: new Date() }), true);
+  });
+
+  it("source='orion' com paidAt → NÃO marca", () => {
+    assert.equal(deveMarcarConversaoBootstrap({ source: "orion", paidAt: new Date() }), false);
+  });
+
+  it("source='devquest' com paidAt → NÃO marca", () => {
+    assert.equal(deveMarcarConversaoBootstrap({ source: "devquest", paidAt: new Date() }), false);
+  });
+
+  it("source='manual' com paidAt → NÃO marca", () => {
+    assert.equal(deveMarcarConversaoBootstrap({ source: "manual", paidAt: new Date() }), false);
+  });
+
+  it("source='admin-bulk' com paidAt → NÃO marca", () => {
+    assert.equal(deveMarcarConversaoBootstrap({ source: "admin-bulk", paidAt: new Date() }), false);
+  });
+
+  it("source='hubla' sem paidAt → NÃO marca", () => {
+    assert.equal(deveMarcarConversaoBootstrap({ source: "hubla", paidAt: null }), false);
+  });
+
+  it("source=null com paidAt → NÃO marca", () => {
+    assert.equal(deveMarcarConversaoBootstrap({ source: null, paidAt: new Date() }), false);
+  });
+});
+
+describe("N4: dataConversaoSegura — prefere paidAt da fatura (B5: importado)", () => {
   it("usa cobradoEm quando disponível", () => {
     const cobranca = {
       valorCentavos: 9900,
@@ -130,7 +173,7 @@ describe("N4: dataConversaoSegura — prefere paidAt da fatura", () => {
   });
 });
 
-describe("B3: escolherOfferIdOficial — prefere ofertas mapeadas", () => {
+describe("B3: escolherOfferIdOficial — prefere ofertas mapeadas (B5: importado)", () => {
   const offerMap = new Map<string, PlanoPagoHubla>([
     ["offer-pro-oficial", "pro"],
     ["offer-elite-oficial", "elite"],
@@ -160,172 +203,146 @@ describe("B3: escolherOfferIdOficial — prefere ofertas mapeadas", () => {
   });
 });
 
-describe("DadosEntregaWebhook — estrutura de dados (importa tipo real)", () => {
-  it("aceita dados completos para evento processado", () => {
-    const dados: DadosEntregaWebhook = {
-      idempotencyKey: "key-123",
-      eventType: "invoice.payment_succeeded",
-      payload: { type: "invoice.payment_succeeded", event: {} },
-      productId: "prod-abc",
-      offerId: "offer-123",
-      email: "test@example.com",
-      membershipId: "mem-xyz",
-      status: "processed",
-      erro: null,
-    };
-    assert.equal(dados.status, "processed");
-    assert.equal(dados.productId, "prod-abc");
+describe("N1: statusEhReprocessavel — error é reprocessável (B5: importado)", () => {
+  it("pending é reprocessável", () => {
+    assert.equal(statusEhReprocessavel("pending"), true);
   });
 
-  it("aceita dados para evento ignorado com motivo", () => {
-    const dados: DadosEntregaWebhook = {
-      idempotencyKey: "key-456",
-      eventType: "invoice.created",
-      payload: { type: "invoice.created" },
-      productId: null,
-      email: null,
-      status: "ignored",
-      erro: "tipo não tratado: invoice.created",
-    };
-    assert.equal(dados.status, "ignored");
-    assert.equal(dados.erro, "tipo não tratado: invoice.created");
+  it("error é reprocessável", () => {
+    assert.equal(statusEhReprocessavel("error"), true);
   });
 
-  it("aceita dados para evento com erro (N1: pode ser reprocessado)", () => {
-    const dados: DadosEntregaWebhook = {
-      idempotencyKey: "key-789",
-      eventType: "customer.member_added",
-      payload: { type: "customer.member_added" },
-      status: "error",
-      erro: "Falha de conexão",
-    };
-    assert.equal(dados.status, "error");
-    assert.ok(dados.erro?.includes("Falha"));
+  it("processing NÃO é reprocessável (precisa verificar timeout)", () => {
+    assert.equal(statusEhReprocessavel("processing"), false);
+  });
+
+  it("processed NÃO é reprocessável", () => {
+    assert.equal(statusEhReprocessavel("processed"), false);
+  });
+
+  it("ignored NÃO é reprocessável", () => {
+    assert.equal(statusEhReprocessavel("ignored"), false);
   });
 });
 
-describe("N1: retry após erro — status 'error' é reprocessável", () => {
-  it("processed não é reprocessável", () => {
-    const status = "processed";
-    const reprocessavel = status !== "processed" && status !== "ignored";
-    assert.equal(reprocessavel, false);
+describe("N1: statusEhFinal — processed/ignored são finais (B5: importado)", () => {
+  it("processed é final", () => {
+    assert.equal(statusEhFinal("processed"), true);
   });
 
-  it("ignored não é reprocessável", () => {
-    const status = "ignored";
-    const reprocessavel = status !== "processed" && status !== "ignored";
-    assert.equal(reprocessavel, false);
+  it("ignored é final", () => {
+    assert.equal(statusEhFinal("ignored"), true);
   });
 
-  it("error É reprocessável", () => {
-    const status = "error";
-    const reprocessavel = status !== "processed" && status !== "ignored";
-    assert.equal(reprocessavel, true);
+  it("pending não é final", () => {
+    assert.equal(statusEhFinal("pending"), false);
   });
 
-  it("pending É reprocessável", () => {
-    const status = "pending";
-    const reprocessavel = status !== "processed" && status !== "ignored";
-    assert.equal(reprocessavel, true);
+  it("processing não é final", () => {
+    assert.equal(statusEhFinal("processing"), false);
+  });
+
+  it("error não é final", () => {
+    assert.equal(statusEhFinal("error"), false);
   });
 });
 
-describe("N2: allowlist — só marca conversão quando source='hubla'|'tmb' E paidAt não nulo", () => {
-  type AllowlistData = { source: string | null; paidAt: Date | null };
-
-  function deveMarcarConversaoBootstrap(data: AllowlistData): boolean {
-    const isHublaOrTmb = data.source === "hubla" || data.source === "tmb";
-    return isHublaOrTmb && data.paidAt !== null;
-  }
-
-  it("source='hubla' com paidAt → marca", () => {
-    assert.equal(deveMarcarConversaoBootstrap({ source: "hubla", paidAt: new Date() }), true);
+describe("N5: processingEstaTravado — timeout de processing (B5: importado)", () => {
+  it("sem claimedAt não está travado", () => {
+    assert.equal(processingEstaTravado(null), false);
   });
 
-  it("source='tmb' com paidAt → marca", () => {
-    assert.equal(deveMarcarConversaoBootstrap({ source: "tmb", paidAt: new Date() }), true);
+  it("claimedAt recente não está travado", () => {
+    const agora = new Date();
+    const recente = new Date(agora.getTime() - 60_000); // 1 minuto atrás
+    assert.equal(processingEstaTravado(recente, agora), false);
   });
 
-  it("source='orion' com paidAt → NÃO marca", () => {
-    assert.equal(deveMarcarConversaoBootstrap({ source: "orion", paidAt: new Date() }), false);
+  it("claimedAt > TIMEOUT_PROCESSING_MS está travado", () => {
+    const agora = new Date();
+    const antigo = new Date(agora.getTime() - TIMEOUT_PROCESSING_MS - 1000);
+    assert.equal(processingEstaTravado(antigo, agora), true);
   });
 
-  it("source='devquest' com paidAt → NÃO marca", () => {
-    assert.equal(deveMarcarConversaoBootstrap({ source: "devquest", paidAt: new Date() }), false);
-  });
-
-  it("source='manual' com paidAt → NÃO marca", () => {
-    assert.equal(deveMarcarConversaoBootstrap({ source: "manual", paidAt: new Date() }), false);
-  });
-
-  it("source='admin-bulk' com paidAt → NÃO marca", () => {
-    assert.equal(deveMarcarConversaoBootstrap({ source: "admin-bulk", paidAt: new Date() }), false);
-  });
-
-  it("source='hubla' sem paidAt → NÃO marca", () => {
-    assert.equal(deveMarcarConversaoBootstrap({ source: "hubla", paidAt: null }), false);
-  });
-
-  it("source=null com paidAt → NÃO marca", () => {
-    assert.equal(deveMarcarConversaoBootstrap({ source: null, paidAt: new Date() }), false);
+  it("claimedAt exatamente no limite NÃO está travado", () => {
+    const agora = new Date();
+    const limite = new Date(agora.getTime() - TIMEOUT_PROCESSING_MS);
+    assert.equal(processingEstaTravado(limite, agora), false);
   });
 });
 
-describe("N5: claim atômico — lógica de condição", () => {
-  type StatusWebhook = "pending" | "processed" | "ignored" | "error";
-
-  function podeSerClaimado(status: StatusWebhook): boolean {
-    return status === "pending" || status === "error";
-  }
+describe("N5: podeSerClaimado — lógica completa de claim (B5: importado)", () => {
+  const agora = new Date();
+  const recente = new Date(agora.getTime() - 60_000);
+  const antigo = new Date(agora.getTime() - TIMEOUT_PROCESSING_MS - 1000);
 
   it("pending pode ser claimado", () => {
-    assert.equal(podeSerClaimado("pending"), true);
+    assert.equal(podeSerClaimado("pending", null, agora), true);
   });
 
   it("error pode ser claimado (N1 retry)", () => {
-    assert.equal(podeSerClaimado("error"), true);
+    assert.equal(podeSerClaimado("error", null, agora), true);
+  });
+
+  it("processing recente NÃO pode ser claimado", () => {
+    assert.equal(podeSerClaimado("processing", recente, agora), false);
+  });
+
+  it("processing travado PODE ser claimado", () => {
+    assert.equal(podeSerClaimado("processing", antigo, agora), true);
   });
 
   it("processed NÃO pode ser claimado", () => {
-    assert.equal(podeSerClaimado("processed"), false);
+    assert.equal(podeSerClaimado("processed", null, agora), false);
   });
 
   it("ignored NÃO pode ser claimado", () => {
-    assert.equal(podeSerClaimado("ignored"), false);
+    assert.equal(podeSerClaimado("ignored", null, agora), false);
   });
 });
 
-describe("upgrade pro→elite sem marcar conversão", () => {
-  function deveMarcarConversaoUpgrade(tierAtual: MembershipTier, convertedToPaidAt: Date | null): boolean {
-    const eraGratuito = !isPago(tierAtual);
-    if (!eraGratuito) return false;
-    return convertedToPaidAt === null;
-  }
+describe("calcularProximoTier — nunca rebaixa (B5: importado)", () => {
+  it("free + pro = pro", () => {
+    assert.equal(calcularProximoTier("free", "pro"), "pro");
+  });
 
+  it("free + elite = elite", () => {
+    assert.equal(calcularProximoTier("free", "elite"), "elite");
+  });
+
+  it("pro + elite = elite (upgrade)", () => {
+    assert.equal(calcularProximoTier("pro", "elite"), "elite");
+  });
+
+  it("elite + pro = elite (não rebaixa)", () => {
+    assert.equal(calcularProximoTier("elite", "pro"), "elite");
+  });
+
+  it("pro + pro = pro", () => {
+    assert.equal(calcularProximoTier("pro", "pro"), "pro");
+  });
+});
+
+describe("upgrade pro→elite sem marcar conversão (usa deveMarcarConversao)", () => {
   it("pro→elite: não marca (já era pago)", () => {
-    assert.equal(deveMarcarConversaoUpgrade("pro", new Date()), false);
-    assert.equal(deveMarcarConversaoUpgrade("pro", null), false);
+    const m1 = { tier: "pro" as MembershipTier, convertedToPaidAt: new Date() };
+    const m2 = { tier: "pro" as MembershipTier, convertedToPaidAt: null };
+    assert.equal(deveMarcarConversao(m1), false);
+    assert.equal(deveMarcarConversao(m2), false);
   });
 
   it("paid→elite: não marca (já era pago)", () => {
-    assert.equal(deveMarcarConversaoUpgrade("paid", null), false);
+    const m = { tier: "paid" as MembershipTier, convertedToPaidAt: null };
+    assert.equal(deveMarcarConversao(m), false);
   });
 
   it("elite→elite: não marca", () => {
-    assert.equal(deveMarcarConversaoUpgrade("elite", new Date()), false);
+    const m = { tier: "elite" as MembershipTier, convertedToPaidAt: new Date() };
+    assert.equal(deveMarcarConversao(m), false);
   });
 });
 
-describe("B2: allowlist só grava paidAt quando nulo", () => {
-  type UpdatePayload = { paidAt?: Date };
-
-  function buildUpdatePaidAt(opts: { paidAt?: Date }, existingPaidAt: Date | null): UpdatePayload {
-    if (opts.paidAt && !existingPaidAt) {
-      return { paidAt: opts.paidAt };
-    }
-    return {};
-  }
-
+describe("B2: buildUpdatePaidAt — só grava quando nulo (B5: importado)", () => {
   it("grava paidAt quando existente é null", () => {
     const novoPaidAt = new Date("2026-10-05T10:00:00Z");
     const update = buildUpdatePaidAt({ paidAt: novoPaidAt }, null);
@@ -345,35 +362,67 @@ describe("B2: allowlist só grava paidAt quando nulo", () => {
   });
 });
 
-describe("revogação (downgrade para free)", () => {
-  it("revogação não desfaz convertedToPaidAt (N6)", () => {
-    type MembershipMock = {
-      tier: MembershipTier;
-      convertedToPaidAt: Date | null;
-    };
+describe("B2: deveAtualizarPaidAtAllowlist — regra pura (B5: importado)", () => {
+  it("true quando novoPaidAt definido e existente é null", () => {
+    assert.equal(deveAtualizarPaidAtAllowlist(new Date(), null), true);
+  });
 
+  it("false quando existente não é null", () => {
+    assert.equal(deveAtualizarPaidAtAllowlist(new Date(), new Date()), false);
+  });
+
+  it("false quando novoPaidAt é undefined", () => {
+    assert.equal(deveAtualizarPaidAtAllowlist(undefined, null), false);
+  });
+});
+
+describe("revogação (N6: não desfaz conversão)", () => {
+  it("revogação não desfaz convertedToPaidAt", () => {
     const dataConversaoOriginal = new Date("2026-10-01");
-
-    const depois: MembershipMock = {
-      tier: "free",
-      convertedToPaidAt: dataConversaoOriginal,
-    };
-
+    const depois = { tier: "free" as MembershipTier, convertedToPaidAt: dataConversaoOriginal };
     assert.equal(depois.convertedToPaidAt, dataConversaoOriginal);
     assert.equal(depois.tier, "free");
   });
 
   it("revogação de quem nunca teve conversão mantém null", () => {
-    type MembershipMock = {
-      tier: MembershipTier;
-      convertedToPaidAt: Date | null;
-    };
-
-    const depois: MembershipMock = {
-      tier: "free",
-      convertedToPaidAt: null,
-    };
-
+    const depois = { tier: "free" as MembershipTier, convertedToPaidAt: null };
     assert.equal(depois.convertedToPaidAt, null);
+  });
+});
+
+describe("DadosEntregaWebhook — estrutura de dados com processing (N5)", () => {
+  type DadosEntregaWebhook = {
+    idempotencyKey: string;
+    eventType: string;
+    payload: unknown;
+    productId?: string | null;
+    offerId?: string | null;
+    email?: string | null;
+    membershipId?: string | null;
+    status: StatusWebhook;
+    erro?: string | null;
+  };
+
+  it("aceita status processing (N5)", () => {
+    const dados: DadosEntregaWebhook = {
+      idempotencyKey: "key-123",
+      eventType: "invoice.payment_succeeded",
+      payload: { type: "invoice.payment_succeeded" },
+      status: "processing",
+      erro: null,
+    };
+    assert.equal(dados.status, "processing");
+  });
+
+  it("aceita dados para evento com erro (N1: pode ser reprocessado)", () => {
+    const dados: DadosEntregaWebhook = {
+      idempotencyKey: "key-789",
+      eventType: "customer.member_added",
+      payload: { type: "customer.member_added" },
+      status: "error",
+      erro: "Falha de conexão",
+    };
+    assert.equal(dados.status, "error");
+    assert.ok(podeSerClaimado(dados.status, null));
   });
 });

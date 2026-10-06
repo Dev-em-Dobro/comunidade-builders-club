@@ -65,6 +65,27 @@ export function gerarChaves7Dias(agora: Date): string[] {
   return keys;
 }
 
+/**
+ * B5: Conta conversões por dia usando as chaves YYYY-MM-DD.
+ * Função pura exportada para testes.
+ */
+export function contarPorDia(
+  conversoes: { convertedToPaidAt: Date }[],
+  diasValidos: Set<string>,
+): Map<string, number> {
+  const contagem = new Map<string, number>();
+  for (const key of diasValidos) {
+    contagem.set(key, 0);
+  }
+  for (const c of conversoes) {
+    const key = getDateKeySaoPaulo(c.convertedToPaidAt);
+    if (diasValidos.has(key)) {
+      contagem.set(key, (contagem.get(key) ?? 0) + 1);
+    }
+  }
+  return contagem;
+}
+
 export async function listarConversoesUltimos7Dias(): Promise<MetricasConversao> {
   const agora = new Date();
   const chaves = gerarChaves7Dias(agora);

@@ -10,6 +10,7 @@ import {
   type ContextoAceite,
 } from "./aceite-legal";
 import type { TierPagoAllowlist } from "./tier-allowlist";
+import { deveMarcarConversaoBootstrap } from "@/lib/hubla/regras-conversao";
 
 export type BootstrapResult = {
   membership: Membership;
@@ -114,8 +115,10 @@ async function resolverBootstrap(
 
   if (!existing) {
     const origin = await readOrigemFromCookie();
-    const isHublaOrTmb = sourceAllowlist === "hubla" || sourceAllowlist === "tmb";
-    const deveMarcarConversao = allowed && !isBootstrapAdmin && isHublaOrTmb && paidAtAllowlist !== null;
+    const marcarConversao = allowed && !isBootstrapAdmin && deveMarcarConversaoBootstrap({
+      source: sourceAllowlist,
+      paidAt: paidAtAllowlist,
+    });
     const membership = await prisma.membership.create({
       data: {
         userId,
@@ -129,7 +132,7 @@ async function resolverBootstrap(
               originAt: new Date(),
             }
           : {}),
-        ...(deveMarcarConversao ? { convertedToPaidAt: paidAtAllowlist } : {}),
+        ...(marcarConversao ? { convertedToPaidAt: paidAtAllowlist } : {}),
       },
     });
     return { membership, profile: nextProfile };

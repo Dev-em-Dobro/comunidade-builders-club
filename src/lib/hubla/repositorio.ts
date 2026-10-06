@@ -16,13 +16,16 @@ import { addAllowedEmail, findUserByEmail, removeAllowedEmail } from "@/lib/memb
 import { interpretarEventoHubla } from "./interpretar";
 import { emailDoEvento, offerIdsDoEvento, productIdDoEvento } from "./normalizar";
 import { mapaOfertasHubla, type PlanoPagoHubla } from "./produtos";
+import {
+  isPago,
+  statusEhFinal,
+  calcularProximoTier,
+  TIMEOUT_PROCESSING_MS,
+  type StatusWebhook,
+} from "./regras-conversao";
 import type { AcaoAllowlist, CobrancaHubla, HublaWebhookPayload } from "./tipos";
 
-function rankPago(tier: MembershipTier | PlanoPagoHubla): number {
-  if (tier === "elite") return 3;
-  if (tier === "pro" || tier === "paid") return 2;
-  return 1;
-}
+export { isPago, deveMarcarConversao } from "./regras-conversao";
 
 function dadosCobrancaMembership(cobranca: CobrancaHubla, plan: PlanoPagoHubla) {
   return {
@@ -43,7 +46,7 @@ export async function jaProcessouIdempotency(key: string): Promise<boolean> {
     select: { status: true },
   });
   if (!row) return false;
-  return row.status === "processed" || row.status === "ignored";
+  return statusEhFinal(row.status as StatusWebhook);
 }
 
 export type DadosEntregaWebhook = {
@@ -54,28 +57,59 @@ export type DadosEntregaWebhook = {
   offerId?: string | null;
   email?: string | null;
   membershipId?: string | null;
-  status: "pending" | "processed" | "ignored" | "error";
+  status: StatusWebhook;
   erro?: string | null;
 };
 
 /**
- * N5: Claim atômico usando updateMany WHERE status IN ('pending', 'error').
+ * N5: Claim atômico usando updateMany com status intermediário 'processing'.
+ * 
+ * Fluxo:
+ * 1. updateMany WHERE status IN ('pending', 'error') OR (status='processing' AND travado)
+ * 2. SET status='processing', claimedAt=now()
+ * 3. Só quem obteve count=1 processa
+ * 
  * Retorna true se conseguiu fazer o claim, false se já está sendo processado.
  */
 export async function tentarClaimEntrega(idempotencyKey: string): Promise<boolean> {
+  const agora = new Date();
+  const timeoutThreshold = new Date(agora.getTime() - TIMEOUT_PROCESSING_MS);
+
   const result = await prisma.hublaWebhookDelivery.updateMany({
     where: {
       idempotencyKey,
-      status: { in: ["pending", "error"] },
+      OR: [
+        { status: { in: ["pending", "error"] } },
+        {
+          status: "processing",
+          claimedAt: { lt: timeoutThreshold },
+        },
+      ],
     },
     data: {
-      status: "pending",
+      status: "processing",
+      claimedAt: agora,
     },
   });
   return result.count > 0;
 }
 
-export async function registrarOuAtualizarEntrega(dados: DadosEntregaWebhook): Promise<void> {
+/**
+ * N5: Registra entrega inicial sem rebaixar status de processing/processed/ignored.
+ */
+export async function registrarEntregaInicial(dados: DadosEntregaWebhook): Promise<void> {
+  const existing = await prisma.hublaWebhookDelivery.findUnique({
+    where: { idempotencyKey: dados.idempotencyKey },
+    select: { status: true },
+  });
+
+  if (existing) {
+    const statusAtual = existing.status as StatusWebhook;
+    if (statusAtual === "processing" || statusEhFinal(statusAtual)) {
+      return;
+    }
+  }
+
   await prisma.hublaWebhookDelivery.upsert({
     where: { idempotencyKey: dados.idempotencyKey },
     create: {
@@ -90,16 +124,28 @@ export async function registrarOuAtualizarEntrega(dados: DadosEntregaWebhook): P
       erro: dados.erro ?? null,
     },
     update: {
+      eventType: dados.eventType,
+      payload: dados.payload as Prisma.InputJsonValue,
+      productId: dados.productId ?? null,
+      offerId: dados.offerId ?? null,
+      email: dados.email ?? null,
+    },
+  });
+}
+
+/**
+ * Atualiza entrega após processamento (status final).
+ */
+export async function atualizarEntregaFinal(dados: DadosEntregaWebhook): Promise<void> {
+  await prisma.hublaWebhookDelivery.update({
+    where: { idempotencyKey: dados.idempotencyKey },
+    data: {
       status: dados.status,
       erro: dados.erro ?? null,
       membershipId: dados.membershipId ?? null,
       offerId: dados.offerId ?? null,
     },
   });
-}
-
-export function isPago(tier: MembershipTier | PlanoPagoHubla): boolean {
-  return tier === "pro" || tier === "elite" || tier === "paid";
 }
 
 export type ResultadoConcessao = {
@@ -113,7 +159,7 @@ export type ResultadoConcessao = {
  * 2. Se não existir, usa horário de recebimento do webhook (agora)
  * Nunca usa createdAt da subscription (pode ser antigo).
  */
-function dataConversaoSegura(cobranca: CobrancaHubla): Date {
+export function dataConversaoSegura(cobranca: CobrancaHubla): Date {
   if (cobranca.cobradoEm) {
     return cobranca.cobradoEm;
   }
@@ -155,60 +201,30 @@ export async function concederPago(
       if ((e as { code?: string }).code === "P2002") {
         const existing = await prisma.membership.findUnique({ where: { userId: user.id } });
         if (existing) {
-          const eraGratuito = !isPago(existing.tier);
-          const nextTier = rankPago(plan) >= rankPago(existing.tier) ? plan : existing.tier;
-
-          if (eraGratuito) {
-            const updated = await prisma.membership.updateMany({
-              where: {
-                userId: user.id,
-                convertedToPaidAt: null,
-              },
-              data: {
-                status: "active",
-                tier: nextTier,
-                convertedToPaidAt: convertedAt,
-                ...dinheiro,
-              },
-            });
-
-            if (updated.count === 0) {
-              await prisma.membership.update({
-                where: { userId: user.id },
-                data: {
-                  status: "active",
-                  tier: nextTier,
-                  ...dinheiro,
-                },
-              });
-            }
-
-            return { membershipId: existing.id, conversao: updated.count > 0 };
-          }
-
-          await prisma.membership.update({
-            where: { userId: user.id },
-            data: {
-              status: "active",
-              tier: nextTier,
-              ...dinheiro,
-            },
-          });
-
-          return { membershipId: existing.id, conversao: false };
+          return aplicarTierAposCorrida(user.id, existing, plan, convertedAt, dinheiro);
         }
       }
       throw e;
     }
   }
 
-  const eraGratuito = !isPago(m.tier);
-  const nextTier = rankPago(plan) >= rankPago(m.tier) ? plan : m.tier;
+  return aplicarTierAposCorrida(user.id, m, plan, convertedAt, dinheiro);
+}
+
+async function aplicarTierAposCorrida(
+  userId: string,
+  existing: { id: string; tier: MembershipTier; convertedToPaidAt: Date | null },
+  plan: PlanoPagoHubla,
+  convertedAt: Date,
+  dinheiro: ReturnType<typeof dadosCobrancaMembership>,
+): Promise<ResultadoConcessao> {
+  const eraGratuito = !isPago(existing.tier);
+  const nextTier = calcularProximoTier(existing.tier, plan);
 
   if (eraGratuito) {
     const updated = await prisma.membership.updateMany({
       where: {
-        userId: user.id,
+        userId,
         convertedToPaidAt: null,
       },
       data: {
@@ -221,7 +237,7 @@ export async function concederPago(
 
     if (updated.count === 0) {
       await prisma.membership.update({
-        where: { userId: user.id },
+        where: { userId },
         data: {
           status: "active",
           tier: nextTier,
@@ -230,11 +246,11 @@ export async function concederPago(
       });
     }
 
-    return { membershipId: m.id, conversao: updated.count > 0 };
+    return { membershipId: existing.id, conversao: updated.count > 0 };
   }
 
   await prisma.membership.update({
-    where: { userId: user.id },
+    where: { userId },
     data: {
       status: "active",
       tier: nextTier,
@@ -242,7 +258,7 @@ export async function concederPago(
     },
   });
 
-  return { membershipId: m.id, conversao: false };
+  return { membershipId: existing.id, conversao: false };
 }
 
 async function findUserPorEmails(emails: string[]) {
@@ -306,7 +322,7 @@ export async function aplicarAcaoAllowlist(acao: AcaoAllowlist): Promise<Resulta
  * B3: Escolhe offer_id preferindo ofertas oficiais (mapeadas para PRO/Elite).
  * Se nenhuma mapear, usa a primeira oferta não order-bump.
  */
-function escolherOfferIdOficial(
+export function escolherOfferIdOficial(
   offerIds: string[],
   offerMap: Map<string, PlanoPagoHubla>,
 ): string | null {
@@ -371,7 +387,7 @@ export async function processarWebhookHubla(
 
   const dadosPayload = extrairDadosDoPayload(payload, offerMap);
 
-  await registrarOuAtualizarEntrega({
+  await registrarEntregaInicial({
     idempotencyKey,
     eventType: opts.eventType,
     payload,
@@ -388,7 +404,7 @@ export async function processarWebhookHubla(
     return { ignorado: true, motivo: "evento em processamento" };
   }
 
-  let status: "processed" | "ignored" | "error" = "processed";
+  let status: StatusWebhook = "processed";
   let erro: string | null = null;
   let membershipId: string | null = null;
   let resultado: { ignorado: boolean; motivo?: string; conversao?: boolean };
@@ -418,7 +434,7 @@ export async function processarWebhookHubla(
     erro = e instanceof Error ? e.message : "Erro desconhecido";
     throw e;
   } finally {
-    await registrarOuAtualizarEntrega({
+    await atualizarEntregaFinal({
       idempotencyKey,
       eventType: opts.eventType,
       payload,
@@ -436,4 +452,4 @@ export async function processarWebhookHubla(
   return resultado!;
 }
 
-export { dataConversaoSegura, escolherOfferIdOficial, buscarMembershipIdPorEmail };
+export { buscarMembershipIdPorEmail };

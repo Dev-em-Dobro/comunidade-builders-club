@@ -4,6 +4,7 @@ import {
   tierPagoDaNotaAllowlist,
   type TierPagoAllowlist,
 } from "./tier-allowlist";
+import { buildUpdatePaidAt } from "@/lib/hubla/regras-conversao";
 
 export function normalizarEmail(email: string): string {
   return email.trim().toLowerCase();
@@ -65,6 +66,7 @@ export async function addAllowedEmail(opts: {
     select: { paidAt: true },
   });
 
+  const paidAtUpdate = buildUpdatePaidAt({ paidAt: opts.paidAt }, existing?.paidAt ?? null);
   const row = await prisma.allowedEmail.upsert({
     where: { email },
     create: {
@@ -76,7 +78,7 @@ export async function addAllowedEmail(opts: {
     update: {
       ...(opts.source ? { source: opts.source } : {}),
       ...(opts.note !== undefined ? { note: opts.note } : {}),
-      ...(opts.paidAt && !existing?.paidAt ? { paidAt: opts.paidAt } : {}),
+      ...paidAtUpdate,
     },
   });
 
