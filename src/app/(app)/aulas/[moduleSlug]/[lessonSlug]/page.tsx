@@ -167,27 +167,7 @@ export default async function LessonPage({ params }: Props) {
               )}
             </div>
           </div>
-          {canWatch ? (
-            progress?.completedAt ? (
-              <p className="mt-3 inline-flex items-center gap-2 rounded-xl border border-accent/30 bg-accent/10 px-4 py-2 text-[15px] font-semibold text-accent">
-                <span aria-hidden>✓</span>
-                Concluída
-              </p>
-            ) : (
-              <div className="mt-3 w-full rounded-2xl border border-accent/30 bg-accent/10 p-3 sm:w-fit">
-                <p className="mb-2 text-sm font-medium text-foreground">
-                  Terminou esta aula? Atualize seu progresso.
-                </p>
-                <MarkLessonCompleteButton
-                  lessonId={lesson.id}
-                  moduleSlug={moduleSlug}
-                  lessonSlug={lessonSlug}
-                  className="btn-primary w-full"
-                />
-              </div>
-            )
-          ) : null}
-          <div className="mt-3 flex items-center justify-between gap-3">
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
             {prev ? (
               <Link
                 href={`/aulas/${prev.moduleSlug}/${prev.slug}`}
@@ -198,16 +178,31 @@ export default async function LessonPage({ params }: Props) {
             ) : (
               <span />
             )}
-            {next ? (
-              <Link
-                href={`/aulas/${next.moduleSlug}/${next.slug}`}
-                className="text-sm font-medium text-muted hover:text-accent"
-              >
-                Próxima aula →
-              </Link>
-            ) : (
-              <span />
-            )}
+            <div className="ml-auto flex items-center gap-2">
+              {canWatch ? (
+                progress?.completedAt ? (
+                  <p className="text-sm font-semibold text-accent">
+                    Concluída
+                  </p>
+                ) : (
+                  <MarkLessonCompleteButton
+                    lessonId={lesson.id}
+                    moduleSlug={moduleSlug}
+                    lessonSlug={lessonSlug}
+                    label="Concluir aula"
+                    className="btn-primary px-3 py-2 text-sm active:scale-[0.98]"
+                  />
+                )
+              ) : null}
+              {next ? (
+                <Link
+                  href={`/aulas/${next.moduleSlug}/${next.slug}`}
+                  className="text-sm font-medium text-muted hover:text-accent"
+                >
+                  Próxima aula →
+                </Link>
+              ) : null}
+            </div>
           </div>
         </div>
 
