@@ -80,23 +80,34 @@ export function AulaCourseSidebar({
                 </button>
                 {open ? (
                   <ul className="border-t border-border px-3 pb-3 pt-1">
-                    {section.lessons.map((l) => {
+                    {section.lessons.map((l, index) => {
                       const active =
                         l.slug === currentLessonSlug &&
                         l.moduleSlug === currentModuleSlug;
                       const locked = !isPaid && !l.freeAccess;
+                      const nextLesson = section.lessons[index + 1];
                       return (
-                        <li key={l.id}>
+                        <li key={l.id} className="relative">
+                          {nextLesson ? (
+                            <span
+                              className={`absolute left-3.5 top-[1.125rem] -bottom-[1.125rem] w-px ${
+                                l.completed && nextLesson.completed
+                                  ? "bg-accent"
+                                  : "bg-border"
+                              }`}
+                              aria-hidden
+                            />
+                          ) : null}
                           <Link
                             href={`/aulas/${l.moduleSlug}/${l.slug}`}
-                            className={`flex items-start gap-2.5 rounded-lg px-2 py-2 text-sm leading-snug ${
+                            className={`relative flex items-start gap-2.5 rounded-lg px-2 py-2 text-sm leading-snug ${
                               active
                                 ? "font-semibold text-accent"
                                 : "text-foreground hover:bg-surface/70"
                             }`}
                           >
                             <span
-                              className={`mt-[0.4em] box-border size-2 shrink-0 rounded-full ${
+                              className={`relative z-[1] mt-[0.3em] box-border size-3 shrink-0 rounded-full ${
                                 l.completed
                                   ? "border-2 border-accent bg-accent"
                                   : active
