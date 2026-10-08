@@ -103,19 +103,11 @@ export async function listarConversoesUltimos7Dias(): Promise<MetricasConversao>
     },
   });
 
-  const contagemPorDia = new Map<string, number>();
-  for (const key of chaves) {
-    contagemPorDia.set(key, 0);
-  }
-
-  for (const c of conversoes) {
-    if (c.convertedToPaidAt) {
-      const key = getDateKeySaoPaulo(c.convertedToPaidAt);
-      if (contagemPorDia.has(key)) {
-        contagemPorDia.set(key, (contagemPorDia.get(key) ?? 0) + 1);
-      }
-    }
-  }
+  const diasValidos = new Set(chaves);
+  const conversoesComData = conversoes.filter(
+    (c): c is { convertedToPaidAt: Date } => c.convertedToPaidAt !== null,
+  );
+  const contagemPorDia = contarPorDia(conversoesComData, diasValidos);
 
   const conversoesPorDia: ConversaoDiaria[] = [];
   let total7dias = 0;

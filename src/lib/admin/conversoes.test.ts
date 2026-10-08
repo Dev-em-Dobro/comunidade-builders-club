@@ -100,10 +100,14 @@ describe("inicioDodiaSaoPaulo — B1: meia-noite de SP com offset explícito", (
   });
 });
 
-describe("contarPorDia — B5: importado do código de produção", () => {
+type ConversaoParaTeste = { convertedToPaidAt: Date };
+
+// B5: contarPorDia é a função pura usada por listarConversoesUltimos7Dias.
+// Estes testes garantem que a lógica de contagem por dia está correta.
+describe("contarPorDia — B5: função pura usada por listarConversoesUltimos7Dias", () => {
   it("conta conversões no mesmo dia", () => {
     const diasValidos = new Set(["2026-10-05"]);
-    const conversoes: ConversaoMock[] = [
+    const conversoes: ConversaoParaTeste[] = [
       { convertedToPaidAt: new Date("2026-10-05T10:00:00Z") },
       { convertedToPaidAt: new Date("2026-10-05T15:00:00Z") },
     ];
@@ -113,7 +117,7 @@ describe("contarPorDia — B5: importado do código de produção", () => {
 
   it("ignora conversões fora da janela", () => {
     const diasValidos = new Set(["2026-10-05"]);
-    const conversoes: ConversaoMock[] = [
+    const conversoes: ConversaoParaTeste[] = [
       { convertedToPaidAt: new Date("2026-10-04T10:00:00Z") },
       { convertedToPaidAt: new Date("2026-10-05T15:00:00Z") },
     ];
@@ -124,7 +128,7 @@ describe("contarPorDia — B5: importado do código de produção", () => {
 
   it("dias sem conversão ficam com zero", () => {
     const diasValidos = new Set(["2026-10-04", "2026-10-05"]);
-    const conversoes: ConversaoMock[] = [
+    const conversoes: ConversaoParaTeste[] = [
       { convertedToPaidAt: new Date("2026-10-05T15:00:00Z") },
     ];
     const contagem = contarPorDia(conversoes, diasValidos);
@@ -134,7 +138,7 @@ describe("contarPorDia — B5: importado do código de produção", () => {
 
   it("conversão às 01h SP (madrugada) fica no dia correto", () => {
     const diasValidos = new Set(["2026-10-05", "2026-10-06"]);
-    const conv: ConversaoMock = { convertedToPaidAt: new Date("2026-10-06T04:00:00Z") };
+    const conv: ConversaoParaTeste = { convertedToPaidAt: new Date("2026-10-06T04:00:00Z") };
     const contagem = contarPorDia([conv], diasValidos);
     assert.equal(contagem.get("2026-10-06"), 1);
     assert.equal(contagem.get("2026-10-05"), 0);
