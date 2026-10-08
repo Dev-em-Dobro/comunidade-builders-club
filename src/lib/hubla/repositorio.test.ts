@@ -138,38 +138,34 @@ describe("N2: deveMarcarConversaoBootstrap — só hubla/tmb com paidAt (B5: imp
   });
 });
 
-describe("N4: dataConversaoSegura — prefere paidAt da fatura (B5: importado)", () => {
-  it("usa cobradoEm quando disponível", () => {
-    const cobranca = {
-      valorCentavos: 9900,
-      moeda: "BRL" as const,
-      cobradoEm: new Date("2026-10-05T10:00:00Z"),
-    };
-    const result = dataConversaoSegura(cobranca);
+describe("N4: dataConversaoSegura — paidAt da fatura, senão recebimento do webhook", () => {
+  const recebidoEm = new Date("2026-10-08T12:34:56.000Z");
+
+  it("usa pagoEm (invoice.paidAt) quando disponível", () => {
+    const result = dataConversaoSegura({ pagoEm: new Date("2026-10-05T10:00:00Z") }, recebidoEm);
     assert.equal(result.toISOString(), "2026-10-05T10:00:00.000Z");
   });
 
-  it("usa now() quando cobradoEm não está disponível", () => {
-    const antes = Date.now();
-    const cobranca = {
-      valorCentavos: 9900,
-      moeda: "BRL" as const,
-      cobradoEm: null,
-    };
-    const result = dataConversaoSegura(cobranca);
-    const depois = Date.now();
-    assert.ok(result.getTime() >= antes);
-    assert.ok(result.getTime() <= depois);
+  it("sem pagoEm usa a hora de recebimento do webhook", () => {
+    const result = dataConversaoSegura({ pagoEm: null }, recebidoEm);
+    assert.equal(result.toISOString(), recebidoEm.toISOString());
   });
 
-  it("nunca usa createdAt da subscription (não existe no tipo)", () => {
+  it("ignora cobradoEm (billingDate/createdAt) mesmo quando presente", () => {
     const cobranca = {
       valorCentavos: 9900,
-      moeda: "BRL" as const,
-      cobradoEm: new Date("2026-10-05T15:30:00Z"),
+      moeda: "BRL",
+      cobradoEm: new Date("2025-01-10T00:00:00Z"),
+      pagoEm: null,
     };
-    const result = dataConversaoSegura(cobranca);
-    assert.equal(result.toISOString(), "2026-10-05T15:30:00.000Z");
+    const result = dataConversaoSegura(cobranca, recebidoEm);
+    assert.equal(result.toISOString(), recebidoEm.toISOString());
+  });
+
+  it("sem recebidoEm explícito usa now()", () => {
+    const antes = Date.now();
+    const result = dataConversaoSegura({ pagoEm: null });
+    assert.ok(result.getTime() >= antes && result.getTime() <= Date.now());
   });
 });
 
