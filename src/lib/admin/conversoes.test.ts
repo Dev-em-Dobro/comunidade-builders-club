@@ -5,6 +5,7 @@ import {
   formatarRotuloDaChave,
   gerarChaves7Dias,
   inicioDodiaSaoPaulo,
+  contarPorDia,
 } from "./conversoes";
 
 describe("getDateKeySaoPaulo — B1: não depende do TZ do processo", () => {
@@ -78,38 +79,35 @@ describe("gerarChaves7Dias — janela móvel", () => {
   });
 });
 
-describe("inicioDodiaSaoPaulo — meia-noite de SP", () => {
-  it("meia-noite de SP é aproximadamente 03:00 UTC (horário padrão)", () => {
-    const ref = new Date("2026-06-15T12:00:00Z");
-    const inicio = inicioDodiaSaoPaulo(ref);
-    const horaUtc = inicio.getUTCHours();
-    assert.ok(horaUtc === 3, `esperado 3h UTC, recebido ${horaUtc}h`);
+describe("inicioDodiaSaoPaulo — B1: meia-noite de SP com offset explícito", () => {
+  it("meia-noite de SP é 03:00 UTC (offset -03:00 fixo)", () => {
+    const inicio = inicioDodiaSaoPaulo("2026-06-15");
+    assert.equal(inicio.getUTCHours(), 3);
+    assert.equal(inicio.getUTCMinutes(), 0);
+    assert.equal(inicio.getUTCSeconds(), 0);
+  });
+
+  it("funciona com qualquer data", () => {
+    const inicio = inicioDodiaSaoPaulo("2026-10-05");
+    assert.equal(inicio.toISOString(), "2026-10-05T03:00:00.000Z");
+  });
+
+  it("não depende do TZ do processo (offset explícito)", () => {
+    const inicio1 = inicioDodiaSaoPaulo("2026-01-15");
+    const inicio2 = inicioDodiaSaoPaulo("2026-07-15");
+    assert.equal(inicio1.getUTCHours(), 3);
+    assert.equal(inicio2.getUTCHours(), 3);
   });
 });
 
-describe("contagem de conversões por dia", () => {
-  type ConversaoMock = { convertedToPaidAt: Date };
+type ConversaoParaTeste = { convertedToPaidAt: Date };
 
-  function contarPorDia(
-    conversoes: ConversaoMock[],
-    diasValidos: Set<string>,
-  ): Map<string, number> {
-    const contagem = new Map<string, number>();
-    for (const key of diasValidos) {
-      contagem.set(key, 0);
-    }
-    for (const c of conversoes) {
-      const key = getDateKeySaoPaulo(c.convertedToPaidAt);
-      if (diasValidos.has(key)) {
-        contagem.set(key, (contagem.get(key) ?? 0) + 1);
-      }
-    }
-    return contagem;
-  }
-
+// B5: contarPorDia é a função pura usada por listarConversoesUltimos7Dias.
+// Estes testes garantem que a lógica de contagem por dia está correta.
+describe("contarPorDia — B5: função pura usada por listarConversoesUltimos7Dias", () => {
   it("conta conversões no mesmo dia", () => {
     const diasValidos = new Set(["2026-10-05"]);
-    const conversoes: ConversaoMock[] = [
+    const conversoes: ConversaoParaTeste[] = [
       { convertedToPaidAt: new Date("2026-10-05T10:00:00Z") },
       { convertedToPaidAt: new Date("2026-10-05T15:00:00Z") },
     ];
@@ -119,7 +117,7 @@ describe("contagem de conversões por dia", () => {
 
   it("ignora conversões fora da janela", () => {
     const diasValidos = new Set(["2026-10-05"]);
-    const conversoes: ConversaoMock[] = [
+    const conversoes: ConversaoParaTeste[] = [
       { convertedToPaidAt: new Date("2026-10-04T10:00:00Z") },
       { convertedToPaidAt: new Date("2026-10-05T15:00:00Z") },
     ];
@@ -130,7 +128,7 @@ describe("contagem de conversões por dia", () => {
 
   it("dias sem conversão ficam com zero", () => {
     const diasValidos = new Set(["2026-10-04", "2026-10-05"]);
-    const conversoes: ConversaoMock[] = [
+    const conversoes: ConversaoParaTeste[] = [
       { convertedToPaidAt: new Date("2026-10-05T15:00:00Z") },
     ];
     const contagem = contarPorDia(conversoes, diasValidos);
@@ -140,7 +138,7 @@ describe("contagem de conversões por dia", () => {
 
   it("conversão às 01h SP (madrugada) fica no dia correto", () => {
     const diasValidos = new Set(["2026-10-05", "2026-10-06"]);
-    const conv: ConversaoMock = { convertedToPaidAt: new Date("2026-10-06T04:00:00Z") };
+    const conv: ConversaoParaTeste = { convertedToPaidAt: new Date("2026-10-06T04:00:00Z") };
     const contagem = contarPorDia([conv], diasValidos);
     assert.equal(contagem.get("2026-10-06"), 1);
     assert.equal(contagem.get("2026-10-05"), 0);

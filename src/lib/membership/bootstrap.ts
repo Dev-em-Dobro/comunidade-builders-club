@@ -10,6 +10,21 @@ import {
   type ContextoAceite,
 } from "./aceite-legal";
 import type { TierPagoAllowlist } from "./tier-allowlist";
+import { deveMarcarConversaoBootstrap } from "@/lib/hubla/regras-conversao";
+
+/**
+ * N2: Decide se deve marcar conversão no bootstrap.
+ * Exportada para testes.
+ */
+export function calcularConversaoBootstrap(
+  isAllowed: boolean,
+  isBootstrapAdmin: boolean,
+  source: string | null,
+  paidAt: Date | null,
+): boolean {
+  if (!isAllowed || isBootstrapAdmin) return false;
+  return deveMarcarConversaoBootstrap({ source, paidAt });
+}
 
 export type BootstrapResult = {
   membership: Membership;
@@ -91,10 +106,12 @@ async function resolverBootstrap(
   // F053 hotfix — allowlist Elite não pode nascer como PRO no 1º login.
   let tierAllowlist: TierPagoAllowlist = "pro";
   let paidAtAllowlist: Date | null = null;
+  let sourceAllowlist: string | null = null;
   if (allowed && !isBootstrapAdmin) {
     const dados = await dadosPagosDoEmailAllowlist(email);
     tierAllowlist = dados.tier;
     paidAtAllowlist = dados.paidAt;
+    sourceAllowlist = dados.source;
   }
 
   let nextProfile = profile;
@@ -112,7 +129,12 @@ async function resolverBootstrap(
 
   if (!existing) {
     const origin = await readOrigemFromCookie();
-    const isPagante = allowed && !isBootstrapAdmin;
+    const marcarConversao = calcularConversaoBootstrap(
+      allowed,
+      isBootstrapAdmin,
+      sourceAllowlist,
+      paidAtAllowlist,
+    );
     const membership = await prisma.membership.create({
       data: {
         userId,
@@ -126,7 +148,7 @@ async function resolverBootstrap(
               originAt: new Date(),
             }
           : {}),
-        ...(isPagante ? { convertedToPaidAt: paidAtAllowlist ?? new Date() } : {}),
+        ...(marcarConversao ? { convertedToPaidAt: paidAtAllowlist } : {}),
       },
     });
     return { membership, profile: nextProfile };
