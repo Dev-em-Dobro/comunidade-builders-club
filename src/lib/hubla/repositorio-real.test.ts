@@ -188,7 +188,7 @@ let registrarEntregaInicial: (dados: {
 let concederPago: (
   emails: string[],
   plan: "pro" | "elite",
-  cobranca: { valorCentavos: number | null; moeda: string; cobradoEm: Date | null },
+  cobranca: { valorCentavos: number | null; moeda: string; cobradoEm: Date | null; pagoEm: Date | null },
 ) => Promise<{ membershipId: string | null; conversao: boolean }>;
 let buscarMembershipIdPorEmail: (email: string | null) => Promise<string | null>;
 let TIMEOUT_PROCESSING_MS: number;
@@ -464,7 +464,7 @@ describe("Testes de repositorio.ts com Prisma fake", () => {
       const result = await concederPago(
         ["free@test.com"],
         "pro",
-        { valorCentavos: 9900, moeda: "BRL", cobradoEm: new Date() },
+        { valorCentavos: 9900, moeda: "BRL", cobradoEm: new Date(), pagoEm: new Date() },
       );
       
       assert.ok(result.conversao, "deve marcar conversão para free sem conversão prévia");
@@ -485,7 +485,7 @@ describe("Testes de repositorio.ts com Prisma fake", () => {
       const result = await concederPago(
         ["ex@test.com"],
         "pro",
-        { valorCentavos: 9900, moeda: "BRL", cobradoEm: new Date() },
+        { valorCentavos: 9900, moeda: "BRL", cobradoEm: new Date(), pagoEm: new Date() },
       );
       
       assert.ok(!result.conversao, "NÃO deve marcar conversão para ex-pagante");
@@ -507,7 +507,7 @@ describe("Testes de repositorio.ts com Prisma fake", () => {
       await concederPago(
         ["test@test.com"],
         "pro",
-        { valorCentavos: 9900, moeda: "BRL", cobradoEm: new Date() },
+        { valorCentavos: 9900, moeda: "BRL", cobradoEm: new Date(), pagoEm: new Date() },
       );
       
       const membershipUpdateMany = capturedUpdateManyArgs.find(
@@ -532,7 +532,7 @@ describe("Testes de repositorio.ts com Prisma fake", () => {
       const result = await concederPago(
         ["pro@test.com"],
         "elite",
-        { valorCentavos: 19900, moeda: "BRL", cobradoEm: new Date() },
+        { valorCentavos: 19900, moeda: "BRL", cobradoEm: new Date(), pagoEm: new Date() },
       );
       
       assert.ok(!result.conversao, "upgrade não deve marcar conversão");
@@ -557,7 +557,7 @@ describe("Testes de repositorio.ts com Prisma fake", () => {
       const result = await concederPago(
         ["p2002@test.com"],
         "pro",
-        { valorCentavos: 9900, moeda: "BRL", cobradoEm: new Date() },
+        { valorCentavos: 9900, moeda: "BRL", cobradoEm: new Date(), pagoEm: new Date() },
       );
       
       assert.equal(result.membershipId, "m-race");

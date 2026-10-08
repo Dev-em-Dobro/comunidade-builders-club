@@ -154,16 +154,17 @@ export type ResultadoConcessao = {
 };
 
 /**
- * N4: Data de conversão usa:
- * 1. paidAt da fatura (invoice.paidAt)
- * 2. Se não existir, usa horário de recebimento do webhook (agora)
- * Nunca usa createdAt da subscription (pode ser antigo).
+ * N4: Data de conversão (membership.convertedToPaidAt e allowed_email.paid_at):
+ * 1. paidAt da fatura (`cobranca.pagoEm` = invoice.paidAt)
+ * 2. Sem ele, a hora em que o webhook chegou (`recebidoEm`)
+ * Nunca usa `cobradoEm` (que cai para billingDate / createdAt, inclusive o
+ * createdAt da assinatura, que pode ser de meses atrás).
  */
-export function dataConversaoSegura(cobranca: CobrancaHubla): Date {
-  if (cobranca.cobradoEm) {
-    return cobranca.cobradoEm;
-  }
-  return new Date();
+export function dataConversaoSegura(
+  cobranca: Pick<CobrancaHubla, "pagoEm">,
+  recebidoEm: Date = new Date(),
+): Date {
+  return cobranca.pagoEm ?? recebidoEm;
 }
 
 /**
@@ -175,12 +176,13 @@ export async function concederPago(
   emails: string[],
   plan: PlanoPagoHubla,
   cobranca: CobrancaHubla,
+  recebidoEm: Date = new Date(),
 ): Promise<ResultadoConcessao> {
   const user = await findUserPorEmails(emails);
   if (!user) return { membershipId: null, conversao: false };
 
   const dinheiro = dadosCobrancaMembership(cobranca, plan);
-  const convertedAt = dataConversaoSegura(cobranca);
+  const convertedAt = dataConversaoSegura(cobranca, recebidoEm);
 
   const m = await prisma.membership.findUnique({ where: { userId: user.id } });
 
@@ -287,11 +289,24 @@ export type ResultadoAcaoAllowlist = {
   conversao: boolean;
 };
 
-export async function aplicarAcaoAllowlist(acao: AcaoAllowlist): Promise<ResultadoAcaoAllowlist> {
+export async function aplicarAcaoAllowlist(
+  acao: AcaoAllowlist,
+  recebidoEm: Date = new Date(),
+): Promise<ResultadoAcaoAllowlist> {
   if (acao.acao === "ignorar") return { membershipId: null, conversao: false };
 
   if (acao.acao === "conceder") {
-    const paidAt = dataConversaoSegura(acao.cobranca);
+    // N4: mesma data na allowlist e na membership (paidAt da fatura ou recebimento).
+    const paidAt = dataConversaoSegura(acao.cobranca, recebidoEm);
+    // concederPago ANTES de addAllowedEmail: addAllowedEmail (F053) promove o tier
+    // de quem já tem conta; se rodasse antes, o Free já chegaria aqui como PRO e a
+    // conversão Free→Pago (convertedToPaidAt) nunca seria marcada.
+    const resultado = await concederPago(
+      acao.emails.length > 0 ? acao.emails : [acao.email],
+      acao.plan,
+      acao.cobranca,
+      recebidoEm,
+    );
     await addAllowedEmail({
       email: acao.email,
       source: "hubla",
@@ -301,11 +316,6 @@ export async function aplicarAcaoAllowlist(acao: AcaoAllowlist): Promise<Resulta
       tier: acao.plan,
       paidAt,
     });
-    const resultado = await concederPago(
-      acao.emails.length > 0 ? acao.emails : [acao.email],
-      acao.plan,
-      acao.cobranca,
-    );
     return resultado;
   }
 
@@ -369,6 +379,45 @@ function extrairDadosDoPayload(
   };
 }
 
+/** Motivo devolvido quando outra execução ainda segura o claim da entrega. */
+export const MOTIVO_EM_PROCESSAMENTO = "evento em processamento";
+
+export type ResultadoProcessamentoHubla = {
+  ignorado: boolean;
+  motivo?: string;
+  conversao?: boolean;
+  /**
+   * Q1: true quando outra execução ainda está com a entrega em 'processing'.
+   * A rota responde 409 para a Hubla reenviar depois (não é sucesso).
+   */
+  emProcessamento?: boolean;
+};
+
+/** Q1: a entrega não pôde ser marcada com o status final (a rota responde 500). */
+export class ErroAtualizarEntregaHubla extends Error {
+  constructor(idempotencyKey: string, causa: unknown) {
+    super(
+      `falha ao gravar status final da entrega ${idempotencyKey}: ${
+        causa instanceof Error ? causa.message : String(causa)
+      }`,
+    );
+    this.name = "ErroAtualizarEntregaHubla";
+  }
+}
+
+/**
+ * Q1: se o status final não grava, devolve a linha de 'processing' para 'error'
+ * (só se ainda estiver em processing) para o reenvio da Hubla poder reprocessar
+ * sem esperar o timeout. Best-effort: se o banco também falhar aqui, a linha fica
+ * em processing e é reclamada após TIMEOUT_PROCESSING_MS.
+ */
+async function liberarEntregaAposFalha(idempotencyKey: string, erro: string): Promise<void> {
+  await prisma.hublaWebhookDelivery.updateMany({
+    where: { idempotencyKey, status: "processing" },
+    data: { status: "error", erro },
+  });
+}
+
 export async function processarWebhookHubla(
   payload: unknown,
   opts: {
@@ -376,8 +425,11 @@ export async function processarWebhookHubla(
     offerPlanMap?: Map<string, PlanoPagoHubla> | null;
     idempotencyKey?: string | null;
     eventType: string;
+    /** N4: hora em que o webhook chegou (fallback da data de conversão). */
+    recebidoEm?: Date;
   },
-): Promise<{ ignorado: boolean; motivo?: string; conversao?: boolean }> {
+): Promise<ResultadoProcessamentoHubla> {
+  const recebidoEm = opts.recebidoEm ?? new Date();
   const idempotencyKey = opts.idempotencyKey || `fallback-${randomUUID()}`;
   const offerMap = opts.offerPlanMap ?? mapaOfertasHubla();
 
@@ -401,13 +453,15 @@ export async function processarWebhookHubla(
 
   const claimed = await tentarClaimEntrega(idempotencyKey);
   if (!claimed) {
-    return { ignorado: true, motivo: "evento em processamento" };
+    // Q1: NÃO é sucesso — a rota responde 409 e a Hubla tenta de novo.
+    return { ignorado: true, motivo: MOTIVO_EM_PROCESSAMENTO, emProcessamento: true };
   }
 
   let status: StatusWebhook = "processed";
   let erro: string | null = null;
   let membershipId: string | null = null;
-  let resultado: { ignorado: boolean; motivo?: string; conversao?: boolean };
+  let resultado: ResultadoProcessamentoHubla | null = null;
+  let falha: unknown = null;
 
   try {
     const acao = interpretarEventoHubla(payload as HublaWebhookPayload, {
@@ -421,7 +475,7 @@ export async function processarWebhookHubla(
       membershipId = await buscarMembershipIdPorEmail(dadosPayload.email);
       resultado = { ignorado: true, motivo: acao.motivo };
     } else {
-      const res = await aplicarAcaoAllowlist(acao);
+      const res = await aplicarAcaoAllowlist(acao, recebidoEm);
       membershipId = res.membershipId;
       if (!membershipId) {
         membershipId = await buscarMembershipIdPorEmail(dadosPayload.email);
@@ -432,8 +486,10 @@ export async function processarWebhookHubla(
   } catch (e) {
     status = "error";
     erro = e instanceof Error ? e.message : "Erro desconhecido";
-    throw e;
-  } finally {
+    falha = e;
+  }
+
+  try {
     await atualizarEntregaFinal({
       idempotencyKey,
       eventType: opts.eventType,
@@ -444,11 +500,24 @@ export async function processarWebhookHubla(
       membershipId,
       status,
       erro,
-    }).catch((err) => {
-      console.error("[hubla/webhook] falha ao atualizar entrega", err);
     });
+  } catch (errUpdate) {
+    // Q1: não engole — loga, tenta liberar a linha e não devolve sucesso falso.
+    console.error(
+      "[hubla/webhook] falha ao gravar status final da entrega",
+      { idempotencyKey, statusPretendido: status },
+      errUpdate,
+    );
+    const msg = `falha ao gravar status final (${status}): ${
+      errUpdate instanceof Error ? errUpdate.message : String(errUpdate)
+    }`;
+    await liberarEntregaAposFalha(idempotencyKey, msg).catch((errLiberar) => {
+      console.error("[hubla/webhook] falha ao liberar entrega após erro", { idempotencyKey }, errLiberar);
+    });
+    if (!falha) falha = new ErroAtualizarEntregaHubla(idempotencyKey, errUpdate);
   }
 
+  if (falha) throw falha;
   return resultado!;
 }
 
