@@ -8,8 +8,8 @@ Dois módulos raiz no catálogo `/aulas` (pago, `freeAccess` false):
 
 | slug | título | sortOrder |
 |------|--------|-----------|
-| `grok-bots-agentes-que-fazem-trabalho-por-voce` | Grok Bots — Agentes que fazem trabalho por você | 14 |
-| `jev-aplicado-ao-mundo-real` | JEV aplicado ao mundo real | 15 |
+| `grok-bots-agentes-que-fazem-trabalho-por-voce` | Grok Bots — Agentes que fazem trabalho por você | 15 |
+| `jev-aplicado-ao-mundo-real` | JEV aplicado ao mundo real | 16 |
 
 Aulas/vídeos entram depois (módulos nascem sem lessons).
 

@@ -52,9 +52,9 @@ const prisma = new PrismaClient({
 
 const ORDEM = [
   { slug: "codex", sortOrder: 13 },
-  { slug: "grok-bots-agentes-que-fazem-trabalho-por-voce", sortOrder: 14 },
-  { slug: "jev-aplicado-ao-mundo-real", sortOrder: 15 },
-  { slug: "claude-code", sortOrder: 16 },
+  { slug: "claude-code", sortOrder: 14 },
+  { slug: "grok-bots-agentes-que-fazem-trabalho-por-voce", sortOrder: 15 },
+  { slug: "jev-aplicado-ao-mundo-real", sortOrder: 16 },
 ] as const;
 
 for (const row of ORDEM) {

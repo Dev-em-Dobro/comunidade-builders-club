@@ -5,14 +5,15 @@ Em implementação
 
 ## Objetivo
 1. Módulos raiz **Claude Code** e **Codex** (pago). Codex ganhou aula na
-   [F110](F110-aula-codex-do-zero.md); Claude Code segue sem aulas.
+   [F110](F110-aula-codex-do-zero.md) e Claude Code na
+   [F111](F111-aula-claude-code-ide.md).
 2. Badge **Em breve** nos cards sem aulas (`contentCount === 0`: Grok Bots,
-   JEV, Claude Code).
+   JEV).
 
 | slug | título | sortOrder |
 |------|--------|-----------|
 | `codex` | Codex (aula · F110) | 13 |
-| `claude-code` | Claude Code | 16 |
+| `claude-code` | Claude Code (aula · F111) | 14 |
 
 ## HML
 
