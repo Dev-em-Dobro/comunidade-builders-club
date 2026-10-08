@@ -886,7 +886,7 @@ Nesta live a gente abre o modelo: o que entra no pacote, como explicar o valor s
     title: "Grok Bots — Agentes que fazem trabalho por você",
     description:
       "Agentes no Grok que executam tarefas de verdade: do setup ao fluxo rodando sem você no meio de cada passo.",
-    sortOrder: 13,
+    sortOrder: 14,
     lessons: [],
   },
   {
@@ -895,7 +895,7 @@ Nesta live a gente abre o modelo: o que entra no pacote, como explicar o valor s
     title: "JEV aplicado ao mundo real",
     description:
       "JEV fora da teoria: como aplicar no dia a dia do builder — prospecção, entrega e operação com IA.",
-    sortOrder: 14,
+    sortOrder: 15,
     lessons: [],
   },
   {
@@ -904,17 +904,18 @@ Nesta live a gente abre o modelo: o que entra no pacote, como explicar o valor s
     title: "Claude Code",
     description:
       "Agente da Anthropic do primeiro projeto ao app em produção. Em breve no Club.",
-    sortOrder: 15,
+    sortOrder: 16,
     lessons: [],
   },
   {
     // F110 — primeira aula. Pago. Capa própria: thumb do vídeo não vai ao card.
+    // sortOrder 13: logo após Gravações (liberado antes de Grok/JEV/Claude).
     slug: "codex",
     title: "Codex",
     description:
       "Agente da OpenAI: instalação, AGENTS.md, plugins e uso no dia a dia.",
     coverImageUrl: "/6-codex.png",
-    sortOrder: 16,
+    sortOrder: 13,
     forceLessonSort: true,
     lessons: [
       {

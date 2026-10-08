@@ -50,12 +50,27 @@ const prisma = new PrismaClient({
   datasources: { db: { url: resolveUrl(target) } },
 });
 
+const ORDEM = [
+  { slug: "codex", sortOrder: 13 },
+  { slug: "grok-bots-agentes-que-fazem-trabalho-por-voce", sortOrder: 14 },
+  { slug: "jev-aplicado-ao-mundo-real", sortOrder: 15 },
+  { slug: "claude-code", sortOrder: 16 },
+] as const;
+
+for (const row of ORDEM) {
+  await prisma.module.update({
+    where: { slug: row.slug },
+    data: { sortOrder: row.sortOrder },
+  });
+}
+
 const module = await prisma.module.update({
   where: { slug: "codex" },
   data: {
     description:
       "Agente da OpenAI: instalação, AGENTS.md, plugins e uso no dia a dia.",
     coverImageUrl: "/6-codex.png",
+    sortOrder: 13,
   },
 });
 
@@ -88,5 +103,5 @@ const lesson = existing
 
 await prisma.$disconnect();
 console.log(
-  `[${target}] ${module.slug} cover=${module.coverImageUrl} lesson=${lesson.slug} published=${lesson.published}`,
+  `[${target}] ${module.slug} order=${module.sortOrder} cover=${module.coverImageUrl} lesson=${lesson.slug} published=${lesson.published}`,
 );
