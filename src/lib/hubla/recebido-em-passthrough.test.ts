@@ -35,14 +35,12 @@ let memberships: Map<string, Membership>;
 let users: Map<string, { id: string; email: string }>;
 let allowed: Map<string, Allowed>;
 let seq = 0;
-let capturedRecebidoEm: Date | undefined;
 
 function resetDb() {
   deliveries = new Map();
   memberships = new Map();
   users = new Map();
   allowed = new Map();
-  capturedRecebidoEm = undefined;
 }
 
 const fakePrisma = {
@@ -143,7 +141,6 @@ const fakePrisma = {
       }
       const row = { ...args.create };
       allowed.set(args.where.email, row);
-      capturedRecebidoEm = row.paidAt ?? undefined;
       return row;
     },
     delete: async (args: { where: { email: string } }) => {

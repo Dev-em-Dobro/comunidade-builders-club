@@ -421,7 +421,7 @@ describe("processarWebhookHubla — código REAL com Prisma fake", () => {
       assert.equal(deliveries.get("final-1")!.status, "processed");
     });
 
-    it("falha ao gravar status final E ao liberar → rejeita; reenvio em < 5 min recebe 409", async () => {
+    it("falha ao gravar status final E ao liberar → rejeita; reenvio antes do timeout recebe 409", async () => {
       usuarioFree("final2@teste.com");
       falhas.deliveryUpdate = true;
       falhas.deliveryLiberar = true;
