@@ -40,7 +40,7 @@ const MODS = [
     slug: "codex",
     title: "Codex",
     description:
-      "Agente da OpenAI: instalação, AGENTS.md, plugins e uso no dia a dia. Em breve no Club.",
+      "Agente da OpenAI: instalação, AGENTS.md, plugins e uso no dia a dia.",
     sortOrder: 16,
   },
 ] as const;
