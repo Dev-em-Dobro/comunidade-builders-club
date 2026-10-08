@@ -1,6 +1,6 @@
 /**
- * F050 / F051 / F103 / F107 — Seed dos módulos (jornada Fase 1–2, n8n, IA,
- * Fundamentos, gravações das lives, Grok Bots, JEV).
+ * F050 / F051 / F103 / F107 / F110 — Seed dos módulos (jornada Fase 1–2,
+ * n8n, IA, Fundamentos, lives, Grok Bots, JEV, Codex).
  *
  *   npm run db:seed:aulas-panda -- --target=hml
  *   npm run db:seed:aulas-panda -- --target=prod --confirm
@@ -908,13 +908,24 @@ Nesta live a gente abre o modelo: o que entra no pacote, como explicar o valor s
     lessons: [],
   },
   {
-    // F108 — Em breve. Pago.
+    // F110 — primeira aula. Pago. Capa própria: thumb do vídeo não vai ao card.
     slug: "codex",
     title: "Codex",
     description:
-      "Agente da OpenAI: instalação, AGENTS.md, plugins e uso no dia a dia. Em breve no Club.",
+      "Agente da OpenAI: instalação, AGENTS.md, plugins e uso no dia a dia.",
+    coverImageUrl: "/6-codex.png",
     sortOrder: 16,
-    lessons: [],
+    forceLessonSort: true,
+    lessons: [
+      {
+        slug: "codex-do-zero-chatgpt-desktop",
+        title: "Codex do zero (ChatGPT Desktop)",
+        description:
+          "Do zero no Codex pelo ChatGPT Desktop: instalar o app, entender o fluxo do agente da OpenAI e começar o primeiro projeto — AGENTS.md, plugins e o uso no dia a dia.",
+        pandaVideoExternalId: "64ee35dc-5959-4d63-b8c2-b8f711da86da",
+        sortOrder: 0,
+      },
+    ],
   },
 ];
 
@@ -983,7 +994,11 @@ async function upsertModule(
   for (const lesson of seed.lessons) {
     const byVideo = lesson.pandaVideoExternalId
       ? await prisma.lesson.findFirst({
-          where: { pandaVideoExternalId: lesson.pandaVideoExternalId },
+          where: {
+            pandaVideoExternalId: lesson.pandaVideoExternalId,
+            // Mesmo vídeo pode existir em outro módulo (cópia F103).
+            moduleId: module.id,
+          },
         })
       : null;
     const bySlug = await prisma.lesson.findUnique({

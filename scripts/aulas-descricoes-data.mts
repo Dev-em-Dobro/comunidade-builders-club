@@ -538,6 +538,8 @@ Conferir se a régua de preços citada no vídeo é a versão atual aprovada.`,
 
   "fase-2-m07-entregue-o-agente/intencoes-webhook-e-integracoes": `Conexões, intenções, webhook, n8n e integração com outros sistemas.`,
 
+  "codex/codex-do-zero-chatgpt-desktop": `Do zero no Codex pelo ChatGPT Desktop: instalar o app, entender o fluxo do agente da OpenAI e começar o primeiro projeto — AGENTS.md, plugins e o uso no dia a dia.`,
+
   "gravacoes-das-lives-semanais/raas-como-cobrar-pelo-resultado-do-cliente": `RaaS (Result as a Service) é cobrar pelo que o cliente ganha — agenda cheia, leads, recorrência — e não pelo tempo que você passou no projeto.
 
 Nesta live a gente abre o modelo: o que entra no pacote, como explicar o valor sem parecer "eu cobro caro", e como transformar a entrega em uma mensalidade que o cliente quer continuar pagando.

@@ -4,8 +4,10 @@
 Em implementação
 
 ## Objetivo
-1. Módulos raiz **Claude Code** e **Codex** (pago, sem aulas).
-2. Badge **Em breve** nos cards sem aulas (Grok Bots, JEV, Claude Code, Codex).
+1. Módulos raiz **Claude Code** e **Codex** (pago). Codex ganhou aula na
+   [F110](F110-aula-codex-do-zero.md); Claude Code segue sem aulas.
+2. Badge **Em breve** nos cards sem aulas (`contentCount === 0`: Grok Bots,
+   JEV, Claude Code).
 
 | slug | título | sortOrder |
 |------|--------|-----------|
