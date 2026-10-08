@@ -376,53 +376,48 @@ describe("B2: deveAtualizarPaidAtAllowlist — regra pura (B5: importado)", () =
   });
 });
 
-describe("revogação (N6: não desfaz conversão)", () => {
-  it("revogação não desfaz convertedToPaidAt", () => {
-    const dataConversaoOriginal = new Date("2026-10-01");
-    const depois = { tier: "free" as MembershipTier, convertedToPaidAt: dataConversaoOriginal };
-    assert.equal(depois.convertedToPaidAt, dataConversaoOriginal);
-    assert.equal(depois.tier, "free");
+describe("N6: revogação — verificação via regras de produção", () => {
+  it("após revogação, tier=free mas isPago retorna false", () => {
+    assert.equal(isPago("free"), false);
   });
 
-  it("revogação de quem nunca teve conversão mantém null", () => {
-    const depois = { tier: "free" as MembershipTier, convertedToPaidAt: null };
-    assert.equal(depois.convertedToPaidAt, null);
+  it("deveMarcarConversao com free + conversão prévia = false (preserva histórico)", () => {
+    const membro = {
+      tier: "free" as MembershipTier,
+      convertedToPaidAt: new Date("2026-10-01"),
+    };
+    assert.equal(deveMarcarConversao(membro), false);
+  });
+
+  it("reativação de ex-pagante não marca nova conversão (B7)", () => {
+    const membro = {
+      tier: "free" as MembershipTier,
+      convertedToPaidAt: new Date("2026-01-01"),
+    };
+    assert.equal(deveMarcarConversao(membro), false);
   });
 });
 
-describe("DadosEntregaWebhook — estrutura de dados com processing (N5)", () => {
-  type DadosEntregaWebhook = {
-    idempotencyKey: string;
-    eventType: string;
-    payload: unknown;
-    productId?: string | null;
-    offerId?: string | null;
-    email?: string | null;
-    membershipId?: string | null;
-    status: StatusWebhook;
-    erro?: string | null;
-  };
-
-  it("aceita status processing (N5)", () => {
-    const dados: DadosEntregaWebhook = {
-      idempotencyKey: "key-123",
-      eventType: "invoice.payment_succeeded",
-      payload: { type: "invoice.payment_succeeded" },
-      status: "processing",
-      erro: null,
-    };
-    assert.equal(dados.status, "processing");
+describe("N5: DadosEntregaWebhook — validação de status com regras de produção", () => {
+  it("status processing não é reprocessável (claim ativo)", () => {
+    assert.equal(statusEhReprocessavel("processing"), false);
+    assert.equal(statusEhFinal("processing"), false);
   });
 
-  it("aceita dados para evento com erro (N1: pode ser reprocessado)", () => {
-    const dados: DadosEntregaWebhook = {
-      idempotencyKey: "key-789",
-      eventType: "customer.member_added",
-      payload: { type: "customer.member_added" },
-      status: "error",
-      erro: "Falha de conexão",
-    };
-    assert.equal(dados.status, "error");
-    assert.ok(podeSerClaimado(dados.status, null));
+  it("status error é reprocessável (N1: retry após 500)", () => {
+    assert.equal(statusEhReprocessavel("error"), true);
+    assert.equal(podeSerClaimado("error", null), true);
+  });
+
+  it("status pending é reprocessável", () => {
+    assert.equal(statusEhReprocessavel("pending"), true);
+    assert.equal(podeSerClaimado("pending", null), true);
+  });
+
+  it("status processed/ignored são finais", () => {
+    assert.equal(statusEhFinal("processed"), true);
+    assert.equal(statusEhFinal("ignored"), true);
+    assert.equal(podeSerClaimado("processed", null), false);
+    assert.equal(podeSerClaimado("ignored", null), false);
   });
 });
