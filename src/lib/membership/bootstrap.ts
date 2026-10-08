@@ -12,6 +12,20 @@ import {
 import type { TierPagoAllowlist } from "./tier-allowlist";
 import { deveMarcarConversaoBootstrap } from "@/lib/hubla/regras-conversao";
 
+/**
+ * N2: Decide se deve marcar conversão no bootstrap.
+ * Exportada para testes.
+ */
+export function calcularConversaoBootstrap(
+  isAllowed: boolean,
+  isBootstrapAdmin: boolean,
+  source: string | null,
+  paidAt: Date | null,
+): boolean {
+  if (!isAllowed || isBootstrapAdmin) return false;
+  return deveMarcarConversaoBootstrap({ source, paidAt });
+}
+
 export type BootstrapResult = {
   membership: Membership;
   profile: Profile;
@@ -115,10 +129,12 @@ async function resolverBootstrap(
 
   if (!existing) {
     const origin = await readOrigemFromCookie();
-    const marcarConversao = allowed && !isBootstrapAdmin && deveMarcarConversaoBootstrap({
-      source: sourceAllowlist,
-      paidAt: paidAtAllowlist,
-    });
+    const marcarConversao = calcularConversaoBootstrap(
+      allowed,
+      isBootstrapAdmin,
+      sourceAllowlist,
+      paidAtAllowlist,
+    );
     const membership = await prisma.membership.create({
       data: {
         userId,
