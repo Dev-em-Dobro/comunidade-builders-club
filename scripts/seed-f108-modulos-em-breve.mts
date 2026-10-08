@@ -1,5 +1,5 @@
 /**
- * F108 — módulos raiz "Em breve" (sem aulas): Grok Bots, JEV, Claude Code, Codex.
+ * F108 — módulos raiz: Grok Bots, JEV, Claude Code, Codex.
  *
  *   npx tsx scripts/seed-f108-modulos-em-breve.mts
  *   npx tsx scripts/seed-f108-modulos-em-breve.mts --target=prod --confirm
@@ -20,21 +20,21 @@ const MODS = [
     title: "Grok Bots — Agentes que fazem trabalho por você",
     description:
       "Agentes no Grok que executam tarefas de verdade: do setup ao fluxo rodando sem você no meio de cada passo.",
-    sortOrder: 14,
+    sortOrder: 15,
   },
   {
     slug: "jev-aplicado-ao-mundo-real",
     title: "JEV aplicado ao mundo real",
     description:
       "JEV fora da teoria: como aplicar no dia a dia do builder — prospecção, entrega e operação com IA.",
-    sortOrder: 15,
+    sortOrder: 16,
   },
   {
     slug: "claude-code",
     title: "Claude Code",
     description:
-      "Agente da Anthropic do primeiro projeto ao app em produção. Em breve no Club.",
-    sortOrder: 16,
+      "Instale e use o Claude Code na IDE para desenvolver e revisar projetos com IA.",
+    sortOrder: 14,
   },
   {
     slug: "codex",
