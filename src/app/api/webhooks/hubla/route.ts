@@ -3,6 +3,7 @@
 import { timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { processarWebhookHubla } from "@/lib/hubla";
+import { respostaWebhookHubla } from "@/lib/hubla/resposta";
 import { mapaOfertasHubla, mapaProdutosHubla, webhookHublaConfigurado } from "@/lib/hubla/produtos";
 
 export const dynamic = "force-dynamic";
@@ -20,6 +21,8 @@ function tokenValido(recebido: string, esperado: string): boolean {
 }
 
 export async function POST(request: NextRequest) {
+  // N4: hora de recebimento — vira a data de conversão quando a fatura não traz paidAt.
+  const recebidoEm = new Date();
   const esperado = tokenEsperado();
   if (!esperado) {
     return NextResponse.json(
@@ -68,13 +71,11 @@ export async function POST(request: NextRequest) {
       offerPlanMap,
       idempotencyKey,
       eventType,
+      recebidoEm,
     });
 
-    return NextResponse.json({
-      ok: true,
-      ignorado: resultado.ignorado,
-      ...(resultado.motivo ? { motivo: resultado.motivo } : {}),
-    });
+    const resposta = respostaWebhookHubla(resultado);
+    return NextResponse.json(resposta.body, { status: resposta.status });
   } catch (e) {
     console.error("[hubla/webhook] falha ao processar", e);
     return NextResponse.json(

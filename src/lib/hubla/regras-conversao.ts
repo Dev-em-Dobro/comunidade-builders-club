@@ -39,6 +39,11 @@ export function deveMarcarConversao(
  * N2: Determina se deve marcar conversão no bootstrap.
  * Só marca quando source='hubla'|'tmb' E paidAt não é null.
  * Previne backfill de emails orion/devquest/manual.
+ *
+ * Q4: o fluxo TMB (src/lib/tmb) ainda NÃO grava paid_at na allowlist —
+ * comprador TMB sem conta NÃO é contado como conversão no bootstrap, mesmo
+ * com source='tmb'. A condição `source === "tmb"` aqui é só simetria futura;
+ * até o TMB passar paidAt, na prática só Hubla (que grava paid_at) marca.
  */
 export function deveMarcarConversaoBootstrap(data: {
   source: string | null;
