@@ -5,9 +5,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { processarWebhookHubla } from "@/lib/hubla";
 import { respostaWebhookHubla } from "@/lib/hubla/resposta";
 import { mapaOfertasHubla, mapaProdutosHubla, webhookHublaConfigurado } from "@/lib/hubla/produtos";
-
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
+export const maxDuration = 20;
 
 function tokenEsperado(): string | null {
   return process.env.HUBLA_WEBHOOK_TOKEN?.trim() || null;

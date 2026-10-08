@@ -250,7 +250,7 @@ describe("N5: processingEstaTravado — timeout de processing (B5: importado)", 
 
   it("claimedAt recente não está travado", () => {
     const agora = new Date();
-    const recente = new Date(agora.getTime() - 60_000); // 1 minuto atrás
+    const recente = new Date(agora.getTime() - 10_000); // 10 segundos atrás (< timeout de 30s)
     assert.equal(processingEstaTravado(recente, agora), false);
   });
 
@@ -269,7 +269,7 @@ describe("N5: processingEstaTravado — timeout de processing (B5: importado)", 
 
 describe("N5: podeSerClaimado — lógica completa de claim (B5: importado)", () => {
   const agora = new Date();
-  const recente = new Date(agora.getTime() - 60_000);
+  const recente = new Date(agora.getTime() - 10_000); // 10s < timeout 30s
   const antigo = new Date(agora.getTime() - TIMEOUT_PROCESSING_MS - 1000);
 
   it("pending pode ser claimado", () => {
