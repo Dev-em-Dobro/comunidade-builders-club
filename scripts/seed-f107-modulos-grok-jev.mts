@@ -20,14 +20,14 @@ const MODS = [
     title: "Grok Bots — Agentes que fazem trabalho por você",
     description:
       "Agentes no Grok que executam tarefas de verdade: do setup ao fluxo rodando sem você no meio de cada passo.",
-    sortOrder: 13,
+    sortOrder: 14,
   },
   {
     slug: "jev-aplicado-ao-mundo-real",
     title: "JEV aplicado ao mundo real",
     description:
       "JEV fora da teoria: como aplicar no dia a dia do builder — prospecção, entrega e operação com IA.",
-    sortOrder: 14,
+    sortOrder: 15,
   },
 ] as const;
 

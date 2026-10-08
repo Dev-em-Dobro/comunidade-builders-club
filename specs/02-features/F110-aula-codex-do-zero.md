@@ -12,6 +12,13 @@ publicada, descrição do card sem “Em breve no Club”, capa genérica 3D
 Pago (`freeAccess` false). Badge F108 some sozinho quando
 `contentCount > 0`.
 
+Ordem no catálogo (liberado antes de Grok/JEV/Claude): Gravações →
+**Codex** → Grok Bots → JEV → Claude Code (`sortOrder` 13).
+
+Capa `/6-codex.png` precisa estar no deploy. Se o arquivo 404 (ex.:
+produção ainda na `main` antiga), o card cai no gradiente com o título
+— não fica o retângulo vazio.
+
 ## Aula
 
 | Campo | Valor |

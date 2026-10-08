@@ -11,8 +11,8 @@ Em implementação
 
 | slug | título | sortOrder |
 |------|--------|-----------|
-| `claude-code` | Claude Code | 15 |
-| `codex` | Codex | 16 |
+| `codex` | Codex (aula · F110) | 13 |
+| `claude-code` | Claude Code | 16 |
 
 ## HML
 

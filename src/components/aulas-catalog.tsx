@@ -2,6 +2,7 @@ import { SafeImage as Image } from "@/components/safe-image";
 import Link from "next/link";
 import { snippetFromBody } from "@/lib/markdown/text";
 import { FASE_1_M01_SLUG } from "@/lib/aulas/access";
+import { ModuleCover } from "@/components/module-cover";
 
 export type AulaLessonCard = {
   id: string;
@@ -325,41 +326,6 @@ function ModuleBranch({
   );
 }
 
-function Cover({
-  src,
-  title,
-  locked = false,
-}: {
-  src: string | null;
-  title: string;
-  locked?: boolean;
-}) {
-  /**
-   * F072 — capa cinza é o que faz o estado ser lido pela imagem, de longe:
-   * colorida abre, cinza não. O cadeado confirma; não é a única pista.
-   */
-  const bloqueada = locked ? " grayscale opacity-75" : "";
-  if (src) {
-    return (
-      <Image
-        src={src}
-        alt=""
-        fill
-        className={`h-full w-full object-cover${bloqueada}`}
-        sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
-      />
-    );
-  }
-  return (
-    <div
-      className={`flex h-full w-full items-end bg-gradient-to-br from-accent/80 to-accent-hover p-4${bloqueada}`}
-    >
-      <span className="font-[family-name:var(--font-outfit)] text-lg font-semibold text-accent-foreground">
-        {title}
-      </span>
-    </div>
-  );
-}
 
 export function AulasCatalog({
   modules,
@@ -386,7 +352,7 @@ export function AulasCatalog({
               className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-colors hover:border-accent/40 hover:shadow-md"
             >
               <div className="relative aspect-video w-full overflow-hidden bg-surface">
-                <Cover src={coverOf(mod)} title={mod.title} locked={locked} />
+                <ModuleCover src={coverOf(mod)} title={mod.title} locked={locked} />
                 {/*
                  * F072 — só o cadeado, maior. "Pago" nomeava a tranca; a
                  * F067 fixou que o separador entre tiers é o nome do plano,

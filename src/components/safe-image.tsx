@@ -24,7 +24,8 @@ export function SafeImage(props: ImageProps) {
     return <Image {...props} alt={alt} />;
   }
 
-  const { fill, priority, className, sizes, width, height, id, style } = props;
+  const { fill, priority, className, sizes, width, height, id, style, onError } =
+    props;
 
   /** `fill` no next/image é absolute cobrindo o pai relative. Replicado à mão. */
   const estiloFill: React.CSSProperties = {
@@ -47,6 +48,7 @@ export function SafeImage(props: ImageProps) {
       height={fill ? undefined : height}
       loading={priority ? "eager" : "lazy"}
       fetchPriority={priority ? "high" : undefined}
+      onError={onError}
     />
   );
 }
