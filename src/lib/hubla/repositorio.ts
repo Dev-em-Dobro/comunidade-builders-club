@@ -69,11 +69,24 @@ export type DadosEntregaWebhook = {
  * 2. SET status='processing', claimedAt=now()
  * 3. Só quem obteve count=1 processa
  * 
- * Retorna true se conseguiu fazer o claim, false se já está sendo processado.
+ * Retorna { claimed: true, staleReclaim: boolean } se conseguiu fazer o claim.
+ * staleReclaim=true indica que a linha estava em 'processing' travado (função morreu).
  */
-export async function tentarClaimEntrega(idempotencyKey: string): Promise<boolean> {
+export async function tentarClaimEntrega(
+  idempotencyKey: string,
+): Promise<{ claimed: boolean; staleReclaim: boolean }> {
   const agora = new Date();
   const timeoutThreshold = new Date(agora.getTime() - TIMEOUT_PROCESSING_MS);
+
+  const existing = await prisma.hublaWebhookDelivery.findUnique({
+    where: { idempotencyKey },
+    select: { status: true, claimedAt: true },
+  });
+
+  const wasStaleProcessing =
+    existing?.status === "processing" &&
+    existing.claimedAt !== null &&
+    existing.claimedAt < timeoutThreshold;
 
   const result = await prisma.hublaWebhookDelivery.updateMany({
     where: {
@@ -91,7 +104,22 @@ export async function tentarClaimEntrega(idempotencyKey: string): Promise<boolea
       claimedAt: agora,
     },
   });
-  return result.count > 0;
+
+  const claimed = result.count > 0;
+  const staleReclaim = claimed && wasStaleProcessing;
+
+  if (staleReclaim) {
+    console.error(
+      "[hubla][stuck-processing] linha travada em processing foi reclamada",
+      {
+        idempotencyKey,
+        claimedAtOriginal: existing?.claimedAt?.toISOString(),
+        timeoutMs: TIMEOUT_PROCESSING_MS,
+      },
+    );
+  }
+
+  return { claimed, staleReclaim };
 }
 
 /**
@@ -451,8 +479,8 @@ export async function processarWebhookHubla(
     erro: null,
   });
 
-  const claimed = await tentarClaimEntrega(idempotencyKey);
-  if (!claimed) {
+  const claimResult = await tentarClaimEntrega(idempotencyKey);
+  if (!claimResult.claimed) {
     // Q1: NÃO é sucesso — a rota responde 409 e a Hubla tenta de novo.
     return { ignorado: true, motivo: MOTIVO_EM_PROCESSAMENTO, emProcessamento: true };
   }

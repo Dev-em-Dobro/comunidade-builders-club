@@ -377,7 +377,7 @@ describe("processarWebhookHubla — código REAL com Prisma fake", () => {
     }
 
     it("reenvio enquanto outra execução está em processing → emProcessamento, HTTP 409", async () => {
-      deliveryEmProcessamento("proc-1", 60_000);
+      deliveryEmProcessamento("proc-1", 10_000); // 10s < timeout 30s
 
       const r = await processar(payloadFatura({ email: "proc@teste.com" }), "proc-1");
 
@@ -523,7 +523,7 @@ describe("processarWebhookHubla — código REAL com Prisma fake", () => {
       deliveries.set("rota-2", {
         idempotencyKey: "rota-2",
         status: "processing",
-        claimedAt: new Date(Date.now() - 30_000),
+        claimedAt: new Date(Date.now() - 10_000), // 10s < timeout 30s
         email: "rota2@teste.com",
         membershipId: null,
         eventType: "invoice.payment_succeeded",

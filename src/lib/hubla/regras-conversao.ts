@@ -81,11 +81,20 @@ export function buildUpdatePaidAt(
 export type StatusWebhook = "pending" | "processing" | "processed" | "ignored" | "error";
 
 /**
- * N1/N5: Verifica se um status pode ser claimado para processamento.
- * pending e error podem ser claimados.
- * processing travado há mais de TIMEOUT_PROCESSING_MS também pode.
+ * R1: Timeout e maxDuration alinhados com a política de retry da Hubla.
+ *
+ * Hubla reenvia até 5× em ~75s (+5, +10, +20, +40s). Para que uma entrega
+ * travada em 'processing' (função morreu ou falha ao gravar status final)
+ * seja retomada DENTRO dessa janela:
+ *
+ *   ROUTE_MAX_DURATION_S  <  TIMEOUT_PROCESSING_MS  <  ~75s (janela Hubla)
+ *
+ * Valores atuais: maxDuration=20s, claim timeout=30s. O 4º retry (~35s) ou
+ * o 5º (~75s) já encontram a linha velha e reprocessam. Se a função demorar
+ * mais de 20s, a Vercel mata; 30s depois o retry assume.
  */
-export const TIMEOUT_PROCESSING_MS = 5 * 60 * 1000; // 5 minutos
+export const ROUTE_MAX_DURATION_S = 20;
+export const TIMEOUT_PROCESSING_MS = 30_000; // 30 segundos
 
 export function statusEhReprocessavel(status: StatusWebhook): boolean {
   return status === "pending" || status === "error";

@@ -173,7 +173,7 @@ const fakePrisma = {
 (globalThis as unknown as { prisma: unknown }).prisma = fakePrisma;
 
 // Funções importadas dinamicamente
-let tentarClaimEntrega: (key: string) => Promise<boolean>;
+let tentarClaimEntrega: (key: string) => Promise<{ claimed: boolean; staleReclaim: boolean }>;
 let registrarEntregaInicial: (dados: {
   idempotencyKey: string;
   eventType: string;
@@ -209,7 +209,7 @@ describe("Testes de repositorio.ts com Prisma fake", () => {
   describe("N1/N5: tentarClaimEntrega — código REAL", () => {
     beforeEach(() => resetDb());
 
-    it("claim de pending retorna true", async () => {
+    it("claim de pending retorna claimed=true, staleReclaim=false", async () => {
       deliveries.set("key-1", {
         idempotencyKey: "key-1",
         status: "pending",
@@ -224,11 +224,12 @@ describe("Testes de repositorio.ts com Prisma fake", () => {
       });
       
       const result = await tentarClaimEntrega("key-1");
-      assert.equal(result, true);
+      assert.equal(result.claimed, true);
+      assert.equal(result.staleReclaim, false);
       assert.equal(deliveries.get("key-1")!.status, "processing");
     });
 
-    it("claim de error retorna true (N1: retry após 500)", async () => {
+    it("claim de error retorna claimed=true, staleReclaim=false (N1: retry após 500)", async () => {
       deliveries.set("key-2", {
         idempotencyKey: "key-2",
         status: "error",
@@ -243,16 +244,17 @@ describe("Testes de repositorio.ts com Prisma fake", () => {
       });
       
       const result = await tentarClaimEntrega("key-2");
-      assert.equal(result, true);
+      assert.equal(result.claimed, true);
+      assert.equal(result.staleReclaim, false);
       assert.equal(deliveries.get("key-2")!.status, "processing");
     });
 
-    it("claim de processing recente retorna false", async () => {
+    it("claim de processing recente retorna claimed=false", async () => {
       const agora = new Date();
       deliveries.set("key-3", {
         idempotencyKey: "key-3",
         status: "processing",
-        claimedAt: new Date(agora.getTime() - 60_000), // 1 min atrás
+        claimedAt: new Date(agora.getTime() - 10_000), // 10 segundos atrás (< timeout)
         email: null,
         membershipId: null,
         eventType: "test",
@@ -263,10 +265,10 @@ describe("Testes de repositorio.ts com Prisma fake", () => {
       });
       
       const result = await tentarClaimEntrega("key-3");
-      assert.equal(result, false);
+      assert.equal(result.claimed, false);
     });
 
-    it("claim de processing travado retorna true (N5: timeout)", async () => {
+    it("claim de processing travado retorna claimed=true, staleReclaim=true (N5: timeout)", async () => {
       const agora = new Date();
       deliveries.set("key-4", {
         idempotencyKey: "key-4",
@@ -282,10 +284,11 @@ describe("Testes de repositorio.ts com Prisma fake", () => {
       });
       
       const result = await tentarClaimEntrega("key-4");
-      assert.equal(result, true);
+      assert.equal(result.claimed, true);
+      assert.equal(result.staleReclaim, true, "deve indicar que foi stale reclaim");
     });
 
-    it("claim de processed retorna false", async () => {
+    it("claim de processed retorna claimed=false", async () => {
       deliveries.set("key-5", {
         idempotencyKey: "key-5",
         status: "processed",
@@ -300,7 +303,7 @@ describe("Testes de repositorio.ts com Prisma fake", () => {
       });
       
       const result = await tentarClaimEntrega("key-5");
-      assert.equal(result, false);
+      assert.equal(result.claimed, false);
     });
 
     it("WHERE do updateMany inclui error (N1)", async () => {
