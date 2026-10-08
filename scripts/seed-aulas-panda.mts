@@ -1,6 +1,6 @@
 /**
- * F050 / F051 / F103 / F107 / F110 — Seed dos módulos (jornada Fase 1–2,
- * n8n, IA, Fundamentos, lives, Grok Bots, JEV, Codex).
+ * F050 / F051 / F103 / F107 / F110 / F111 — Seed dos módulos (jornada Fase 1–2,
+ * n8n, IA, Fundamentos, lives, Grok Bots, JEV, Codex, Claude Code).
  *
  *   npm run db:seed:aulas-panda -- --target=hml
  *   npm run db:seed:aulas-panda -- --target=prod --confirm
@@ -886,7 +886,7 @@ Nesta live a gente abre o modelo: o que entra no pacote, como explicar o valor s
     title: "Grok Bots — Agentes que fazem trabalho por você",
     description:
       "Agentes no Grok que executam tarefas de verdade: do setup ao fluxo rodando sem você no meio de cada passo.",
-    sortOrder: 14,
+    sortOrder: 15,
     lessons: [],
   },
   {
@@ -895,17 +895,27 @@ Nesta live a gente abre o modelo: o que entra no pacote, como explicar o valor s
     title: "JEV aplicado ao mundo real",
     description:
       "JEV fora da teoria: como aplicar no dia a dia do builder — prospecção, entrega e operação com IA.",
-    sortOrder: 15,
+    sortOrder: 16,
     lessons: [],
   },
   {
-    // F108 — Em breve. Pago.
+    // F111 — primeira aula. Pago.
     slug: "claude-code",
     title: "Claude Code",
     description:
-      "Agente da Anthropic do primeiro projeto ao app em produção. Em breve no Club.",
-    sortOrder: 16,
-    lessons: [],
+      "Instale e use o Claude Code na IDE para desenvolver e revisar projetos com IA.",
+    coverImageUrl: "/7-claude-code.webp",
+    sortOrder: 14,
+    lessons: [
+      {
+        slug: "claude-code-na-ide",
+        title: "Claude Code na IDE",
+        description:
+          "Nessa aula você vai aprender a instalar e usar o Claude Code dentro da IDE para agilizar o desenvolvimento de projetos.\n\nO Claude Code requer um plano pago do Claude (Pro). Mesmo sem a assinatura, vale assistir: as técnicas de desenvolvimento e revisão mostradas aqui funcionam com outras IAs, inclusive gratuitas.\n\n[Guia da aula](https://comunidade-builders-club.devemdobro.com/presentes/inicio/inicio-2026-10-08)\n\n[Baixar material da aula (ZIP)](/materiais/claude-code-print-lp.zip)",
+        pandaVideoExternalId: "3ec9d2a0-d36f-4c43-b652-1d0e57f10f18",
+        sortOrder: 0,
+      },
+    ],
   },
   {
     // F110 — primeira aula. Pago. Capa própria: thumb do vídeo não vai ao card.
