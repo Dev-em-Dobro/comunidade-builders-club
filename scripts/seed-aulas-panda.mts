@@ -899,13 +899,14 @@ Nesta live a gente abre o modelo: o que entra no pacote, como explicar o valor s
     lessons: [],
   },
   {
-    // F111 — primeira aula. Pago.
+    // F111 — primeira aula. Pago. sortOrder 14: logo após Codex.
     slug: "claude-code",
     title: "Claude Code",
     description:
       "Instale e use o Claude Code na IDE para desenvolver e revisar projetos com IA.",
     coverImageUrl: "/7-claude-code.webp",
     sortOrder: 14,
+    forceLessonSort: true,
     lessons: [
       {
         slug: "claude-code-na-ide",

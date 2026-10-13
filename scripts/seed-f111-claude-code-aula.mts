@@ -1,5 +1,5 @@
 /**
- * F111 — primeira aula do Claude Code e ordem após Codex.
+ * F111 — primeira aula do Claude Code (sai de Em breve) e ordem após Codex.
  *
  *   npx tsx scripts/seed-f111-claude-code-aula.mts --target=hml
  *   npx tsx scripts/seed-f111-claude-code-aula.mts --target=prod --confirm
@@ -13,7 +13,8 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 config({ path: resolve(root, ".env"), override: true });
 
 type Target = "local" | "hml" | "prod";
-const target = (process.argv.find((arg) => arg.startsWith("--target="))?.slice(9) ?? "hml") as Target;
+const target = (process.argv.find((arg) => arg.startsWith("--target="))?.slice(9) ??
+  "hml") as Target;
 if (!["local", "hml", "prod"].includes(target)) {
   throw new Error("Use --target=hml|local|prod");
 }
@@ -23,7 +24,9 @@ if (target === "prod" && !process.argv.includes("--confirm")) {
 
 const url = {
   local: process.env.DATABASE_URL?.trim(),
-  hml: process.env.DATABASE_URL_HML?.trim() || process.env.DATABASE_URL_STAGING?.trim(),
+  hml:
+    process.env.DATABASE_URL_HML?.trim() ||
+    process.env.DATABASE_URL_STAGING?.trim(),
   prod: process.env.DATABASE_URL_PROD?.trim(),
 }[target];
 if (!url) throw new Error(`Env ausente para --target=${target}`);
@@ -43,18 +46,28 @@ try {
       ["grok-bots-agentes-que-fazem-trabalho-por-voce", 15],
       ["jev-aplicado-ao-mundo-real", 16],
     ] as const) {
-      await db.module.update({ where: { slug: moduleSlug }, data: { sortOrder } });
+      await db.module.update({
+        where: { slug: moduleSlug },
+        data: { sortOrder },
+      });
     }
 
     const module = await db.module.update({
       where: { slug: "claude-code" },
       data: {
-        description: "Instale e use o Claude Code na IDE para desenvolver e revisar projetos com IA.",
+        description:
+          "Instale e use o Claude Code na IDE para desenvolver e revisar projetos com IA.",
         coverImageUrl: "/7-claude-code.webp",
         published: true,
         freeAccess: false,
+        sortOrder: 14,
       },
     });
+
+    await db.lesson.deleteMany({
+      where: { moduleId: module.id, slug: "claude-code-na-pratica" },
+    });
+
     const lesson = await db.lesson.upsert({
       where: { moduleId_slug: { moduleId: module.id, slug } },
       create: {

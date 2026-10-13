@@ -540,6 +540,14 @@ Conferir se a régua de preços citada no vídeo é a versão atual aprovada.`,
 
   "codex/codex-do-zero-chatgpt-desktop": `Do zero no Codex pelo ChatGPT Desktop: instalar o app, entender o fluxo do agente da OpenAI e começar o primeiro projeto — AGENTS.md, plugins e o uso no dia a dia.`,
 
+  "claude-code/claude-code-na-ide": `Nessa aula você vai aprender a instalar e usar o Claude Code dentro da IDE para agilizar o desenvolvimento de projetos.
+
+O Claude Code requer um plano pago do Claude (Pro). Mesmo sem a assinatura, vale assistir: as técnicas de desenvolvimento e revisão mostradas aqui funcionam com outras IAs, inclusive gratuitas.
+
+[Guia da aula](https://comunidade-builders-club.devemdobro.com/presentes/inicio/inicio-2026-10-08)
+
+[Baixar material da aula (ZIP)](/materiais/claude-code-print-lp.zip)`,
+
   "gravacoes-das-lives-semanais/raas-como-cobrar-pelo-resultado-do-cliente": `RaaS (Result as a Service) é cobrar pelo que o cliente ganha — agenda cheia, leads, recorrência — e não pelo tempo que você passou no projeto.
 
 Nesta live a gente abre o modelo: o que entra no pacote, como explicar o valor sem parecer "eu cobro caro", e como transformar a entrega em uma mensalidade que o cliente quer continuar pagando.
