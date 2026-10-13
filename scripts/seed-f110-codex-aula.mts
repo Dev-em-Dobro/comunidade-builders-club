@@ -51,8 +51,8 @@ const prisma = new PrismaClient({
 });
 
 const ORDEM = [
-  { slug: "codex", sortOrder: 13 },
-  { slug: "claude-code", sortOrder: 14 },
+  { slug: "claude-code", sortOrder: 13 },
+  { slug: "codex", sortOrder: 14 },
   { slug: "grok-bots-agentes-que-fazem-trabalho-por-voce", sortOrder: 15 },
   { slug: "jev-aplicado-ao-mundo-real", sortOrder: 16 },
 ] as const;
@@ -70,7 +70,7 @@ const module = await prisma.module.update({
     description:
       "Agente da OpenAI: instalação, AGENTS.md, plugins e uso no dia a dia.",
     coverImageUrl: "/6-codex.png",
-    sortOrder: 13,
+    sortOrder: 14,
   },
 });
 

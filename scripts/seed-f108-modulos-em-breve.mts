@@ -34,14 +34,14 @@ const MODS = [
     title: "Claude Code",
     description:
       "Instale e use o Claude Code na IDE para desenvolver e revisar projetos com IA.",
-    sortOrder: 14,
+    sortOrder: 13,
   },
   {
     slug: "codex",
     title: "Codex",
     description:
       "Agente da OpenAI: instalação, AGENTS.md, plugins e uso no dia a dia.",
-    sortOrder: 13,
+    sortOrder: 14,
   },
 ] as const;
 
