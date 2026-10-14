@@ -1,5 +1,5 @@
 /**
- * F050 / F051 / F103 / F107 / F110 / F111 — Seed dos módulos (jornada Fase 1–2,
+ * F050 / F051 / F103 / F107 / F110 / F111 / F112 — Seed dos módulos (jornada Fase 1–2,
  * n8n, IA, Fundamentos, lives, Grok Bots, JEV, Codex, Claude Code).
  *
  *   npm run db:seed:aulas-panda -- --target=hml
@@ -881,13 +881,25 @@ Nesta live a gente abre o modelo: o que entra no pacote, como explicar o valor s
     ],
   },
   {
-    // F107 — agentes Grok. Pago (freeAccess default false). Aulas entram depois.
+    // F112 — primeira aula. Pago. Capa própria: thumb do vídeo não vai ao card.
+    // sortOrder 15: depois do Codex.
     slug: "grok-bots-agentes-que-fazem-trabalho-por-voce",
     title: "Grok Bots — Agentes que fazem trabalho por você",
     description:
       "Agentes no Grok que executam tarefas de verdade: do setup ao fluxo rodando sem você no meio de cada passo.",
+    coverImageUrl: "/8-grok-bots.png",
     sortOrder: 15,
-    lessons: [],
+    forceLessonSort: true,
+    lessons: [
+      {
+        slug: "grok-bots-na-pratica",
+        title: "Grok Bots na prática",
+        description:
+          "Nessa aula a gente monta ao vivo o Emaildo – Recepção: um bot do Grok Bot que lê a caixa de e-mail de uma clínica fictícia, etiqueta cada mensagem e deixa a resposta em rascunho usando só o FAQ. Quem revisa e envia é uma pessoa.\n\nVocê vê criar o bot do zero e com o dr eggbot, escrever instruções com anti-jobs (o que o bot não faz), conectar o Gmail, criar rotina, salvar skill, colocar um segundo bot pra revisar o primeiro e os cuidados de segurança — com os tropeços reais junto.\n\nA regra da aula inteira: o bot propõe e rascunha, e a pessoa aprova.\n\n## Material\n- [Baixar material da aula (PDF)](/materiais/grok-bots-na-pratica.pdf) — capítulos, prompts e o FAQ da clínica fictícia\n- [Baixar o Grok Bot](https://x.ai/bot)",
+        pandaVideoExternalId: "b1661728-611f-4519-9484-9ce269163dcf",
+        sortOrder: 0,
+      },
+    ],
   },
   {
     // F107 — JEV na prática. Pago (freeAccess default false). Aulas entram depois.

@@ -7,8 +7,8 @@ Em implementação
 1. Módulos raiz **Claude Code** e **Codex** (pago). Codex ganhou aula na
    [F110](F110-aula-codex-do-zero.md) e Claude Code na
    [F111](F111-aula-claude-code-ide.md).
-2. Badge **Em breve** nos cards sem aulas (`contentCount === 0`: Grok Bots,
-   JEV).
+2. Badge **Em breve** nos cards sem aulas (`contentCount === 0`: JEV.
+   Grok Bots saiu na [F112](F112-aula-grok-bots-na-pratica.md)).
 
 | slug | título | sortOrder |
 |------|--------|-----------|
