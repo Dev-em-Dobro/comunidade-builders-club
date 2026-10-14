@@ -540,6 +540,16 @@ Conferir se a régua de preços citada no vídeo é a versão atual aprovada.`,
 
   "codex/codex-do-zero-chatgpt-desktop": `Do zero no Codex pelo ChatGPT Desktop: instalar o app, entender o fluxo do agente da OpenAI e começar o primeiro projeto — AGENTS.md, plugins e o uso no dia a dia.`,
 
+  "grok-bots-agentes-que-fazem-trabalho-por-voce/grok-bots-na-pratica": `Nessa aula a gente monta ao vivo o Emaildo – Recepção: um bot do Grok Bot que lê a caixa de e-mail de uma clínica fictícia, etiqueta cada mensagem e deixa a resposta em rascunho usando só o FAQ. Quem revisa e envia é uma pessoa.
+
+Você vê criar o bot do zero e com o dr eggbot, escrever instruções com anti-jobs (o que o bot não faz), conectar o Gmail, criar rotina, salvar skill, colocar um segundo bot pra revisar o primeiro e os cuidados de segurança — com os tropeços reais junto.
+
+A regra da aula inteira: o bot propõe e rascunha, e a pessoa aprova.
+
+## Material
+- [Baixar material da aula (PDF)](/materiais/grok-bots-na-pratica.pdf) — capítulos, prompts e o FAQ da clínica fictícia
+- [Baixar o Grok Bot](https://x.ai/bot)`,
+
   "claude-code/claude-code-na-ide": `Nessa aula você vai aprender a instalar e usar o Claude Code dentro da IDE para agilizar o desenvolvimento de projetos.
 
 O Claude Code requer um plano pago do Claude (Pro). Mesmo sem a assinatura, vale assistir: as técnicas de desenvolvimento e revisão mostradas aqui funcionam com outras IAs, inclusive gratuitas.

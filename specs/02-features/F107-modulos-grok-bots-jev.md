@@ -11,7 +11,8 @@ Dois módulos raiz no catálogo `/aulas` (pago, `freeAccess` false):
 | `grok-bots-agentes-que-fazem-trabalho-por-voce` | Grok Bots — Agentes que fazem trabalho por você | 15 |
 | `jev-aplicado-ao-mundo-real` | JEV aplicado ao mundo real | 16 |
 
-Aulas/vídeos entram depois (módulos nascem sem lessons).
+A primeira aula do Grok Bots entra na [F112](F112-aula-grok-bots-na-pratica.md).
+JEV continua sem lessons até a aula correspondente.
 
 ## Como aplicar (HML)
 
