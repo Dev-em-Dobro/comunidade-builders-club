@@ -1,5 +1,5 @@
 /**
- * F050 / F051 / F103 / F107 / F110 / F111 / F112 — Seed dos módulos (jornada Fase 1–2,
+ * F050 / F051 / F103 / F107 / F110 / F111 / F112 / F113 — Seed dos módulos (jornada Fase 1–2,
  * n8n, IA, Fundamentos, lives, Grok Bots, JEV, Codex, Claude Code).
  *
  *   npm run db:seed:aulas-panda -- --target=hml
@@ -927,6 +927,14 @@ Nesta live a gente abre o modelo: o que entra no pacote, como explicar o valor s
           "Nessa aula você vai aprender a instalar e usar o Claude Code dentro da IDE para agilizar o desenvolvimento de projetos.\n\nO Claude Code requer um plano pago do Claude (Pro). Mesmo sem a assinatura, vale assistir: as técnicas de desenvolvimento e revisão mostradas aqui funcionam com outras IAs, inclusive gratuitas.\n\n[Guia da aula](https://comunidade-builders-club.devemdobro.com/presentes/inicio/inicio-2026-10-08)\n\n[Baixar material da aula (ZIP)](/materiais/claude-code-print-lp.zip)",
         pandaVideoExternalId: "3ec9d2a0-d36f-4c43-b652-1d0e57f10f18",
         sortOrder: 0,
+      },
+      {
+        slug: "claude-code-na-pratica",
+        title: "Claude Code na prática",
+        description:
+          "Aprenda a transformar o Claude Code em um parceiro de desenvolvimento mais estratégico. Nesta aula, vamos melhorar nossa base no uso do Claude Code, aprofundar o CLAUDE.md, a pasta .claude e o Plan Mode para planejar melhor, reduzir retrabalho e criar projetos com mais velocidade e consistência.\n\n## Materiais\n- [Baixar projeto da aula (ZIP)](/materiais/claude-code-na-pratica-aula-2.zip)\n- [Baixar tutorial da aula (PDF)](/materiais/tutorial-aula-2-claude-code.pdf)",
+        pandaVideoExternalId: "600db079-fa56-4434-88ef-2be1f6a99e19",
+        sortOrder: 1,
       },
     ],
   },

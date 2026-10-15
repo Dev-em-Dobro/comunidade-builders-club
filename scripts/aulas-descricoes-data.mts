@@ -558,6 +558,12 @@ O Claude Code requer um plano pago do Claude (Pro). Mesmo sem a assinatura, vale
 
 [Baixar material da aula (ZIP)](/materiais/claude-code-print-lp.zip)`,
 
+  "claude-code/claude-code-na-pratica": `Aprenda a transformar o Claude Code em um parceiro de desenvolvimento mais estratégico. Nesta aula, vamos melhorar nossa base no uso do Claude Code, aprofundar o CLAUDE.md, a pasta .claude e o Plan Mode para planejar melhor, reduzir retrabalho e criar projetos com mais velocidade e consistência.
+
+## Materiais
+- [Baixar projeto da aula (ZIP)](/materiais/claude-code-na-pratica-aula-2.zip)
+- [Baixar tutorial da aula (PDF)](/materiais/tutorial-aula-2-claude-code.pdf)`,
+
   "gravacoes-das-lives-semanais/raas-como-cobrar-pelo-resultado-do-cliente": `RaaS (Result as a Service) é cobrar pelo que o cliente ganha — agenda cheia, leads, recorrência — e não pelo tempo que você passou no projeto.
 
 Nesta live a gente abre o modelo: o que entra no pacote, como explicar o valor sem parecer "eu cobro caro", e como transformar a entrega em uma mensalidade que o cliente quer continuar pagando.
