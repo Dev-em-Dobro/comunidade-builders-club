@@ -35,7 +35,7 @@ limpeza de duplicata da aula 1).
 
 ## Critérios
 
-- [ ] Aula 2 aparece depois de Claude Code na IDE, no mesmo módulo
-- [ ] Descrição + ZIP + PDF visíveis na aula
-- [ ] `freeAccess` permanece `false`
-- [ ] Embed usa `video_external_id`, não o UUID do dashboard
+- [x] Aula 2 aparece depois de Claude Code na IDE, no mesmo módulo
+- [x] Descrição + ZIP + PDF visíveis na aula
+- [x] `freeAccess` permanece `false`
+- [x] Embed usa `video_external_id`, não o UUID do dashboard
