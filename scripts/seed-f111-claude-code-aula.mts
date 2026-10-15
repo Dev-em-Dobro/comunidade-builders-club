@@ -64,10 +64,6 @@ try {
       },
     });
 
-    await db.lesson.deleteMany({
-      where: { moduleId: module.id, slug: "claude-code-na-pratica" },
-    });
-
     const lesson = await db.lesson.upsert({
       where: { moduleId_slug: { moduleId: module.id, slug } },
       create: {

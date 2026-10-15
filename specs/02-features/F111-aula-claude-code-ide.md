@@ -35,8 +35,9 @@ outras IAs. Inclui o guia da aula e o download do ZIP.
 
 `scripts/seed-aulas-panda.mts` (CATALOG) +
 `scripts/seed-f111-claude-code-aula.mts`. HML por padrão; produção com
-`--target=prod --confirm`. Remove a slug duplicada `claude-code-na-pratica`
-se existir.
+`--target=prod --confirm`. A slug `claude-code-na-pratica` passou a ser a
+aula 2 ([F113](F113-aula-2-claude-code-na-pratica.md)); o seed F111 não
+a apaga.
 
 ## Critérios
 
