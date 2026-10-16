@@ -4,6 +4,7 @@ import {
   tierPagoDaNotaAllowlist,
   type TierPagoAllowlist,
 } from "./tier-allowlist";
+import { buildUpdatePaidAt } from "@/lib/hubla/regras-conversao";
 
 export function normalizarEmail(email: string): string {
   return email.trim().toLowerCase();
@@ -34,17 +35,18 @@ export async function tierPagoDoEmailAllowlist(
   return tierPagoDaNotaAllowlist(row?.note);
 }
 
-/** Dados da allowlist para o bootstrap: tier e data do pagamento. */
+/** Dados da allowlist para o bootstrap: tier, data do pagamento e source. */
 export async function dadosPagosDoEmailAllowlist(
   email: string,
-): Promise<{ tier: TierPagoAllowlist; paidAt: Date | null }> {
+): Promise<{ tier: TierPagoAllowlist; paidAt: Date | null; source: string | null }> {
   const row = await prisma.allowedEmail.findUnique({
     where: { email: normalizarEmail(email) },
-    select: { note: true, paidAt: true },
+    select: { note: true, paidAt: true, source: true },
   });
   return {
     tier: tierPagoDaNotaAllowlist(row?.note),
     paidAt: row?.paidAt ?? null,
+    source: row?.source ?? null,
   };
 }
 
@@ -58,6 +60,13 @@ export async function addAllowedEmail(opts: {
   paidAt?: Date;
 }) {
   const email = normalizarEmail(opts.email);
+
+  const existing = await prisma.allowedEmail.findUnique({
+    where: { email },
+    select: { paidAt: true },
+  });
+
+  const paidAtUpdate = buildUpdatePaidAt({ paidAt: opts.paidAt }, existing?.paidAt ?? null);
   const row = await prisma.allowedEmail.upsert({
     where: { email },
     create: {
@@ -69,7 +78,7 @@ export async function addAllowedEmail(opts: {
     update: {
       ...(opts.source ? { source: opts.source } : {}),
       ...(opts.note !== undefined ? { note: opts.note } : {}),
-      ...(opts.paidAt ? { paidAt: opts.paidAt } : {}),
+      ...paidAtUpdate,
     },
   });
 
