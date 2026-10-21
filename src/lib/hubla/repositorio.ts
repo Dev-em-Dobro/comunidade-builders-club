@@ -107,6 +107,9 @@ export async function concederPago(
           tier: plan,
           role: "member",
           convertedToPaidAt: convertedAt,
+          ...(plan === "elite" && cobranca.cobradoEm
+            ? { eliteStartedAt: cobranca.cobradoEm }
+            : {}),
           ...dinheiro,
         },
       });
@@ -135,6 +138,9 @@ export async function concederPago(
         status: "active",
         tier: nextTier,
         convertedToPaidAt: convertedAt,
+        ...(nextTier === "elite" && m.tier !== "elite" && cobranca.cobradoEm
+          ? { eliteStartedAt: cobranca.cobradoEm }
+          : {}),
         ...dinheiro,
       },
     });
@@ -145,6 +151,9 @@ export async function concederPago(
         data: {
           status: "active",
           tier: nextTier,
+          ...(nextTier === "elite" && m.tier !== "elite" && cobranca.cobradoEm
+            ? { eliteStartedAt: cobranca.cobradoEm }
+            : {}),
           ...dinheiro,
         },
       });
@@ -158,6 +167,9 @@ export async function concederPago(
     data: {
       status: "active",
       tier: nextTier,
+      ...(nextTier === "elite" && m.tier !== "elite" && cobranca.cobradoEm
+        ? { eliteStartedAt: cobranca.cobradoEm }
+        : {}),
       ...dinheiro,
     },
   });
@@ -195,7 +207,9 @@ export async function aplicarAcaoAllowlist(acao: AcaoAllowlist): Promise<Resulta
   if (acao.acao === "ignorar") return { membershipId: null, conversao: false };
 
   if (acao.acao === "conceder") {
-    const paidAt = acao.cobranca.cobradoEm ?? new Date();
+    // A data exibida nos termos do Elite precisa vir do pagamento, não do
+    // instante em que o webhook chegou.
+    const paidAt = acao.cobranca.cobradoEm ?? undefined;
     await addAllowedEmail({
       email: acao.email,
       source: "hubla",

@@ -69,7 +69,11 @@ export async function addAllowedEmail(opts: {
     update: {
       ...(opts.source ? { source: opts.source } : {}),
       ...(opts.note !== undefined ? { note: opts.note } : {}),
-      ...(opts.paidAt ? { paidAt: opts.paidAt } : {}),
+      ...(opts.paidAt
+        ? { paidAt: opts.paidAt }
+        : opts.tier === "elite"
+          ? { paidAt: null }
+          : {}),
     },
   });
 
@@ -83,7 +87,13 @@ export async function addAllowedEmail(opts: {
       const tier = mesclarTierPago(m.tier, desejado);
       await prisma.membership.update({
         where: { userId: user.id },
-        data: { status: "active", tier },
+        data: {
+          status: "active",
+          tier,
+          ...(m.tier !== "elite" && tier === "elite" && opts.paidAt
+            ? { eliteStartedAt: opts.paidAt }
+            : {}),
+        },
       });
     }
   }

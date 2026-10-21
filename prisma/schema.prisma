@@ -175,6 +175,8 @@ model Membership {
   /// Data em que o membro virou pagante (Free/novo → pro/elite). Gravado só
   /// na primeira conversão, não atualiza em renovações. Null em membros legados.
   convertedToPaidAt DateTime?       @map("converted_to_paid_at")
+  /// F115 — primeira compra/upgrade para Elite; renovações não alteram.
+  eliteStartedAt    DateTime?       @map("elite_started_at")
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
 
@@ -218,7 +220,7 @@ model LegalAcceptance {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  /// `termos` | `privacidade` | `garantia` (F058 / F090).
+  /// `termos` | `privacidade` | `garantia` | `termos-elite`.
   documento String
   versao    String
   aceitoEm  DateTime @default(now()) @map("aceito_em")

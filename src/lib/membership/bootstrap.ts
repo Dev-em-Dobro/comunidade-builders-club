@@ -127,6 +127,9 @@ async function resolverBootstrap(
             }
           : {}),
         ...(isPagante ? { convertedToPaidAt: paidAtAllowlist ?? new Date() } : {}),
+        ...(tierAllowlist === "elite" && paidAtAllowlist
+          ? { eliteStartedAt: paidAtAllowlist }
+          : {}),
       },
     });
     return { membership, profile: nextProfile };
@@ -150,6 +153,9 @@ async function resolverBootstrap(
         status: "active",
         tier: isBootstrapAdmin ? "elite" : allowed ? tierAllowlist : "free",
         ...(isBootstrapAdmin ? { role: "admin" as const } : {}),
+        ...(tierAllowlist === "elite" && paidAtAllowlist
+          ? { eliteStartedAt: paidAtAllowlist }
+          : {}),
       },
     });
     return { membership, profile: nextProfile };
