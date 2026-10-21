@@ -164,7 +164,12 @@ Página **`/planos`** (liberada para free e PRO):
 
 - Título “Ver planos”
 - Subtítulo profissional (formação, comunidade, 1º cliente em 90 dias)
-- Três cards (empilhados no mobile): PRO à vista, **PRO Mensal**, Elite
+- **Vitrine (F114):** só as chaves em `PLANOS_VISIVEIS_NA_VITRINE`
+  (`checkout.ts`). Hoje: `["elite"]` — uma coluna centralizada. PRO à vista
+  e PRO Mensal continuam no checkout/webhook; para reabrir na página, inclua
+  `"pro"` e `"proMensal"` na lista.
+- Três ofertas no código (PRO à vista, **PRO Mensal**, Elite); a página
+  filtra pela lista acima. Empilhados no mobile quando houver mais de uma.
 - PRO Mensal espelha a lista do PRO; preço e copy falam em assinatura
   (sem “Parcele em até” / à vista)
 - Cards com destaque, hover (elevação/sombra) e lista de entregas em título + detalhe
