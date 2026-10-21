@@ -1,7 +1,7 @@
 # F114 — Vitrine `/planos` só Elite
 
 ## Status
-Em implementação — 2026-10-21
+Implementada — 2026-10-21
 
 Depende de: [F053](F053-ofertas-pro-elite.md) (ofertas, checkouts Hubla, webhook).
 
@@ -42,8 +42,8 @@ da vitrine). Os cards e botões voltam a renderizar.
 
 ## Critérios
 
-- [ ] `/planos` não mostra botão "Assinar mensal" nem "Entrar no PRO anual"
-- [ ] `/planos` mostra a coluna Elite com o checkout Hubla intacto
-- [ ] Uma coluna só: card centralizado, sem buraco de grid (desktop e mobile)
-- [ ] Ofertas PRO/mensal, webhook e permissões continuam no código
-- [ ] Lista `PLANOS_VISIVEIS_NA_VITRINE` é o único interruptor da vitrine
+- [x] `/planos` não mostra botão "Assinar mensal" nem "Entrar no PRO anual"
+- [x] `/planos` mostra a coluna Elite com o checkout Hubla intacto
+- [x] Uma coluna só: card centralizado, sem buraco de grid (desktop e mobile)
+- [x] Ofertas PRO/mensal, webhook e permissões continuam no código
+- [x] Lista `PLANOS_VISIVEIS_NA_VITRINE` é o único interruptor da vitrine
