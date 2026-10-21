@@ -1,7 +1,7 @@
 # F115 — Termos do Elite com aceite obrigatório
 
 ## Status
-Em desenvolvimento — 2026-10-21. Texto sujeito à validação dos fundadores antes da publicação.
+Em validação em homologação — 2026-10-21. Texto aprovado pelos fundadores.
 
 ## Contexto
 Tarefa `cmvb3vtab0001lf06bb1sajbz`: quem compra o Elite deve conhecer, antes de usar a comunidade, a diferença entre acesso vitalício às aulas gravadas e acompanhamento por um ano a partir da compra. O aceite precisa ser demonstrável.
@@ -16,12 +16,13 @@ Tarefa `cmvb3vtab0001lf06bb1sajbz`: quem compra o Elite deve conhecer, antes de 
 
 ## Critérios
 - [ ] Todo Elite ativo sem aceite da versão vigente vê o modal no primeiro acesso após a compra ou upgrade.
-- [ ] Aulas gravadas são descritas explicitamente como vitalícias; lives, suporte e mentoria terminam um ano após a compra do Elite.
-- [ ] A data individual de término aparece quando a compra tem data confiável; ausência de data é explícita.
-- [ ] Checkbox inicia desmarcado; botão desabilitado até marcá-lo; erro de gravação mantém o bloqueio.
-- [ ] Aceite persiste usuário, versão, data/hora e contexto de origem, sem duplicar.
+- [x] Aulas gravadas são descritas explicitamente como vitalícias; lives, suporte e mentoria terminam um ano após a compra do Elite.
+- [x] A data individual de término aparece quando a compra tem data confiável; ausência de data é explícita.
+- [x] Checkbox inicia desmarcado; botão desabilitado até marcá-lo; erro de gravação mantém o bloqueio.
+- [x] Aceite persiste usuário, versão, data/hora e contexto de origem, sem duplicar.
 - [ ] Layout funciona em desktop e celular.
-- [ ] Texto validado pelos fundadores e verificado em conta Elite de teste antes da publicação.
+- [ ] Verificado em conta Elite de teste antes da publicação.
+- [x] Texto validado pelos fundadores em 2026-10-21.
 
 ## Minuta do texto para validação
 

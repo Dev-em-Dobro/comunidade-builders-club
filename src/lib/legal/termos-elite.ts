@@ -1,4 +1,4 @@
-/** F115 — minuta para validação dos fundadores antes da publicação. */
+/** F115 — termos Elite aprovados pelos fundadores em 2026-10-21. */
 export const DOCUMENTO_TERMOS_ELITE = "termos-elite" as const;
 export const VERSAO_TERMOS_ELITE = "2026-10-21";
 
