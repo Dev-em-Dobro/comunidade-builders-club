@@ -6,6 +6,7 @@ import {
   ofertaPro,
   ofertaProMensal,
   PROMESSA_PRIMEIRO_CLIENTE,
+  vitrineMostra,
 } from "@/lib/membership/checkout";
 import { NOME_PRODUTO } from "@/lib/produto";
 import {
@@ -16,6 +17,7 @@ import {
 /**
  * F063 — `/planos` é rota pública.
  * UI atual = layout v2 (PRO mensal/anual + Elite). Anterior em `/planos-v2`.
+ * F114 — a vitrine filtra por `PLANOS_VISIVEIS_NA_VITRINE` (hoje só Elite).
  */
 export const metadata: Metadata = {
   title: `Planos — ${NOME_PRODUTO}`,
@@ -42,10 +44,22 @@ function CheckIcon() {
   );
 }
 
+function classeGradeVitrine(colunas: number): string {
+  if (colunas <= 1) {
+    return "mx-auto mt-10 w-full max-w-xl";
+  }
+  return "mt-10 grid items-stretch gap-5 sm:grid-cols-2";
+}
+
 export default function PlanosPage() {
   const pro = ofertaPro();
   const proMensal = ofertaProMensal();
   const elite = ofertaElite();
+  const mostraPro = vitrineMostra("pro");
+  const mostraProMensal = vitrineMostra("proMensal");
+  const mostraElite = vitrineMostra("elite");
+  const mostraColunaPro = mostraPro || mostraProMensal;
+  const colunas = Number(mostraColunaPro) + Number(mostraElite);
 
   return (
     <main className="relative min-h-dvh px-4 py-10 md:py-16">
@@ -60,17 +74,15 @@ export default function PlanosPage() {
             {NOME_PRODUTO}
           </p>
           <h1 className="mt-3 font-[family-name:var(--font-outfit)] text-3xl font-bold tracking-tight md:text-5xl">
-            Escolha como quer entrar
-          </h1>
-          <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">
             Pare de brincar com IA, feche o primeiro cliente em 90 dias
-          </p>
+          </h1>
         </header>
 
         <section
-          className="mt-10 grid items-stretch gap-5 sm:grid-cols-2"
+          className={classeGradeVitrine(colunas)}
           aria-label="Planos do Builders Club"
         >
+          {mostraColunaPro ? (
           <article className="relative flex flex-col rounded-2xl border-2 border-accent bg-accent/5 p-6 shadow-md">
             <span className="absolute right-5 top-5 rounded-full bg-accent px-3 py-1 text-xs font-semibold text-accent-foreground">
               Melhor valor
@@ -95,6 +107,7 @@ export default function PlanosPage() {
             </ul>
 
             <div className="mt-auto pt-6">
+              {mostraProMensal ? (
               <div className="rounded-xl border border-accent/40 bg-card p-4">
                 <p className="text-xs font-semibold uppercase tracking-wide text-accent">
                   Opção mensal
@@ -117,7 +130,10 @@ export default function PlanosPage() {
                   Assinar mensal
                 </TrackedCheckoutLink>
               </div>
+              ) : null}
 
+              {mostraPro ? (
+              <>
               <p className="mt-5 text-xs font-semibold uppercase tracking-wide text-muted">
                 Plano anual · melhor valor
               </p>
@@ -146,9 +162,13 @@ export default function PlanosPage() {
               >
                 Entrar no PRO anual
               </TrackedCheckoutLink>
+              </>
+              ) : null}
             </div>
           </article>
+          ) : null}
 
+          {mostraElite ? (
           <article className="relative flex flex-col rounded-2xl border-2 border-accent bg-card p-6 shadow-md">
             <span className="absolute right-5 top-5 rounded-full bg-accent px-3 py-1 text-xs font-semibold text-accent-foreground">
               Mais completo
@@ -209,6 +229,7 @@ export default function PlanosPage() {
               </p>
             </div>
           </article>
+          ) : null}
         </section>
 
         <p className="mx-auto mt-5 max-w-xl rounded-xl border border-accent/30 bg-accent/10 px-4 py-3 text-center text-sm font-medium">

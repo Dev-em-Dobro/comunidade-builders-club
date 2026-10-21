@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { aceitarGarantiaAction } from "@/actions/legal/aceitar-garantia";
 import { VERSAO_GARANTIA } from "@/lib/legal/garantia";
-import type { ClubOffer } from "@/lib/membership/checkout";
+import { vitrineMostra, type ClubOffer } from "@/lib/membership/checkout";
 
 function CheckIcon({ forte }: { forte?: boolean }) {
   return (
@@ -229,8 +229,20 @@ export function PlanCards({
   garantiaJaAceita: boolean;
 }) {
   const proAtual = currentPlan === "pro" || currentPlan === "elite";
+  const mostraPro = vitrineMostra("pro");
+  const mostraProMensal = vitrineMostra("proMensal");
+  const mostraElite = vitrineMostra("elite");
+  const colunas = Number(mostraPro) + Number(mostraProMensal) + Number(mostraElite);
+  const grade =
+    colunas <= 1
+      ? "mx-auto w-full max-w-xl"
+      : colunas === 2
+        ? "grid items-stretch gap-4 sm:grid-cols-2 sm:gap-5"
+        : "grid items-stretch gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3";
+
   return (
-    <div className="grid items-stretch gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
+    <div className={grade}>
+      {mostraPro ? (
       <OfferCard
         offer={offers.pro}
         cta="Quero o PRO"
@@ -238,6 +250,8 @@ export function PlanCards({
         loggedIn={loggedIn}
         garantiaJaAceita={garantiaJaAceita}
       />
+      ) : null}
+      {mostraProMensal ? (
       <OfferCard
         offer={offers.proMensal}
         cta="Assinar PRO mensal"
@@ -245,6 +259,8 @@ export function PlanCards({
         loggedIn={loggedIn}
         garantiaJaAceita={garantiaJaAceita}
       />
+      ) : null}
+      {mostraElite ? (
       <OfferCard
         offer={offers.elite}
         cta="Quero o Elite"
@@ -253,6 +269,7 @@ export function PlanCards({
         loggedIn={loggedIn}
         garantiaJaAceita={garantiaJaAceita}
       />
+      ) : null}
     </div>
   );
 }

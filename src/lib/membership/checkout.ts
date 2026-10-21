@@ -43,6 +43,23 @@ export type OfferId = "pro" | "elite";
 export type OfferBilling = "installments" | "monthly";
 
 /**
+ * F114 — o que `/planos` (e o layout antigo em `/planos-v2`) mostra.
+ *
+ * Chaves batem com `ofertasBuildersClub()`, não com `ClubOffer.id` (PRO à
+ * vista e PRO Mensal compartilham `id: "pro"`). Checkout Hubla, webhook e
+ * permissão **não** leem isto: só a vitrine. Para reabrir Mensal/PRO,
+ * inclua `"pro"` e `"proMensal"`.
+ */
+export type ChaveOfertaVitrine = "pro" | "proMensal" | "elite";
+export const PLANOS_VISIVEIS_NA_VITRINE: readonly ChaveOfertaVitrine[] = [
+  "elite",
+];
+
+export function vitrineMostra(chave: ChaveOfertaVitrine): boolean {
+  return PLANOS_VISIVEIS_NA_VITRINE.includes(chave);
+}
+
+/**
  * F093 — item de plano é **uma linha só**, que se explica sozinha.
  *
  * Era título curto + parágrafo de apoio: 12 itens viravam 24 blocos de texto
