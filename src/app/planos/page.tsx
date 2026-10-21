@@ -74,11 +74,8 @@ export default function PlanosPage() {
             {NOME_PRODUTO}
           </p>
           <h1 className="mt-3 font-[family-name:var(--font-outfit)] text-3xl font-bold tracking-tight md:text-5xl">
-            Escolha como quer entrar
-          </h1>
-          <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">
             Pare de brincar com IA, feche o primeiro cliente em 90 dias
-          </p>
+          </h1>
         </header>
 
         <section
