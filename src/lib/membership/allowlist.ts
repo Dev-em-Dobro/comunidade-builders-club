@@ -92,7 +92,13 @@ export async function addAllowedEmail(opts: {
       const tier = mesclarTierPago(m.tier, desejado);
       await prisma.membership.update({
         where: { userId: user.id },
-        data: { status: "active", tier },
+        data: {
+          status: "active",
+          tier,
+          ...(m.tier !== "elite" && tier === "elite" && opts.paidAt
+            ? { eliteStartedAt: opts.paidAt }
+            : {}),
+        },
       });
     }
   }

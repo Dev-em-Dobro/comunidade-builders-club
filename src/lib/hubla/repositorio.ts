@@ -223,6 +223,9 @@ export async function concederPago(
           tier: plan,
           role: "member",
           convertedToPaidAt: convertedAt,
+          ...(plan === "elite" && cobranca.cobradoEm
+            ? { eliteStartedAt: cobranca.cobradoEm }
+            : {}),
           ...dinheiro,
         },
       });
@@ -261,6 +264,9 @@ async function aplicarTierAposCorrida(
         status: "active",
         tier: nextTier,
         convertedToPaidAt: convertedAt,
+        ...(nextTier === "elite" && m.tier !== "elite" && cobranca.cobradoEm
+          ? { eliteStartedAt: cobranca.cobradoEm }
+          : {}),
         ...dinheiro,
       },
     });
@@ -271,6 +277,9 @@ async function aplicarTierAposCorrida(
         data: {
           status: "active",
           tier: nextTier,
+          ...(nextTier === "elite" && m.tier !== "elite" && cobranca.cobradoEm
+            ? { eliteStartedAt: cobranca.cobradoEm }
+            : {}),
           ...dinheiro,
         },
       });
@@ -284,6 +293,9 @@ async function aplicarTierAposCorrida(
     data: {
       status: "active",
       tier: nextTier,
+      ...(nextTier === "elite" && m.tier !== "elite" && cobranca.cobradoEm
+        ? { eliteStartedAt: cobranca.cobradoEm }
+        : {}),
       ...dinheiro,
     },
   });
