@@ -25,8 +25,12 @@ A partir de `md`: a pop-up volta a ser a modal **centrada** de
 (`max-w-lg`, `rounded-2xl`, `p-6` / `sm:p-7`, borda, sombra). Markup de
 referência: `presente-aula-popup.tsx` **antes** do merge #133 (`2c083b8`).
 
-Abaixo de `md`: **a mesma caixa** (não é sheet, não tem puxador) senta no
-**rodapé**. Teto de ~`50dvh`; o conteúdo rola dentro. A metade de cima da
+Abaixo de `md`: **a mesma caixa** (não é sheet, não tem puxador) cola no
+**rodapé** — largura total, `bottom` encostado, sem `p-4` nas laterais nem
+embaixo (`p-0`, `md:p-4`). Cantos de cima `rounded-t-2xl`, de baixo
+retos. Teto de ~`50dvh`; o conteúdo rola dentro. `padding-bottom` interno
+respeita `env(safe-area-inset-bottom)`. Se o aviso de cookies estiver
+visível, `--bc-consent-h` reserva a faixa dele. A metade de cima da
 página continua visível (título do artigo). Continua dismissible: Esc, X,
 clique no fundo, "Agora não". Delay, público (só anônimo) e o
 `GiftSignupForm` interno permanecem os da F078.
@@ -53,12 +57,14 @@ Sem coluna nova no banco.
 Safari privado / `sessionStorage` bloqueado: o lembrete não aparece, o
 cadastro e a origem seguem iguais.
 
-### 4. Overlay/fundo iguais aos de antes da F118
+### 4. Overlay/fundo: desktop igual; mobile sem blur e sem folga
 
-`bg-black/60`, `backdrop-blur-sm`, `p-4`, `overflow-y-auto`. Só o
-`z-index` sobe para `60` para a caixa ficar **acima** do aviso de cookies
-(`z-50`) e continuar clicável no mobile. O componente do aviso **não
-muda**. Sem `--bc-consent-h` na pop-up. Sem esconder o aviso.
+`bg-black/60` nos dois viewports. No `md+`: `backdrop-blur-sm` e `p-4`
+como antes da F118. Abaixo de `md`: `backdrop-blur-none` e `p-0` — o
+título do artigo precisa continuar legível, e a caixa cola nas bordas.
+`z-[60]` acima do aviso (`z-50`). O componente do aviso **não muda**.
+Sem esconder o aviso. `--bc-consent-h` só empurra a caixa no mobile
+enquanto o aviso existe.
 
 ### 5. Sem slide: fade de opacity na posição final
 
@@ -100,8 +106,8 @@ Sem migration. Sem env nova. Sem mudança em `GiftVisit`, `Membership` nem
 - [x] Spec antes do código
 - [x] `giftPublicPath` e show-once cobertos por teste (sem Prisma)
 - [ ] Em 1280px a pop-up é a modal centrada de antes da F118
-- [ ] Em 390px a mesma caixa está no rodapé, ≤ ~50dvh, metade de cima
-      do artigo visível; X e "Agora não" clicáveis
+- [ ] Em 390px a caixa cola nas bordas e no rodapé, ≤ ~50dvh, título
+      do artigo legível (sem blur); X e "Agora não" clicáveis
 - [ ] Sem botão "Ver meu presente" na pop-up (o CTA fica no lembrete)
 - [ ] Fade só de opacity; reduced-motion sem animação
 - [ ] Overlay/fundo iguais aos de antes (#133), z acima do aviso

@@ -49,6 +49,13 @@ export const POPUP_AULA = {
 export const POPUP_FADE_CLASS = "popup-aula-fade" as const;
 
 /**
+ * F118 — no mobile, padding-bottom lê `--bc-consent-h` (F086) quando o
+ * aviso está na tela. Mora em `globals.css`: utility Tailwind com
+ * `var(,)` não gera o padding. No `md+` não se aplica.
+ */
+export const POPUP_OVERLAY_CLASS = "popup-aula-overlay" as const;
+
+/**
  * O número vem do banco (decisão 4.1). Sem número — contagem falhou ou veio
  * zero — a copy perde força, mas não mente.
  */
