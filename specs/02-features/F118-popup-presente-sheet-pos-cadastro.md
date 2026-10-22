@@ -27,12 +27,13 @@ mais `sm:items-center`. Continua dismissible: Esc, X, clique no fundo,
 "Agora não". Delay, público (só anônimo) e o `GiftSignupForm` interno
 permanecem os da F078.
 
-### 2. CTA "Ver meu presente" aponta para o próprio Presente
+### 2. A sheet não tem CTA "Ver meu presente"
 
-O destino é a rota pública que a página já é: `/presentes/[slug]`
-(`giftPublicPath`). Na própria página, o botão fecha a sheet e rola até
-`#presente` — não abre outra URL nem o `linkUrl` externo. Cadastro genérico
-(`/cadastro`, slug `cadastro`) não tem este CTA.
+Quem abriu o link **já está** na página do presente. Um botão na sheet para
+rolar até o artigo era redundante e saiu. Fechar (X, Esc, fundo, "Agora
+não") revela o presente. O CTA "Ver meu presente" fica só no lembrete
+**pós-cadastro** (decisão 3), quando a pessoa já saiu da página pública e
+caiu na aula.
 
 ### 3. Depois do cadastro novo, um lembrete uma vez
 
@@ -66,12 +67,12 @@ gera esse padding.
 | Arquivo | Mudança |
 |---|---|
 | `src/lib/presentes/pos-cadastro.ts` | href, parse/encode, show-once |
-| `src/lib/presentes/popup-aula.ts` | copy do CTA "Ver meu presente" |
-| `src/app/presentes/presente-aula-popup.tsx` | sheet no rodapé + CTA |
+| `src/lib/presentes/popup-aula.ts` | copy da sheet (sem CTA do presente) |
+| `src/app/presentes/presente-aula-popup.tsx` | sheet no rodapé |
 | `src/components/gift-signup-form.tsx` | grava pending após conta nova |
 | `src/components/presente-pos-cadastro-popup.tsx` | modal do lembrete |
 | `src/components/app-shell-client.tsx` | monta o lembrete no app logado |
-| `src/app/presentes/presente-publico.tsx` | âncora, props, lembrete se logado |
+| `src/app/presentes/presente-publico.tsx` | props da sheet, lembrete se logado |
 
 Sem migration. Sem env nova. Sem mudança em `GiftVisit`, `Membership` nem
 `bastidoresCtaClick`.
@@ -88,7 +89,8 @@ Sem migration. Sem env nova. Sem mudança em `GiftVisit`, `Membership` nem
 - [x] Spec antes do código
 - [x] `giftPublicPath` e show-once cobertos por teste (sem Prisma)
 - [ ] Sheet abre no rodapé em 1280px e 390px, não no centro
-- [ ] "Ver meu presente" fecha a sheet e leva ao artigo do presente
+- [x] Sheet do Presente **não** tem botão "Ver meu presente" (o artigo já
+      está na página; o CTA fica no lembrete pós-cadastro)
 - [ ] Sheet continua fechável (Esc, X, fundo, "Agora não")
 - [ ] Conta nova vê o lembrete com o título quando houver
 - [ ] Lembrete não reaparece no page load seguinte da mesma sessão

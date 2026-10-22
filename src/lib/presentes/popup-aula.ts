@@ -38,8 +38,6 @@ export const POPUP_AULA = {
   eyebrow: "Aulas liberadas",
   promessa: PROMESSA_PRIMEIRO_CLIENTE,
   cta: "Quero assistir agora",
-  /** F118 — fecha a sheet e vai ao artigo do Presente nesta página. */
-  verPresente: "Ver meu presente",
   dispensar: "Agora não",
   fechar: "Fechar",
 } as const;

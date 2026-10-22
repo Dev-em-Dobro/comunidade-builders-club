@@ -21,7 +21,6 @@ import { PresenteAulaPopup } from "@/app/presentes/presente-aula-popup";
 import { PresentePosCadastroPopup } from "@/components/presente-pos-cadastro-popup";
 import { contarAulasGratuitas } from "@/lib/aulas";
 import { AULA_ABERTURA_HREF } from "@/lib/presentes/popup-aula";
-import { PRESENTE_ARTIGO_ID } from "@/lib/presentes/pos-cadastro";
 
 /** Âncora do CTA "Criar conta grátis" do bloco de promessa (F063). */
 const FORM_ANCHOR_ID = "criar-conta";
@@ -172,7 +171,7 @@ export async function PresentePublico({
          */}
         <PresenteImersaoCta utmContent={utm.content} />
 
-        <article id={PRESENTE_ARTIGO_ID} className="mt-8">
+        <article className="mt-8">
           {/*
            * F076 — a capa abre o artigo. Antes, `imageUrl` só saía no PostMedia
            * lá embaixo, depois do texto: o que era para ser capa chegava como
