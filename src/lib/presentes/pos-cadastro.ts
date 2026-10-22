@@ -10,8 +10,6 @@ import {
   sanitizeGiftSlug,
 } from "@/lib/gifts/origem";
 
-export const PRESENTE_ARTIGO_ID = "presente";
-
 export const POS_CADASTRO_PENDING_KEY = "bc_pos_cadastro_presente";
 export const POS_CADASTRO_SHOWN_KEY = "bc_pos_cadastro_presente_shown";
 

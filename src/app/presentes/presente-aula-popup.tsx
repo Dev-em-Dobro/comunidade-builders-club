@@ -9,15 +9,13 @@ import {
   subheadPopup,
   tituloPopup,
 } from "@/lib/presentes/popup-aula";
-import {
-  giftPublicPath,
-  PRESENTE_ARTIGO_ID,
-} from "@/lib/presentes/pos-cadastro";
 
 /**
  * F078 — pop-up da aula no Presente.
- * F118 — deixa de ser modal centrada: sheet no rodapé, nos dois viewports,
- * com CTA "Ver meu presente" para o artigo desta página.
+ * F118 — deixa de ser modal centrada: sheet no rodapé, nos dois viewports.
+ * O presente já está na página; a sheet não tem CTA para ele. Depois do
+ * cadastro, o lembrete (PresentePosCadastroPopup) é quem oferece ir ao
+ * presente.
  *
  * Abre `POPUP_DELAY_MS` depois que a página monta, só para quem não tem conta.
  * O e-mail é capturado aqui dentro pelo mesmo `GiftSignupForm` do rodapé — é ele
@@ -48,25 +46,12 @@ export function PresenteAulaPopup({
 }) {
   const [aberta, setAberta] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
-  const giftHref = giftPublicPath(giftSlug);
 
   /**
    * Fechar vale só para esta visita (F078 decisão 5). Nada é gravado no
    * navegador: abrir o Presente de novo é uma chance nova.
    */
   const fechar = useCallback(() => setAberta(false), []);
-
-  const verPresente = useCallback(() => {
-    fechar();
-    window.requestAnimationFrame(() => {
-      const artigo = document.getElementById(PRESENTE_ARTIGO_ID);
-      if (artigo) {
-        artigo.scrollIntoView({ behavior: "smooth", block: "start" });
-        return;
-      }
-      if (giftHref) window.location.assign(giftHref);
-    });
-  }, [fechar, giftHref]);
 
   /**
    * O timer roda uma vez, na montagem — fechar não reagenda. Navegar de um
@@ -148,17 +133,7 @@ export function PresenteAulaPopup({
             {POPUP_AULA.promessa}
           </p>
 
-          {giftHref ? (
-            <button
-              type="button"
-              onClick={verPresente}
-              className="btn-primary mt-5 w-full"
-            >
-              {POPUP_AULA.verPresente}
-            </button>
-          ) : null}
-
-          <div className="mt-4">
+          <div className="mt-5">
             <GiftSignupForm
               headline={POPUP_AULA.cta}
               subhead="Seu e-mail recebe um código de 6 dígitos. Você digita aqui mesmo e cai direto na primeira aula."
