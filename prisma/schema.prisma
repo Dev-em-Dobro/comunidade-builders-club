@@ -195,6 +195,8 @@ model AllowedEmail {
   /// Data do pagamento Hubla/TMB que gerou esta entrada. Usado no bootstrap
   /// para preencher convertedToPaidAt quando o usuário ainda não tinha conta.
   paidAt    DateTime? @map("paid_at")
+  /// F115 — pagamento confirmado da primeira compra Elite, separado da conversão.
+  eliteStartedAt DateTime? @map("elite_started_at")
   createdAt DateTime  @default(now())
 
   @@map("allowed_email")

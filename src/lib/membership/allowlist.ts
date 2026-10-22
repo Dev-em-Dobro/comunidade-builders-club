@@ -35,18 +35,19 @@ export async function tierPagoDoEmailAllowlist(
   return tierPagoDaNotaAllowlist(row?.note);
 }
 
-/** Dados da allowlist para o bootstrap: tier, data do pagamento e source. */
+/** Dados da allowlist para o bootstrap: conversão e compra Elite separadas. */
 export async function dadosPagosDoEmailAllowlist(
   email: string,
-): Promise<{ tier: TierPagoAllowlist; paidAt: Date | null; source: string | null }> {
+): Promise<{ tier: TierPagoAllowlist; paidAt: Date | null; source: string | null; eliteStartedAt: Date | null }> {
   const row = await prisma.allowedEmail.findUnique({
     where: { email: normalizarEmail(email) },
-    select: { note: true, paidAt: true, source: true },
+    select: { note: true, paidAt: true, source: true, eliteStartedAt: true },
   });
   return {
     tier: tierPagoDaNotaAllowlist(row?.note),
     paidAt: row?.paidAt ?? null,
     source: row?.source ?? null,
+    eliteStartedAt: row?.eliteStartedAt ?? null,
   };
 }
 
@@ -58,12 +59,13 @@ export async function addAllowedEmail(opts: {
   tier?: TierPagoAllowlist;
   /** Data do pagamento (para preencher convertedToPaidAt no bootstrap). */
   paidAt?: Date;
+  /** Data confirmada da compra Elite; nunca inferir do horário do webhook. */
+  eliteStartedAt?: Date;
 }) {
   const email = normalizarEmail(opts.email);
-
   const existing = await prisma.allowedEmail.findUnique({
     where: { email },
-    select: { paidAt: true },
+    select: { paidAt: true, eliteStartedAt: true, note: true },
   });
 
   const paidAtUpdate = buildUpdatePaidAt({ paidAt: opts.paidAt }, existing?.paidAt ?? null);
@@ -74,11 +76,16 @@ export async function addAllowedEmail(opts: {
       source: opts.source ?? "manual",
       note: opts.note ?? null,
       paidAt: opts.paidAt ?? null,
+      eliteStartedAt: opts.eliteStartedAt ?? null,
     },
     update: {
       ...(opts.source ? { source: opts.source } : {}),
       ...(opts.note !== undefined ? { note: opts.note } : {}),
       ...paidAtUpdate,
+      ...(opts.eliteStartedAt && !existing?.eliteStartedAt &&
+      (!existing || tierPagoDaNotaAllowlist(existing.note) !== "elite")
+        ? { eliteStartedAt: opts.eliteStartedAt }
+        : {}),
     },
   });
 
@@ -95,8 +102,8 @@ export async function addAllowedEmail(opts: {
         data: {
           status: "active",
           tier,
-          ...(m.tier !== "elite" && tier === "elite" && opts.paidAt
-            ? { eliteStartedAt: opts.paidAt }
+          ...(m.tier !== "elite" && !m.eliteStartedAt && tier === "elite" && opts.eliteStartedAt
+            ? { eliteStartedAt: opts.eliteStartedAt }
             : {}),
         },
       });

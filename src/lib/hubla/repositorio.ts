@@ -223,8 +223,8 @@ export async function concederPago(
           tier: plan,
           role: "member",
           convertedToPaidAt: convertedAt,
-          ...(plan === "elite" && cobranca.cobradoEm
-            ? { eliteStartedAt: cobranca.cobradoEm }
+          ...(plan === "elite" && cobranca.pagoEm
+            ? { eliteStartedAt: cobranca.pagoEm }
             : {}),
           ...dinheiro,
         },
@@ -234,22 +234,23 @@ export async function concederPago(
       if ((e as { code?: string }).code === "P2002") {
         const existing = await prisma.membership.findUnique({ where: { userId: user.id } });
         if (existing) {
-          return aplicarTierAposCorrida(user.id, existing, plan, convertedAt, dinheiro);
+          return aplicarTierAposCorrida(user.id, existing, plan, convertedAt, dinheiro, cobranca.pagoEm);
         }
       }
       throw e;
     }
   }
 
-  return aplicarTierAposCorrida(user.id, m, plan, convertedAt, dinheiro);
+  return aplicarTierAposCorrida(user.id, m, plan, convertedAt, dinheiro, cobranca.pagoEm);
 }
 
 async function aplicarTierAposCorrida(
   userId: string,
-  existing: { id: string; tier: MembershipTier; convertedToPaidAt: Date | null },
+  existing: { id: string; tier: MembershipTier; convertedToPaidAt: Date | null; eliteStartedAt: Date | null },
   plan: PlanoPagoHubla,
   convertedAt: Date,
   dinheiro: ReturnType<typeof dadosCobrancaMembership>,
+  elitePaidAt: Date | null,
 ): Promise<ResultadoConcessao> {
   const eraGratuito = !isPago(existing.tier);
   const nextTier = calcularProximoTier(existing.tier, plan);
@@ -264,8 +265,8 @@ async function aplicarTierAposCorrida(
         status: "active",
         tier: nextTier,
         convertedToPaidAt: convertedAt,
-        ...(nextTier === "elite" && m.tier !== "elite" && cobranca.cobradoEm
-          ? { eliteStartedAt: cobranca.cobradoEm }
+        ...(nextTier === "elite" && existing.tier !== "elite" && !existing.eliteStartedAt && elitePaidAt
+          ? { eliteStartedAt: elitePaidAt }
           : {}),
         ...dinheiro,
       },
@@ -277,8 +278,8 @@ async function aplicarTierAposCorrida(
         data: {
           status: "active",
           tier: nextTier,
-          ...(nextTier === "elite" && m.tier !== "elite" && cobranca.cobradoEm
-            ? { eliteStartedAt: cobranca.cobradoEm }
+          ...(nextTier === "elite" && existing.tier !== "elite" && !existing.eliteStartedAt && elitePaidAt
+            ? { eliteStartedAt: elitePaidAt }
             : {}),
           ...dinheiro,
         },
@@ -293,8 +294,8 @@ async function aplicarTierAposCorrida(
     data: {
       status: "active",
       tier: nextTier,
-      ...(nextTier === "elite" && m.tier !== "elite" && cobranca.cobradoEm
-        ? { eliteStartedAt: cobranca.cobradoEm }
+      ...(nextTier === "elite" && existing.tier !== "elite" && !existing.eliteStartedAt && elitePaidAt
+        ? { eliteStartedAt: elitePaidAt }
         : {}),
       ...dinheiro,
     },
@@ -355,6 +356,7 @@ export async function aplicarAcaoAllowlist(
         : `product:${acao.productId}; plan=${acao.plan}`,
       tier: acao.plan,
       paidAt,
+      eliteStartedAt: acao.plan === "elite" ? acao.cobranca.pagoEm ?? undefined : undefined,
     });
     return resultado;
   }

@@ -107,11 +107,13 @@ async function resolverBootstrap(
   let tierAllowlist: TierPagoAllowlist = "pro";
   let paidAtAllowlist: Date | null = null;
   let sourceAllowlist: string | null = null;
+  let eliteStartedAtAllowlist: Date | null = null;
   if (allowed && !isBootstrapAdmin) {
     const dados = await dadosPagosDoEmailAllowlist(email);
     tierAllowlist = dados.tier;
     paidAtAllowlist = dados.paidAt;
     sourceAllowlist = dados.source;
+    eliteStartedAtAllowlist = dados.eliteStartedAt;
   }
 
   let nextProfile = profile;
@@ -149,8 +151,8 @@ async function resolverBootstrap(
             }
           : {}),
         ...(marcarConversao ? { convertedToPaidAt: paidAtAllowlist } : {}),
-        ...(tierAllowlist === "elite" && paidAtAllowlist
-          ? { eliteStartedAt: paidAtAllowlist }
+        ...(tierAllowlist === "elite" && eliteStartedAtAllowlist
+          ? { eliteStartedAt: eliteStartedAtAllowlist }
           : {}),
       },
     });
@@ -175,8 +177,8 @@ async function resolverBootstrap(
         status: "active",
         tier: isBootstrapAdmin ? "elite" : allowed ? tierAllowlist : "free",
         ...(isBootstrapAdmin ? { role: "admin" as const } : {}),
-        ...(tierAllowlist === "elite" && paidAtAllowlist
-          ? { eliteStartedAt: paidAtAllowlist }
+        ...(tierAllowlist === "elite" && eliteStartedAtAllowlist
+          ? { eliteStartedAt: eliteStartedAtAllowlist }
           : {}),
       },
     });
