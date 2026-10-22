@@ -18,6 +18,7 @@ import { GIFT_UTM_DEFAULTS, sanitizeUtmValue } from "@/lib/gifts/origem";
 import { PresentePromessa } from "@/app/presentes/presente-promessa";
 import { PresenteImersaoCta } from "@/app/presentes/presente-imersao-cta";
 import { PresenteAulaPopup } from "@/app/presentes/presente-aula-popup";
+import { PresenteBlackInfinitaFaixa } from "@/app/presentes/presente-black-infinita-faixa";
 import { PresentePosCadastroPopup } from "@/components/presente-pos-cadastro-popup";
 import { contarAulasGratuitas } from "@/lib/aulas";
 import { AULA_ABERTURA_HREF } from "@/lib/presentes/popup-aula";
@@ -131,10 +132,16 @@ export async function PresentePublico({
   const showBody = link ? link.showBody : gift.body.trim().length > 0;
 
   return (
-    <div className="relative min-h-dvh px-4 py-10">
-      <div className="absolute right-4 top-4 z-10">
-        <ThemeToggle variant="icon" />
-      </div>
+    <div className="relative min-h-dvh">
+      {/*
+       * F119 — faixa da Black só para anônimo. No fluxo do topo, sem
+       * z-index: não tapa o artigo nem briga com a pop-up / cookies.
+       */}
+      {!user ? <PresenteBlackInfinitaFaixa /> : null}
+      <div className="relative px-4 py-10">
+        <div className="absolute right-4 top-4 z-10">
+          <ThemeToggle variant="icon" />
+        </div>
       {/* F060 — presente é leitura pública: mesma coluna e escala do post. */}
       <main className="reading-wrap">
         <p className="font-[family-name:var(--font-outfit)] text-sm font-semibold uppercase tracking-[0.12em] text-accent">
@@ -235,6 +242,7 @@ export async function PresentePublico({
           </div>
         ) : null}
       </main>
+      </div>
 
       {/*
        * F078 / F118 — pop-up da aula (centrada no md+, rodapé abaixo).
