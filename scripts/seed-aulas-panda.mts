@@ -1,5 +1,5 @@
 /**
- * F050 / F051 / F103 / F107 / F110 / F111 / F112 / F113 — Seed dos módulos (jornada Fase 1–2,
+ * F050 / F051 / F103 / F107 / F110 / F111 / F112 / F113 / F116 — Seed dos módulos (jornada Fase 1–2,
  * n8n, IA, Fundamentos, lives, Grok Bots, JEV, Codex, Claude Code).
  *
  *   npm run db:seed:aulas-panda -- --target=hml
@@ -902,12 +902,32 @@ Nesta live a gente abre o modelo: o que entra no pacote, como explicar o valor s
     ],
   },
   {
+    // F116 — módulo + aula. Pago. Capa própria. sortOrder 16: antes do JEV.
+    slug: "criando-um-site-premium",
+    title: "Criando um site premium",
+    description:
+      "Projeto guiado: site premium de relógio com animação no scroll e vídeo 3D.",
+    coverImageUrl: "/9-site-premium.png",
+    sortOrder: 16,
+    forceLessonSort: true,
+    lessons: [
+      {
+        slug: "criando-um-site-premium",
+        title: "Criando um site premium",
+        description:
+          "Nesta aula você monta um site premium de relógio com animação no scroll e vídeo 3D: do mockup à página no navegador, controlando o filme pela rolagem.\n\nO guia passo a passo traz as etapas, os prompts para copiar e o que conferir antes de cada geração paga. O ZIP tem o site pronto para abrir e estudar.\n\n## Materiais\n- [Baixar guia passo a passo (PDF)](/materiais/guia-passo-a-passo-aluno.pdf)\n- [Baixar o site pronto (ZIP)](https://drive.google.com/uc?export=download&id=16N--KGFcfjbIYqKbO1nG4lOIIBpD24hX)",
+        pandaVideoExternalId: "15e6afe9-633e-4d15-b960-e81a426a4402",
+        sortOrder: 0,
+      },
+    ],
+  },
+  {
     // F107 — JEV na prática. Pago (freeAccess default false). Aulas entram depois.
     slug: "jev-aplicado-ao-mundo-real",
     title: "JEV aplicado ao mundo real",
     description:
       "JEV fora da teoria: como aplicar no dia a dia do builder — prospecção, entrega e operação com IA.",
-    sortOrder: 16,
+    sortOrder: 17,
     lessons: [],
   },
   {
