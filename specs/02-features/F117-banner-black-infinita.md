@@ -20,4 +20,4 @@ Campanha Black Friday 2026. A Curseduca recebe uma arte configurada pela operaç
 - [x] Desktop e 320 px mantêm texto, data e CTA legíveis sem corte ou rolagem horizontal (prévia local).
 - [x] Leitor de tela recebe o conteúdo textual e foco de teclado fica visível.
 - [x] Fora da janela da Black, o topo volta à faixa anterior (teste automatizado).
-- [ ] Preview validado e evidência anexada à tarefa antes de concluir a implementação.
+- [x] HML validado com contas paga e Free; evidências anexadas à tarefa.
