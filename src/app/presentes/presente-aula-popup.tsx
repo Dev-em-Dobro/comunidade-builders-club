@@ -7,6 +7,7 @@ import {
   POPUP_AULA,
   POPUP_DELAY_MS,
   POPUP_FADE_CLASS,
+  POPUP_OVERLAY_CLASS,
   subheadPopup,
   tituloPopup,
 } from "@/lib/presentes/popup-aula";
@@ -31,9 +32,10 @@ import {
  * Fechar não é lembrado (decisão 5 da F078): cada visita ao Presente é uma
  * chance nova.
  *
- * Overlay/fundo: o mesmo de antes da F118 (`bg-black/60`, blur, `p-4`).
- * `z-[60]` só para ficar acima do aviso de cookies (`z-50`) e continuar
- * clicável no mobile. O aviso não é escondido nem empurrado.
+ * Overlay/fundo no `md+`: o mesmo de antes da F118 (`bg-black/60`, blur,
+ * `p-4`). Abaixo de `md`: sem blur, `p-0`, caixa colada nas bordas e no
+ * rodapé. `z-[60]` acima do aviso de cookies (`z-50`). Se o aviso estiver
+ * visível, `--bc-consent-h` reserva a faixa dele.
  *
  * Entrada: fade de opacity na posição final (centro no desktop, rodapé no
  * mobile). `prefers-reduced-motion` corta a animação.
@@ -93,7 +95,7 @@ export function PresenteAulaPopup({
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-end justify-center overflow-y-auto bg-black/60 p-4 backdrop-blur-sm md:items-center"
+      className={`${POPUP_OVERLAY_CLASS} fixed inset-0 z-[60] flex items-end justify-center overflow-y-auto bg-black/60 p-0 backdrop-blur-none md:items-center md:p-4 md:backdrop-blur-sm`}
       onClick={(e) => {
         if (e.target === e.currentTarget) fechar();
       }}
@@ -104,7 +106,7 @@ export function PresenteAulaPopup({
         aria-modal="true"
         aria-labelledby="popup-aula-titulo"
         tabIndex={-1}
-        className={`${POPUP_FADE_CLASS} relative my-0 flex w-full max-w-lg flex-col rounded-2xl border border-border/80 bg-card p-6 shadow-2xl outline-none max-md:max-h-[50dvh] md:my-auto sm:p-7`}
+        className={`${POPUP_FADE_CLASS} relative my-0 flex w-full max-w-lg flex-col rounded-t-2xl rounded-b-none border border-border/80 bg-card p-6 shadow-2xl outline-none max-md:max-h-[50dvh] max-md:max-w-none md:my-auto md:rounded-2xl sm:p-7`}
       >
         <button
           type="button"

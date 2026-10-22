@@ -366,6 +366,21 @@
   animation: popupAulaFade 0.2s ease-out both;
 }
 
+/*
+ * F118 — abaixo de `md` a caixa cola no rodapé. `--bc-consent-h` (F086)
+ * só existe enquanto o aviso está visível; sem ele o padding é zero.
+ * `padding-bottom` do diálogo reserva o safe-area. Fora de @layer:
+ * utility com `var(,)` não gera esse padding.
+ */
+@media (max-width: 767px) {
+  .popup-aula-overlay {
+    padding-bottom: var(--bc-consent-h, 0px);
+  }
+  .popup-aula-overlay > [role="dialog"] {
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+  }
+}
+
 @keyframes popupAulaFade {
   from {
     opacity: 0;

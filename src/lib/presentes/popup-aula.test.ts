@@ -5,6 +5,7 @@ import {
   AULA_ABERTURA_HREF,
   POPUP_DELAY_MS,
   POPUP_FADE_CLASS,
+  POPUP_OVERLAY_CLASS,
   subheadPopup,
   tituloPopup,
 } from "./popup-aula";
@@ -61,16 +62,20 @@ describe("layout da pop-up (F118)", () => {
     assert.doesNotMatch(jsx, /sm:items-center/);
   });
 
-  it("mantém o fundo de antes da F118 e só sobe o z para cobrir o aviso", () => {
+  it("no mobile cola nas bordas, sem blur; no desktop o overlay de sempre", () => {
     assert.match(jsx, /bg-black\/60/);
-    assert.match(jsx, /backdrop-blur-sm/);
+    assert.match(jsx, /backdrop-blur-none/);
+    assert.match(jsx, /md:backdrop-blur-sm/);
     assert.match(jsx, /z-\[60\]/);
     assert.match(jsx, /overflow-y-auto/);
-    assert.match(jsx, /\bp-4\b/);
+    assert.match(jsx, /\bp-0\b/);
+    assert.match(jsx, /md:p-4/);
+    assert.match(jsx, /rounded-t-2xl/);
+    assert.match(jsx, /rounded-b-none/);
+    assert.match(jsx, /md:rounded-2xl/);
   });
 
   it("é a mesma caixa (sem puxador de sheet) e some o CTA Ver meu presente", () => {
-    assert.match(jsx, /rounded-2xl/);
     assert.match(jsx, /max-w-lg/);
     assert.doesNotMatch(jsx, /h-1\.5 w-10/);
     assert.doesNotMatch(jsx, /Ver meu presente/);
@@ -99,8 +104,12 @@ describe("layout da pop-up (F118)", () => {
   it("não mexe no componente do aviso de cookies", () => {
     assert.doesNotMatch(banner, /data-presente-sheet/);
     assert.doesNotMatch(banner, /className="cookie-consent /);
-    assert.doesNotMatch(popup, /--bc-consent-h/);
-    assert.doesNotMatch(jsx, /--bc-consent-h/);
+    assert.equal(POPUP_OVERLAY_CLASS, "popup-aula-overlay");
+    assert.match(
+      css,
+      /@media \(max-width: 767px\)[\s\S]*padding-bottom:\s*var\(--bc-consent-h/,
+    );
+    assert.match(css, /env\(safe-area-inset-bottom\)/);
   });
 });
 
