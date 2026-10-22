@@ -46,9 +46,8 @@ describe("destino do cadastro pela modal (F078)", () => {
 });
 
 describe("sheet acima do aviso de cookies (F118)", () => {
-  it("reserva a altura publicada pelo banner, com fallback zero", () => {
-    assert.equal(SHEET_CONSENT_OFFSET, "pb-[var(--bc-consent-h,0px)]");
-    assert.match(SHEET_CONSENT_OFFSET, /--bc-consent-h/);
+  it("usa a classe CSS que lê --bc-consent-h, não uma utility Tailwind", () => {
+    assert.equal(SHEET_CONSENT_OFFSET, "presente-sheet-overlay");
   });
 });
 

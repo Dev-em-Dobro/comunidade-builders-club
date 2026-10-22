@@ -105,7 +105,7 @@ export function PresenteAulaPopup({
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-end justify-center bg-black/50 pb-[var(--bc-consent-h,0px)]"
+      className="presente-sheet-overlay fixed inset-0 z-[60] flex items-end justify-center bg-black/50"
       onClick={(e) => {
         if (e.target === e.currentTarget) fechar();
       }}
@@ -116,63 +116,65 @@ export function PresenteAulaPopup({
         aria-modal="true"
         aria-labelledby="popup-aula-titulo"
         tabIndex={-1}
-        className="sheet-slide-up relative w-full max-w-lg rounded-t-2xl border border-border/80 border-b-0 bg-card px-5 pt-4 shadow-2xl outline-none animate-[slideUpSheet_0.28s_ease-out] sm:px-6 max-h-[min(72dvh,36rem,calc(100dvh-var(--bc-consent-h,0px)))] overflow-y-auto pb-[max(1rem,env(safe-area-inset-bottom))]"
+        className="sheet-slide-up relative flex w-full max-w-lg flex-col overflow-hidden rounded-t-2xl border border-border/80 border-b-0 bg-card shadow-2xl outline-none animate-[slideUpSheet_0.28s_ease-out]"
       >
-        <div
-          className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-border"
-          aria-hidden
-        />
-        <button
-          type="button"
-          onClick={() => fechar()}
-          aria-label={POPUP_AULA.fechar}
-          className="absolute right-3 top-3 rounded-lg px-2 py-1 text-lg leading-none text-muted transition hover:bg-surface hover:text-foreground"
-        >
-          ×
-        </button>
-
-        <p className="font-[family-name:var(--font-outfit)] text-xs font-semibold uppercase tracking-[0.12em] text-accent">
-          {POPUP_AULA.eyebrow}
-        </p>
-        <h2
-          id="popup-aula-titulo"
-          className="mt-2 pr-6 font-[family-name:var(--font-outfit)] text-lg font-bold leading-snug tracking-tight sm:text-xl"
-        >
-          {tituloPopup(totalAulas)}
-        </h2>
-        <p className="mt-2 text-sm leading-relaxed text-muted">
-          {subheadPopup(totalAulas)}
-        </p>
-        <p className="mt-2 font-[family-name:var(--font-outfit)] text-sm font-semibold">
-          {POPUP_AULA.promessa}
-        </p>
-
-        {giftHref ? (
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 pt-4 sm:px-6">
+          <div
+            className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-border"
+            aria-hidden
+          />
           <button
             type="button"
-            onClick={verPresente}
-            className="btn-primary mt-5 w-full"
+            onClick={() => fechar()}
+            aria-label={POPUP_AULA.fechar}
+            className="absolute right-3 top-3 rounded-lg px-2 py-1 text-lg leading-none text-muted transition hover:bg-surface hover:text-foreground"
           >
-            {POPUP_AULA.verPresente}
+            ×
           </button>
-        ) : null}
 
-        <div className="mt-4">
-          <GiftSignupForm
-            headline={POPUP_AULA.cta}
-            subhead="Seu e-mail recebe um código de 6 dígitos. Você digita aqui mesmo e cai direto na primeira aula."
-            redirectTo={AULA_ABERTURA_HREF}
-            formId="cadastro-presente-popup"
-            pedirNome={false}
-            giftSlug={giftSlug}
-            giftTitle={giftTitle}
-          />
+          <p className="font-[family-name:var(--font-outfit)] text-xs font-semibold uppercase tracking-[0.12em] text-accent">
+            {POPUP_AULA.eyebrow}
+          </p>
+          <h2
+            id="popup-aula-titulo"
+            className="mt-2 pr-6 font-[family-name:var(--font-outfit)] text-lg font-bold leading-snug tracking-tight sm:text-xl"
+          >
+            {tituloPopup(totalAulas)}
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-muted">
+            {subheadPopup(totalAulas)}
+          </p>
+          <p className="mt-2 font-[family-name:var(--font-outfit)] text-sm font-semibold">
+            {POPUP_AULA.promessa}
+          </p>
+
+          {giftHref ? (
+            <button
+              type="button"
+              onClick={verPresente}
+              className="btn-primary mt-5 w-full"
+            >
+              {POPUP_AULA.verPresente}
+            </button>
+          ) : null}
+
+          <div className="mt-4">
+            <GiftSignupForm
+              headline={POPUP_AULA.cta}
+              subhead="Seu e-mail recebe um código de 6 dígitos. Você digita aqui mesmo e cai direto na primeira aula."
+              redirectTo={AULA_ABERTURA_HREF}
+              formId="cadastro-presente-popup"
+              pedirNome={false}
+              giftSlug={giftSlug}
+              giftTitle={giftTitle}
+            />
+          </div>
         </div>
 
         <button
           type="button"
           onClick={() => fechar()}
-          className="btn-ghost mt-2 w-full text-xs"
+          className="btn-ghost w-full shrink-0 px-5 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 text-xs"
         >
           {POPUP_AULA.dispensar}
         </button>

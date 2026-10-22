@@ -270,6 +270,20 @@
   }
 
   /*
+   * F118 — a sheet do Presente senta no mesmo rodapé do aviso de cookies.
+   * `--bc-consent-h` já é publicado pelo banner (F086). Utility Tailwind
+   * com vírgula no `var()` não gera o padding; a classe mora aqui, como
+   * o `.auth-painel`. Sem o aviso, a variável some e o padding é zero.
+   */
+  .presente-sheet-overlay {
+    padding-bottom: var(--bc-consent-h, 0px);
+    overflow: hidden;
+  }
+  .presente-sheet-overlay > [role="dialog"] {
+    max-height: min(72dvh, 36rem, calc(100dvh - var(--bc-consent-h, 0px)));
+  }
+
+  /*
    * F086 — entrada das telas de login e cadastro (ver `auth-split-layout`).
    * O atraso de cada elemento vai no componente, via `[animation-delay:*]`.
    */

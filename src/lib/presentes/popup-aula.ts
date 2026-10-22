@@ -45,12 +45,10 @@ export const POPUP_AULA = {
 } as const;
 
 /**
- * F118 — reserva a altura do aviso de cookies (F086 / `--bc-consent-h`)
- * para a sheet não ficar embaixo do banner. Sem o aviso, a variável some e
- * o padding é zero.
+ * F118 — classe do overlay que reserva `--bc-consent-h` (F086). Mora em
+ * `globals.css`: utility Tailwind com vírgula no `var()` não gera o padding.
  */
-export const SHEET_CONSENT_OFFSET =
-  "pb-[var(--bc-consent-h,0px)]" as const;
+export const SHEET_CONSENT_OFFSET = "presente-sheet-overlay" as const;
 
 /**
  * O número vem do banco (decisão 4.1). Sem número — contagem falhou ou veio
