@@ -2,7 +2,13 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { readFileSync } from "node:fs";
 import {
+  serializarConsentimento,
+  CONSENTIMENTO_ANALYTICS_EVENT,
+} from "@/lib/consentimento";
+import {
   AULA_ABERTURA_HREF,
+  aguardarConsentimentoParaPopup,
+  deveAbrirPopupAula,
   POPUP_DELAY_MS,
   POPUP_FADE_CLASS,
   POPUP_OVERLAY_CLASS,
@@ -101,15 +107,104 @@ describe("layout da pop-up (F118)", () => {
     assert.doesNotMatch(css, /presente-sheet-overlay/);
   });
 
-  it("não mexe no componente do aviso de cookies", () => {
+  it("não mexe no componente do aviso de cookies e não usa --bc-consent-h", () => {
     assert.doesNotMatch(banner, /data-presente-sheet/);
     assert.doesNotMatch(banner, /className="cookie-consent /);
     assert.equal(POPUP_OVERLAY_CLASS, "popup-aula-overlay");
-    assert.match(
-      css,
-      /@media \(max-width: 767px\)[\s\S]*padding-bottom:\s*var\(--bc-consent-h/,
-    );
+    const overlayCss =
+      css.split(".popup-aula-overlay")[1]?.split("@keyframes")[0] ?? "";
+    assert.doesNotMatch(overlayCss, /--bc-consent-h/);
     assert.match(css, /env\(safe-area-inset-bottom\)/);
+    assert.match(popup, /aguardarConsentimentoParaPopup/);
+  });
+});
+
+describe("pop-up espera o aviso de cookies (F118)", () => {
+  function harness(cookieInicial: string | undefined) {
+    let cookie = cookieInicial;
+    let abriu = false;
+    const listeners = new Set<() => void>();
+    const intervals = new Map<number, () => void>();
+    let nextId = 1;
+    const parar = aguardarConsentimentoParaPopup({
+      lerCookie: () => cookie,
+      onLiberado: () => {
+        abriu = true;
+      },
+      addEventListener: (_type, listener) => {
+        listeners.add(listener);
+      },
+      removeEventListener: (_type, listener) => {
+        listeners.delete(listener);
+      },
+      setInterval: (fn) => {
+        const id = nextId++;
+        intervals.set(id, fn);
+        return id;
+      },
+      clearInterval: (id) => {
+        intervals.delete(id);
+      },
+    });
+    return {
+      get abriu() {
+        return abriu;
+      },
+      get polling() {
+        return intervals.size > 0;
+      },
+      escolher(decisao: "aceito" | "recusado") {
+        cookie = serializarConsentimento(decisao);
+      },
+      dispararEvento() {
+        for (const fn of listeners) fn();
+      },
+      tick() {
+        for (const fn of intervals.values()) fn();
+      },
+      parar,
+    };
+  }
+
+  it("não abre enquanto o consentimento está pendente", () => {
+    assert.equal(deveAbrirPopupAula(undefined), false);
+    assert.equal(deveAbrirPopupAula(null), false);
+    assert.equal(deveAbrirPopupAula(""), false);
+    const h = harness(undefined);
+    assert.equal(h.abriu, false);
+    h.tick();
+    assert.equal(h.abriu, false);
+    assert.equal(h.polling, true);
+    h.parar();
+  });
+
+  it("abre depois da escolha (aceite ou recusa)", () => {
+    const aceite = harness(undefined);
+    aceite.escolher("aceito");
+    aceite.dispararEvento();
+    assert.equal(aceite.abriu, true);
+    assert.equal(aceite.polling, false);
+
+    const recusa = harness(undefined);
+    recusa.escolher("recusado");
+    recusa.tick();
+    assert.equal(recusa.abriu, true);
+    assert.equal(recusa.polling, false);
+  });
+
+  it("abre na hora se o consentimento já existe", () => {
+    assert.equal(deveAbrirPopupAula(serializarConsentimento("aceito")), true);
+    assert.equal(deveAbrirPopupAula(serializarConsentimento("recusado")), true);
+    const aceite = harness(serializarConsentimento("aceito"));
+    assert.equal(aceite.abriu, true);
+    assert.equal(aceite.polling, false);
+    const recusa = harness(serializarConsentimento("recusado"));
+    assert.equal(recusa.abriu, true);
+    assert.equal(recusa.polling, false);
+  });
+
+  it("o aceite usa o evento já existente do aviso", () => {
+    assert.equal(CONSENTIMENTO_ANALYTICS_EVENT, "bc-consent-analytics");
   });
 });
 

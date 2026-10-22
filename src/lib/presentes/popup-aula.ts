@@ -1,4 +1,9 @@
 import { AULAS_FREE_HREF } from "@/lib/aulas/access";
+import {
+  CONSENTIMENTO_ANALYTICS_EVENT,
+  COOKIE_CONSENTIMENTO,
+  precisaDecidir,
+} from "@/lib/consentimento";
 import { PROMESSA_PRIMEIRO_CLIENTE } from "@/lib/membership/checkout";
 
 /**
@@ -49,11 +54,80 @@ export const POPUP_AULA = {
 export const POPUP_FADE_CLASS = "popup-aula-fade" as const;
 
 /**
- * F118 — no mobile, padding-bottom lê `--bc-consent-h` (F086) quando o
- * aviso está na tela. Mora em `globals.css`: utility Tailwind com
- * `var(,)` não gera o padding. No `md+` não se aplica.
+ * F118 — no mobile, o overlay não reserva `--bc-consent-h`: a pop-up só
+ * abre depois da decisão de cookies, então cola no rodapé. A classe
+ * ainda ancora o `safe-area` em `globals.css`.
  */
 export const POPUP_OVERLAY_CLASS = "popup-aula-overlay" as const;
+
+/** Mesma fonte do aviso: cookie `bc_consent` + `precisaDecidir` (F057). */
+export function valorCookie(
+  documentCookie: string,
+  nome: string,
+): string | undefined {
+  const alvo = `${nome}=`;
+  for (const parte of documentCookie.split("; ")) {
+    if (parte.startsWith(alvo)) {
+      return decodeURIComponent(parte.slice(alvo.length));
+    }
+  }
+  return undefined;
+}
+
+export function cookieConsentimentoAtual(
+  documentCookie: string,
+): string | undefined {
+  return valorCookie(documentCookie, COOKIE_CONSENTIMENTO);
+}
+
+/**
+ * Pendente = aviso na tela = pop-up fechada. Aceito ou recusado = abre.
+ * Versão antiga do cookie conta como pendente (F057).
+ */
+export function deveAbrirPopupAula(
+  consentCookie: string | null | undefined,
+): boolean {
+  return !precisaDecidir(consentCookie);
+}
+
+const POLL_CONSENTIMENTO_MS = 200;
+
+/**
+ * Aceite dispara `CONSENTIMENTO_ANALYTICS_EVENT`; recusa só grava o
+ * cookie. O poll cobre a recusa sem mexer em `cookie-consent.tsx`.
+ */
+export function aguardarConsentimentoParaPopup(opts: {
+  lerCookie: () => string | undefined;
+  onLiberado: () => void;
+  addEventListener: (type: string, listener: () => void) => void;
+  removeEventListener: (type: string, listener: () => void) => void;
+  setInterval: (fn: () => void, ms: number) => number;
+  clearInterval: (id: number) => void;
+}): () => void {
+  let encerrado = false;
+  let intervalId: number | undefined;
+
+  const tentar = () => {
+    if (encerrado) return;
+    if (!deveAbrirPopupAula(opts.lerCookie())) return;
+    encerrado = true;
+    if (intervalId !== undefined) opts.clearInterval(intervalId);
+    opts.removeEventListener(CONSENTIMENTO_ANALYTICS_EVENT, tentar);
+    opts.onLiberado();
+  };
+
+  opts.addEventListener(CONSENTIMENTO_ANALYTICS_EVENT, tentar);
+  tentar();
+  if (!encerrado) {
+    intervalId = opts.setInterval(tentar, POLL_CONSENTIMENTO_MS);
+  }
+
+  return () => {
+    encerrado = true;
+    if (intervalId !== undefined) opts.clearInterval(intervalId);
+    opts.removeEventListener(CONSENTIMENTO_ANALYTICS_EVENT, tentar);
+  };
+}
 
 /**
  * O número vem do banco (decisão 4.1). Sem número — contagem falhou ou veio

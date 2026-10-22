@@ -29,11 +29,14 @@ Abaixo de `md`: **a mesma caixa** (não é sheet, não tem puxador) cola no
 **rodapé** — largura total, `bottom` encostado, sem `p-4` nas laterais nem
 embaixo (`p-0`, `md:p-4`). Cantos de cima `rounded-t-2xl`, de baixo
 retos. Teto de ~`50dvh`; o conteúdo rola dentro. `padding-bottom` interno
-respeita `env(safe-area-inset-bottom)`. Se o aviso de cookies estiver
-visível, `--bc-consent-h` reserva a faixa dele. A metade de cima da
-página continua visível (título do artigo). Continua dismissible: Esc, X,
-clique no fundo, "Agora não". Delay, público (só anônimo) e o
-`GiftSignupForm` interno permanecem os da F078.
+respeita `env(safe-area-inset-bottom)`. A pop-up **não abre** enquanto
+o aviso de cookies está na tela — só depois de aceitar ou recusar, ou
+na hora se a decisão já estava no cookie `bc_consent` (mesma fonte do
+`cookie-consent.tsx`). No mobile cola em `bottom-0`; sem
+`--bc-consent-h`. A metade de cima da página continua visível (título
+do artigo). Continua dismissible: Esc, X, clique no fundo, "Agora não".
+Delay, público (só anônimo) e o `GiftSignupForm` interno permanecem os
+da F078.
 
 ### 2. A pop-up não tem CTA "Ver meu presente"
 
@@ -62,9 +65,8 @@ cadastro e a origem seguem iguais.
 `bg-black/60` nos dois viewports. No `md+`: `backdrop-blur-sm` e `p-4`
 como antes da F118. Abaixo de `md`: `backdrop-blur-none` e `p-0` — o
 título do artigo precisa continuar legível, e a caixa cola nas bordas.
-`z-[60]` acima do aviso (`z-50`). O componente do aviso **não muda**.
-Sem esconder o aviso. `--bc-consent-h` só empurra a caixa no mobile
-enquanto o aviso existe.
+O componente do aviso **não muda**. A pop-up espera a decisão (cookie
+`bc_consent` / evento de aceite). Sem `--bc-consent-h` no overlay.
 
 ### 5. Sem slide: fade de opacity na posição final
 
@@ -99,7 +101,8 @@ Sem migration. Sem env nova. Sem mudança em `GiftVisit`, `Membership` nem
 - Persistir o lembrete no banco
 - Teste A/B ou métrica de clique própria
 - Sheet / puxador / slide
-- Esconder ou empurrar o aviso de cookies
+- Esconder o aviso de cookies (a pop-up espera a decisão)
+- Empurrar a caixa com `--bc-consent-h`
 
 ## Critérios de aceitação
 
@@ -117,3 +120,5 @@ Sem migration. Sem env nova. Sem mudança em `GiftVisit`, `Membership` nem
 - [x] Origem / funil lives / métricas de Presentes intactos
 - [x] Sem migration
 - [x] `cookie-consent.tsx` intocado
+- [ ] Pop-up não abre enquanto o aviso de cookies está pendente; abre
+      depois da escolha e na hora se o cookie já existe

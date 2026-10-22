@@ -70,9 +70,11 @@ de contornada mais uma vez.
 
 ### 1. Dispara na abertura da página, e só para quem não tem conta
 
-`POPUP_DELAY_MS = 0`: a modal aparece assim que a página hidrata. Não aparece
-para sessão logada — free ou paga. Quem já é membro não tem o que ganhar com um
-convite para criar conta, e a modal só atrapalharia a leitura.
+`POPUP_DELAY_MS = 0`: a modal aparece assim que a página hidrata, **depois**
+da decisão de cookies (F057 / F118) — ou na hora, se o `bc_consent` já
+existir. Não aparece para sessão logada — free ou paga. Quem já é membro não
+tem o que ganhar com um convite para criar conta, e a modal só atrapalharia
+a leitura.
 
 Sem gatilho de rolagem e sem exit-intent: um gatilho só é mais fácil de medir.
 
