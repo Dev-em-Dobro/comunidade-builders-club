@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { GiftSignupForm } from "@/components/gift-signup-form";
 import {
   AULA_ABERTURA_HREF,
+  aguardarConsentimentoParaPopup,
+  cookieConsentimentoAtual,
   POPUP_AULA,
   POPUP_DELAY_MS,
   POPUP_FADE_CLASS,
@@ -34,8 +36,8 @@ import {
  *
  * Overlay/fundo no `md+`: o mesmo de antes da F118 (`bg-black/60`, blur,
  * `p-4`). Abaixo de `md`: sem blur, `p-0`, caixa colada nas bordas e no
- * rodapé. `z-[60]` acima do aviso de cookies (`z-50`). Se o aviso estiver
- * visível, `--bc-consent-h` reserva a faixa dele.
+ * rodapé. Só abre depois da decisão de cookies (F057); no mobile fica
+ * `bottom-0`, sem `--bc-consent-h`.
  *
  * Entrada: fade de opacity na posição final (centro no desktop, rodapé no
  * mobile). `prefers-reduced-motion` corta a animação.
@@ -59,12 +61,27 @@ export function PresenteAulaPopup({
   const fechar = useCallback(() => setAberta(false), []);
 
   /**
-   * O timer roda uma vez, na montagem — fechar não reagenda. Navegar de um
-   * Presente para outro remonta o componente, e isso conta como visita nova.
+   * Só abre depois do aviso de cookies (aceito ou recusado), ou na hora
+   * se a decisão já estava no cookie. Fechar não reagenda.
    */
   useEffect(() => {
-    const t = window.setTimeout(() => setAberta(true), POPUP_DELAY_MS);
-    return () => window.clearTimeout(t);
+    let delay: number | undefined;
+    const parar = aguardarConsentimentoParaPopup({
+      lerCookie: () => cookieConsentimentoAtual(document.cookie),
+      onLiberado: () => {
+        delay = window.setTimeout(() => setAberta(true), POPUP_DELAY_MS);
+      },
+      addEventListener: (type, listener) =>
+        window.addEventListener(type, listener),
+      removeEventListener: (type, listener) =>
+        window.removeEventListener(type, listener),
+      setInterval: (fn, ms) => window.setInterval(fn, ms),
+      clearInterval: (id) => window.clearInterval(id),
+    });
+    return () => {
+      parar();
+      if (delay !== undefined) window.clearTimeout(delay);
+    };
   }, []);
 
   /**
