@@ -270,20 +270,6 @@
   }
 
   /*
-   * F118 — a sheet do Presente senta no mesmo rodapé do aviso de cookies.
-   * `--bc-consent-h` já é publicado pelo banner (F086). Utility Tailwind
-   * com vírgula no `var()` não gera o padding; a classe mora aqui, como
-   * o `.auth-painel`. Sem o aviso, a variável some e o padding é zero.
-   */
-  .presente-sheet-overlay {
-    padding-bottom: var(--bc-consent-h, 0px);
-    overflow: hidden;
-  }
-  .presente-sheet-overlay > [role="dialog"] {
-    max-height: min(72dvh, 36rem, calc(100dvh - var(--bc-consent-h, 0px)));
-  }
-
-  /*
    * F086 — entrada das telas de login e cadastro (ver `auth-split-layout`).
    * O atraso de cada elemento vai no componente, via `[animation-delay:*]`.
    */
@@ -372,14 +358,48 @@
   }
 }
 
-/* F118 — sheet do Presente sobe do rodapé (desktop e mobile). */
+/*
+ * F118 — sheet do Presente.
+ *
+ * Fora de @layer: utilities do Tailwind (flex items-end, relative,
+ * animate-[…]) ganhariam de @layer components, e o primeiro frame
+ * pintava a caixa no meio da tela antes do translateY(100%) valer.
+ * Posição inicial = absolute + bottom (offset do aviso de cookies).
+ * Animação só translateY(100%) → 0, fill-mode both: o frame 0 já está
+ * abaixo da borda, nunca centrado. Sem opacity — fade no meio do
+ * trajeto parecia um card nascendo no centro.
+ */
+.presente-sheet-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  overflow: hidden;
+  background: rgb(0 0 0 / 0.5);
+}
+
+.presente-sheet-overlay > [role="dialog"] {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: var(--bc-consent-h, 0px);
+  width: 100%;
+  max-width: 32rem;
+  margin-inline: auto;
+  max-height: min(72dvh, 36rem, calc(100dvh - var(--bc-consent-h, 0px)));
+  /*
+   * 100% é a altura da sheet; o `bottom` já subiu `--bc-consent-h`.
+   * Sem somar o offset, o frame 0 deixa a tampa da sheet visível na
+   * faixa do aviso de cookies — parece um card nascendo no meio.
+   */
+  transform: translateY(calc(100% + var(--bc-consent-h, 0px)));
+  animation: slideUpSheet 0.28s ease-out both;
+}
+
 @keyframes slideUpSheet {
   from {
-    opacity: 0;
-    transform: translateY(100%);
+    transform: translateY(calc(100% + var(--bc-consent-h, 0px)));
   }
   to {
-    opacity: 1;
     transform: translateY(0);
   }
 }
@@ -437,7 +457,9 @@
   .heart-float {
     display: none;
   }
-  .sheet-slide-up {
+  .sheet-slide-up,
+  .presente-sheet-overlay > [role="dialog"] {
     animation: none !important;
+    transform: translateY(0);
   }
 }

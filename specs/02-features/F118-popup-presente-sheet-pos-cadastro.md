@@ -57,10 +57,25 @@ cadastro e a origem seguem iguais.
 O aviso da F057 é `fixed` no rodapé, irmão do `<body>` (`z-50`). A sheet
 mora dentro da página: mesmo com `z-[60]`, o aviso pode ganhar no
 empilhamento e comer o "Agora não". Classe `.presente-sheet-overlay` em
-`globals.css` usa `--bc-consent-h` (F086) como `padding-bottom` — a sheet
-fica acima do banner em desktop e em 390px. Quando fecha, o aviso continua
-no lugar e clicável. Sem cookie novo. Utility Tailwind com `var(,)` não
-gera esse padding.
+`globals.css` ancora o diálogo em `bottom: var(--bc-consent-h)` (F086) —
+a sheet fica acima do banner em desktop e em 390px. Quando fecha, o aviso
+continua no lugar e clicável. Sem cookie novo. Utility Tailwind com
+`var(,)` não gera esse offset.
+
+### 5. A sheet só entra deslizando da borda de baixo
+
+Posição inicial, em todo breakpoint: `position: absolute; bottom: var(--bc-consent-h, 0px)`.
+A animação é `translateY(calc(100% + var(--bc-consent-h, 0px))) → 0` com
+`animation-fill-mode: both` — o frame 0 já está abaixo da viewport (100%
+é a altura da sheet; o offset do aviso também precisa sair da tela). Sem
+`items-center`, sem `sm:items-center`, sem `top: 50%` / `translateY(-50%)`,
+sem `<dialog>` nativo, sem fade de opacity. `prefers-reduced-motion: reduce`
+corta o slide e deixa a sheet já no rodapé.
+
+A regra de posicionamento mora **fora** de `@layer` em `globals.css`.
+Utilities Tailwind (`flex items-end`, `relative`, `animate-[…]`) ganham
+de `@layer components`; o primeiro paint com a caixa `relative` no flex
+mostrava a sheet no meio da tela antes do `translateY(100%)` valer.
 
 ## O que muda
 
@@ -69,6 +84,7 @@ gera esse padding.
 | `src/lib/presentes/pos-cadastro.ts` | href, parse/encode, show-once |
 | `src/lib/presentes/popup-aula.ts` | copy da sheet (sem CTA do presente) |
 | `src/app/presentes/presente-aula-popup.tsx` | sheet no rodapé |
+| `src/app/globals.css` | overlay + slide da borda de baixo |
 | `src/components/gift-signup-form.tsx` | grava pending após conta nova |
 | `src/components/presente-pos-cadastro-popup.tsx` | modal do lembrete |
 | `src/components/app-shell-client.tsx` | monta o lembrete no app logado |
@@ -89,6 +105,8 @@ Sem migration. Sem env nova. Sem mudança em `GiftVisit`, `Membership` nem
 - [x] Spec antes do código
 - [x] `giftPublicPath` e show-once cobertos por teste (sem Prisma)
 - [ ] Sheet abre no rodapé em 1280px e 390px, não no centro
+- [ ] Nenhum frame da entrada (0–400 ms) mostra a sheet centrada; só
+      desliza de baixo (frame 0 abaixo da viewport, âncora em `bottom`)
 - [x] Sheet do Presente **não** tem botão "Ver meu presente" (o artigo já
       está na página; o CTA fica no lembrete pós-cadastro)
 - [ ] Sheet continua fechável (Esc, X, fundo, "Agora não")

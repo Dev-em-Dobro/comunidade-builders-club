@@ -6,6 +6,8 @@ import {
   AULA_ABERTURA_HREF,
   POPUP_AULA,
   POPUP_DELAY_MS,
+  SHEET_CONSENT_OFFSET,
+  SHEET_DIALOG_CLASS,
   subheadPopup,
   tituloPopup,
 } from "@/lib/presentes/popup-aula";
@@ -34,6 +36,10 @@ import {
  * da sheet no empilhamento mesmo com z-60. `--bc-consent-h` (F086) reserva
  * a altura do aviso: "Agora não" fica acima dele enquanto o banner existe, e
  * o banner volta a ser clicável quando a sheet fecha.
+ *
+ * Entrada (F118 decisão 5): a sheet nasce `absolute; bottom: var(--bc-consent-h)`
+ * com `translateY(100%)` — nunca `items-center` / `top-1/2`. A animação só
+ * sobe da borda; `prefers-reduced-motion` corta o slide.
  */
 export function PresenteAulaPopup({
   totalAulas,
@@ -90,7 +96,7 @@ export function PresenteAulaPopup({
 
   return (
     <div
-      className="presente-sheet-overlay fixed inset-0 z-[60] flex items-end justify-center bg-black/50"
+      className={SHEET_CONSENT_OFFSET}
       onClick={(e) => {
         if (e.target === e.currentTarget) fechar();
       }}
@@ -101,7 +107,7 @@ export function PresenteAulaPopup({
         aria-modal="true"
         aria-labelledby="popup-aula-titulo"
         tabIndex={-1}
-        className="sheet-slide-up relative flex w-full max-w-lg flex-col overflow-hidden rounded-t-2xl border border-border/80 border-b-0 bg-card shadow-2xl outline-none animate-[slideUpSheet_0.28s_ease-out]"
+        className={`${SHEET_DIALOG_CLASS} flex w-full max-w-lg flex-col overflow-hidden rounded-t-2xl border border-border/80 border-b-0 bg-card shadow-2xl outline-none`}
       >
         <div className="min-h-0 flex-1 overflow-y-auto px-5 pt-4 sm:px-6">
           <div

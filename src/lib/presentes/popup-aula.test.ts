@@ -1,9 +1,11 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
+import { readFileSync } from "node:fs";
 import {
   AULA_ABERTURA_HREF,
   POPUP_DELAY_MS,
   SHEET_CONSENT_OFFSET,
+  SHEET_DIALOG_CLASS,
   subheadPopup,
   tituloPopup,
 } from "./popup-aula";
@@ -47,6 +49,41 @@ describe("destino do cadastro pela modal (F078)", () => {
 describe("sheet acima do aviso de cookies (F118)", () => {
   it("usa a classe CSS que lê --bc-consent-h, não uma utility Tailwind", () => {
     assert.equal(SHEET_CONSENT_OFFSET, "presente-sheet-overlay");
+  });
+});
+
+describe("entrada da sheet só pela borda de baixo (F118)", () => {
+  const css = readFileSync("src/app/globals.css", "utf8");
+  const popup = readFileSync("src/app/presentes/presente-aula-popup.tsx", "utf8");
+
+  it("ancora o diálogo em bottom e anima translateY(100%) → 0 com fill both", () => {
+    assert.equal(SHEET_DIALOG_CLASS, "sheet-slide-up");
+    assert.match(css, /bottom:\s*var\(--bc-consent-h,\s*0px\)/);
+    assert.match(css, /animation:\s*slideUpSheet\s+0\.28s\s+ease-out\s+both/);
+    const keyframes =
+      css.split("@keyframes slideUpSheet")[1]?.split("@keyframes")[0] ?? "";
+    assert.match(
+      keyframes,
+      /from\s*\{[^}]*translateY\(calc\(100% \+ var\(--bc-consent-h/,
+    );
+    assert.match(keyframes, /to\s*\{[^}]*translateY\(0\)/);
+    assert.doesNotMatch(keyframes, /opacity/);
+  });
+
+  it("respeita prefers-reduced-motion sem slide", () => {
+    assert.match(
+      css,
+      /prefers-reduced-motion:\s*reduce[\s\S]*\.presente-sheet-overlay > \[role="dialog"\][\s\S]*animation:\s*none/s,
+    );
+  });
+
+  it("não usa posicionamento de modal centrada no JSX", () => {
+    const jsx = popup.slice(popup.indexOf("return ("));
+    assert.doesNotMatch(jsx, /items-center/);
+    assert.doesNotMatch(jsx, /top-1\/2/);
+    assert.doesNotMatch(jsx, /translate-y-1\/2/);
+    assert.doesNotMatch(jsx, /<dialog[\s>]/);
+    assert.doesNotMatch(jsx, /animate-\[slideUpSheet/);
   });
 });
 
