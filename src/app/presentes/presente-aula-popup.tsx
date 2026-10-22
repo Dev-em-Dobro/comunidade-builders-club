@@ -31,6 +31,11 @@ import {
  *
  * Fechar não é lembrado (decisão 5 da F078): cada visita ao Presente é uma
  * chance nova.
+ *
+ * O aviso de cookies (F057) é `fixed` no rodapé, irmão do `<body>`, e ganha
+ * da sheet no empilhamento mesmo com z-60. `--bc-consent-h` (F086) reserva
+ * a altura do aviso: "Agora não" fica acima dele enquanto o banner existe, e
+ * o banner volta a ser clicável quando a sheet fecha.
  */
 export function PresenteAulaPopup({
   totalAulas,
@@ -100,7 +105,7 @@ export function PresenteAulaPopup({
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-end justify-center bg-black/50"
+      className="fixed inset-0 z-[60] flex items-end justify-center bg-black/50 pb-[var(--bc-consent-h,0px)]"
       onClick={(e) => {
         if (e.target === e.currentTarget) fechar();
       }}
@@ -111,7 +116,7 @@ export function PresenteAulaPopup({
         aria-modal="true"
         aria-labelledby="popup-aula-titulo"
         tabIndex={-1}
-        className="sheet-slide-up relative w-full max-w-lg rounded-t-2xl border border-border/80 border-b-0 bg-card px-5 pt-4 shadow-2xl outline-none animate-[slideUpSheet_0.28s_ease-out] sm:px-6 max-h-[min(72dvh,36rem)] overflow-y-auto pb-[max(1rem,env(safe-area-inset-bottom))]"
+        className="sheet-slide-up relative w-full max-w-lg rounded-t-2xl border border-border/80 border-b-0 bg-card px-5 pt-4 shadow-2xl outline-none animate-[slideUpSheet_0.28s_ease-out] sm:px-6 max-h-[min(72dvh,36rem,calc(100dvh-var(--bc-consent-h,0px)))] overflow-y-auto pb-[max(1rem,env(safe-area-inset-bottom))]"
       >
         <div
           className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-border"

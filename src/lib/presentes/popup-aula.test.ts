@@ -4,6 +4,7 @@ import {
   AULA_ABERTURA_HREF,
   POPUP_AULA,
   POPUP_DELAY_MS,
+  SHEET_CONSENT_OFFSET,
   subheadPopup,
   tituloPopup,
 } from "./popup-aula";
@@ -41,6 +42,13 @@ describe("destino do cadastro pela modal (F078)", () => {
       AULA_ABERTURA_HREF,
       "/aulas/fase-1-m01-comece-por-aqui/desafio-quick-win-lovable",
     );
+  });
+});
+
+describe("sheet acima do aviso de cookies (F118)", () => {
+  it("reserva a altura publicada pelo banner, com fallback zero", () => {
+    assert.equal(SHEET_CONSENT_OFFSET, "pb-[var(--bc-consent-h,0px)]");
+    assert.match(SHEET_CONSENT_OFFSET, /--bc-consent-h/);
   });
 });
 

@@ -51,6 +51,14 @@ Sem coluna nova no banco.
 Safari privado / `sessionStorage` bloqueado: o lembrete não aparece, o
 cadastro e a origem seguem iguais.
 
+### 4. Sheet acima do aviso de cookies enquanto ele existir
+
+O aviso da F057 é `fixed` no rodapé, irmão do `<body>` (`z-50`). A sheet
+mora dentro da página: mesmo com `z-[60]`, o aviso ganha no empilhamento e
+come o "Agora não". A sheet usa `--bc-consent-h` (F086) como `padding-bottom`
+do overlay — fica acima do banner em desktop e em 390px. Quando a sheet
+fecha, o aviso continua no lugar e clicável. Sem cookie novo.
+
 ## O que muda
 
 | Arquivo | Mudança |
