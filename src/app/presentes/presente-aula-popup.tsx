@@ -100,7 +100,7 @@ export function PresenteAulaPopup({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/50"
+      className="fixed inset-0 z-[60] flex items-end justify-center bg-black/50"
       onClick={(e) => {
         if (e.target === e.currentTarget) fechar();
       }}
@@ -111,7 +111,7 @@ export function PresenteAulaPopup({
         aria-modal="true"
         aria-labelledby="popup-aula-titulo"
         tabIndex={-1}
-        className="sheet-slide-up relative w-full max-w-lg rounded-t-2xl border border-border/80 border-b-0 bg-card p-5 shadow-2xl outline-none animate-[slideUpSheet_0.28s_ease-out] sm:p-6 max-h-[min(92dvh,42rem)] overflow-y-auto pb-[max(1.25rem,env(safe-area-inset-bottom))]"
+        className="sheet-slide-up relative w-full max-w-lg rounded-t-2xl border border-border/80 border-b-0 bg-card px-5 pt-4 shadow-2xl outline-none animate-[slideUpSheet_0.28s_ease-out] sm:px-6 max-h-[min(72dvh,36rem)] overflow-y-auto pb-[max(1rem,env(safe-area-inset-bottom))]"
       >
         <div
           className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-border"
@@ -131,14 +131,14 @@ export function PresenteAulaPopup({
         </p>
         <h2
           id="popup-aula-titulo"
-          className="mt-2 pr-6 font-[family-name:var(--font-outfit)] text-xl font-bold leading-snug tracking-tight sm:text-2xl"
+          className="mt-2 pr-6 font-[family-name:var(--font-outfit)] text-lg font-bold leading-snug tracking-tight sm:text-xl"
         >
           {tituloPopup(totalAulas)}
         </h2>
-        <p className="mt-3 text-[15px] leading-relaxed text-muted">
+        <p className="mt-2 text-sm leading-relaxed text-muted">
           {subheadPopup(totalAulas)}
         </p>
-        <p className="mt-3 font-[family-name:var(--font-outfit)] text-base font-semibold">
+        <p className="mt-2 font-[family-name:var(--font-outfit)] text-sm font-semibold">
           {POPUP_AULA.promessa}
         </p>
 
@@ -152,7 +152,7 @@ export function PresenteAulaPopup({
           </button>
         ) : null}
 
-        <div className="mt-5">
+        <div className="mt-4">
           <GiftSignupForm
             headline={POPUP_AULA.cta}
             subhead="Seu e-mail recebe um código de 6 dígitos. Você digita aqui mesmo e cai direto na primeira aula."
@@ -167,7 +167,7 @@ export function PresenteAulaPopup({
         <button
           type="button"
           onClick={() => fechar()}
-          className="btn-ghost mt-3 w-full text-xs"
+          className="btn-ghost mt-2 w-full text-xs"
         >
           {POPUP_AULA.dispensar}
         </button>
