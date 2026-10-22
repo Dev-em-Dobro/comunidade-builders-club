@@ -32,7 +32,7 @@ Supabase), a partir do [repositório público](https://github.com/devemdobro/ger
 
 ## Critérios
 
-- [ ] Aula 3 aparece depois da aula 2 no módulo Claude Code
-- [ ] Descrição + ZIP visíveis na aula
-- [ ] `freeAccess` permanece `false`
-- [ ] Embed usa `video_external_id`, não o UUID do dashboard
+- [x] Aula 3 aparece depois da aula 2 no módulo Claude Code
+- [x] Descrição + ZIP visíveis na aula
+- [x] `freeAccess` permanece `false`
+- [x] Embed usa `video_external_id`, não o UUID do dashboard
