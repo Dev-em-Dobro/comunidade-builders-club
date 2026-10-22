@@ -4,8 +4,7 @@ import { readFileSync } from "node:fs";
 import {
   AULA_ABERTURA_HREF,
   POPUP_DELAY_MS,
-  SHEET_CONSENT_OFFSET,
-  SHEET_DIALOG_CLASS,
+  POPUP_FADE_CLASS,
   subheadPopup,
   tituloPopup,
 } from "./popup-aula";
@@ -46,44 +45,62 @@ describe("destino do cadastro pela modal (F078)", () => {
   });
 });
 
-describe("sheet acima do aviso de cookies (F118)", () => {
-  it("usa a classe CSS que lê --bc-consent-h, não uma utility Tailwind", () => {
-    assert.equal(SHEET_CONSENT_OFFSET, "presente-sheet-overlay");
-  });
-});
-
-describe("entrada da sheet só pela borda de baixo (F118)", () => {
+describe("layout da pop-up (F118)", () => {
   const css = readFileSync("src/app/globals.css", "utf8");
-  const popup = readFileSync("src/app/presentes/presente-aula-popup.tsx", "utf8");
+  const popup = readFileSync(
+    "src/app/presentes/presente-aula-popup.tsx",
+    "utf8",
+  );
+  const jsx = popup.slice(popup.indexOf("return ("));
+  const banner = readFileSync("src/components/cookie-consent.tsx", "utf8");
 
-  it("ancora o diálogo em bottom e anima translateY(100%) → 0 com fill both", () => {
-    assert.equal(SHEET_DIALOG_CLASS, "sheet-slide-up");
-    assert.match(css, /bottom:\s*var\(--bc-consent-h,\s*0px\)/);
-    assert.match(css, /animation:\s*slideUpSheet\s+0\.28s\s+ease-out\s+both/);
-    const keyframes =
-      css.split("@keyframes slideUpSheet")[1]?.split("@keyframes")[0] ?? "";
-    assert.match(
-      keyframes,
-      /from\s*\{[^}]*translateY\(calc\(100% \+ var\(--bc-consent-h/,
-    );
-    assert.match(keyframes, /to\s*\{[^}]*translateY\(0\)/);
-    assert.doesNotMatch(keyframes, /opacity/);
+  it("no desktop (md+) centra; no mobile senta no rodapé com teto de 50dvh", () => {
+    assert.match(jsx, /items-end/);
+    assert.match(jsx, /md:items-center/);
+    assert.match(jsx, /max-md:max-h-\[50dvh\]/);
+    assert.doesNotMatch(jsx, /sm:items-center/);
   });
 
-  it("respeita prefers-reduced-motion sem slide", () => {
+  it("mantém o fundo de antes da F118 e só sobe o z para cobrir o aviso", () => {
+    assert.match(jsx, /bg-black\/60/);
+    assert.match(jsx, /backdrop-blur-sm/);
+    assert.match(jsx, /z-\[60\]/);
+    assert.match(jsx, /overflow-y-auto/);
+    assert.match(jsx, /\bp-4\b/);
+  });
+
+  it("é a mesma caixa (sem puxador de sheet) e some o CTA Ver meu presente", () => {
+    assert.match(jsx, /rounded-2xl/);
+    assert.match(jsx, /max-w-lg/);
+    assert.doesNotMatch(jsx, /h-1\.5 w-10/);
+    assert.doesNotMatch(jsx, /Ver meu presente/);
+    assert.match(jsx, /giftSlug=\{giftSlug\}/);
+  });
+
+  it("o X tem área de toque 44px", () => {
+    assert.match(jsx, /h-11 w-11/);
+  });
+
+  it("fade só de opacity, na posição final, com reduced-motion", () => {
+    assert.equal(POPUP_FADE_CLASS, "popup-aula-fade");
+    const fade =
+      css.split("@keyframes popupAulaFade")[1]?.split("@keyframes")[0] ?? "";
+    assert.match(fade, /from\s*\{[^}]*opacity:\s*0/);
+    assert.match(fade, /to\s*\{[^}]*opacity:\s*1/);
+    assert.doesNotMatch(fade, /transform/);
     assert.match(
       css,
-      /prefers-reduced-motion:\s*reduce[\s\S]*\.presente-sheet-overlay > \[role="dialog"\][\s\S]*animation:\s*none/s,
+      /prefers-reduced-motion:\s*reduce[\s\S]*\.popup-aula-fade[\s\S]*animation:\s*none/s,
     );
+    assert.doesNotMatch(css, /slideUpSheet/);
+    assert.doesNotMatch(css, /presente-sheet-overlay/);
   });
 
-  it("não usa posicionamento de modal centrada no JSX", () => {
-    const jsx = popup.slice(popup.indexOf("return ("));
-    assert.doesNotMatch(jsx, /items-center/);
-    assert.doesNotMatch(jsx, /top-1\/2/);
-    assert.doesNotMatch(jsx, /translate-y-1\/2/);
-    assert.doesNotMatch(jsx, /<dialog[\s>]/);
-    assert.doesNotMatch(jsx, /animate-\[slideUpSheet/);
+  it("não mexe no componente do aviso de cookies", () => {
+    assert.doesNotMatch(banner, /data-presente-sheet/);
+    assert.doesNotMatch(banner, /className="cookie-consent /);
+    assert.doesNotMatch(popup, /--bc-consent-h/);
+    assert.doesNotMatch(jsx, /--bc-consent-h/);
   });
 });
 

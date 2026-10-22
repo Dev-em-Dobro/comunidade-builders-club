@@ -6,18 +6,17 @@ import {
   AULA_ABERTURA_HREF,
   POPUP_AULA,
   POPUP_DELAY_MS,
-  SHEET_CONSENT_OFFSET,
-  SHEET_DIALOG_CLASS,
+  POPUP_FADE_CLASS,
   subheadPopup,
   tituloPopup,
 } from "@/lib/presentes/popup-aula";
 
 /**
  * F078 — pop-up da aula no Presente.
- * F118 — deixa de ser modal centrada: sheet no rodapé, nos dois viewports.
- * O presente já está na página; a sheet não tem CTA para ele. Depois do
- * cadastro, o lembrete (PresentePosCadastroPopup) é quem oferece ir ao
- * presente.
+ * F118 — no desktop (`md+`) é a modal centrada de sempre; abaixo de `md`
+ * a mesma caixa senta no rodapé com teto de ~50dvh. Sem sheet, sem puxador,
+ * sem slide. O CTA "Ver meu presente" não entra aqui; depois do cadastro o
+ * lembrete (PresentePosCadastroPopup) é quem oferece ir ao presente.
  *
  * Abre `POPUP_DELAY_MS` depois que a página monta, só para quem não tem conta.
  * O e-mail é capturado aqui dentro pelo mesmo `GiftSignupForm` do rodapé — é ele
@@ -32,14 +31,12 @@ import {
  * Fechar não é lembrado (decisão 5 da F078): cada visita ao Presente é uma
  * chance nova.
  *
- * O aviso de cookies (F057) é `fixed` no rodapé, irmão do `<body>`, e ganha
- * da sheet no empilhamento mesmo com z-60. `--bc-consent-h` (F086) reserva
- * a altura do aviso: "Agora não" fica acima dele enquanto o banner existe, e
- * o banner volta a ser clicável quando a sheet fecha.
+ * Overlay/fundo: o mesmo de antes da F118 (`bg-black/60`, blur, `p-4`).
+ * `z-[60]` só para ficar acima do aviso de cookies (`z-50`) e continuar
+ * clicável no mobile. O aviso não é escondido nem empurrado.
  *
- * Entrada (F118 decisão 5): a sheet nasce `absolute; bottom: var(--bc-consent-h)`
- * com `translateY(100%)` — nunca `items-center` / `top-1/2`. A animação só
- * sobe da borda; `prefers-reduced-motion` corta o slide.
+ * Entrada: fade de opacity na posição final (centro no desktop, rodapé no
+ * mobile). `prefers-reduced-motion` corta a animação.
  */
 export function PresenteAulaPopup({
   totalAulas,
@@ -69,7 +66,7 @@ export function PresenteAulaPopup({
   }, []);
 
   /**
-   * Esc fecha, foco entra na sheet e o fundo trava. Uma modal sem Esc no meio
+   * Esc fecha, foco entra na modal e o fundo trava. Uma modal sem Esc no meio
    * de um artigo é sequestro, não convite.
    */
   useEffect(() => {
@@ -96,7 +93,7 @@ export function PresenteAulaPopup({
 
   return (
     <div
-      className={SHEET_CONSENT_OFFSET}
+      className="fixed inset-0 z-[60] flex items-end justify-center overflow-y-auto bg-black/60 p-4 backdrop-blur-sm md:items-center"
       onClick={(e) => {
         if (e.target === e.currentTarget) fechar();
       }}
@@ -107,35 +104,31 @@ export function PresenteAulaPopup({
         aria-modal="true"
         aria-labelledby="popup-aula-titulo"
         tabIndex={-1}
-        className={`${SHEET_DIALOG_CLASS} flex w-full max-w-lg flex-col overflow-hidden rounded-t-2xl border border-border/80 border-b-0 bg-card shadow-2xl outline-none`}
+        className={`${POPUP_FADE_CLASS} relative my-0 flex w-full max-w-lg flex-col rounded-2xl border border-border/80 bg-card p-6 shadow-2xl outline-none max-md:max-h-[50dvh] md:my-auto sm:p-7`}
       >
-        <div className="min-h-0 flex-1 overflow-y-auto px-5 pt-4 sm:px-6">
-          <div
-            className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-border"
-            aria-hidden
-          />
-          <button
-            type="button"
-            onClick={() => fechar()}
-            aria-label={POPUP_AULA.fechar}
-            className="absolute right-3 top-3 rounded-lg px-2 py-1 text-lg leading-none text-muted transition hover:bg-surface hover:text-foreground"
-          >
-            ×
-          </button>
+        <button
+          type="button"
+          onClick={() => fechar()}
+          aria-label={POPUP_AULA.fechar}
+          className="absolute right-2 top-2 flex h-11 w-11 items-center justify-center rounded-lg text-2xl leading-none text-muted transition hover:bg-surface hover:text-foreground"
+        >
+          ×
+        </button>
 
+        <div className="min-h-0 flex-1 overflow-y-auto">
           <p className="font-[family-name:var(--font-outfit)] text-xs font-semibold uppercase tracking-[0.12em] text-accent">
             {POPUP_AULA.eyebrow}
           </p>
           <h2
             id="popup-aula-titulo"
-            className="mt-2 pr-6 font-[family-name:var(--font-outfit)] text-lg font-bold leading-snug tracking-tight sm:text-xl"
+            className="mt-2 pr-12 font-[family-name:var(--font-outfit)] text-xl font-bold leading-snug tracking-tight sm:text-2xl"
           >
             {tituloPopup(totalAulas)}
           </h2>
-          <p className="mt-2 text-sm leading-relaxed text-muted">
+          <p className="mt-3 text-[15px] leading-relaxed text-muted">
             {subheadPopup(totalAulas)}
           </p>
-          <p className="mt-2 font-[family-name:var(--font-outfit)] text-sm font-semibold">
+          <p className="mt-3 font-[family-name:var(--font-outfit)] text-base font-semibold">
             {POPUP_AULA.promessa}
           </p>
 
@@ -155,7 +148,7 @@ export function PresenteAulaPopup({
         <button
           type="button"
           onClick={() => fechar()}
-          className="btn-ghost w-full shrink-0 px-5 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 text-xs"
+          className="btn-ghost mt-3 w-full shrink-0 text-xs"
         >
           {POPUP_AULA.dispensar}
         </button>
