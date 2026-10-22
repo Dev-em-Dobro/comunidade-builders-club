@@ -359,48 +359,19 @@
 }
 
 /*
- * F118 — sheet do Presente.
- *
- * Fora de @layer: utilities do Tailwind (flex items-end, relative,
- * animate-[…]) ganhariam de @layer components, e o primeiro frame
- * pintava a caixa no meio da tela antes do translateY(100%) valer.
- * Posição inicial = absolute + bottom (offset do aviso de cookies).
- * Animação só translateY(100%) → 0, fill-mode both: o frame 0 já está
- * abaixo da borda, nunca centrado. Sem opacity — fade no meio do
- * trajeto parecia um card nascendo no centro.
+ * F118 — pop-up da aula: só fade de opacity, já na posição final.
+ * Sem translate: o primeiro frame é centro no desktop e rodapé no mobile.
  */
-.presente-sheet-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 60;
-  overflow: hidden;
-  background: rgb(0 0 0 / 0.5);
+.popup-aula-fade {
+  animation: popupAulaFade 0.2s ease-out both;
 }
 
-.presente-sheet-overlay > [role="dialog"] {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: var(--bc-consent-h, 0px);
-  width: 100%;
-  max-width: 32rem;
-  margin-inline: auto;
-  max-height: min(72dvh, 36rem, calc(100dvh - var(--bc-consent-h, 0px)));
-  /*
-   * 100% é a altura da sheet; o `bottom` já subiu `--bc-consent-h`.
-   * Sem somar o offset, o frame 0 deixa a tampa da sheet visível na
-   * faixa do aviso de cookies — parece um card nascendo no meio.
-   */
-  transform: translateY(calc(100% + var(--bc-consent-h, 0px)));
-  animation: slideUpSheet 0.28s ease-out both;
-}
-
-@keyframes slideUpSheet {
+@keyframes popupAulaFade {
   from {
-    transform: translateY(calc(100% + var(--bc-consent-h, 0px)));
+    opacity: 0;
   }
   to {
-    transform: translateY(0);
+    opacity: 1;
   }
 }
 
@@ -457,9 +428,7 @@
   .heart-float {
     display: none;
   }
-  .sheet-slide-up,
-  .presente-sheet-overlay > [role="dialog"] {
+  .popup-aula-fade {
     animation: none !important;
-    transform: translateY(0);
   }
 }

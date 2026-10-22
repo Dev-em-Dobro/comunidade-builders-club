@@ -237,9 +237,10 @@ export async function PresentePublico({
       </main>
 
       {/*
-       * F078 / F118 — a sheet da aula no rodapé. Só para quem não tem
-       * conta: quem já é membro não ganha nada com um convite para se
-       * cadastrar, e a interrupção só atrapalharia a leitura.
+       * F078 / F118 — pop-up da aula (centrada no md+, rodapé abaixo).
+       * Só para quem não tem conta: quem já é membro não ganha nada com
+       * um convite para se cadastrar, e a interrupção só atrapalharia
+       * a leitura.
        */}
       {!user ? (
         <PresenteAulaPopup

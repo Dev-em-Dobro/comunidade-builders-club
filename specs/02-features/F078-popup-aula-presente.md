@@ -3,11 +3,11 @@
 ## Status
 Rascunho — 2026-09-04
 
-**Layout (F118):** a pop-up deixa de abrir no centro (`sm:items-center`) e
-passa a ser uma faixa/sheet no rodapé, em desktop e mobile. A entrada é
-só slide de baixo (`translateY(calc(100% + offset do aviso)) → 0`
-ancorado em `bottom`), nunca um frame centrado. Atribuição, delay, `GiftSignupForm` e destino da aula não
-mudam. O CTA "Ver meu presente" é só do lembrete pós-cadastro, não da sheet.
+**Layout (F118):** no desktop (`md+`) a pop-up volta a ser a modal
+centrada de sempre. Abaixo de `md`, a **mesma caixa** senta no rodapé
+(teto ~50dvh, sem sheet/puxador). Fade de opacity na posição final.
+Atribuição, delay, `GiftSignupForm` e destino da aula não mudam. O CTA
+"Ver meu presente" é só do lembrete pós-cadastro.
 
 Depende de: [F059](F059-presentes-publicos-atribuicao.md) (Presente público, OTP e
 atribuição por `utm_content`), [F063](F063-funil-presente-conta-free.md) (bloco da

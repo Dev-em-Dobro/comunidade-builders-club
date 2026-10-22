@@ -43,14 +43,10 @@ export const POPUP_AULA = {
 } as const;
 
 /**
- * F118 — classe do overlay. Posição, z-index, dimmer e offset do aviso
- * de cookies (`bottom: var(--bc-consent-h)`) moram em `globals.css`, fora
- * de @layer: utility Tailwind ganharia e o primeiro frame centrava.
+ * F118 — fade só de opacity na posição final (centro no `md+`, rodapé
+ * abaixo). Sem translate. `prefers-reduced-motion` zera a animação.
  */
-export const SHEET_CONSENT_OFFSET = "presente-sheet-overlay" as const;
-
-/** Classe do diálogo: âncora em `bottom` + slide de baixo para cima. */
-export const SHEET_DIALOG_CLASS = "sheet-slide-up" as const;
+export const POPUP_FADE_CLASS = "popup-aula-fade" as const;
 
 /**
  * O número vem do banco (decisão 4.1). Sem número — contagem falhou ou veio
