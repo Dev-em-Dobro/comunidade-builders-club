@@ -25,6 +25,18 @@ describe("extrairCobrancaHubla — F081", () => {
     assert.equal(c.valorCentavos, 29700);
     assert.equal(c.moeda, "BRL");
     assert.equal(c.cobradoEm?.toISOString(), "2026-09-08T12:00:00.000Z");
+    assert.equal(c.pagoEm?.toISOString(), "2026-09-08T12:00:00.000Z");
+  });
+
+  it("não usa billingDate nem a data da assinatura como pagamento confirmado", () => {
+    const payload: HublaWebhookPayload = {
+      type: "invoice.payment_succeeded",
+      event: {
+        invoice: { billingDate: "2026-09-08T12:00:00.000Z" },
+        subscription: { paidAt: "2025-01-01T00:00:00.000Z" },
+      },
+    };
+    assert.equal(extrairCobrancaHubla(payload).pagoEm, null);
   });
 
   it("lê amount inteiro como centavos", () => {
@@ -53,6 +65,7 @@ describe("extrairCobrancaHubla — F081", () => {
       valorCentavos: null,
       moeda: null,
       cobradoEm: null,
+      pagoEm: null,
     });
   });
 });

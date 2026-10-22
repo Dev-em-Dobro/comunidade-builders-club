@@ -107,8 +107,8 @@ export async function concederPago(
           tier: plan,
           role: "member",
           convertedToPaidAt: convertedAt,
-          ...(plan === "elite" && cobranca.cobradoEm
-            ? { eliteStartedAt: cobranca.cobradoEm }
+          ...(plan === "elite" && cobranca.pagoEm
+            ? { eliteStartedAt: cobranca.pagoEm }
             : {}),
           ...dinheiro,
         },
@@ -138,8 +138,8 @@ export async function concederPago(
         status: "active",
         tier: nextTier,
         convertedToPaidAt: convertedAt,
-        ...(nextTier === "elite" && m.tier !== "elite" && cobranca.cobradoEm
-          ? { eliteStartedAt: cobranca.cobradoEm }
+        ...(nextTier === "elite" && m.tier !== "elite" && cobranca.pagoEm
+          ? { eliteStartedAt: cobranca.pagoEm }
           : {}),
         ...dinheiro,
       },
@@ -151,8 +151,8 @@ export async function concederPago(
         data: {
           status: "active",
           tier: nextTier,
-          ...(nextTier === "elite" && m.tier !== "elite" && cobranca.cobradoEm
-            ? { eliteStartedAt: cobranca.cobradoEm }
+          ...(nextTier === "elite" && m.tier !== "elite" && cobranca.pagoEm
+            ? { eliteStartedAt: cobranca.pagoEm }
             : {}),
           ...dinheiro,
         },
@@ -167,8 +167,8 @@ export async function concederPago(
     data: {
       status: "active",
       tier: nextTier,
-      ...(nextTier === "elite" && m.tier !== "elite" && cobranca.cobradoEm
-        ? { eliteStartedAt: cobranca.cobradoEm }
+      ...(nextTier === "elite" && m.tier !== "elite" && cobranca.pagoEm
+        ? { eliteStartedAt: cobranca.pagoEm }
         : {}),
       ...dinheiro,
     },
@@ -218,6 +218,7 @@ export async function aplicarAcaoAllowlist(acao: AcaoAllowlist): Promise<Resulta
         : `product:${acao.productId}; plan=${acao.plan}`,
       tier: acao.plan,
       paidAt,
+      eliteStartedAt: acao.plan === "elite" ? acao.cobranca.pagoEm ?? undefined : undefined,
     });
     const resultado = await concederPago(
       acao.emails.length > 0 ? acao.emails : [acao.email],

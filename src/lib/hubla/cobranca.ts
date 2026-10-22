@@ -11,6 +11,7 @@ const SEM_COBRANCA: CobrancaHubla = {
   valorCentavos: null,
   moeda: null,
   cobradoEm: null,
+  pagoEm: null,
 };
 
 function lerNumero(v: unknown): number | null {
@@ -115,7 +116,14 @@ export function extrairCobrancaHubla(payload: HublaWebhookPayload): CobrancaHubl
 
     if (valorCentavos !== null && !moeda) moeda = "BRL";
 
-    return { valorCentavos, moeda, cobradoEm };
+    const pagoEmRaw = event.invoice?.paidAt;
+    const pagoEm = typeof pagoEmRaw === "string" ? new Date(pagoEmRaw) : null;
+    return {
+      valorCentavos,
+      moeda,
+      cobradoEm,
+      pagoEm: pagoEm && !Number.isNaN(pagoEm.getTime()) ? pagoEm : null,
+    };
   } catch {
     return SEM_COBRANCA;
   }

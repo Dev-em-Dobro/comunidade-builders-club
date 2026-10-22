@@ -91,10 +91,12 @@ async function resolverBootstrap(
   // F053 hotfix — allowlist Elite não pode nascer como PRO no 1º login.
   let tierAllowlist: TierPagoAllowlist = "pro";
   let paidAtAllowlist: Date | null = null;
+  let eliteStartedAtAllowlist: Date | null = null;
   if (allowed && !isBootstrapAdmin) {
     const dados = await dadosPagosDoEmailAllowlist(email);
     tierAllowlist = dados.tier;
     paidAtAllowlist = dados.paidAt;
+    eliteStartedAtAllowlist = dados.eliteStartedAt;
   }
 
   let nextProfile = profile;
@@ -127,8 +129,8 @@ async function resolverBootstrap(
             }
           : {}),
         ...(isPagante ? { convertedToPaidAt: paidAtAllowlist ?? new Date() } : {}),
-        ...(tierAllowlist === "elite" && paidAtAllowlist
-          ? { eliteStartedAt: paidAtAllowlist }
+        ...(tierAllowlist === "elite" && eliteStartedAtAllowlist
+          ? { eliteStartedAt: eliteStartedAtAllowlist }
           : {}),
       },
     });
@@ -153,8 +155,8 @@ async function resolverBootstrap(
         status: "active",
         tier: isBootstrapAdmin ? "elite" : allowed ? tierAllowlist : "free",
         ...(isBootstrapAdmin ? { role: "admin" as const } : {}),
-        ...(tierAllowlist === "elite" && paidAtAllowlist
-          ? { eliteStartedAt: paidAtAllowlist }
+        ...(tierAllowlist === "elite" && eliteStartedAtAllowlist
+          ? { eliteStartedAt: eliteStartedAtAllowlist }
           : {}),
       },
     });

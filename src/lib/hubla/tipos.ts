@@ -69,6 +69,8 @@ export type CobrancaHubla = {
   valorCentavos: number | null;
   moeda: string | null;
   cobradoEm: Date | null;
+  /** Apenas invoice.paidAt comprova a data do pagamento. */
+  pagoEm?: Date | null;
 };
 
 export type AcaoAllowlist =
