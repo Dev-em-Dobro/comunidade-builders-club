@@ -572,6 +572,13 @@ O guia passo a passo traz as etapas, os prompts para copiar e o que conferir ant
 - [Baixar projeto da aula (ZIP)](/materiais/claude-code-na-pratica-aula-2.zip)
 - [Baixar tutorial da aula (PDF)](/materiais/tutorial-aula-2-claude-code.pdf)`,
 
+  "claude-code/claude-code-na-pratica-aula-3": `Nesta aula a gente sai do plano e constrói, com Claude Code, um gerador de orçamentos e propostas por link: briefing, faixas de preço, aprovação do valor e página pública para o cliente pagar.
+
+Você acompanha o PLANO.md virando um app Next.js + Supabase, os erros reais no caminho e o deploy.
+
+## Materiais
+- [Baixar projeto da aula (ZIP)](/materiais/claude-code-na-pratica-aula-3.zip)`,
+
   "gravacoes-das-lives-semanais/raas-como-cobrar-pelo-resultado-do-cliente": `RaaS (Result as a Service) é cobrar pelo que o cliente ganha — agenda cheia, leads, recorrência — e não pelo tempo que você passou no projeto.
 
 Nesta live a gente abre o modelo: o que entra no pacote, como explicar o valor sem parecer "eu cobro caro", e como transformar a entrega em uma mensalidade que o cliente quer continuar pagando.
