@@ -43,10 +43,14 @@ export const POPUP_AULA = {
 } as const;
 
 /**
- * F118 — classe do overlay que reserva `--bc-consent-h` (F086). Mora em
- * `globals.css`: utility Tailwind com vírgula no `var()` não gera o padding.
+ * F118 — classe do overlay. Posição, z-index, dimmer e offset do aviso
+ * de cookies (`bottom: var(--bc-consent-h)`) moram em `globals.css`, fora
+ * de @layer: utility Tailwind ganharia e o primeiro frame centrava.
  */
 export const SHEET_CONSENT_OFFSET = "presente-sheet-overlay" as const;
+
+/** Classe do diálogo: âncora em `bottom` + slide de baixo para cima. */
+export const SHEET_DIALOG_CLASS = "sheet-slide-up" as const;
 
 /**
  * O número vem do banco (decisão 4.1). Sem número — contagem falhou ou veio
