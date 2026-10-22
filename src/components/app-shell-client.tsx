@@ -19,6 +19,7 @@ import {
 } from "@/lib/spaces/constants";
 import { ClubImersaoBanner } from "@/components/club-imersao-banner";
 import { BastidoresBanner } from "@/components/bastidores-banner";
+import { BlackInfinitaBanner } from "@/components/black-infinita-banner";
 import { faixaDoTopo } from "@/lib/eventos/bastidores";
 import {
   ICON_ADMIN,
@@ -495,6 +496,8 @@ function ShellInner({
     return () => window.removeEventListener("keydown", onKey);
   }, [drawerOpen]);
 
+  const faixa = faixaDoTopo({ isElite });
+
   return (
     <div className="flex min-h-dvh w-full">
       <aside className="sticky top-0 z-40 hidden h-dvh w-[260px] shrink-0 flex-col border-r border-border bg-sidebar/95 p-5 backdrop-blur-md md:flex">
@@ -586,15 +589,10 @@ function ShellInner({
       ) : null}
 
       <div className="relative flex min-w-0 flex-1 flex-col">
-        {/*
-         * F102 — uma faixa por vez no topo, nunca duas empilhadas.
-         *
-         * A Imersão (F088) tem precedência enquanto está no prazo, para todo
-         * mundo menos Elite: é nela que o Elite é vendido, então o PRO
-         * precisa ver. Passado o prazo, ou para quem já é Elite, entra
-         * Bastidores — que é aberta e não tem gate de tier.
-         */}
-        {faixaDoTopo({ isElite }) === "imersao" ? (
+        {/* F117 — a campanha ocupa o slot único do topo durante a Black. */}
+        {faixa === "black" ? (
+          <BlackInfinitaBanner isPaid={isPaid} />
+        ) : faixa === "imersao" ? (
           <ClubImersaoBanner />
         ) : (
           <BastidoresBanner />

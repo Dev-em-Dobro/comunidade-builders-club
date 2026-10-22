@@ -1,4 +1,5 @@
 import { imersaoAtiva } from "./imersao-ia";
+import { blackAtiva } from "./black-infinita";
 
 /**
  * F102 — Bastidores dos 5 Dígitos com IA: live pública, toda quinta às 20h.
@@ -46,15 +47,14 @@ export const BASTIDORES = {
   url: "https://sndflw.com/i/JaDGKmxpDHdXT85jCpAg",
 } as const;
 
-export type FaixaDoTopo = "imersao" | "bastidores";
+export type FaixaDoTopo = "black" | "imersao" | "bastidores";
 
 /**
- * F102 + F088 — o topo do Club carrega **uma** faixa por vez, nunca duas
+ * F117 + F102 + F088 — o topo do Club carrega **uma** faixa por vez, nunca duas
  * empilhadas.
  *
- * A Imersão tem data marcada e some sozinha (`imersaoAtiva`), então ela tem
- * precedência enquanto existe. Bastidores é aberta e fica com o resto, e com
- * todo mundo depois que a Imersão passa.
+ * A Black tem prioridade durante a campanha. Depois dela, a Imersão tem
+ * precedência enquanto existe (`imersaoAtiva`). Bastidores fica com o resto.
  *
  * O gate é `isElite`, não `isPaid`: a F088 corrigiu isso em 24/09 porque a
  * Imersão é **onde o Elite é vendido** — esconder a faixa do PRO tirava dela
@@ -66,6 +66,7 @@ export function faixaDoTopo(opts: {
   isElite: boolean;
   agora?: Date;
 }): FaixaDoTopo {
+  if (blackAtiva(opts.agora ?? new Date())) return "black";
   if (!opts.isElite && imersaoAtiva(opts.agora ?? new Date())) return "imersao";
   return "bastidores";
 }
