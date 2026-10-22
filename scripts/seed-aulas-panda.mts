@@ -1,5 +1,5 @@
 /**
- * F050 / F051 / F103 / F107 / F110 / F111 / F112 / F113 / F116 — Seed dos módulos (jornada Fase 1–2,
+ * F050 / F051 / F103 / F107 / F110 / F111 / F112 / F113 / F116 / F118 — Seed dos módulos (jornada Fase 1–2,
  * n8n, IA, Fundamentos, lives, Grok Bots, JEV, Codex, Claude Code).
  *
  *   npm run db:seed:aulas-panda -- --target=hml
@@ -955,6 +955,14 @@ Nesta live a gente abre o modelo: o que entra no pacote, como explicar o valor s
           "Aprenda a transformar o Claude Code em um parceiro de desenvolvimento mais estratégico. Nesta aula, vamos melhorar nossa base no uso do Claude Code, aprofundar o CLAUDE.md, a pasta .claude e o Plan Mode para planejar melhor, reduzir retrabalho e criar projetos com mais velocidade e consistência.\n\n## Materiais\n- [Baixar projeto da aula (ZIP)](/materiais/claude-code-na-pratica-aula-2.zip)\n- [Baixar tutorial da aula (PDF)](/materiais/tutorial-aula-2-claude-code.pdf)",
         pandaVideoExternalId: "600db079-fa56-4434-88ef-2be1f6a99e19",
         sortOrder: 1,
+      },
+      {
+        slug: "claude-code-na-pratica-aula-3",
+        title: "Claude Code na prática: gerador de orçamentos",
+        description:
+          "Nesta aula a gente sai do plano e constrói, com Claude Code, um gerador de orçamentos e propostas por link: briefing, faixas de preço, aprovação do valor e página pública para o cliente pagar.\n\nVocê acompanha o PLANO.md virando um app Next.js + Supabase, os erros reais no caminho e o deploy.\n\n## Materiais\n- [Baixar projeto da aula (ZIP)](/materiais/claude-code-na-pratica-aula-3.zip)",
+        pandaVideoExternalId: "7f45c2b4-ae66-47d3-974f-cd232eecaccf",
+        sortOrder: 2,
       },
     ],
   },
