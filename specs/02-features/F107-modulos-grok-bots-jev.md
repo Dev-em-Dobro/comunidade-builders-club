@@ -9,7 +9,7 @@ Dois módulos raiz no catálogo `/aulas` (pago, `freeAccess` false):
 | slug | título | sortOrder |
 |------|--------|-----------|
 | `grok-bots-agentes-que-fazem-trabalho-por-voce` | Grok Bots — Agentes que fazem trabalho por você | 15 |
-| `jev-aplicado-ao-mundo-real` | JEV aplicado ao mundo real | 16 |
+| `jev-aplicado-ao-mundo-real` | JEV aplicado ao mundo real | 17 |
 
 A primeira aula do Grok Bots entra na [F112](F112-aula-grok-bots-na-pratica.md).
 JEV continua sem lessons até a aula correspondente.

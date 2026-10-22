@@ -27,7 +27,7 @@ const MODS = [
     title: "JEV aplicado ao mundo real",
     description:
       "JEV fora da teoria: como aplicar no dia a dia do builder — prospecção, entrega e operação com IA.",
-    sortOrder: 16,
+    sortOrder: 17,
   },
 ] as const;
 

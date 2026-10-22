@@ -558,6 +558,14 @@ O Claude Code requer um plano pago do Claude (Pro). Mesmo sem a assinatura, vale
 
 [Baixar material da aula (ZIP)](/materiais/claude-code-print-lp.zip)`,
 
+  "criando-um-site-premium/criando-um-site-premium": `Nesta aula você monta um site premium de relógio com animação no scroll e vídeo 3D: do mockup à página no navegador, controlando o filme pela rolagem.
+
+O guia passo a passo traz as etapas, os prompts para copiar e o que conferir antes de cada geração paga. O ZIP tem o site pronto para abrir e estudar.
+
+## Materiais
+- [Baixar guia passo a passo (PDF)](/materiais/guia-passo-a-passo-aluno.pdf)
+- [Baixar o site pronto (ZIP)](https://drive.google.com/uc?export=download&id=16N--KGFcfjbIYqKbO1nG4lOIIBpD24hX)`,
+
   "claude-code/claude-code-na-pratica": `Aprenda a transformar o Claude Code em um parceiro de desenvolvimento mais estratégico. Nesta aula, vamos melhorar nossa base no uso do Claude Code, aprofundar o CLAUDE.md, a pasta .claude e o Plan Mode para planejar melhor, reduzir retrabalho e criar projetos com mais velocidade e consistência.
 
 ## Materiais
