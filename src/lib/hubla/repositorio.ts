@@ -138,7 +138,7 @@ export async function concederPago(
         status: "active",
         tier: nextTier,
         convertedToPaidAt: convertedAt,
-        ...(nextTier === "elite" && m.tier !== "elite" && cobranca.pagoEm
+        ...(nextTier === "elite" && m.tier !== "elite" && !m.eliteStartedAt && cobranca.pagoEm
           ? { eliteStartedAt: cobranca.pagoEm }
           : {}),
         ...dinheiro,
@@ -151,7 +151,7 @@ export async function concederPago(
         data: {
           status: "active",
           tier: nextTier,
-          ...(nextTier === "elite" && m.tier !== "elite" && cobranca.pagoEm
+          ...(nextTier === "elite" && m.tier !== "elite" && !m.eliteStartedAt && cobranca.pagoEm
             ? { eliteStartedAt: cobranca.pagoEm }
             : {}),
           ...dinheiro,
@@ -167,7 +167,7 @@ export async function concederPago(
     data: {
       status: "active",
       tier: nextTier,
-      ...(nextTier === "elite" && m.tier !== "elite" && cobranca.pagoEm
+      ...(nextTier === "elite" && m.tier !== "elite" && !m.eliteStartedAt && cobranca.pagoEm
         ? { eliteStartedAt: cobranca.pagoEm }
         : {}),
       ...dinheiro,

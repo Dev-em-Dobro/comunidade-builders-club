@@ -98,7 +98,7 @@ export async function addAllowedEmail(opts: {
         data: {
           status: "active",
           tier,
-          ...(m.tier !== "elite" && tier === "elite" && opts.eliteStartedAt
+          ...(m.tier !== "elite" && !m.eliteStartedAt && tier === "elite" && opts.eliteStartedAt
             ? { eliteStartedAt: opts.eliteStartedAt }
             : {}),
         },
