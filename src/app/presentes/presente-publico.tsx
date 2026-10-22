@@ -18,8 +18,10 @@ import { GIFT_UTM_DEFAULTS, sanitizeUtmValue } from "@/lib/gifts/origem";
 import { PresentePromessa } from "@/app/presentes/presente-promessa";
 import { PresenteImersaoCta } from "@/app/presentes/presente-imersao-cta";
 import { PresenteAulaPopup } from "@/app/presentes/presente-aula-popup";
+import { PresentePosCadastroPopup } from "@/components/presente-pos-cadastro-popup";
 import { contarAulasGratuitas } from "@/lib/aulas";
 import { AULA_ABERTURA_HREF } from "@/lib/presentes/popup-aula";
+import { PRESENTE_ARTIGO_ID } from "@/lib/presentes/pos-cadastro";
 
 /** Âncora do CTA "Criar conta grátis" do bloco de promessa (F063). */
 const FORM_ANCHOR_ID = "criar-conta";
@@ -170,7 +172,7 @@ export async function PresentePublico({
          */}
         <PresenteImersaoCta utmContent={utm.content} />
 
-        <article className="mt-8">
+        <article id={PRESENTE_ARTIGO_ID} className="mt-8">
           {/*
            * F076 — a capa abre o artigo. Antes, `imageUrl` só saía no PostMedia
            * lá embaixo, depois do texto: o que era para ser capa chegava como
@@ -226,17 +228,29 @@ export async function PresentePublico({
         {!user ? (
           <div id={FORM_ANCHOR_ID} className="mx-auto mt-8 w-full max-w-xl">
             {/* F083 — mesmo destino da pop-up: primeira aula, não Boas-vindas. */}
-            <GiftSignupForm redirectTo={AULA_ABERTURA_HREF} />
+            <GiftSignupForm
+              redirectTo={AULA_ABERTURA_HREF}
+              giftSlug={gift.slug ?? slug}
+              giftTitle={title}
+            />
           </div>
         ) : null}
       </main>
 
       {/*
-       * F078 — a modal da aula, 60s depois de abrir. Só para quem não tem
+       * F078 / F118 — a sheet da aula no rodapé. Só para quem não tem
        * conta: quem já é membro não ganha nada com um convite para se
        * cadastrar, e a interrupção só atrapalharia a leitura.
        */}
-      {!user ? <PresenteAulaPopup totalAulas={aulasGratuitas} /> : null}
+      {!user ? (
+        <PresenteAulaPopup
+          totalAulas={aulasGratuitas}
+          giftSlug={gift.slug ?? slug}
+          giftTitle={title}
+        />
+      ) : (
+        <PresentePosCadastroPopup />
+      )}
     </div>
   );
 }

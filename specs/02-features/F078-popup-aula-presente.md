@@ -3,6 +3,10 @@
 ## Status
 Rascunho — 2026-09-04
 
+**Layout (F118):** a pop-up deixa de abrir no centro (`sm:items-center`) e
+passa a ser uma faixa/sheet no rodapé, em desktop e mobile, com CTA "Ver meu
+presente". Atribuição, delay, `GiftSignupForm` e destino da aula não mudam.
+
 Depende de: [F059](F059-presentes-publicos-atribuicao.md) (Presente público, OTP e
 atribuição por `utm_content`), [F063](F063-funil-presente-conta-free.md) (bloco da
 promessa e razão do cadastro), [F065](F065-aulas-fase-1-free.md) (o módulo

@@ -9,9 +9,15 @@ import {
   subheadPopup,
   tituloPopup,
 } from "@/lib/presentes/popup-aula";
+import {
+  giftPublicPath,
+  PRESENTE_ARTIGO_ID,
+} from "@/lib/presentes/pos-cadastro";
 
 /**
  * F078 — pop-up da aula no Presente.
+ * F118 — deixa de ser modal centrada: sheet no rodapé, nos dois viewports,
+ * com CTA "Ver meu presente" para o artigo desta página.
  *
  * Abre `POPUP_DELAY_MS` depois que a página monta, só para quem não tem conta.
  * O e-mail é capturado aqui dentro pelo mesmo `GiftSignupForm` do rodapé — é ele
@@ -23,17 +29,39 @@ import {
  * F063"). O que a mantém honesta: ela **dá** em vez de vender, e fechar custa
  * um Esc — o artigo continua inteiro atrás.
  *
- * Fechar não é lembrado (decisão 5): cada visita ao Presente é uma chance nova.
+ * Fechar não é lembrado (decisão 5 da F078): cada visita ao Presente é uma
+ * chance nova.
  */
-export function PresenteAulaPopup({ totalAulas }: { totalAulas: number }) {
+export function PresenteAulaPopup({
+  totalAulas,
+  giftSlug,
+  giftTitle,
+}: {
+  totalAulas: number;
+  giftSlug: string;
+  giftTitle: string;
+}) {
   const [aberta, setAberta] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
+  const giftHref = giftPublicPath(giftSlug);
 
   /**
-   * Fechar vale só para esta visita (decisão 5). Nada é gravado no navegador:
-   * abrir o Presente de novo é uma chance nova.
+   * Fechar vale só para esta visita (F078 decisão 5). Nada é gravado no
+   * navegador: abrir o Presente de novo é uma chance nova.
    */
   const fechar = useCallback(() => setAberta(false), []);
+
+  const verPresente = useCallback(() => {
+    fechar();
+    window.requestAnimationFrame(() => {
+      const artigo = document.getElementById(PRESENTE_ARTIGO_ID);
+      if (artigo) {
+        artigo.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+      if (giftHref) window.location.assign(giftHref);
+    });
+  }, [fechar, giftHref]);
 
   /**
    * O timer roda uma vez, na montagem — fechar não reagenda. Navegar de um
@@ -45,7 +73,7 @@ export function PresenteAulaPopup({ totalAulas }: { totalAulas: number }) {
   }, []);
 
   /**
-   * Esc fecha, foco entra na modal e o fundo trava. Uma modal sem Esc no meio
+   * Esc fecha, foco entra na sheet e o fundo trava. Uma modal sem Esc no meio
    * de um artigo é sequestro, não convite.
    */
   useEffect(() => {
@@ -72,7 +100,7 @@ export function PresenteAulaPopup({ totalAulas }: { totalAulas: number }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center overflow-y-auto bg-black/60 p-4 backdrop-blur-sm sm:items-center"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/50"
       onClick={(e) => {
         if (e.target === e.currentTarget) fechar();
       }}
@@ -83,8 +111,12 @@ export function PresenteAulaPopup({ totalAulas }: { totalAulas: number }) {
         aria-modal="true"
         aria-labelledby="popup-aula-titulo"
         tabIndex={-1}
-        className="relative my-auto w-full max-w-lg rounded-2xl border border-border/80 bg-card p-6 shadow-2xl outline-none sm:p-7"
+        className="sheet-slide-up relative w-full max-w-lg rounded-t-2xl border border-border/80 border-b-0 bg-card p-5 shadow-2xl outline-none animate-[slideUpSheet_0.28s_ease-out] sm:p-6 max-h-[min(92dvh,42rem)] overflow-y-auto pb-[max(1.25rem,env(safe-area-inset-bottom))]"
       >
+        <div
+          className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-border"
+          aria-hidden
+        />
         <button
           type="button"
           onClick={() => fechar()}
@@ -110,6 +142,16 @@ export function PresenteAulaPopup({ totalAulas }: { totalAulas: number }) {
           {POPUP_AULA.promessa}
         </p>
 
+        {giftHref ? (
+          <button
+            type="button"
+            onClick={verPresente}
+            className="btn-primary mt-5 w-full"
+          >
+            {POPUP_AULA.verPresente}
+          </button>
+        ) : null}
+
         <div className="mt-5">
           <GiftSignupForm
             headline={POPUP_AULA.cta}
@@ -117,6 +159,8 @@ export function PresenteAulaPopup({ totalAulas }: { totalAulas: number }) {
             redirectTo={AULA_ABERTURA_HREF}
             formId="cadastro-presente-popup"
             pedirNome={false}
+            giftSlug={giftSlug}
+            giftTitle={giftTitle}
           />
         </div>
 
