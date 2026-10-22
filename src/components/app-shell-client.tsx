@@ -20,6 +20,7 @@ import {
 import { ClubImersaoBanner } from "@/components/club-imersao-banner";
 import { BastidoresBanner } from "@/components/bastidores-banner";
 import { BlackInfinitaBanner } from "@/components/black-infinita-banner";
+import { PresentePosCadastroPopup } from "@/components/presente-pos-cadastro-popup";
 import { faixaDoTopo } from "@/lib/eventos/bastidores";
 import {
   ICON_ADMIN,
@@ -730,6 +731,7 @@ export function AppShellClient({
       >
         {children}
       </ShellInner>
+      <PresentePosCadastroPopup />
     </UpgradeProvider>
   );
 }

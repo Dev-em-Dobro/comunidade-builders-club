@@ -358,6 +358,18 @@
   }
 }
 
+/* F118 — sheet do Presente sobe do rodapé (desktop e mobile). */
+@keyframes slideUpSheet {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* F060 — reagir: estufa e volta, com leve recuo antes de assentar. */
 @keyframes heartPop {
   0% {
@@ -410,5 +422,8 @@
   }
   .heart-float {
     display: none;
+  }
+  .sheet-slide-up {
+    animation: none !important;
   }
 }

@@ -7,6 +7,10 @@ import { authClient } from "@/lib/auth/client";
 import { completarCadastroPresenteAction } from "@/actions/gifts";
 import { WELCOME_SPACE_SLUG } from "@/lib/spaces/constants";
 import { safeCallbackPath } from "@/lib/security/urls";
+import {
+  getBrowserSessionStorage,
+  rememberPosCadastroPresente,
+} from "@/lib/presentes/pos-cadastro";
 
 type Step = "form" | "otp";
 
@@ -47,6 +51,13 @@ type Props = {
    * borda para se destacar.
    */
   variant?: "card" | "plain";
+  /**
+   * F118 — slug/título do Presente desta página. Depois de conta **nova**,
+   * o lembrete pós-cadastro lê isso no sessionStorage. `/cadastro` genérico
+   * não passa: remember recusa o slug `cadastro`.
+   */
+  giftSlug?: string;
+  giftTitle?: string | null;
 };
 
 export function GiftSignupForm({
@@ -61,6 +72,8 @@ export function GiftSignupForm({
   formId = "cadastro-presente",
   pedirNome = true,
   variant = "card",
+  giftSlug,
+  giftTitle,
 }: Props) {
   const router = useRouter();
   const caixa =
@@ -144,6 +157,19 @@ export function GiftSignupForm({
         setAlreadyHadAccount(true);
         window.setTimeout(() => router.refresh(), 2200);
         return;
+      }
+      /**
+       * F118 — conta nova, e só ela: quem já tinha conta não vê o lembrete.
+       * sessionStorage bloqueado é silêncio; a aula continua sendo o destino.
+       */
+      if (giftSlug) {
+        const storage = getBrowserSessionStorage();
+        if (storage) {
+          rememberPosCadastroPresente(storage, {
+            slug: giftSlug,
+            title: giftTitle,
+          });
+        }
       }
       /**
        * F048 manda conta nova de `/` para Boas-vindas. Se o OTP cair no

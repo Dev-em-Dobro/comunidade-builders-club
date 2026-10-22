@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   AULA_ABERTURA_HREF,
+  POPUP_AULA,
   POPUP_DELAY_MS,
   subheadPopup,
   tituloPopup,
@@ -36,6 +37,16 @@ describe("copy por número de aulas (F078)", () => {
 
 describe("destino do cadastro pela modal (F078)", () => {
   it("aponta para a aula de abertura do módulo gratuito", () => {
+    assert.equal(
+      AULA_ABERTURA_HREF,
+      "/aulas/fase-1-m01-comece-por-aqui/desafio-quick-win-lovable",
+    );
+  });
+});
+
+describe("CTA Ver meu presente (F118)", () => {
+  it("tem copy curta e não troca o destino da aula", () => {
+    assert.equal(POPUP_AULA.verPresente, "Ver meu presente");
     assert.equal(
       AULA_ABERTURA_HREF,
       "/aulas/fase-1-m01-comece-por-aqui/desafio-quick-win-lovable",
