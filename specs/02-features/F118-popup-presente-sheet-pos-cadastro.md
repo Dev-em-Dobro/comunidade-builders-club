@@ -28,7 +28,7 @@ referência: `presente-aula-popup.tsx` **antes** do merge #133 (`2c083b8`).
 Abaixo de `md`: **a mesma caixa** (não é sheet, não tem puxador) cola no
 **rodapé** — largura total, `bottom` encostado, sem `p-4` nas laterais nem
 embaixo (`p-0`, `md:p-4`). Cantos de cima `rounded-t-2xl`, de baixo
-retos. Teto de ~`50dvh`; o conteúdo rola dentro. `padding-bottom` interno
+retos. Teto de ~`60dvh`; o conteúdo rola dentro. `padding-bottom` interno
 respeita `env(safe-area-inset-bottom)`. No mobile cola em `bottom-0`;
 sem `--bc-consent-h` — aviso e pop-up podem empilhar. A metade de cima
 da página continua visível (título do artigo). Continua dismissible:
@@ -108,7 +108,7 @@ Sem migration. Sem env nova. Sem mudança em `GiftVisit`, `Membership` nem
 - [x] Spec antes do código
 - [x] `giftPublicPath` e show-once cobertos por teste (sem Prisma)
 - [ ] Em 1280px a pop-up é a modal centrada de antes da F118
-- [ ] Em 390px a caixa cola nas bordas e no rodapé, ≤ ~50dvh, título
+- [ ] Em 390px a caixa cola nas bordas e no rodapé, ≤ ~60dvh, título
       do artigo legível (sem blur); X e "Agora não" clicáveis
 - [ ] Sem botão "Ver meu presente" na pop-up (o CTA fica no lembrete)
 - [ ] Fade só de opacity; reduced-motion sem animação

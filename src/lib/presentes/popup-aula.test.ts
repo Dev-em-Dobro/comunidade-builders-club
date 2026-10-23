@@ -55,10 +55,11 @@ describe("layout da pop-up (F118)", () => {
   const jsx = popup.slice(popup.indexOf("return ("));
   const banner = readFileSync("src/components/cookie-consent.tsx", "utf8");
 
-  it("no desktop (md+) centra; no mobile senta no rodapé com teto de 50dvh", () => {
+  it("no desktop (md+) centra; no mobile senta no rodapé com teto de 60dvh", () => {
     assert.match(jsx, /items-end/);
     assert.match(jsx, /md:items-center/);
-    assert.match(jsx, /max-md:max-h-\[50dvh\]/);
+    assert.match(jsx, /max-md:max-h-\[60dvh\]/);
+    assert.doesNotMatch(jsx, /max-md:max-h-\[50dvh\]/);
     assert.doesNotMatch(jsx, /sm:items-center/);
   });
 
