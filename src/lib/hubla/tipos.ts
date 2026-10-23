@@ -68,7 +68,17 @@ export type HublaWebhookEvent = {
 export type CobrancaHubla = {
   valorCentavos: number | null;
   moeda: string | null;
+  /**
+   * F081 — data da última cobrança (paidAt ?? billingDate ?? createdAt de qualquer fonte).
+   * Serve só para `ultimaCobrancaEm`. NÃO usar como data de conversão.
+   */
   cobradoEm: Date | null;
+  /**
+   * N4 — `invoice.paidAt` (quando a fatura foi paga). Única data do payload aceita
+   * como data de conversão / allowed_email.paid_at. Nunca billingDate nem
+   * createdAt (da fatura ou da assinatura).
+   */
+  pagoEm: Date | null;
 };
 
 export type AcaoAllowlist =
