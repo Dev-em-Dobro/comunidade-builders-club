@@ -34,7 +34,7 @@ scroll) e o ZIP do site pronto.
 
 ## Critérios
 
-- [ ] Card no catálogo com capa, sem Em breve
-- [ ] Aula publicada com vídeo Panda, PDF e ZIP na descrição
-- [ ] `freeAccess` permanece `false`
-- [ ] Embed usa `video_external_id`, não o UUID do dashboard
+- [x] Card no catálogo com capa, sem Em breve
+- [x] Aula publicada com vídeo Panda, PDF e ZIP na descrição
+- [x] `freeAccess` permanece `false`
+- [x] Embed usa `video_external_id`, não o UUID do dashboard

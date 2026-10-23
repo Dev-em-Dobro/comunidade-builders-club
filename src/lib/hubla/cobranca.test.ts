@@ -25,6 +25,30 @@ describe("extrairCobrancaHubla — F081", () => {
     assert.equal(c.valorCentavos, 29700);
     assert.equal(c.moeda, "BRL");
     assert.equal(c.cobradoEm?.toISOString(), "2026-09-08T12:00:00.000Z");
+    assert.equal(c.pagoEm?.toISOString(), "2026-09-08T12:00:00.000Z");
+  });
+
+  it("N4: pagoEm só vem de invoice.paidAt — nunca billingDate/createdAt da assinatura", () => {
+    const payload: HublaWebhookPayload = {
+      type: "invoice.payment_succeeded",
+      event: {
+        invoice: { amountInCents: 29700, billingDate: "2025-02-01T00:00:00.000Z" },
+        subscription: { id: "sub-1", createdAt: "2025-01-10T00:00:00.000Z" },
+      },
+    };
+    const c = extrairCobrancaHubla(payload);
+    assert.equal(c.pagoEm, null);
+  });
+
+  it("N4: pagoEm ignora paidAt da assinatura", () => {
+    const payload: HublaWebhookPayload = {
+      type: "invoice.payment_succeeded",
+      event: {
+        invoice: { amountInCents: 29700 },
+        subscription: { id: "sub-1", paidAt: "2025-01-10T00:00:00.000Z" },
+      },
+    };
+    assert.equal(extrairCobrancaHubla(payload).pagoEm, null);
   });
 
   it("lê amount inteiro como centavos", () => {
@@ -53,6 +77,7 @@ describe("extrairCobrancaHubla — F081", () => {
       valorCentavos: null,
       moeda: null,
       cobradoEm: null,
+      pagoEm: null,
     });
   });
 });

@@ -12,8 +12,8 @@ publicada, descrição do card sem “Em breve no Club”, capa genérica
 Pago (`freeAccess` false). Badge F108 some sozinho quando
 `contentCount > 0`.
 
-Ordem no catálogo: Gravações → Codex → **Claude Code** → Grok Bots →
-JEV (`sortOrder` 14).
+Ordem no catálogo: Gravações → **Claude Code** → Codex → Grok Bots →
+JEV (`sortOrder` 13).
 
 ## Conteúdo
 
@@ -41,7 +41,7 @@ a apaga.
 
 ## Critérios
 
-- [x] Card Claude Code imediatamente depois do Codex, sem “Em breve”
+- [x] Card Claude Code imediatamente depois das Gravações e antes do Codex, sem “Em breve”
 - [x] Aula abre o vídeo Panda e mostra guia, descrição e ZIP
 - [x] `freeAccess` permanece `false`
 - [x] Embed usa `video_external_id`, não o UUID do dashboard

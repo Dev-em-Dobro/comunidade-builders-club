@@ -4,6 +4,7 @@ import {
   tierPagoDaNotaAllowlist,
   type TierPagoAllowlist,
 } from "./tier-allowlist";
+import { buildUpdatePaidAt } from "@/lib/hubla/regras-conversao";
 
 export function normalizarEmail(email: string): string {
   return email.trim().toLowerCase();
@@ -34,17 +35,19 @@ export async function tierPagoDoEmailAllowlist(
   return tierPagoDaNotaAllowlist(row?.note);
 }
 
-/** Dados da allowlist para o bootstrap: tier e data do pagamento. */
+/** Dados da allowlist para o bootstrap: conversão e compra Elite separadas. */
 export async function dadosPagosDoEmailAllowlist(
   email: string,
-): Promise<{ tier: TierPagoAllowlist; paidAt: Date | null }> {
+): Promise<{ tier: TierPagoAllowlist; paidAt: Date | null; source: string | null; eliteStartedAt: Date | null }> {
   const row = await prisma.allowedEmail.findUnique({
     where: { email: normalizarEmail(email) },
-    select: { note: true, paidAt: true },
+    select: { note: true, paidAt: true, source: true, eliteStartedAt: true },
   });
   return {
     tier: tierPagoDaNotaAllowlist(row?.note),
     paidAt: row?.paidAt ?? null,
+    source: row?.source ?? null,
+    eliteStartedAt: row?.eliteStartedAt ?? null,
   };
 }
 
@@ -56,8 +59,16 @@ export async function addAllowedEmail(opts: {
   tier?: TierPagoAllowlist;
   /** Data do pagamento (para preencher convertedToPaidAt no bootstrap). */
   paidAt?: Date;
+  /** Data confirmada da compra Elite; nunca inferir do horário do webhook. */
+  eliteStartedAt?: Date;
 }) {
   const email = normalizarEmail(opts.email);
+  const existing = await prisma.allowedEmail.findUnique({
+    where: { email },
+    select: { paidAt: true, eliteStartedAt: true, note: true },
+  });
+
+  const paidAtUpdate = buildUpdatePaidAt({ paidAt: opts.paidAt }, existing?.paidAt ?? null);
   const row = await prisma.allowedEmail.upsert({
     where: { email },
     create: {
@@ -65,11 +76,16 @@ export async function addAllowedEmail(opts: {
       source: opts.source ?? "manual",
       note: opts.note ?? null,
       paidAt: opts.paidAt ?? null,
+      eliteStartedAt: opts.eliteStartedAt ?? null,
     },
     update: {
       ...(opts.source ? { source: opts.source } : {}),
       ...(opts.note !== undefined ? { note: opts.note } : {}),
-      ...(opts.paidAt ? { paidAt: opts.paidAt } : {}),
+      ...paidAtUpdate,
+      ...(opts.eliteStartedAt && !existing?.eliteStartedAt &&
+      (!existing || tierPagoDaNotaAllowlist(existing.note) !== "elite")
+        ? { eliteStartedAt: opts.eliteStartedAt }
+        : {}),
     },
   });
 
@@ -83,7 +99,13 @@ export async function addAllowedEmail(opts: {
       const tier = mesclarTierPago(m.tier, desejado);
       await prisma.membership.update({
         where: { userId: user.id },
-        data: { status: "active", tier },
+        data: {
+          status: "active",
+          tier,
+          ...(m.tier !== "elite" && !m.eliteStartedAt && tier === "elite" && opts.eliteStartedAt
+            ? { eliteStartedAt: opts.eliteStartedAt }
+            : {}),
+        },
       });
     }
   }

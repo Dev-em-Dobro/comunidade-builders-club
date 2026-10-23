@@ -358,6 +358,35 @@
   }
 }
 
+/*
+ * F118 — pop-up da aula: só fade de opacity, já na posição final.
+ * Sem translate: o primeiro frame é centro no desktop e rodapé no mobile.
+ */
+.popup-aula-fade {
+  animation: popupAulaFade 0.2s ease-out both;
+}
+
+/*
+ * F118 — abaixo de `md` a caixa cola no rodapé. Sem `--bc-consent-h`:
+ * aviso e pop-up podem empilhar; a caixa não sobe. `padding-bottom`
+ * do diálogo reserva o safe-area. Fora de @layer: utility com `var(,)`
+ * não gera esse padding.
+ */
+@media (max-width: 767px) {
+  .popup-aula-overlay > [role="dialog"] {
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+  }
+}
+
+@keyframes popupAulaFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 /* F060 — reagir: estufa e volta, com leve recuo antes de assentar. */
 @keyframes heartPop {
   0% {
@@ -410,5 +439,8 @@
   }
   .heart-float {
     display: none;
+  }
+  .popup-aula-fade {
+    animation: none !important;
   }
 }

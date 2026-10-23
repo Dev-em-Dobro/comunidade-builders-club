@@ -43,7 +43,7 @@ produção). Se a capa 404, o card cai no gradiente com o título.
 
 ## Critérios
 
-- [ ] Card Grok Bots em `/aulas` sem badge Em breve (HML + prod)
-- [ ] Aula abre o vídeo Panda e mostra descrição + PDF
-- [ ] `freeAccess` permanece `false`
-- [ ] Embed usa `video_external_id`, não o UUID do dashboard
+- [x] Card Grok Bots em `/aulas` sem badge Em breve (HML + prod)
+- [x] Aula abre o vídeo Panda e mostra descrição + PDF
+- [x] `freeAccess` permanece `false`
+- [x] Embed usa `video_external_id`, não o UUID do dashboard

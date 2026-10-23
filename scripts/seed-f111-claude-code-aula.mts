@@ -1,5 +1,5 @@
 /**
- * F111 — primeira aula do Claude Code (sai de Em breve) e ordem após Codex.
+ * F111 — primeira aula do Claude Code (sai de Em breve) e ordem antes do Codex.
  *
  *   npx tsx scripts/seed-f111-claude-code-aula.mts --target=hml
  *   npx tsx scripts/seed-f111-claude-code-aula.mts --target=prod --confirm
@@ -41,8 +41,8 @@ const description =
 try {
   const result = await prisma.$transaction(async (db) => {
     for (const [moduleSlug, sortOrder] of [
-      ["codex", 13],
-      ["claude-code", 14],
+      ["claude-code", 13],
+      ["codex", 14],
       ["grok-bots-agentes-que-fazem-trabalho-por-voce", 15],
       ["jev-aplicado-ao-mundo-real", 16],
     ] as const) {
@@ -60,7 +60,7 @@ try {
         coverImageUrl: "/7-claude-code.webp",
         published: true,
         freeAccess: false,
-        sortOrder: 14,
+        sortOrder: 13,
       },
     });
 

@@ -175,6 +175,8 @@ model Membership {
   /// Data em que o membro virou pagante (Free/novo → pro/elite). Gravado só
   /// na primeira conversão, não atualiza em renovações. Null em membros legados.
   convertedToPaidAt DateTime?       @map("converted_to_paid_at")
+  /// F115 — primeira compra/upgrade para Elite; renovações não alteram.
+  eliteStartedAt    DateTime?       @map("elite_started_at")
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
 
@@ -193,6 +195,8 @@ model AllowedEmail {
   /// Data do pagamento Hubla/TMB que gerou esta entrada. Usado no bootstrap
   /// para preencher convertedToPaidAt quando o usuário ainda não tinha conta.
   paidAt    DateTime? @map("paid_at")
+  /// F115 — pagamento confirmado da primeira compra Elite, separado da conversão.
+  eliteStartedAt DateTime? @map("elite_started_at")
   createdAt DateTime  @default(now())
 
   @@map("allowed_email")
@@ -218,7 +222,7 @@ model LegalAcceptance {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  /// `termos` | `privacidade` | `garantia` (F058 / F090).
+  /// `termos` | `privacidade` | `garantia` | `termos-elite`.
   documento String
   versao    String
   aceitoEm  DateTime @default(now()) @map("aceito_em")
@@ -232,26 +236,30 @@ model LegalAcceptance {
 
 /// F014 / F081 — idempotência do webhook Hubla (+ payload bruto).
 model HublaWebhookDelivery {
-  idempotencyKey String   @id @map("idempotency_key")
-  eventType      String   @map("event_type")
+  idempotencyKey String    @id @map("idempotency_key")
+  eventType      String    @map("event_type")
   /// F081 — JSON completo do POST (achar campos de valor; auditar cancelamentos).
   payload        Json?
   /// Product ID do evento Hubla.
-  productId      String?  @map("product_id")
+  productId      String?   @map("product_id")
   /// Offer ID do evento Hubla (quando presente).
-  offerId        String?  @map("offer_id")
+  offerId        String?   @map("offer_id")
   /// E-mail principal do evento.
   email          String?
   /// Membership vinculada (se existir usuário no momento do evento).
-  membershipId   String?  @map("membership_id")
-  /// Status do processamento: pending | processed | ignored | error.
-  status         String   @default("pending")
+  membershipId   String?   @map("membership_id")
+  /// Status do processamento: pending | processing | processed | ignored | error.
+  /// N5: 'processing' é estado intermediário durante claim atômico.
+  status         String    @default("pending")
   /// Mensagem de erro ou motivo de ignorar.
   erro           String?
-  processedAt    DateTime @default(now()) @map("processed_at")
+  /// N5: Timestamp do claim atômico (para detectar processing travado).
+  claimedAt      DateTime? @map("claimed_at")
+  processedAt    DateTime  @default(now()) @map("processed_at")
 
   @@index([email])
   @@index([processedAt])
+  @@index([status, claimedAt])
   @@map("hubla_webhook_delivery")
 }
 

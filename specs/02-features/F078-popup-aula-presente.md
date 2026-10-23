@@ -3,6 +3,13 @@
 ## Status
 Rascunho — 2026-09-04
 
+**Layout (F118):** no desktop (`md+`) a pop-up volta a ser a modal
+centrada de sempre. Abaixo de `md`, a **mesma caixa** cola no rodapé
+(largura total, sem folga, teto ~60dvh, sem blur no overlay). Fade de
+opacity na posição final.
+Atribuição, delay, `GiftSignupForm` e destino da aula não mudam. O CTA
+"Ver meu presente" é só do lembrete pós-cadastro.
+
 Depende de: [F059](F059-presentes-publicos-atribuicao.md) (Presente público, OTP e
 atribuição por `utm_content`), [F063](F063-funil-presente-conta-free.md) (bloco da
 promessa e razão do cadastro), [F065](F065-aulas-fase-1-free.md) (o módulo

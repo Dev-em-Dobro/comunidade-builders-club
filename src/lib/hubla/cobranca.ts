@@ -11,6 +11,7 @@ const SEM_COBRANCA: CobrancaHubla = {
   valorCentavos: null,
   moeda: null,
   cobradoEm: null,
+  pagoEm: null,
 };
 
 function lerNumero(v: unknown): number | null {
@@ -53,12 +54,15 @@ function moedaDeCampos(campos: HublaCobrancaCampos | undefined): string | null {
   return m || null;
 }
 
-function dataDeCampos(campos: HublaCobrancaCampos | undefined): Date | null {
-  if (!campos) return null;
-  const raw = campos.paidAt ?? campos.billingDate ?? campos.createdAt;
+function lerData(raw: unknown): Date | null {
   if (typeof raw !== "string" || !raw.trim()) return null;
   const d = new Date(raw);
   return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function dataDeCampos(campos: HublaCobrancaCampos | undefined): Date | null {
+  if (!campos) return null;
+  return lerData(campos.paidAt ?? campos.billingDate ?? campos.createdAt);
 }
 
 function primeiraOferta(
@@ -115,7 +119,10 @@ export function extrairCobrancaHubla(payload: HublaWebhookPayload): CobrancaHubl
 
     if (valorCentavos !== null && !moeda) moeda = "BRL";
 
-    return { valorCentavos, moeda, cobradoEm };
+    // N4: só o paidAt da FATURA vale como data de pagamento/conversão.
+    const pagoEm = lerData(event.invoice?.paidAt);
+
+    return { valorCentavos, moeda, cobradoEm, pagoEm };
   } catch {
     return SEM_COBRANCA;
   }

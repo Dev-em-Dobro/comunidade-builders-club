@@ -43,6 +43,19 @@ export const POPUP_AULA = {
 } as const;
 
 /**
+ * F118 — fade só de opacity na posição final (centro no `md+`, rodapé
+ * abaixo). Sem translate. `prefers-reduced-motion` zera a animação.
+ */
+export const POPUP_FADE_CLASS = "popup-aula-fade" as const;
+
+/**
+ * F118 — no mobile a caixa cola no rodapé. Sem `--bc-consent-h`: aviso
+ * e pop-up podem empilhar; a caixa não sobe. A classe ancora o
+ * `safe-area` em `globals.css`.
+ */
+export const POPUP_OVERLAY_CLASS = "popup-aula-overlay" as const;
+
+/**
  * O número vem do banco (decisão 4.1). Sem número — contagem falhou ou veio
  * zero — a copy perde força, mas não mente.
  */

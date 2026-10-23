@@ -931,13 +931,13 @@ Nesta live a gente abre o modelo: o que entra no pacote, como explicar o valor s
     lessons: [],
   },
   {
-    // F111 — primeira aula. Pago. sortOrder 14: logo após Codex.
+    // F111 — primeira aula. Pago. sortOrder 13: logo após Gravações.
     slug: "claude-code",
     title: "Claude Code",
     description:
       "Instale e use o Claude Code na IDE para desenvolver e revisar projetos com IA.",
     coverImageUrl: "/7-claude-code.webp",
-    sortOrder: 14,
+    sortOrder: 13,
     forceLessonSort: true,
     lessons: [
       {
@@ -968,13 +968,13 @@ Nesta live a gente abre o modelo: o que entra no pacote, como explicar o valor s
   },
   {
     // F110 — primeira aula. Pago. Capa própria: thumb do vídeo não vai ao card.
-    // sortOrder 13: logo após Gravações (liberado antes de Grok/JEV/Claude).
+    // sortOrder 14: depois do Claude Code.
     slug: "codex",
     title: "Codex",
     description:
       "Agente da OpenAI: instalação, AGENTS.md, plugins e uso no dia a dia.",
     coverImageUrl: "/6-codex.png",
-    sortOrder: 13,
+    sortOrder: 14,
     forceLessonSort: true,
     lessons: [
       {

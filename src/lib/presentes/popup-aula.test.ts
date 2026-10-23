@@ -1,8 +1,11 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
+import { readFileSync } from "node:fs";
 import {
   AULA_ABERTURA_HREF,
   POPUP_DELAY_MS,
+  POPUP_FADE_CLASS,
+  POPUP_OVERLAY_CLASS,
   subheadPopup,
   tituloPopup,
 } from "./popup-aula";
@@ -40,6 +43,84 @@ describe("destino do cadastro pela modal (F078)", () => {
       AULA_ABERTURA_HREF,
       "/aulas/fase-1-m01-comece-por-aqui/desafio-quick-win-lovable",
     );
+  });
+});
+
+describe("layout da pop-up (F118)", () => {
+  const css = readFileSync("src/app/globals.css", "utf8");
+  const popup = readFileSync(
+    "src/app/presentes/presente-aula-popup.tsx",
+    "utf8",
+  );
+  const jsx = popup.slice(popup.indexOf("return ("));
+  const banner = readFileSync("src/components/cookie-consent.tsx", "utf8");
+
+  it("no desktop (md+) centra; no mobile senta no rodapé com teto de 60dvh", () => {
+    assert.match(jsx, /items-end/);
+    assert.match(jsx, /md:items-center/);
+    assert.match(jsx, /max-md:max-h-\[60dvh\]/);
+    assert.doesNotMatch(jsx, /max-md:max-h-\[50dvh\]/);
+    assert.doesNotMatch(jsx, /sm:items-center/);
+  });
+
+  it("no mobile cola nas bordas, sem blur; no desktop o overlay de sempre", () => {
+    assert.match(jsx, /bg-black\/60/);
+    assert.match(jsx, /backdrop-blur-none/);
+    assert.match(jsx, /md:backdrop-blur-sm/);
+    assert.match(jsx, /z-\[60\]/);
+    assert.match(jsx, /overflow-y-auto/);
+    assert.match(jsx, /\bp-0\b/);
+    assert.match(jsx, /md:p-4/);
+    assert.match(jsx, /rounded-t-2xl/);
+    assert.match(jsx, /rounded-b-none/);
+    assert.match(jsx, /md:rounded-2xl/);
+  });
+
+  it("é a mesma caixa (sem puxador de sheet) e some o CTA Ver meu presente", () => {
+    assert.match(jsx, /max-w-lg/);
+    assert.doesNotMatch(jsx, /h-1\.5 w-10/);
+    assert.doesNotMatch(jsx, /Ver meu presente/);
+    assert.match(jsx, /giftSlug=\{giftSlug\}/);
+  });
+
+  it("o X tem área de toque 44px", () => {
+    assert.match(jsx, /h-11 w-11/);
+  });
+
+  it("fade só de opacity, na posição final, com reduced-motion", () => {
+    assert.equal(POPUP_FADE_CLASS, "popup-aula-fade");
+    const fade =
+      css.split("@keyframes popupAulaFade")[1]?.split("@keyframes")[0] ?? "";
+    assert.match(fade, /from\s*\{[^}]*opacity:\s*0/);
+    assert.match(fade, /to\s*\{[^}]*opacity:\s*1/);
+    assert.doesNotMatch(fade, /transform/);
+    assert.match(
+      css,
+      /prefers-reduced-motion:\s*reduce[\s\S]*\.popup-aula-fade[\s\S]*animation:\s*none/s,
+    );
+    assert.doesNotMatch(css, /slideUpSheet/);
+    assert.doesNotMatch(css, /presente-sheet-overlay/);
+  });
+
+  it("não mexe no componente do aviso de cookies e não usa --bc-consent-h", () => {
+    assert.doesNotMatch(banner, /data-presente-sheet/);
+    assert.doesNotMatch(banner, /className="cookie-consent /);
+    assert.equal(POPUP_OVERLAY_CLASS, "popup-aula-overlay");
+    const overlayCss =
+      css.split(".popup-aula-overlay")[1]?.split("@keyframes")[0] ?? "";
+    assert.doesNotMatch(overlayCss, /--bc-consent-h/);
+    assert.match(css, /env\(safe-area-inset-bottom\)/);
+  });
+
+  it("abre no delay da F078, sem esperar o cookie de consentimento", () => {
+    assert.match(
+      popup,
+      /setTimeout\(\(\) => setAberta\(true\), POPUP_DELAY_MS\)/,
+    );
+    assert.doesNotMatch(popup, /aguardarConsentimentoParaPopup/);
+    assert.doesNotMatch(popup, /bc_consent/);
+    assert.doesNotMatch(popup, /precisaDecidir/);
+    assert.doesNotMatch(popup, /CONSENTIMENTO_ANALYTICS_EVENT/);
   });
 });
 
