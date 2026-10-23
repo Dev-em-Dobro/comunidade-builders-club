@@ -368,8 +368,8 @@
 
 /*
  * F118 — abaixo de `md` a caixa cola no rodapé. Sem `--bc-consent-h`:
- * a pop-up só abre depois do aviso de cookies. `padding-bottom` do
- * diálogo reserva o safe-area. Fora de @layer: utility com `var(,)`
+ * aviso e pop-up podem empilhar; a caixa não sobe. `padding-bottom`
+ * do diálogo reserva o safe-area. Fora de @layer: utility com `var(,)`
  * não gera esse padding.
  */
 @media (max-width: 767px) {
