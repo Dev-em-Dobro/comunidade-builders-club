@@ -15,7 +15,7 @@ import {
 /**
  * F078 — pop-up da aula no Presente.
  * F118 — no desktop (`md+`) é a modal centrada de sempre; abaixo de `md`
- * a mesma caixa senta no rodapé com teto de ~50dvh. Sem sheet, sem puxador,
+ * a mesma caixa senta no rodapé com teto de ~60dvh. Sem sheet, sem puxador,
  * sem slide. O CTA "Ver meu presente" não entra aqui; depois do cadastro o
  * lembrete (PresentePosCadastroPopup) é quem oferece ir ao presente.
  *
@@ -107,7 +107,7 @@ export function PresenteAulaPopup({
         aria-modal="true"
         aria-labelledby="popup-aula-titulo"
         tabIndex={-1}
-        className={`${POPUP_FADE_CLASS} relative my-0 flex w-full max-w-lg flex-col rounded-t-2xl rounded-b-none border border-border/80 bg-card p-6 shadow-2xl outline-none max-md:max-h-[50dvh] max-md:max-w-none md:my-auto md:rounded-2xl sm:p-7`}
+        className={`${POPUP_FADE_CLASS} relative my-0 flex w-full max-w-lg flex-col rounded-t-2xl rounded-b-none border border-border/80 bg-card p-6 shadow-2xl outline-none max-md:max-h-[60dvh] max-md:max-w-none md:my-auto md:rounded-2xl sm:p-7`}
       >
         <button
           type="button"

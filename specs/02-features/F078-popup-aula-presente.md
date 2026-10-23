@@ -5,7 +5,7 @@ Rascunho — 2026-09-04
 
 **Layout (F118):** no desktop (`md+`) a pop-up volta a ser a modal
 centrada de sempre. Abaixo de `md`, a **mesma caixa** cola no rodapé
-(largura total, sem folga, teto ~50dvh, sem blur no overlay). Fade de
+(largura total, sem folga, teto ~60dvh, sem blur no overlay). Fade de
 opacity na posição final.
 Atribuição, delay, `GiftSignupForm` e destino da aula não mudam. O CTA
 "Ver meu presente" é só do lembrete pós-cadastro.
