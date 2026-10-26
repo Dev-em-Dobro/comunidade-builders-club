@@ -65,6 +65,13 @@ export function isEliteMembership(
   return m.tier === "elite";
 }
 
+/** F120 — Black Infinita / acesso permanente. */
+export function isVitalicioMembership(
+  m: Pick<Membership, "vitalicio" | "status">,
+): boolean {
+  return m.status === "active" && m.vitalicio === true;
+}
+
 export function isFreeMembership(
   m: Pick<Membership, "tier" | "role" | "status">,
 ): boolean {

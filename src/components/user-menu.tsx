@@ -26,6 +26,7 @@ export function UserMenu({
   avatarUrl,
   isPaid,
   isElite,
+  isVitalicio = false,
   onNavigate,
 }: {
   displayName: string;
@@ -33,6 +34,7 @@ export function UserMenu({
   avatarUrl?: string | null;
   isPaid: boolean;
   isElite: boolean;
+  isVitalicio?: boolean;
   onNavigate?: () => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -114,7 +116,11 @@ export function UserMenu({
               {email}
             </p>
             <div className="mt-1.5">
-              <PlanBadge isPaid={isPaid} isElite={isElite} />
+              <PlanBadge
+                isPaid={isPaid}
+                isElite={isElite}
+                isVitalicio={isVitalicio}
+              />
             </div>
           </div>
 

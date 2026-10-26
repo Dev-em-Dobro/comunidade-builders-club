@@ -89,6 +89,8 @@ export type AcaoAllowlist =
       productId: string;
       offerId?: string;
       plan: PlanoPagoHubla;
+      /** F120 — Black Infinita / acesso permanente. */
+      vitalicio?: boolean;
       hublaUserId?: string;
       subscriptionId?: string;
       cobranca: CobrancaHubla;

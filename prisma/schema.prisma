@@ -177,12 +177,17 @@ model Membership {
   convertedToPaidAt DateTime?       @map("converted_to_paid_at")
   /// F115 — primeira compra/upgrade para Elite; renovações não alteram.
   eliteStartedAt    DateTime?       @map("elite_started_at")
+  /// F120 — Black Infinita / acesso permanente; revoke Hubla não desce para free.
+  vitalicio           Boolean   @default(false)
+  vitalicioOfferId    String?   @map("vitalicio_offer_id")
+  vitalicioGrantedAt  DateTime? @map("vitalicio_granted_at")
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
 
   @@index([status])
   @@index([tier])
   @@index([convertedToPaidAt])
+  @@index([vitalicio])
   @@map("membership")
 }
 

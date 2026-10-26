@@ -297,6 +297,7 @@ function SidebarFooter({
   isAdmin,
   isPaid,
   isElite,
+  isVitalicio = false,
   orionUrl,
   notifPreview,
   displayName,
@@ -308,6 +309,7 @@ function SidebarFooter({
   isAdmin: boolean;
   isPaid: boolean;
   isElite: boolean;
+  isVitalicio?: boolean;
   orionUrl: string;
   notifPreview: NotifPreview[];
   displayName: string;
@@ -380,6 +382,7 @@ function SidebarFooter({
           avatarUrl={avatarUrl}
           isPaid={isPaid}
           isElite={isElite}
+          isVitalicio={isVitalicio}
           onNavigate={onNavigate}
         />
         <BuscaButton isPaid={isPaid} onNavigate={onNavigate} />
@@ -463,6 +466,7 @@ function ShellInner({
   isAdmin,
   isPaid,
   isElite,
+  isVitalicio = false,
   orionUrl,
   unread,
   spaces,
@@ -475,6 +479,7 @@ function ShellInner({
   isAdmin: boolean;
   isPaid: boolean;
   isElite: boolean;
+  isVitalicio?: boolean;
   orionUrl: string;
   unread: number;
   spaces: SpaceLink[];
@@ -523,6 +528,7 @@ function ShellInner({
           isAdmin={isAdmin}
           isPaid={isPaid}
           isElite={isElite}
+          isVitalicio={isVitalicio}
           orionUrl={orionUrl}
           notifPreview={notifPreview}
           displayName={displayName}
@@ -578,6 +584,7 @@ function ShellInner({
               isAdmin={isAdmin}
               isPaid={isPaid}
               isElite={isElite}
+              isVitalicio={isVitalicio}
               orionUrl={orionUrl}
               notifPreview={notifPreview}
               displayName={displayName}
@@ -653,6 +660,7 @@ export function AppShellClient({
   isAdmin,
   isPaid,
   isElite,
+  isVitalicio = false,
   orionUrl,
   unread,
   spaces: initialSpaces,
@@ -666,6 +674,7 @@ export function AppShellClient({
   isAdmin: boolean;
   isPaid: boolean;
   isElite: boolean;
+  isVitalicio?: boolean;
   orionUrl: string;
   unread: number;
   spaces: SpaceLink[];
@@ -723,6 +732,7 @@ export function AppShellClient({
         isAdmin={isAdmin}
         isPaid={isPaid}
         isElite={isElite}
+        isVitalicio={isVitalicio}
         orionUrl={orionUrl}
         unread={unread}
         spaces={spaces}

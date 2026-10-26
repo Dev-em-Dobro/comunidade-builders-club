@@ -2,6 +2,7 @@ import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
 import {
   isEliteMembership,
   isPaidMembership,
+  isVitalicioMembership,
 } from "@/lib/membership/capabilities";
 import { temAceiteGarantiaVigente } from "@/lib/membership/aceite-garantia";
 import { temAceiteTermosEliteVigente } from "@/lib/membership/aceite-termos-elite";
@@ -18,6 +19,7 @@ export default async function AppSegmentLayout({
   const member = await requireActiveMemberOrRedirect();
   const isPaid = isPaidMembership(member.membership);
   const isElite = isEliteMembership(member.membership);
+  const isVitalicio = isVitalicioMembership(member.membership);
   const precisaAceitarTermosElite =
     member.membership.tier === "elite" &&
     !(await temAceiteTermosEliteVigente(
@@ -44,6 +46,7 @@ export default async function AppSegmentLayout({
       isAdmin={member.membership.role === "admin"}
       isPaid={isPaid}
       isElite={isElite}
+      isVitalicio={isVitalicio}
       displayName={member.profile.displayName}
       email={member.user.email}
       avatarUrl={member.profile.avatarUrl}

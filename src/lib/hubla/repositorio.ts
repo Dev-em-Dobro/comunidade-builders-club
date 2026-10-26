@@ -200,11 +200,32 @@ export function dataConversaoSegura(
  * B6: Usa updateMany com condição atômica para evitar corrida.
  * N3: Após erro de unicidade, faz re-read e aplica tier/conversão.
  */
+export type OpcoesConcessao = {
+  vitalicio?: boolean;
+  vitalicioOfferId?: string | null;
+};
+
+function dadosVitalicio(
+  opts: OpcoesConcessao | undefined,
+  existingVitalicio?: boolean,
+  existingOfferId?: string | null,
+  existingGrantedAt?: Date | null,
+) {
+  if (!opts?.vitalicio) return {};
+  const agora = new Date();
+  return {
+    vitalicio: true,
+    vitalicioOfferId: existingOfferId ?? opts.vitalicioOfferId ?? null,
+    vitalicioGrantedAt: existingGrantedAt ?? agora,
+  };
+}
+
 export async function concederPago(
   emails: string[],
   plan: PlanoPagoHubla,
   cobranca: CobrancaHubla,
   recebidoEm: Date = new Date(),
+  opcoes?: OpcoesConcessao,
 ): Promise<ResultadoConcessao> {
   const user = await findUserPorEmails(emails);
   if (!user) return { membershipId: null, conversao: false };
@@ -226,6 +247,7 @@ export async function concederPago(
           ...(plan === "elite" && cobranca.pagoEm
             ? { eliteStartedAt: cobranca.pagoEm }
             : {}),
+          ...dadosVitalicio(opcoes),
           ...dinheiro,
         },
       });
@@ -234,26 +256,57 @@ export async function concederPago(
       if ((e as { code?: string }).code === "P2002") {
         const existing = await prisma.membership.findUnique({ where: { userId: user.id } });
         if (existing) {
-          return aplicarTierAposCorrida(user.id, existing, plan, convertedAt, dinheiro, cobranca.pagoEm);
+          return aplicarTierAposCorrida(
+            user.id,
+            existing,
+            plan,
+            convertedAt,
+            dinheiro,
+            cobranca.pagoEm,
+            opcoes,
+          );
         }
       }
       throw e;
     }
   }
 
-  return aplicarTierAposCorrida(user.id, m, plan, convertedAt, dinheiro, cobranca.pagoEm);
+  return aplicarTierAposCorrida(
+    user.id,
+    m,
+    plan,
+    convertedAt,
+    dinheiro,
+    cobranca.pagoEm,
+    opcoes,
+  );
 }
 
 async function aplicarTierAposCorrida(
   userId: string,
-  existing: { id: string; tier: MembershipTier; convertedToPaidAt: Date | null; eliteStartedAt: Date | null },
+  existing: {
+    id: string;
+    tier: MembershipTier;
+    convertedToPaidAt: Date | null;
+    eliteStartedAt: Date | null;
+    vitalicio?: boolean;
+    vitalicioOfferId?: string | null;
+    vitalicioGrantedAt?: Date | null;
+  },
   plan: PlanoPagoHubla,
   convertedAt: Date,
   dinheiro: ReturnType<typeof dadosCobrancaMembership>,
   elitePaidAt: Date | null,
+  opcoes?: OpcoesConcessao,
 ): Promise<ResultadoConcessao> {
   const eraGratuito = !isPago(existing.tier);
   const nextTier = calcularProximoTier(existing.tier, plan);
+  const vitalicioData = dadosVitalicio(
+    opcoes,
+    existing.vitalicio,
+    existing.vitalicioOfferId,
+    existing.vitalicioGrantedAt,
+  );
 
   if (eraGratuito) {
     const updated = await prisma.membership.updateMany({
@@ -268,6 +321,7 @@ async function aplicarTierAposCorrida(
         ...(nextTier === "elite" && existing.tier !== "elite" && !existing.eliteStartedAt && elitePaidAt
           ? { eliteStartedAt: elitePaidAt }
           : {}),
+        ...vitalicioData,
         ...dinheiro,
       },
     });
@@ -281,6 +335,7 @@ async function aplicarTierAposCorrida(
           ...(nextTier === "elite" && existing.tier !== "elite" && !existing.eliteStartedAt && elitePaidAt
             ? { eliteStartedAt: elitePaidAt }
             : {}),
+          ...vitalicioData,
           ...dinheiro,
         },
       });
@@ -297,6 +352,7 @@ async function aplicarTierAposCorrida(
       ...(nextTier === "elite" && existing.tier !== "elite" && !existing.eliteStartedAt && elitePaidAt
         ? { eliteStartedAt: elitePaidAt }
         : {}),
+      ...vitalicioData,
       ...dinheiro,
     },
   });
@@ -312,12 +368,16 @@ async function findUserPorEmails(emails: string[]) {
   return null;
 }
 
-/** F041 — cancelamento Hubla desce para free (não revoga o login). */
+/**
+ * F041 — cancelamento Hubla desce para free (não revoga o login).
+ * F120 — vitalício: não desce (acesso permanente Black Infinita).
+ */
 async function downgradeParaFree(email: string): Promise<string | null> {
   const user = await findUserByEmail(email);
   if (!user) return null;
   const m = await prisma.membership.findUnique({ where: { userId: user.id } });
   if (!m || m.role === "admin") return m?.id ?? null;
+  if (m.vitalicio) return m.id;
   await prisma.membership.update({
     where: { userId: user.id },
     data: { status: "active", tier: "free" },
@@ -347,18 +407,40 @@ export async function aplicarAcaoAllowlist(
       acao.plan,
       acao.cobranca,
       recebidoEm,
+      {
+        vitalicio: acao.vitalicio === true,
+        vitalicioOfferId: acao.offerId ?? null,
+      },
     );
+    const noteParts = [
+      acao.offerId
+        ? `product:${acao.productId} offer:${acao.offerId}`
+        : `product:${acao.productId}`,
+      `plan=${acao.plan}`,
+      acao.vitalicio ? "vitalicio=1" : null,
+    ].filter(Boolean);
     await addAllowedEmail({
       email: acao.email,
       source: "hubla",
-      note: acao.offerId
-        ? `product:${acao.productId} offer:${acao.offerId}; plan=${acao.plan}`
-        : `product:${acao.productId}; plan=${acao.plan}`,
+      note: noteParts.join("; "),
       tier: acao.plan,
       paidAt,
       eliteStartedAt: acao.plan === "elite" ? acao.cobranca.pagoEm ?? undefined : undefined,
+      vitalicio: acao.vitalicio === true,
     });
     return resultado;
+  }
+
+  // F120 — não remove allowlist nem desce vitalício.
+  const userRevogar = await findUserByEmail(acao.email);
+  if (userRevogar) {
+    const m = await prisma.membership.findUnique({
+      where: { userId: userRevogar.id },
+      select: { vitalicio: true, id: true },
+    });
+    if (m?.vitalicio) {
+      return { membershipId: m.id, conversao: false };
+    }
   }
 
   try {

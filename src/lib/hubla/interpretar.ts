@@ -1,6 +1,10 @@
 import { emailDoEvento, emailsDoEvento, offerIdsDoEvento, productIdDoEvento } from "./normalizar";
 import { extrairCobrancaHubla } from "./cobranca";
-import { planoDoEventoHubla, type PlanoPagoHubla } from "./produtos";
+import {
+  isOfertaVitaliciaHubla,
+  planoDoEventoHubla,
+  type PlanoPagoHubla,
+} from "./produtos";
 import {
   EVENTOS_CONCEDER,
   EVENTOS_REVOGAR,
@@ -73,6 +77,7 @@ export function interpretarEventoHubla(
       return { acao: "ignorar", motivo: "subscription não paga" };
     }
     const offerId = offerIds.find((id) => offerPlanMap.get(id) === plan) ?? offerIds[0];
+    const vitalicio = isOfertaVitaliciaHubla(offerId);
     return {
       acao: "conceder",
       email,
@@ -80,6 +85,7 @@ export function interpretarEventoHubla(
       productId,
       ...(offerId ? { offerId } : {}),
       plan: plan ?? "pro",
+      ...(vitalicio ? { vitalicio: true } : {}),
       hublaUserId: event.user?.id,
       subscriptionId: event.subscription?.id,
       cobranca,
