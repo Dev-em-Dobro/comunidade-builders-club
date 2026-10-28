@@ -29,9 +29,9 @@ export default async function AppSegmentLayout({
       member.membership.eliteStartedAt,
     ));
   if (precisaAceitarTermosElite) {
+    // Só o dialog: texto no <main> vazava pelo backdrop semitransparente.
     return (
-      <main className="min-h-screen bg-background p-4">
-        <p className="text-sm text-muted">Leia e aceite os termos do Elite para continuar.</p>
+      <main className="min-h-screen bg-background">
         <TermosEliteModal
           datas={datasAcompanhamentoElite(member.membership.eliteStartedAt)}
         />
@@ -48,10 +48,7 @@ export default async function AppSegmentLayout({
     })
   ) {
     return (
-      <main className="min-h-screen bg-background p-4">
-        <p className="text-sm text-muted">
-          Leia e aceite o contrato de conteúdos digitais para continuar.
-        </p>
+      <main className="min-h-screen bg-background">
         <ContratoConteudosModal />
       </main>
     );
