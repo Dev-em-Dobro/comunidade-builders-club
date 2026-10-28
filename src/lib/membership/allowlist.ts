@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import {
   mesclarTierPago,
   tierPagoDaNotaAllowlist,
+  vitalicioDaNotaAllowlist,
   type TierPagoAllowlist,
 } from "./tier-allowlist";
 import { buildUpdatePaidAt } from "@/lib/hubla/regras-conversao";
@@ -38,7 +39,13 @@ export async function tierPagoDoEmailAllowlist(
 /** Dados da allowlist para o bootstrap: conversão e compra Elite separadas. */
 export async function dadosPagosDoEmailAllowlist(
   email: string,
-): Promise<{ tier: TierPagoAllowlist; paidAt: Date | null; source: string | null; eliteStartedAt: Date | null }> {
+): Promise<{
+  tier: TierPagoAllowlist;
+  paidAt: Date | null;
+  source: string | null;
+  eliteStartedAt: Date | null;
+  vitalicio: boolean;
+}> {
   const row = await prisma.allowedEmail.findUnique({
     where: { email: normalizarEmail(email) },
     select: { note: true, paidAt: true, source: true, eliteStartedAt: true },
@@ -48,6 +55,7 @@ export async function dadosPagosDoEmailAllowlist(
     paidAt: row?.paidAt ?? null,
     source: row?.source ?? null,
     eliteStartedAt: row?.eliteStartedAt ?? null,
+    vitalicio: vitalicioDaNotaAllowlist(row?.note),
   };
 }
 
@@ -61,6 +69,8 @@ export async function addAllowedEmail(opts: {
   paidAt?: Date;
   /** Data confirmada da compra Elite; nunca inferir do horário do webhook. */
   eliteStartedAt?: Date;
+  /** F120 — Black Infinita. */
+  vitalicio?: boolean;
 }) {
   const email = normalizarEmail(opts.email);
   const existing = await prisma.allowedEmail.findUnique({
@@ -94,9 +104,12 @@ export async function addAllowedEmail(opts: {
   if (user) {
     const m = await prisma.membership.findUnique({ where: { userId: user.id } });
     if (m) {
+      const note = opts.note ?? row.note;
       const desejado =
-        opts.tier ?? tierPagoDaNotaAllowlist(opts.note ?? row.note);
+        opts.tier ?? tierPagoDaNotaAllowlist(note);
       const tier = mesclarTierPago(m.tier, desejado);
+      const marcarVitalicio =
+        opts.vitalicio === true || vitalicioDaNotaAllowlist(note);
       await prisma.membership.update({
         where: { userId: user.id },
         data: {
@@ -104,6 +117,12 @@ export async function addAllowedEmail(opts: {
           tier,
           ...(m.tier !== "elite" && !m.eliteStartedAt && tier === "elite" && opts.eliteStartedAt
             ? { eliteStartedAt: opts.eliteStartedAt }
+            : {}),
+          ...(marcarVitalicio && !m.vitalicio
+            ? {
+                vitalicio: true,
+                vitalicioGrantedAt: new Date(),
+              }
             : {}),
         },
       });

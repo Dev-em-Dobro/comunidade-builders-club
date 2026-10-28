@@ -20,6 +20,12 @@ export const HUBLA_OFFER_ID_ELITE_ALUNOS = "SFykfBk80jkM1sAVJKxV";
 export const HUBLA_OFFER_ID_ELITE_EUROPA_50 = "1mGgy9MVD11CJdnsLEov";
 /** Elite Europa (€60) — checkout próprio, não aparece em `/planos`. */
 export const HUBLA_OFFER_ID_ELITE_EUROPA_60 = "cXqc4mz6YZFE4GKjGFUz";
+
+/** F120 — Black Infinita 2026 (acesso Club vitalício; Orion = cortesia 90d). */
+export const HUBLA_OFFER_ID_BLACK_ALUNOS_2025 = "YKPMuMwSBhPBb7UUuDlX";
+export const HUBLA_OFFER_ID_BLACK_ALUNOS = "NZKc6aZXwbD4ihw9vvPN";
+export const HUBLA_OFFER_ID_BLACK_NAO_ALUNOS = "6njIGlJgossHQysj6WA7";
+
 export const HUBLA_OFFER_IDS_PRO_OFICIAIS = [
   HUBLA_OFFER_ID_PRO_OFICIAL,
   HUBLA_OFFER_ID_PRO_MENSAL,
@@ -30,6 +36,25 @@ export const HUBLA_OFFER_IDS_ELITE_OFICIAIS = [
   HUBLA_OFFER_ID_ELITE_EUROPA_50,
   HUBLA_OFFER_ID_ELITE_EUROPA_60,
 ] as const;
+/** Ofertas vitalícias (Black Infinita) — tier elite + flag vitalicio. */
+export const HUBLA_OFFER_IDS_VITALICIO_OFICIAIS = [
+  HUBLA_OFFER_ID_BLACK_ALUNOS_2025,
+  HUBLA_OFFER_ID_BLACK_ALUNOS,
+  HUBLA_OFFER_ID_BLACK_NAO_ALUNOS,
+] as const;
+
+export function isOfertaVitaliciaHubla(offerId: string | null | undefined): boolean {
+  if (!offerId?.trim()) return false;
+  const id = offerId.trim();
+  if ((HUBLA_OFFER_IDS_VITALICIO_OFICIAIS as readonly string[]).includes(id)) {
+    return true;
+  }
+  return (process.env.HUBLA_OFFER_ID_VITALICIO ?? "")
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .includes(id);
+}
 
 export const CHECKOUT_PRO_FALLBACK_URL =
   `https://pay.hub.la/${HUBLA_OFFER_ID_PRO_OFICIAL}`;

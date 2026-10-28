@@ -3,6 +3,8 @@
 import {
   HUBLA_OFFER_IDS_ELITE_OFICIAIS,
   HUBLA_OFFER_IDS_PRO_OFICIAIS,
+  HUBLA_OFFER_IDS_VITALICIO_OFICIAIS,
+  isOfertaVitaliciaHubla,
 } from "@/lib/membership/checkout";
 
 export type TierPagoAllowlist = "pro" | "elite";
@@ -17,7 +19,9 @@ function idsEnv(raw: string | undefined): string[] {
 function eliteOfferIds(): Set<string> {
   return new Set([
     ...HUBLA_OFFER_IDS_ELITE_OFICIAIS,
+    ...HUBLA_OFFER_IDS_VITALICIO_OFICIAIS,
     ...idsEnv(process.env.HUBLA_OFFER_ID_ELITE),
+    ...idsEnv(process.env.HUBLA_OFFER_ID_VITALICIO),
   ]);
 }
 
@@ -67,6 +71,16 @@ export function tierPagoDaNotaAllowlist(
   }
 
   return "pro";
+}
+
+/** F120 — Black Infinita na note (`vitalicio=1` ou offer id Black). */
+export function vitalicioDaNotaAllowlist(
+  note: string | null | undefined,
+): boolean {
+  if (!note?.trim()) return false;
+  if (/(?:^|[;\s])vitalicio=1(?:[;\s]|$)/i.test(note)) return true;
+  const offerMatch = note.match(/offer:([A-Za-z0-9_-]+)/i);
+  return isOfertaVitaliciaHubla(offerMatch?.[1]);
 }
 
 /** Elite nunca desce; senão usa o tier desejado (pro|elite). */

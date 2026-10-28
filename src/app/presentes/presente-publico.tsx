@@ -19,6 +19,7 @@ import { PresentePromessa } from "@/app/presentes/presente-promessa";
 import { PresenteImersaoCta } from "@/app/presentes/presente-imersao-cta";
 import { PresenteAulaPopup } from "@/app/presentes/presente-aula-popup";
 import { PresenteBlackInfinitaFaixa } from "@/app/presentes/presente-black-infinita-faixa";
+import { PresenteBlackInfinitaPopup } from "@/app/presentes/presente-black-infinita-popup";
 import { PresentePosCadastroPopup } from "@/components/presente-pos-cadastro-popup";
 import { contarAulasGratuitas } from "@/lib/aulas";
 import { AULA_ABERTURA_HREF } from "@/lib/presentes/popup-aula";
@@ -259,6 +260,7 @@ export async function PresentePublico({
       ) : (
         <PresentePosCadastroPopup />
       )}
+      {!user ? <PresenteBlackInfinitaPopup /> : null}
     </div>
   );
 }

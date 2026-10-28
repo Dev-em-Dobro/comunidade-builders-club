@@ -3,6 +3,7 @@ import { afterEach, describe, it } from "node:test";
 import {
   mesclarTierPago,
   tierPagoDaNotaAllowlist,
+  vitalicioDaNotaAllowlist,
 } from "./tier-allowlist";
 
 describe("tierPagoDaNotaAllowlist — F053 hotfix", () => {
@@ -74,6 +75,33 @@ describe("tierPagoDaNotaAllowlist — F053 hotfix", () => {
     assert.equal(
       tierPagoDaNotaAllowlist("productId=9DW254247E5; pedido=99"),
       "elite",
+    );
+  });
+});
+
+describe("vitalicioDaNotaAllowlist — F120", () => {
+  it("vitalicio=1 na note", () => {
+    assert.equal(
+      vitalicioDaNotaAllowlist("plan=elite; vitalicio=1; offer:v1SsMcVXNip7Mn5A2pNH"),
+      true,
+    );
+  });
+
+  it("offer Black Infinita sem vitalicio=1", () => {
+    assert.equal(
+      vitalicioDaNotaAllowlist(
+        "product:VL3e0iDO3A32SyjJWr9S offer:NZKc6aZXwbD4ihw9vvPN",
+      ),
+      true,
+    );
+  });
+
+  it("Elite comum não é vitalício", () => {
+    assert.equal(
+      vitalicioDaNotaAllowlist(
+        "product:VL3e0iDO3A32SyjJWr9S offer:v1SsMcVXNip7Mn5A2pNH",
+      ),
+      false,
     );
   });
 });

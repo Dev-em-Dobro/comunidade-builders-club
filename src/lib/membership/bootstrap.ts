@@ -108,12 +108,14 @@ async function resolverBootstrap(
   let paidAtAllowlist: Date | null = null;
   let sourceAllowlist: string | null = null;
   let eliteStartedAtAllowlist: Date | null = null;
+  let vitalicioAllowlist = false;
   if (allowed && !isBootstrapAdmin) {
     const dados = await dadosPagosDoEmailAllowlist(email);
     tierAllowlist = dados.tier;
     paidAtAllowlist = dados.paidAt;
     sourceAllowlist = dados.source;
     eliteStartedAtAllowlist = dados.eliteStartedAt;
+    vitalicioAllowlist = dados.vitalicio;
   }
 
   let nextProfile = profile;
@@ -154,6 +156,9 @@ async function resolverBootstrap(
         ...(tierAllowlist === "elite" && eliteStartedAtAllowlist
           ? { eliteStartedAt: eliteStartedAtAllowlist }
           : {}),
+        ...(vitalicioAllowlist
+          ? { vitalicio: true, vitalicioGrantedAt: new Date() }
+          : {}),
       },
     });
     return { membership, profile: nextProfile };
@@ -179,6 +184,9 @@ async function resolverBootstrap(
         ...(isBootstrapAdmin ? { role: "admin" as const } : {}),
         ...(tierAllowlist === "elite" && eliteStartedAtAllowlist
           ? { eliteStartedAt: eliteStartedAtAllowlist }
+          : {}),
+        ...(vitalicioAllowlist
+          ? { vitalicio: true, vitalicioGrantedAt: new Date() }
           : {}),
       },
     });

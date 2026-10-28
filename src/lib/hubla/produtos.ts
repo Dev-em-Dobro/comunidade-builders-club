@@ -4,9 +4,13 @@
 import {
   HUBLA_OFFER_IDS_ELITE_OFICIAIS,
   HUBLA_OFFER_IDS_PRO_OFICIAIS,
+  HUBLA_OFFER_IDS_VITALICIO_OFICIAIS,
+  isOfertaVitaliciaHubla,
 } from "@/lib/membership/checkout";
 
 export type PlanoPagoHubla = "pro" | "elite";
+
+export { isOfertaVitaliciaHubla };
 
 function collectIds(raw: string | undefined): string[] {
   return (raw ?? "")
@@ -50,10 +54,17 @@ export function mapaOfertasHubla(): Map<string, PlanoPagoHubla> {
   for (const id of HUBLA_OFFER_IDS_ELITE_OFICIAIS) {
     map.set(id, "elite");
   }
+  // F120 — Black Infinita: capacidades Elite + flag vitalicio no grant.
+  for (const id of HUBLA_OFFER_IDS_VITALICIO_OFICIAIS) {
+    map.set(id, "elite");
+  }
   for (const id of collectIds(process.env.HUBLA_OFFER_ID_PRO)) {
     map.set(id, "pro");
   }
   for (const id of collectIds(process.env.HUBLA_OFFER_ID_ELITE)) {
+    map.set(id, "elite");
+  }
+  for (const id of collectIds(process.env.HUBLA_OFFER_ID_VITALICIO)) {
     map.set(id, "elite");
   }
   return map;

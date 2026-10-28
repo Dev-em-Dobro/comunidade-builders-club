@@ -129,6 +129,45 @@ describe("interpretarEventoHubla — F014 / F059", () => {
     assert.equal(acao.plan, "elite");
   });
 
+  it("F120 — Black Infinita concede elite + vitalicio", () => {
+    const blackId = "YKPMuMwSBhPBb7UUuDlX";
+    const offerPlanMap = new Map([
+      ["offer-pro", "pro" as const],
+      [blackId, "elite" as const],
+    ]);
+    const acao = interpretarEventoHubla(
+      payload("invoice.payment_succeeded", {
+        products: [{ id: PRODUCT_ID, offers: [{ id: blackId }] }],
+      }),
+      {
+        productPlanMap: new Map([[PRODUCT_ID, "pro"]]),
+        offerPlanMap,
+      },
+    );
+    assert.equal(acao.acao, "conceder");
+    if (acao.acao !== "conceder") return;
+    assert.equal(acao.plan, "elite");
+    assert.equal(acao.vitalicio, true);
+    assert.equal(acao.offerId, blackId);
+  });
+
+  it("F120 — Elite comum não marca vitalicio", () => {
+    const offerPlanMap = new Map([["offer-elite", "elite" as const]]);
+    const acao = interpretarEventoHubla(
+      payload("invoice.payment_succeeded", {
+        products: [{ id: PRODUCT_ID, offers: [{ id: "offer-elite" }] }],
+      }),
+      {
+        productPlanMap: new Map([[PRODUCT_ID, "pro"]]),
+        offerPlanMap,
+      },
+    );
+    assert.equal(acao.acao, "conceder");
+    if (acao.acao !== "conceder") return;
+    assert.equal(acao.plan, "elite");
+    assert.equal(acao.vitalicio, undefined);
+  });
+
   it("reúne e-mails do user, pagador da assinatura e da fatura", () => {
     const emails = emailsDoEvento({
       user: { email: "User@Example.com" },

@@ -15,13 +15,27 @@ function FlagIcon({ className }: { className?: string }) {
 export function PlanBadge({
   isPaid,
   isElite,
+  isVitalicio = false,
   size = "sm",
 }: {
   isPaid: boolean;
   isElite: boolean;
+  /** F120 — Black Infinita: acesso permanente. */
+  isVitalicio?: boolean;
   size?: "sm" | "md";
 }) {
   const pad = size === "md" ? "px-2.5 py-1 text-[11px]" : "px-2 py-0.5 text-[10px]";
+
+  if (isVitalicio) {
+    return (
+      <span
+        className={`inline-flex items-center gap-1 rounded-full bg-accent font-bold uppercase tracking-wide text-accent-foreground ${pad}`}
+      >
+        <FlagIcon />
+        Vitalício
+      </span>
+    );
+  }
 
   if (isElite) {
     return (

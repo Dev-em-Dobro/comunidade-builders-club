@@ -3,6 +3,7 @@ import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
 import {
   isEliteMembership,
   isPaidMembership,
+  isVitalicioMembership,
 } from "@/lib/membership/capabilities";
 import { PlanBadge } from "@/components/plan-badge";
 import { ExcluirConta } from "@/components/excluir-conta";
@@ -70,6 +71,7 @@ export default async function ConfiguracoesPage() {
   const { user, profile, membership } = member;
   const isPaid = isPaidMembership(membership);
   const isElite = isEliteMembership(membership);
+  const isVitalicio = isVitalicioMembership(membership);
   const whatsapp = whatsappSuporteUrl();
 
   return (
@@ -99,7 +101,12 @@ export default async function ConfiguracoesPage() {
 
       <Secao titulo="Plano e pagamento">
         <div className="flex flex-wrap items-center gap-3">
-          <PlanBadge isPaid={isPaid} isElite={isElite} size="md" />
+          <PlanBadge
+            isPaid={isPaid}
+            isElite={isElite}
+            isVitalicio={isVitalicio}
+            size="md"
+          />
           {!isElite ? (
             <Link href="/planos" className="btn-primary">
               {isPaid ? "Fazer upgrade" : "Ver planos"}

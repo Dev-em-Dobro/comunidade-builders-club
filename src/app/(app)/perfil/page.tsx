@@ -2,6 +2,7 @@ import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
 import {
   isEliteMembership,
   isPaidMembership,
+  isVitalicioMembership,
 } from "@/lib/membership/capabilities";
 import { ProfileForm } from "@/components/profile-form";
 import { PlanBadge } from "@/components/plan-badge";
@@ -11,6 +12,7 @@ export default async function PerfilPage() {
   const { profile, membership } = member;
   const isPaid = isPaidMembership(membership);
   const isElite = isEliteMembership(membership);
+  const isVitalicio = isVitalicioMembership(membership);
 
   return (
     <>
@@ -18,7 +20,12 @@ export default async function PerfilPage() {
         <h1 className="font-[family-name:var(--font-outfit)] text-2xl font-bold">
           Perfil
         </h1>
-        <PlanBadge isPaid={isPaid} isElite={isElite} size="md" />
+        <PlanBadge
+          isPaid={isPaid}
+          isElite={isElite}
+          isVitalicio={isVitalicio}
+          size="md"
+        />
       </div>
       <p className="mt-1 text-sm text-muted">
         Membro desde{" "}

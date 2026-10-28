@@ -12,6 +12,7 @@ export function AppShell({
   isAdmin,
   isPaid,
   isElite,
+  isVitalicio = false,
   displayName,
   email,
   avatarUrl,
@@ -21,6 +22,7 @@ export function AppShell({
   isAdmin: boolean;
   isPaid: boolean;
   isElite: boolean;
+  isVitalicio?: boolean;
   displayName: string;
   /** F062 — exibido no topo do popup da pill do usuário. */
   email: string;
@@ -33,6 +35,7 @@ export function AppShell({
       isAdmin={isAdmin}
       isPaid={isPaid}
       isElite={isElite}
+      isVitalicio={isVitalicio}
       orionUrl={urlOrionApp()}
       unread={0}
       spaces={EMPTY_SPACES}
