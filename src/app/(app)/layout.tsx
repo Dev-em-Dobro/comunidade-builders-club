@@ -6,10 +6,12 @@ import {
 } from "@/lib/membership/capabilities";
 import { temAceiteGarantiaVigente } from "@/lib/membership/aceite-garantia";
 import { temAceiteTermosEliteVigente } from "@/lib/membership/aceite-termos-elite";
+import { precisaAceiteContratoConteudos } from "@/lib/membership/aceite-contrato-conteudos";
 import { datasAcompanhamentoElite } from "@/lib/legal/termos-elite";
 import { AppShell } from "@/components/app-shell";
 import { GarantiaCienteModal } from "@/components/garantia-ciente-modal";
 import { TermosEliteModal } from "@/components/termos-elite-modal";
+import { ContratoConteudosModal } from "@/components/contrato-conteudos-modal";
 
 export default async function AppSegmentLayout({
   children,
@@ -33,6 +35,24 @@ export default async function AppSegmentLayout({
         <TermosEliteModal
           datas={datasAcompanhamentoElite(member.membership.eliteStartedAt)}
         />
+      </main>
+    );
+  }
+
+  // F122 — compras a partir de 28/10/2026 (DevQuest + Builders).
+  if (
+    await precisaAceiteContratoConteudos({
+      userId: member.user.id,
+      email: member.user.email,
+      membership: member.membership,
+    })
+  ) {
+    return (
+      <main className="min-h-screen bg-background p-4">
+        <p className="text-sm text-muted">
+          Leia e aceite o contrato de conteúdos digitais para continuar.
+        </p>
+        <ContratoConteudosModal />
       </main>
     );
   }
