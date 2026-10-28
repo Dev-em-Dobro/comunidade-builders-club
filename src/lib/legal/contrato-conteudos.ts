@@ -27,3 +27,15 @@ export function compraExigeContratoConteudos(
   if (!dataCompra) return false;
   return dataCompra.getTime() >= corte.getTime();
 }
+
+/** Mais recente entre datas conhecidas; null se nenhuma. */
+export function dataEfetivaCompraContrato(
+  datas: Array<Date | null | undefined>,
+): Date | null {
+  let melhor: Date | null = null;
+  for (const d of datas) {
+    if (!d) continue;
+    if (!melhor || d.getTime() > melhor.getTime()) melhor = d;
+  }
+  return melhor;
+}

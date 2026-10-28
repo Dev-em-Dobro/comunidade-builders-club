@@ -18,17 +18,18 @@ também não.
   `2026-10-28`. Mudança material no PDF → nova versão + novo aceite.
 - Modal bloqueante no layout `(app)` (padrão F115): sem shell até aceitar.
   Checkbox desmarcado; botão só após marcar; grava IP/UA via F058.
-- **Quem precisa aceitar:** membership `active` com `tier` ∈
-  `pro` | `elite` | `paid` **e** data de conversão paga ≥
-  `2026-10-28T00:00:00-03:00` (America/São_Paulo), **e** sem aceite da versão
-  vigente.
-- **Data de conversão (nessa ordem):**
+- **Quem precisa aceitar:** membership `active` com compra paga — `tier` ∈
+  `pro` | `elite` | `paid` **ou** `vitalicio=true` (F120 Black Infinita) —
+  **e** data efetiva de compra ≥ `2026-10-28T00:00:00-03:00`
+  (America/São_Paulo), **e** sem aceite da versão vigente.
+- **Data efetiva:** a **mais recente** entre
   1. `Membership.convertedToPaidAt`
-  2. senão `AllowedEmail.paidAt` do e-mail da conta
-  3. sem data confiável → **não** pedir (não inventar data; legado/manual
-     sem `paid_at` fica de fora do gate).
-- Admin/instructor **sem** tier pago de compra não entram no gate só pelo papel
-  (evita bloquear bootstrap admin free).
+  2. `AllowedEmail.paidAt` do e-mail da conta
+  3. `Membership.vitalicioGrantedAt` (F120 — upgrade PRO→Vitalício depois do
+     corte ainda precisa do contrato; Vitalício antigo antes do corte não)
+  Sem nenhuma data confiável → **não** pedir (não inventar).
+- Admin/instructor **sem** tier pago / vitalício não entram no gate só pelo
+  papel (evita bloquear bootstrap admin free).
 - Ordem no layout quando vários gates: Termos Elite (F115) → Contrato (F122) →
   ciente garantia (F090, overlay no shell).
 - PDF fica em `public/legal/` para download autenticado na prática via link

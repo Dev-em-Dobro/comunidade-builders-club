@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import {
   CORTE_CONTRATO_CONTEUDOS,
   compraExigeContratoConteudos,
+  dataEfetivaCompraContrato,
 } from "./contrato-conteudos";
 
 describe("compraExigeContratoConteudos — F122", () => {
@@ -26,6 +27,31 @@ describe("compraExigeContratoConteudos — F122", () => {
     assert.equal(
       compraExigeContratoConteudos(new Date("2026-10-28T12:00:00-03:00")),
       true,
+    );
+  });
+});
+
+describe("dataEfetivaCompraContrato — F122 + F120", () => {
+  it("escolhe a mais recente (PRO antigo + Vitalício novo)", () => {
+    const antiga = new Date("2026-01-10T12:00:00.000Z");
+    const vitalicio = new Date("2026-10-29T15:00:00.000Z");
+    assert.equal(
+      dataEfetivaCompraContrato([antiga, null, vitalicio])?.toISOString(),
+      vitalicio.toISOString(),
+    );
+    assert.equal(
+      compraExigeContratoConteudos(
+        dataEfetivaCompraContrato([antiga, null, vitalicio]),
+      ),
+      true,
+    );
+  });
+
+  it("Vitalício concedido antes do corte → não exige", () => {
+    const vitalicio = new Date("2026-10-26T12:00:00.000Z");
+    assert.equal(
+      compraExigeContratoConteudos(dataEfetivaCompraContrato([vitalicio])),
+      false,
     );
   });
 });
