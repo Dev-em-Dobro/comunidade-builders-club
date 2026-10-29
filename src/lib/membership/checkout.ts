@@ -25,6 +25,8 @@ export const HUBLA_OFFER_ID_ELITE_EUROPA_60 = "cXqc4mz6YZFE4GKjGFUz";
 export const HUBLA_OFFER_ID_BLACK_ALUNOS_2025 = "YKPMuMwSBhPBb7UUuDlX";
 export const HUBLA_OFFER_ID_BLACK_ALUNOS = "NZKc6aZXwbD4ihw9vvPN";
 export const HUBLA_OFFER_ID_BLACK_NAO_ALUNOS = "6njIGlJgossHQysj6WA7";
+/** Produto Hubla "DevQuest 2.0 - Black Friday" que hospeda as 3 ofertas. */
+export const HUBLA_PRODUCT_ID_BLACK_FRIDAY = "hXQcK8O5fZGvRK4RVMxJ";
 
 export const HUBLA_OFFER_IDS_PRO_OFICIAIS = [
   HUBLA_OFFER_ID_PRO_OFICIAL,

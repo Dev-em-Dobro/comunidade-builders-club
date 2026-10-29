@@ -168,6 +168,68 @@ describe("interpretarEventoHubla — F014 / F059", () => {
     assert.equal(acao.vitalicio, undefined);
   });
 
+  it("F120 — payload real: product.id = offer, catalog em products[0] (não alunos)", () => {
+    const offerId = "6njIGlJgossHQysj6WA7";
+    const catalog = "hXQcK8O5fZGvRK4RVMxJ";
+    const acao = interpretarEventoHubla(
+      {
+        type: "customer.member_added",
+        event: {
+          product: { id: offerId, name: "DevQuest 2.0 - Black Friday" },
+          products: [
+            {
+              id: catalog,
+              name: "DevQuest 2.0 - Black Friday",
+              offers: [{ id: offerId, name: "Black Infinita 2026 - não alunos" }],
+            },
+          ],
+          user: { email: "comprador@example.com" },
+          subscription: { status: "active" },
+        },
+      },
+      {
+        productPlanMap: new Map(),
+        offerPlanMap: new Map([[offerId, "elite" as const]]),
+      },
+    );
+    assert.equal(acao.acao, "conceder");
+    if (acao.acao !== "conceder") return;
+    assert.equal(acao.productId, catalog);
+    assert.equal(acao.offerId, offerId);
+    assert.equal(acao.plan, "elite");
+    assert.equal(acao.vitalicio, true);
+  });
+
+  it("F120 — payload real: product.id = offer Black alunos", () => {
+    const offerId = "NZKc6aZXwbD4ihw9vvPN";
+    const catalog = "hXQcK8O5fZGvRK4RVMxJ";
+    const acao = interpretarEventoHubla(
+      {
+        type: "customer.member_added",
+        event: {
+          product: { id: offerId, name: "DevQuest 2.0 - Black Friday" },
+          products: [
+            {
+              id: catalog,
+              offers: [{ id: offerId }],
+            },
+          ],
+          user: { email: "aluno@example.com" },
+          subscription: { status: "active" },
+        },
+      },
+      {
+        productPlanMap: new Map(),
+        offerPlanMap: new Map([[offerId, "elite" as const]]),
+      },
+    );
+    assert.equal(acao.acao, "conceder");
+    if (acao.acao !== "conceder") return;
+    assert.equal(acao.productId, catalog);
+    assert.equal(acao.offerId, offerId);
+    assert.equal(acao.vitalicio, true);
+  });
+
   it("reúne e-mails do user, pagador da assinatura e da fatura", () => {
     const emails = emailsDoEvento({
       user: { email: "User@Example.com" },
