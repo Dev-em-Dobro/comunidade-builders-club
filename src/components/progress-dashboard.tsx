@@ -107,7 +107,7 @@ export function ProgressDashboard({
                     <p className="truncate text-sm font-semibold">
                       {s.displayName}
                       <span className="ml-2 rounded-md bg-surface px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted">
-                        {tierLabel(s.tier)}
+                        {tierLabel(s.tier, s.vitalicio)}
                       </span>
                       {s.role === "admin" ? (
                         <span className="ml-2 rounded-md bg-accent/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-accent">

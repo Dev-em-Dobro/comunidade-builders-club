@@ -295,7 +295,8 @@ export default async function AdminPage({ searchParams }: Props) {
                     {m.user.profile?.displayName ?? m.user.email}
                   </p>
                   <p className="text-xs text-muted">
-                    {m.user.email} · {m.status} · {m.role} · {tierLabel(m.tier)}
+                    {m.user.email} · {m.status} · {m.role} ·{" "}
+                    {tierLabel(m.tier, m.vitalicio)}
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-1">

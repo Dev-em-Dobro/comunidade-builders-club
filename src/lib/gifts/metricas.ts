@@ -11,6 +11,8 @@ export type UtmPostPerson = {
   email: string;
   displayName: string;
   tier: MembershipTier;
+  /** F120 — Black Infinita. */
+  vitalicio: boolean;
   role: Role;
   status: MembershipStatus;
   originAt: Date | null;
@@ -96,6 +98,7 @@ export async function listUtmPostMetrics(): Promise<UtmPostMetric[]> {
         originGiftSlug: true,
         originAt: true,
         tier: true,
+        vitalicio: true,
         role: true,
         status: true,
         user: {
@@ -169,6 +172,7 @@ export async function listUtmPostMetrics(): Promise<UtmPostMetric[]> {
       email: m.user.email,
       displayName: m.user.profile?.displayName ?? m.user.email,
       tier: m.tier,
+      vitalicio: m.vitalicio === true,
       role: m.role,
       status: m.status,
       originAt: m.originAt,

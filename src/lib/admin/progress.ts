@@ -11,6 +11,8 @@ export type StudentProgressRow = {
   email: string;
   role: string;
   tier: MembershipTier;
+  /** F120 — Black Infinita. */
+  vitalicio: boolean;
   joinedAt: Date;
   completedCount: number;
   totalLessons: number;
@@ -161,6 +163,7 @@ export async function listStudentsLessonProgress(): Promise<{
       email: m.user.email,
       role: m.role,
       tier: m.tier,
+      vitalicio: m.vitalicio === true,
       joinedAt: m.user.profile?.joinedAt ?? m.createdAt,
       completedCount,
       totalLessons,
