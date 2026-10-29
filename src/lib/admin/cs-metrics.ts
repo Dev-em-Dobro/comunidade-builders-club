@@ -32,6 +32,7 @@ type MemberRow = {
   email: string;
   role: Role;
   tier: MembershipTier;
+  vitalicio: boolean;
   loginAt: Date;
   allowlistAt: Date | null;
   allowlistSource: string | null;
@@ -106,6 +107,7 @@ async function loadMembers(): Promise<MemberRow[]> {
     select: {
       userId: true,
       tier: true,
+      vitalicio: true,
       role: true,
       createdAt: true,
       user: {
@@ -138,6 +140,7 @@ async function loadMembers(): Promise<MemberRow[]> {
       email,
       role: m.role,
       tier: m.tier,
+      vitalicio: m.vitalicio === true,
       loginAt: m.user.profile?.joinedAt ?? m.createdAt,
       allowlistAt: allow?.createdAt ?? null,
       allowlistSource: allow?.source ?? null,
@@ -347,7 +350,12 @@ export async function loadCsMetrics(now = new Date()): Promise<CsMetrics> {
     pagosAgora
       .filter((c) => proposalEmails.has(c.member.email))
       .map((c) =>
-        toPerson(c.member, c.entrada, true, tierLabel(c.member.tier)),
+        toPerson(
+          c.member,
+          c.entrada,
+          true,
+          tierLabel(c.member.tier, c.member.vitalicio),
+        ),
       ),
   );
 
@@ -383,7 +391,9 @@ export async function loadCsMetrics(now = new Date()): Promise<CsMetrics> {
         c.member,
         c.entrada,
         isPaidNow(c.member.tier),
-        isPaidNow(c.member.tier) ? tierLabel(c.member.tier) : "Gratuito",
+        isPaidNow(c.member.tier)
+          ? tierLabel(c.member.tier, c.member.vitalicio)
+          : "Gratuito",
       ),
     ),
   );

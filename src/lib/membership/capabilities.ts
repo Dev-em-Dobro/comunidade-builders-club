@@ -95,7 +95,12 @@ export function isFreeAppPath(pathname: string): boolean {
   return false;
 }
 
-export function tierLabel(tier: MembershipTier): string {
+export function tierLabel(
+  tier: MembershipTier,
+  /** F120 — Black Infinita: sobrescreve Elite/PRO no rótulo admin/perfil. */
+  vitalicio?: boolean,
+): string {
+  if (vitalicio) return "Vitalício";
   if (tier === "elite") return "Elite";
   if (tier === "pro" || tier === "paid") return "PRO";
   return "Gratuito";

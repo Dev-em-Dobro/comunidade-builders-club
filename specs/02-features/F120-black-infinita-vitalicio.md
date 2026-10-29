@@ -18,8 +18,23 @@ cancelláveis. No Orion, a mesma compra dispara só a **cortesia Pro de 90 dias*
 | Black alunos | `NZKc6aZXwbD4ihw9vvPN` | R$ 797 |
 | Black não alunos | `6njIGlJgossHQysj6WA7` | R$ 997 |
 
-Produto Club continua `HUBLA_PRODUCT_ID` / `VL3e0iDO3A32SyjJWr9S`. Discriminador =
-`offers[].id`.
+Produto Club continua `HUBLA_PRODUCT_ID` / `VL3e0iDO3A32SyjJWr9S` para PRO/Elite
+normais. Black Infinita roda no produto Hubla **DevQuest 2.0 - Black Friday**:
+
+| Campo | Valor |
+|-------|-------|
+| Product catalog id | `hXQcK8O5fZGvRK4RVMxJ` |
+| Discriminador | `offers[].id` (os 3 links acima) |
+
+### Quirk Hubla (sandbox/prod)
+
+Em vários eventos Black, `event.product.id` vem **igual ao offer id** (slug
+pay.hub.la), enquanto o produto de catálogo fica em `event.products[0].id` =
+`hXQcK8O5fZGvRK4RVMxJ`. O interpretador precisa:
+
+1. Aceitar o product catalog `hXQc…` **e** offer ids Black como chaves de produto
+2. Continuar discriminando pelo `offers[].id` / pelo próprio `product.id` quando
+   ele for um offer Black
 
 ## Comportamento
 

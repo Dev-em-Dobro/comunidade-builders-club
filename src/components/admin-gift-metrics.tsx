@@ -70,7 +70,9 @@ export function AdminGiftMetrics({ rows }: { rows: UtmPostMetric[] }) {
                         {formatWhen(p.originAt)}
                       </td>
                       <td className="py-2 pr-3">{p.presentesPegos}</td>
-                      <td className="py-2 pr-3">{tierLabel(p.tier)}</td>
+                      <td className="py-2 pr-3">
+                        {tierLabel(p.tier, p.vitalicio)}
+                      </td>
                       <td className="py-2">
                         {p.assinouPlano ? (
                           <span className="text-accent">sim</span>

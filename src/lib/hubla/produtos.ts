@@ -37,6 +37,15 @@ export function mapaProdutosHubla(): Map<string, PlanoPagoHubla> {
   // Mesmo product.id que o Club: PRO/Elite discriminam por oferta, não daqui.
   if (elite && elite !== legado && elite !== pro) map.set(elite, "elite");
 
+  // F120 — Hubla BF: event.product.id às vezes é o offer slug (não o catalog).
+  // Só os offer ids Black; o catalog hXQc… sozinho NÃO concede (exige oferta).
+  for (const id of HUBLA_OFFER_IDS_VITALICIO_OFICIAIS) {
+    map.set(id, "elite");
+  }
+  for (const id of collectIds(process.env.HUBLA_OFFER_ID_VITALICIO)) {
+    map.set(id, "elite");
+  }
+
   return map;
 }
 
@@ -93,9 +102,19 @@ export function planoDoEventoHubla(opts: {
   const productMap = opts.productMap ?? mapaProdutosHubla();
   const offerMap = opts.offerMap ?? mapaOfertasHubla();
 
-  if (offerMap.size > 0 && opts.offerIds.length > 0) {
+  // product.id pode ser o próprio offer slug (Black Infinita / Hubla BF).
+  const candidatosOferta = [...opts.offerIds];
+  if (
+    opts.productId &&
+    !candidatosOferta.includes(opts.productId) &&
+    offerMap.has(opts.productId)
+  ) {
+    candidatosOferta.push(opts.productId);
+  }
+
+  if (offerMap.size > 0 && candidatosOferta.length > 0) {
     const matched = new Set<PlanoPagoHubla>();
-    for (const id of opts.offerIds) {
+    for (const id of candidatosOferta) {
       const plan = offerMap.get(id);
       if (plan) matched.add(plan);
     }
