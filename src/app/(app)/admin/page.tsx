@@ -36,6 +36,7 @@ import { isAdminTab, type AdminTabId } from "@/lib/admin/tabs";
 import { labelAllowedEmailSource } from "@/lib/membership/allowlist-labels";
 import type { MembershipStatus } from "@prisma/client";
 import { tierLabel } from "@/lib/membership/capabilities";
+import { simularLoginAction } from "@/actions/admin-simular-login";
 import { agregarMetricasEmail } from "@/lib/email/metricas-resend";
 import {
   EMAIL_CATEGORIAS,
@@ -356,6 +357,17 @@ export default async function AdminPage({ searchParams }: Props) {
                       </button>
                     </form>
                   )}
+                  {m.role !== "admin" ? (
+                    <form action={simularLoginAction.bind(null, m.userId)}>
+                      <button
+                        type="submit"
+                        className="btn-primary text-xs"
+                        title="Navegar o app como este membro"
+                      >
+                        Simular login
+                      </button>
+                    </form>
+                  ) : null}
                 </div>
               </li>
             ))}

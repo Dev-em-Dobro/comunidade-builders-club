@@ -95,10 +95,18 @@ export async function setMembershipRole(
     }
   }
 
-  return prisma.membership.update({
+  const membership = await prisma.membership.update({
     where: { userId },
     data: { role },
   });
+
+  // F123 — Better Auth admin plugin lê User.role, não Membership.role.
+  await prisma.user.update({
+    where: { id: userId },
+    data: { role: role === "admin" ? "admin" : "user" },
+  });
+
+  return membership;
 }
 
 export { addAllowedEmail, listAllowedEmails, removeAllowedEmail };

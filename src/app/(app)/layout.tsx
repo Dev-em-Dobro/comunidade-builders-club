@@ -12,6 +12,7 @@ import { AppShell } from "@/components/app-shell";
 import { GarantiaCienteModal } from "@/components/garantia-ciente-modal";
 import { TermosEliteModal } from "@/components/termos-elite-modal";
 import { ContratoConteudosModal } from "@/components/contrato-conteudos-modal";
+import { getImpersonationState } from "@/lib/auth/impersonation";
 
 export default async function AppSegmentLayout({
   children,
@@ -22,6 +23,7 @@ export default async function AppSegmentLayout({
   const isPaid = isPaidMembership(member.membership);
   const isElite = isEliteMembership(member.membership);
   const isVitalicio = isVitalicioMembership(member.membership);
+  const simulacao = await getImpersonationState();
   const precisaAceitarTermosElite =
     member.membership.tier === "elite" &&
     !(await temAceiteTermosEliteVigente(
@@ -67,6 +69,7 @@ export default async function AppSegmentLayout({
       displayName={member.profile.displayName}
       email={member.user.email}
       avatarUrl={member.profile.avatarUrl}
+      simulatingEmail={simulacao.active ? simulacao.email : null}
     >
       {precisaCienteGarantia ? <GarantiaCienteModal /> : null}
       {children}

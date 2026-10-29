@@ -16,6 +16,7 @@ export function AppShell({
   displayName,
   email,
   avatarUrl,
+  simulatingEmail = null,
 }: {
   children: React.ReactNode;
   userId: string;
@@ -27,6 +28,8 @@ export function AppShell({
   /** F062 — exibido no topo do popup da pill do usuário. */
   email: string;
   avatarUrl?: string | null;
+  /** F123 — e-mail do membro sendo simulado (null = sessão normal). */
+  simulatingEmail?: string | null;
 }) {
   return (
     <AppShellClient
@@ -42,6 +45,7 @@ export function AppShell({
       avatarUrl={avatarUrl}
       notifPreview={[]}
       hydrateNav
+      simulatingEmail={simulatingEmail}
     >
       {children}
     </AppShellClient>

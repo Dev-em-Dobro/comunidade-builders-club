@@ -21,6 +21,7 @@ import { ClubImersaoBanner } from "@/components/club-imersao-banner";
 import { BastidoresBanner } from "@/components/bastidores-banner";
 import { BlackInfinitaBanner } from "@/components/black-infinita-banner";
 import { PresentePosCadastroPopup } from "@/components/presente-pos-cadastro-popup";
+import { SimularLoginBanner } from "@/components/simular-login-banner";
 import { faixaDoTopo } from "@/lib/eventos/bastidores";
 import {
   ICON_ADMIN,
@@ -472,6 +473,7 @@ function ShellInner({
   spaces,
   avatarUrl,
   notifPreview,
+  simulatingEmail = null,
 }: {
   children: React.ReactNode;
   displayName: string;
@@ -485,6 +487,7 @@ function ShellInner({
   spaces: SpaceLink[];
   avatarUrl?: string | null;
   notifPreview: NotifPreview[];
+  simulatingEmail?: string | null;
 }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const pathname = usePathname();
@@ -597,6 +600,9 @@ function ShellInner({
       ) : null}
 
       <div className="relative flex min-w-0 flex-1 flex-col">
+        {simulatingEmail ? (
+          <SimularLoginBanner email={simulatingEmail} />
+        ) : null}
         {/* F117 — a campanha ocupa o slot único do topo durante a Black. */}
         {faixa === "black" ? (
           <BlackInfinitaBanner isPaid={isPaid} />
@@ -667,6 +673,7 @@ export function AppShellClient({
   avatarUrl,
   notifPreview,
   hydrateNav = false,
+  simulatingEmail = null,
 }: {
   children: React.ReactNode;
   displayName: string;
@@ -682,6 +689,8 @@ export function AppShellClient({
   notifPreview: NotifPreview[];
   /** Busca spaces em /api/nav após o paint (não bloqueia o feed no SSR). */
   hydrateNav?: boolean;
+  /** F123 */
+  simulatingEmail?: string | null;
 }) {
   const pathname = usePathname();
   const search = useSearchParams();
@@ -738,6 +747,7 @@ export function AppShellClient({
         spaces={spaces}
         avatarUrl={avatarUrl}
         notifPreview={notifPreview}
+        simulatingEmail={simulatingEmail}
       >
         {children}
       </ShellInner>

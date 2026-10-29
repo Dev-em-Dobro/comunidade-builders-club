@@ -20,6 +20,12 @@ model User {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
+  /** F123 — Better Auth admin plugin (sync com Membership.role). */
+  role       String?   @default("user")
+  banned     Boolean?  @default(false)
+  banReason  String?   @map("ban_reason")
+  banExpires DateTime? @map("ban_expires")
+
   sessions Session[]
   accounts Account[]
 
@@ -54,6 +60,8 @@ model Session {
   userAgent String?
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /** F123 — userId do admin quando a sessão é impersonação. */
+  impersonatedBy String? @map("impersonated_by")
 
   @@unique([token])
   @@index([userId])

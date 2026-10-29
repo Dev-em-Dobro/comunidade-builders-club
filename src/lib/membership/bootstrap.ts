@@ -97,6 +97,11 @@ async function resolverBootstrap(
         where: { userId },
         data: { status: "active", tier: "elite", role: "admin" },
       });
+      // F123 — Better Auth admin plugin.
+      await prisma.user.update({
+        where: { id: userId },
+        data: { role: "admin" },
+      });
       return { membership, profile };
     }
     return { membership: existing, profile };
@@ -161,6 +166,12 @@ async function resolverBootstrap(
           : {}),
       },
     });
+    if (isBootstrapAdmin) {
+      await prisma.user.update({
+        where: { id: userId },
+        data: { role: "admin" },
+      });
+    }
     return { membership, profile: nextProfile };
   }
 
@@ -169,6 +180,10 @@ async function resolverBootstrap(
       const membership = await prisma.membership.update({
         where: { userId },
         data: { status: "active", tier: "elite", role: "admin" },
+      });
+      await prisma.user.update({
+        where: { id: userId },
+        data: { role: "admin" },
       });
       return { membership, profile: nextProfile };
     }
@@ -190,6 +205,12 @@ async function resolverBootstrap(
           : {}),
       },
     });
+    if (isBootstrapAdmin) {
+      await prisma.user.update({
+        where: { id: userId },
+        data: { role: "admin" },
+      });
+    }
     return { membership, profile: nextProfile };
   }
 

@@ -1,6 +1,6 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { emailOTP, magicLink } from "better-auth/plugins";
+import { admin, emailOTP, magicLink } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
 import { prisma } from "@/lib/db";
 import { sendMagicLinkEmail, sendOtpEmail } from "@/lib/email";
@@ -85,6 +85,10 @@ export const auth = betterAuth({
       sendVerificationOTP: async ({ email, otp }) => {
         await sendOtpEmail({ to: email, otp });
       },
+    }),
+    // F123 — impersonateUser / stopImpersonating (User.role sync com Membership).
+    admin({
+      impersonationSessionDuration: 60 * 60,
     }),
     nextCookies(),
   ],
