@@ -1,5 +1,5 @@
 /**
- * F050 / F051 / F103 / F107 / F110 / F111 / F112 / F113 / F116 / F118 — Seed dos módulos (jornada Fase 1–2,
+ * F050 / F051 / F103 / F107 / F110 / F111 / F112 / F113 / F116 / F118 / F124 — Seed dos módulos (jornada Fase 1–2,
  * n8n, IA, Fundamentos, lives, Grok Bots, JEV, Codex, Claude Code).
  *
  *   npm run db:seed:aulas-panda -- --target=hml
@@ -922,12 +922,82 @@ Nesta live a gente abre o modelo: o que entra no pacote, como explicar o valor s
     ],
   },
   {
+    // F124 — CRM com IA. Pago. Capa própria. sortOrder 17: antes do JEV.
+    slug: "crm-com-ia",
+    title: "CRM com IA",
+    description:
+      "Template de CRM com WhatsApp, Instagram e agente de IA: da instalação local ao atendimento no ar.",
+    coverImageUrl: "/10-crm.png",
+    sortOrder: 17,
+    forceLessonSort: true,
+    lessons: [
+      {
+        slug: "visao-geral-do-crm",
+        title: "Visão geral do CRM",
+        description:
+          "Nesta aula você vê o CRM com IA do ponto de vista do aluno: uma instalação independente por negócio, com WhatsApp Cloud API, Instagram Direct e agente de atendimento.\n\nA ideia é começar o caminho — o ZIP traz o template 1.0.4, os guias e os prompts de instalação assistida.\n\n## Materiais\n- [Baixar template e guias (ZIP)](/materiais/crm-para-alunos-template.zip)",
+        pandaVideoExternalId: "ae0cabc2-254e-48ed-98cc-3daf0cfc6f13",
+        sortOrder: 0,
+      },
+      {
+        slug: "arquivos-e-instalacao",
+        title: "Arquivos e instalação",
+        description:
+          "Aqui você baixa o pacote, extrai o template, confere Node.js 22 LTS e Docker Desktop, e sobe a instalação local com o setup.\n\nO ZIP da aula 1 tem o template e o guia de instalação assistida (prompts para o agente). Sem Docker aberto e sem Node 22, o setup não anda.\n\n## Materiais\n- [Baixar template e guias (ZIP)](/materiais/crm-para-alunos-template.zip) — o mesmo pacote da aula 1\n- [Node.js 22 LTS](https://nodejs.org/)\n- [Docker Desktop](https://www.docker.com/products/docker-desktop/)",
+        pandaVideoExternalId: "d7b922aa-0484-45af-b0cc-41e1b9dfa6da",
+        sortOrder: 1,
+      },
+      {
+        slug: "primeiro-acesso-e-configuracao",
+        title: "Primeiro acesso e configuração",
+        description:
+          "Depois do setup, você entra no painel, cria o administrador e faz a configuração inicial da instância.\n\nSe travar no primeiro acesso, volte ao README e à instalação assistida que estão no ZIP da aula 1.",
+        pandaVideoExternalId: "df983cd6-689f-4d6a-9406-bc2b77c6060a",
+        sortOrder: 2,
+      },
+      {
+        slug: "agente-de-ia-e-catalogo",
+        title: "Agente de IA e catálogo",
+        description:
+          "Nesta aula você configura o primeiro agente de IA, o catálogo e as regras de transferência para humano.\n\nVocê precisa de uma chave de API da Anthropic ou da OpenAI — assinatura de chat não substitui crédito de API. O guia de agentes está no ZIP da aula 1.",
+        pandaVideoExternalId: "4512a78a-88a6-4df1-a930-094f8941c82e",
+        sortOrder: 3,
+      },
+      {
+        slug: "whatsapp-e-proximos-passos",
+        title: "WhatsApp e próximos passos",
+        description:
+          "Aqui você conecta WhatsApp Cloud API (e Instagram Direct, se for usar) com os ativos da sua própria conta Meta.\n\nO guia META.md está no ZIP da aula 1. A Meta não alcança localhost: para webhook no desenvolvimento use um túnel HTTPS; na produção entra o domínio da aula de deploy.\n\n## Links\n- [WhatsApp Cloud API](https://developers.facebook.com/docs/whatsapp/cloud-api)\n- [Meta for Developers](https://developers.facebook.com/)",
+        pandaVideoExternalId: "fef3b100-d72d-4242-82e7-949bb9e67aa9",
+        sortOrder: 4,
+      },
+      {
+        slug: "deploy-no-railway",
+        title: "Deploy no Railway",
+        description: "Em breve — esta aula ainda não foi gravada.",
+        sortOrder: 5,
+      },
+      {
+        slug: "configurar-dominio-https-e-migrar-callbacks-da-meta",
+        title: "Configurar domínio HTTPS e migrar os callbacks da Meta",
+        description: "Em breve — esta aula ainda não foi gravada.",
+        sortOrder: 6,
+      },
+      {
+        slug: "testes-de-aceitacao-operacao-custos-e-backup",
+        title: "Testes de aceitação, operação, custos e backup",
+        description: "Em breve — esta aula ainda não foi gravada.",
+        sortOrder: 7,
+      },
+    ],
+  },
+  {
     // F107 — JEV na prática. Pago (freeAccess default false). Aulas entram depois.
     slug: "jev-aplicado-ao-mundo-real",
     title: "JEV aplicado ao mundo real",
     description:
       "JEV fora da teoria: como aplicar no dia a dia do builder — prospecção, entrega e operação com IA.",
-    sortOrder: 17,
+    sortOrder: 18,
     lessons: [],
   },
   {
