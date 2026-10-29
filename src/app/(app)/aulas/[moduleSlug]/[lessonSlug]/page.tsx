@@ -138,13 +138,27 @@ export default async function LessonPage({ params }: Props) {
                 </>
               ) : canWatch ? (
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-card px-6 text-center">
-                  <p className="font-[family-name:var(--font-outfit)] text-lg font-semibold">
-                    Aula em texto
-                  </p>
-                  <p className="mt-2 max-w-sm text-sm text-muted">
-                    Esta aula não tem vídeo. O conteúdo está na descrição
-                    abaixo.
-                  </p>
+                  {/^\s*em breve/i.test(lesson.description ?? "") ? (
+                    <>
+                      <p className="font-[family-name:var(--font-outfit)] text-lg font-semibold">
+                        Em breve
+                      </p>
+                      <p className="mt-2 max-w-sm text-sm text-muted">
+                        Esta aula ainda não foi gravada. Volte quando o
+                        conteúdo estiver no ar.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="font-[family-name:var(--font-outfit)] text-lg font-semibold">
+                        Aula em texto
+                      </p>
+                      <p className="mt-2 max-w-sm text-sm text-muted">
+                        Esta aula não tem vídeo. O conteúdo está na descrição
+                        abaixo.
+                      </p>
+                    </>
+                  )}
                 </div>
               ) : (
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-card px-6 text-center">

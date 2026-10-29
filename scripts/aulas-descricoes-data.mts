@@ -572,6 +572,44 @@ O guia passo a passo traz as etapas, os prompts para copiar e o que conferir ant
 - [Baixar projeto da aula (ZIP)](/materiais/claude-code-na-pratica-aula-2.zip)
 - [Baixar tutorial da aula (PDF)](/materiais/tutorial-aula-2-claude-code.pdf)`,
 
+  "crm-com-ia/visao-geral-do-crm": `Nesta aula você vê o CRM com IA do ponto de vista do aluno: uma instalação independente por negócio, com WhatsApp Cloud API, Instagram Direct e agente de atendimento.
+
+A ideia é começar o caminho — o ZIP traz o template 1.0.4, os guias e os prompts de instalação assistida.
+
+## Materiais
+- [Baixar template e guias (ZIP)](/materiais/crm-para-alunos-template.zip)`,
+
+  "crm-com-ia/arquivos-e-instalacao": `Aqui você baixa o pacote, extrai o template, confere Node.js 22 LTS e Docker Desktop, e sobe a instalação local com o setup.
+
+O ZIP da aula 1 tem o template e o guia de instalação assistida (prompts para o agente). Sem Docker aberto e sem Node 22, o setup não anda.
+
+## Materiais
+- [Baixar template e guias (ZIP)](/materiais/crm-para-alunos-template.zip) — o mesmo pacote da aula 1
+- [Node.js 22 LTS](https://nodejs.org/)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)`,
+
+  "crm-com-ia/primeiro-acesso-e-configuracao": `Depois do setup, você entra no painel, cria o administrador e faz a configuração inicial da instância.
+
+Se travar no primeiro acesso, volte ao README e à instalação assistida que estão no ZIP da aula 1.`,
+
+  "crm-com-ia/agente-de-ia-e-catalogo": `Nesta aula você configura o primeiro agente de IA, o catálogo e as regras de transferência para humano.
+
+Você precisa de uma chave de API da Anthropic ou da OpenAI — assinatura de chat não substitui crédito de API. O guia de agentes está no ZIP da aula 1.`,
+
+  "crm-com-ia/whatsapp-e-proximos-passos": `Aqui você conecta WhatsApp Cloud API (e Instagram Direct, se for usar) com os ativos da sua própria conta Meta.
+
+O guia META.md está no ZIP da aula 1. A Meta não alcança localhost: para webhook no desenvolvimento use um túnel HTTPS; na produção entra o domínio da aula de deploy.
+
+## Links
+- [WhatsApp Cloud API](https://developers.facebook.com/docs/whatsapp/cloud-api)
+- [Meta for Developers](https://developers.facebook.com/)`,
+
+  "crm-com-ia/deploy-no-railway": `Em breve — esta aula ainda não foi gravada.`,
+
+  "crm-com-ia/configurar-dominio-https-e-migrar-callbacks-da-meta": `Em breve — esta aula ainda não foi gravada.`,
+
+  "crm-com-ia/testes-de-aceitacao-operacao-custos-e-backup": `Em breve — esta aula ainda não foi gravada.`,
+
   "claude-code/claude-code-na-pratica-aula-3": `Nesta aula a gente sai do plano e constrói, com Claude Code, um gerador de orçamentos e propostas por link: briefing, faixas de preço, aprovação do valor e página pública para o cliente pagar.
 
 Você acompanha o PLANO.md virando um app Next.js + Supabase, os erros reais no caminho e o deploy.
