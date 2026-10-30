@@ -1,3 +1,4 @@
+import Script from "next/script";
 import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
 import {
   isEliteMembership,
@@ -13,6 +14,10 @@ import { GarantiaCienteModal } from "@/components/garantia-ciente-modal";
 import { TermosEliteModal } from "@/components/termos-elite-modal";
 import { ContratoConteudosModal } from "@/components/contrato-conteudos-modal";
 import { getImpersonationState } from "@/lib/auth/impersonation";
+import {
+  BLACK_ALUNOS_POPUP_SRC,
+  shouldShowBlackAlunosPopup,
+} from "@/lib/eventos/black-alunos-popup";
 
 export default async function AppSegmentLayout({
   children,
@@ -72,6 +77,13 @@ export default async function AppSegmentLayout({
       simulatingEmail={simulacao.active ? simulacao.email : null}
     >
       {precisaCienteGarantia ? <GarantiaCienteModal /> : null}
+      {shouldShowBlackAlunosPopup({
+        isPaid,
+        isVitalicio,
+        precisaCienteGarantia,
+      }) ? (
+        <Script src={BLACK_ALUNOS_POPUP_SRC} strategy="afterInteractive" />
+      ) : null}
       {children}
     </AppShell>
   );
