@@ -54,7 +54,7 @@ function LockIcon() {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="h-3.5 w-3.5 shrink-0 opacity-70"
+      className="ml-1.5 inline-block h-3.5 w-3.5 align-[-0.125em] opacity-70"
       aria-hidden
     >
       <rect x="3" y="11" width="18" height="11" rx="2" />
@@ -105,7 +105,7 @@ export function MetodoView({
                       href={whatsappUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[1.0625rem] font-semibold text-foreground underline-offset-2 hover:text-accent hover:underline md:text-[1.125rem]"
+                      className="block w-full text-left text-[1.0625rem] font-semibold text-foreground underline-offset-2 hover:text-accent hover:underline md:text-[1.125rem]"
                     >
                       {step.label}
                     </a>
@@ -117,7 +117,7 @@ export function MetodoView({
                     <button
                       type="button"
                       onClick={() => openUpgrade("whatsapp-elite")}
-                      className="inline-flex items-center gap-2 text-[1.0625rem] font-semibold text-foreground underline-offset-2 hover:text-accent hover:underline md:text-[1.125rem]"
+                      className="block w-full text-left text-[1.0625rem] font-semibold text-foreground underline-offset-2 hover:text-accent hover:underline md:text-[1.125rem]"
                     >
                       {step.label}
                       <LockIcon />

@@ -72,7 +72,11 @@ describe("MetodoView — ordem e cadeado", () => {
       markup.indexOf("<ol"),
       markup.indexOf("</button>"),
     );
-    assert.match(grupo, /<button[^>]*>Entrar no grupo de WhatsApp<svg/);
+    const botao = grupo.match(/<button[^>]*>/)?.[0] ?? "";
+    assert.match(botao, /\btext-left\b/);
+    assert.match(botao, /\bw-full\b/);
+    assert.doesNotMatch(botao, /inline-flex|text-center|justify-center|items-center/);
+    assert.match(grupo, /Entrar no grupo de WhatsApp<svg/);
     assert.match(grupo, new RegExp(CADEADO));
     assert.doesNotMatch(grupo, /chat\.whatsapp\.com/);
     assert.doesNotMatch(grupo, /href=/);
@@ -86,7 +90,11 @@ describe("MetodoView — ordem e cadeado", () => {
     });
     assert.match(
       markup,
-      /href="https:\/\/chat\.whatsapp\.com\/elite"[^>]*target="_blank"/,
+      /href="https:\/\/chat\.whatsapp\.com\/elite"[^>]*target="_blank"[^>]*class="[^"]*\btext-left\b[^"]*"/,
+    );
+    assert.match(
+      markup,
+      /href="https:\/\/chat\.whatsapp\.com\/elite"[^>]*class="[^"]*\bw-full\b[^"]*"/,
     );
     assert.doesNotMatch(markup, new RegExp(CADEADO));
   });
