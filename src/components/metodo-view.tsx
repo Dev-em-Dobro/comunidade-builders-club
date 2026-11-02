@@ -17,33 +17,33 @@ type Step = {
   whatsappElite?: boolean;
 };
 
+const STEP_WHATSAPP: Step = {
+  n: "1",
+  label: "Entrar no grupo de WhatsApp",
+  hint: "Canal do Elite pra tirar dúvida e acompanhar a execução.",
+  whatsappElite: true,
+};
+
 const STEPS_BASE: Step[] = [
   {
-    n: "1",
+    n: "2",
     href: "/perfil",
     label: "Completar o perfil",
     hint: "Nome e foto — é assim que a comunidade te encontra.",
   },
   {
-    n: "2",
+    n: "3",
     href: AULAS_FREE_HREF,
     label: "Assistir as aulas do método",
     hint: "Fase 1 e Fase 2: prospecção, projetos e as ferramentas prontas. É a base — live não substitui isso.",
   },
   {
-    n: "3",
+    n: "4",
     href: "/spaces/conquistas",
     label: "Praticar e postar na comunidade",
     hint: "Dúvida, projeto ou vitória — mostre o que está fazendo e peça ajuda quando travar.",
   },
 ];
-
-const STEP_WHATSAPP: Step = {
-  n: "4",
-  label: "Entrar no grupo de WhatsApp",
-  hint: "Canal do Elite pra tirar dúvida e acompanhar a execução.",
-  whatsappElite: true,
-};
 
 function LockIcon() {
   return (
@@ -54,7 +54,7 @@ function LockIcon() {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="h-3.5 w-3.5 shrink-0 opacity-70"
+      className="ml-1.5 inline-block h-3.5 w-3.5 align-[-0.125em] opacity-70"
       aria-hidden
     >
       <rect x="3" y="11" width="18" height="11" rx="2" />
@@ -75,30 +75,17 @@ export function MetodoView({
   whatsappUrl: string | null;
 }) {
   const { openUpgrade } = useUpgrade();
-  const steps = [
-    ...STEPS_BASE,
-    { ...STEP_WHATSAPP, n: String(STEPS_BASE.length + 1) },
-  ];
+  const steps = [STEP_WHATSAPP, ...STEPS_BASE];
 
   return (
-    <div className="reading-wrap">
+    <div className="mx-auto grid w-full max-w-6xl gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(17.5rem,22rem)] lg:items-start">
       {/*
         F106 — um card no estilo de post aberto: título grande + corpo reading.
         Sem hover de feed (já está “aberto”).
+        Mobile: o passo a passo vem antes no DOM. No lg+ o manifesto ocupa a
+        coluna da esquerda e os passos ficam sticky à direita.
       */}
-      <article className="post-card !shadow-none hover:!shadow-none p-5 sm:p-8 md:p-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.08em] text-accent">
-          Leia com atenção
-        </p>
-        <h1 className="reading-title mt-3">{MANIFESTO_TITULO}</h1>
-        <div className={`mt-8 ${CORPO_LEITURA}`}>
-          {MANIFESTO_PARAGRAFOS.map((p) => (
-            <p key={p.slice(0, 48)}>{p}</p>
-          ))}
-        </div>
-      </article>
-
-      <section className="post-card mt-6 !shadow-none hover:!shadow-none p-5 sm:p-8">
+      <section className="post-card !shadow-none hover:!shadow-none p-5 sm:p-8 lg:sticky lg:top-6 lg:col-start-2 lg:row-start-1 lg:self-start">
         <h2 className="font-[family-name:var(--font-outfit)] text-xl font-bold tracking-tight md:text-2xl">
           Passo a passo
         </h2>
@@ -118,7 +105,7 @@ export function MetodoView({
                       href={whatsappUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[1.0625rem] font-semibold text-foreground underline-offset-2 hover:text-accent hover:underline md:text-[1.125rem]"
+                      className="block w-full text-left text-[1.0625rem] font-semibold text-foreground underline-offset-2 hover:text-accent hover:underline md:text-[1.125rem]"
                     >
                       {step.label}
                     </a>
@@ -130,7 +117,7 @@ export function MetodoView({
                     <button
                       type="button"
                       onClick={() => openUpgrade("whatsapp-elite")}
-                      className="inline-flex items-center gap-2 text-[1.0625rem] font-semibold text-foreground underline-offset-2 hover:text-accent hover:underline md:text-[1.125rem]"
+                      className="block w-full text-left text-[1.0625rem] font-semibold text-foreground underline-offset-2 hover:text-accent hover:underline md:text-[1.125rem]"
                     >
                       {step.label}
                       <LockIcon />
@@ -154,6 +141,18 @@ export function MetodoView({
           ))}
         </ol>
       </section>
+
+      <article className="post-card !shadow-none hover:!shadow-none p-5 sm:p-8 md:p-10 lg:col-start-1 lg:row-start-1">
+        <p className="text-xs font-semibold uppercase tracking-[0.08em] text-accent">
+          Leia com atenção
+        </p>
+        <h1 className="reading-title mt-3">{MANIFESTO_TITULO}</h1>
+        <div className={`mt-8 ${CORPO_LEITURA}`}>
+          {MANIFESTO_PARAGRAFOS.map((p) => (
+            <p key={p.slice(0, 48)}>{p}</p>
+          ))}
+        </div>
+      </article>
     </div>
   );
 }
