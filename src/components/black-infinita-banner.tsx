@@ -31,10 +31,14 @@ export function BlackInfinitaBanner({ isPaid }: { isPaid: boolean }) {
           </p>
         </div>
 
-        <div className="flex shrink-0 items-center justify-between gap-2 @lg:gap-3">
-          <span className="whitespace-nowrap rounded border border-[#44ead9]/40 px-2 py-1 text-[10px] font-extrabold tracking-wide text-[#68f7e7] @lg:text-[11px]">
-            {campanha.data}
-          </span>
+        <div
+          className={`flex shrink-0 items-center gap-2 @lg:gap-3 ${campanha.data ? "justify-between" : "justify-end"}`}
+        >
+          {campanha.data ? (
+            <span className="whitespace-nowrap rounded border border-[#44ead9]/40 px-2 py-1 text-[10px] font-extrabold tracking-wide text-[#68f7e7] @lg:text-[11px]">
+              {campanha.data}
+            </span>
+          ) : null}
           <span className="inline-flex min-h-9 items-center justify-center gap-1 rounded-md bg-[#2bdfca] px-3 py-2 text-[11px] font-extrabold text-[#05201d] shadow-[0_0_20px_rgba(43,223,202,0.15)] transition-colors group-hover:bg-[#65f5e5] @lg:text-[12px]">
             {campanha.cta}
             <span aria-hidden>↗</span>

@@ -2,11 +2,11 @@
 export const BLACK_INFINITA = {
   aluno: {
     etiqueta: "BLACK EM DOBRO INFINITA · ALUNOS",
-    titulo: "A melhor condição da nossa história",
-    descricao: "Participe do grupo de alunos para a Black de 28/10.",
-    data: "28 OUT",
-    cta: "Entrar no grupo de alunos",
-    href: "https://sndflw.com/i/sBjl9OjmppA8znba2jc3",
+    titulo: "A melhor condição da história da Dev em Dobro",
+    descricao: "Live gratuita 05/11 às 20h.",
+    data: "",
+    cta: "Acessar a oferta",
+    href: "https://blackinfinita.devemdobro.com/alunos-dq",
   },
   naoAluno: {
     etiqueta: "BLACK EM DOBRO INFINITA · LIVE GRATUITA",
