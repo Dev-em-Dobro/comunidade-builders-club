@@ -1,11 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
-import {
-  BLACK_INFINITA_POPUP_COPY,
-  BLACK_INFINITA_POPUP_CTA,
-  BLACK_INFINITA_POPUP_HREF,
-} from "../presentes/black-infinita-popup";
+import { BLACK_INFINITA_POPUP_COPY } from "../presentes/black-infinita-popup";
 import { blackAtiva, blackBannerFor } from "./black-infinita";
 import { faixaDoTopo } from "./bastidores";
 
@@ -38,10 +34,10 @@ describe("F117 — Black em Dobro no topo", () => {
       "A melhor condição da história da Dev em Dobro. Live gratuita 05/11 às 20h.",
     );
     assert.ok(BLACK_INFINITA_POPUP_COPY.toLowerCase().includes(subtitulo.toLowerCase()));
-    assert.equal(aluno.cta, BLACK_INFINITA_POPUP_CTA);
-    assert.equal(aluno.cta, "Entrar na lista da live");
-    assert.equal(aluno.href, BLACK_INFINITA_POPUP_HREF);
-    assert.equal(aluno.href, "https://blackinfinita.devemdobro.com/");
+    assert.equal(aluno.cta, "Acessar a oferta");
+    assert.equal(aluno.href, "https://blackinfinita.devemdobro.com/alunos-dq");
+    const popupAlunos = readFileSync("public/black-popup.js", "utf8");
+    assert.match(popupAlunos, /https:\/\/blackinfinita\.devemdobro\.com\/alunos-dq/);
     assert.equal(aluno.etiqueta, "BLACK EM DOBRO INFINITA · ALUNOS");
 
     const banner = readFileSync("src/components/black-infinita-banner.tsx", "utf8");

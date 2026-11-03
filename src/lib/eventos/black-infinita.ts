@@ -5,8 +5,8 @@ export const BLACK_INFINITA = {
     titulo: "A melhor condição da história da Dev em Dobro",
     descricao: "Live gratuita 05/11 às 20h.",
     data: "",
-    cta: "Entrar na lista da live",
-    href: "https://blackinfinita.devemdobro.com/",
+    cta: "Acessar a oferta",
+    href: "https://blackinfinita.devemdobro.com/alunos-dq",
   },
   naoAluno: {
     etiqueta: "BLACK EM DOBRO INFINITA · LIVE GRATUITA",
