@@ -11,11 +11,18 @@ O item **Comece por aqui** no menu abre uma página própria (`/metodo`), não a
 Conteúdo:
 
 1. Bloco **Leia com atenção** + **Manifesto do Builder**
-2. Passo a passo (perfil, aulas do método, comunidade) + **WhatsApp Elite** (cadeado / popup se não Elite)
+2. Passo a passo, nesta ordem: **WhatsApp Elite** (cadeado / popup se não Elite), perfil, aulas do método, comunidade
 3. Menu aponta para `/metodo`
+
+Layout da página (só `/metodo`; os cards continuam `post-card`):
+
+- **lg+:** duas colunas, mais largas que `reading-wrap`. Esquerda = manifesto. Direita = passo a passo, sticky no topo enquanto o manifesto rola.
+- **Abaixo de lg:** uma coluna. Passo a passo primeiro, manifesto embaixo.
 
 ## Critérios
 - [x] `/metodo` autenticado renderiza manifesto + passos
 - [x] Menu “Comece por aqui” → `/metodo` (não redireciona pra aula)
 - [x] Não-Elite: passo WhatsApp com cadeado; clique abre upgrade Elite
 - [x] Elite: passo WhatsApp com link (`WHATSAPP_ELITE_URL` ou `NEXT_PUBLIC_WHATSAPP_ELITE_URL`) quando configurado; exige redeploy após setar a env
+- [x] Ordem dos passos: WhatsApp, perfil, aulas do método, comunidade (1..4)
+- [x] lg+: manifesto à esquerda, passos sticky à direita; abaixo de lg: passos primeiro
