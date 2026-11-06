@@ -13,7 +13,7 @@ export const BLACK_INFINITA = {
     titulo: "A melhor condição da nossa história",
     descricao: "DevQuest + Builders Club com acesso vitalício. Live em 05/11 às 20h.",
     data: "05 NOV · 20H",
-    cta: "Entrar na lista da live",
+    cta: "Acessar oferta",
     href: "https://blackinfinita.devemdobro.com/",
   },
 } as const;

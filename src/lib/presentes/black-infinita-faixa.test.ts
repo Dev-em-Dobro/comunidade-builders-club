@@ -63,7 +63,7 @@ describe("copy, destino e markup da faixa (F119)", () => {
   it("a copy e o destino são os da campanha, sem UTM", () => {
     assert.equal(
       BLACK_INFINITA_FAIXA_COPY,
-      "Black em Dobro Infinita: a melhor condição da história da Dev em Dobro. Live gratuita 05/11 às 20h.",
+      "Inscrições abertas para a Black em Dobro Infinita. Desconto de 75% nas nossas formações, acesso vitalício às aulas e atualizações e bônus exclusivos.",
     );
     assert.equal(
       BLACK_INFINITA_FAIXA_HREF,
