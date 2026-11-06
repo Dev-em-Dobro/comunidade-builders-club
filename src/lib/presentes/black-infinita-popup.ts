@@ -1,13 +1,13 @@
 /**
  * F121 — pop-up da Black Infinita no Presente público.
  *
- * Copy e destino vêm da F119/F117. A ordem com a pop-up da aula (F118)
+ * Copy e CTA vêm da F119/F117; destino da oferta com UTMs próprias.
+ * A ordem com a pop-up da aula (F118)
  * mora aqui para testar sem React: nunca os dois ao mesmo tempo.
  */
 import { BLACK_INFINITA } from "@/lib/eventos/black-infinita";
 import {
   BLACK_INFINITA_FAIXA_COPY,
-  BLACK_INFINITA_FAIXA_HREF,
   type StorageLike,
 } from "@/lib/presentes/black-infinita-faixa";
 import { POPUP_DELAY_MS } from "@/lib/presentes/popup-aula";
@@ -16,7 +16,8 @@ export const BLACK_INFINITA_POPUP_KEY = "bc_black_infinita_popup_dismissed";
 
 export const BLACK_INFINITA_POPUP_COPY = BLACK_INFINITA_FAIXA_COPY;
 
-export const BLACK_INFINITA_POPUP_HREF = BLACK_INFINITA_FAIXA_HREF;
+export const BLACK_INFINITA_POPUP_HREF =
+  "https://blackinfinita.devemdobro.com/oferta-geral?utm_source=builders-club&utm_medium=presente-popup&utm_campaign=black-infinita";
 
 export const BLACK_INFINITA_POPUP_CTA = BLACK_INFINITA.naoAluno.cta;
 

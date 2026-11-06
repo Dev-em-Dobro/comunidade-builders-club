@@ -149,15 +149,14 @@ describe("copy, destino e markup da pop-up Black (F121)", () => {
   const aula = readFileSync("src/app/presentes/presente-aula-popup.tsx", "utf8");
   const banner = readFileSync("src/components/cookie-consent.tsx", "utf8");
 
-  it("reusa copy e destino da faixa / F117, sem UTM", () => {
+  it("reusa a copy e abre a oferta geral com UTMs da pop-up", () => {
     assert.equal(BLACK_INFINITA_POPUP_COPY, BLACK_INFINITA_FAIXA_COPY);
     assert.equal(
       BLACK_INFINITA_POPUP_HREF,
-      "https://blackinfinita.devemdobro.com/",
+      "https://blackinfinita.devemdobro.com/oferta-geral?utm_source=builders-club&utm_medium=presente-popup&utm_campaign=black-infinita",
     );
     assert.equal(BLACK_INFINITA_POPUP_CTA, "Acessar oferta");
     assert.equal(BLACK_INFINITA_POPUP_KEY, "bc_black_infinita_popup_dismissed");
-    assert.doesNotMatch(BLACK_INFINITA_POPUP_HREF, /utm_/);
   });
 
   it("só monta no Presente quando a sessão é anônima", () => {

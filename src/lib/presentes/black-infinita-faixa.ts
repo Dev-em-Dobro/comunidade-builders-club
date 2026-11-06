@@ -7,14 +7,13 @@
  * A sessão (logado vs anônimo) a página já resolve com `getOptionalUser`.
  * Este módulo só responde: com essa sessão e esse storage, a faixa entra?
  */
-import { BLACK_INFINITA } from "@/lib/eventos/black-infinita";
-
 export const BLACK_INFINITA_FAIXA_KEY = "bc_black_infinita_dismissed";
 
 export const BLACK_INFINITA_FAIXA_COPY =
   "Inscrições abertas para a Black em Dobro Infinita. Desconto de 75% nas nossas formações, acesso vitalício às aulas e atualizações e bônus exclusivos.";
 
-export const BLACK_INFINITA_FAIXA_HREF = BLACK_INFINITA.naoAluno.href;
+export const BLACK_INFINITA_FAIXA_HREF =
+  "https://blackinfinita.devemdobro.com/oferta-geral?utm_source=builders-club&utm_medium=presente-faixa&utm_campaign=black-infinita";
 
 export const BLACK_INFINITA_FAIXA_FECHAR =
   "Fechar aviso da Black em Dobro Infinita";

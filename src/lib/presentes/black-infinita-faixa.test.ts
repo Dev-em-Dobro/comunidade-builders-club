@@ -60,17 +60,16 @@ describe("copy, destino e markup da faixa (F119)", () => {
     "utf8",
   );
 
-  it("a copy e o destino são os da campanha, sem UTM", () => {
+  it("mantém a copy e abre a oferta geral com UTMs da faixa", () => {
     assert.equal(
       BLACK_INFINITA_FAIXA_COPY,
       "Inscrições abertas para a Black em Dobro Infinita. Desconto de 75% nas nossas formações, acesso vitalício às aulas e atualizações e bônus exclusivos.",
     );
     assert.equal(
       BLACK_INFINITA_FAIXA_HREF,
-      "https://blackinfinita.devemdobro.com/",
+      "https://blackinfinita.devemdobro.com/oferta-geral?utm_source=builders-club&utm_medium=presente-faixa&utm_campaign=black-infinita",
     );
     assert.equal(BLACK_INFINITA_FAIXA_KEY, "bc_black_infinita_dismissed");
-    assert.doesNotMatch(BLACK_INFINITA_FAIXA_HREF, /utm_/);
   });
 
   it("só monta no Presente quando a sessão é anônima", () => {
