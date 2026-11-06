@@ -1,7 +1,8 @@
 # F125 — Pop-up Black para alunos no Club (logado)
 
 ## Status
-Em implementação — 2026-10-30
+Retirada — 2026-11-06. O pop-up saiu do ar com o fim da Black; o
+script, a foto e a regra de visibilidade foram removidos.
 
 Depende de: [F120](F120-black-infinita-vitalicio.md) (quem comprou a Black
 vira Vitalício). **Não** mexe na [F117](F117-banner-black-infinita.md)
