@@ -12,7 +12,7 @@ import { BLACK_INFINITA } from "@/lib/eventos/black-infinita";
 export const BLACK_INFINITA_FAIXA_KEY = "bc_black_infinita_dismissed";
 
 export const BLACK_INFINITA_FAIXA_COPY =
-  "Black em Dobro Infinita: a melhor condição da história da Dev em Dobro. Live gratuita 05/11 às 20h.";
+  "Inscrições abertas para a Black em Dobro Infinita. Desconto de 75% nas nossas formações, acesso vitalício às aulas e atualizações e bônus exclusivos.";
 
 export const BLACK_INFINITA_FAIXA_HREF = BLACK_INFINITA.naoAluno.href;
 
