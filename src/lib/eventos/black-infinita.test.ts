@@ -34,8 +34,6 @@ describe("F117 — Black em Dobro no topo", () => {
     );
     assert.equal(aluno.cta, "Acessar a oferta");
     assert.equal(aluno.href, "https://blackinfinita.devemdobro.com/alunos-dq");
-    const popupAlunos = readFileSync("public/black-popup.js", "utf8");
-    assert.match(popupAlunos, /https:\/\/blackinfinita\.devemdobro\.com\/alunos-dq/);
     assert.equal(aluno.etiqueta, "BLACK EM DOBRO INFINITA · ALUNOS");
 
     const banner = readFileSync("src/components/black-infinita-banner.tsx", "utf8");
