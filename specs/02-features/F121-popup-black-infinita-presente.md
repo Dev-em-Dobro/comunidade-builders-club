@@ -25,10 +25,11 @@ Só `/presentes/[slug]` e `/presentes/[slug]/[utmContent]`.
 
 ### 2. Copy e destino já existentes
 
-Texto da F119 / destino da F117 (`naoAluno`): sem UTM, sem copy nova.
+Texto da F119 e CTA da F117 (`naoAluno`). Desde 06/11/2026, o destino
+da pop-up é a oferta geral com UTMs próprias para atribuir os acessos:
 
 - título e corpo: `BLACK_INFINITA_FAIXA_COPY` (a mesma frase da faixa)
-- CTA: `BLACK_INFINITA.naoAluno.cta` → `https://blackinfinita.devemdobro.com/`
+- CTA: `BLACK_INFINITA.naoAluno.cta` → `https://blackinfinita.devemdobro.com/oferta-geral?utm_source=builders-club&utm_medium=presente-popup&utm_campaign=black-infinita`
   em nova aba (`rel="noopener noreferrer"`)
 
 ### 3. Dispensa em `localStorage`, chave própria
@@ -66,12 +67,12 @@ Sem migration. Sem env. Sem mudança em F118 nem F057.
 - Faixa (F119) e banner logado (F117)
 - Esperar Aceitar/Recusar cookies
 - Persistir no banco
-- UTM no destino
 - Mudar a pop-up da aula
 
 ## Critérios de aceitação
 
 - [x] Spec antes do código
+- [x] CTA abre `/oferta-geral` com UTMs `builders-club` / `presente-popup` / `black-infinita`
 - [ ] Deslogado vê a modal depois de fechar a da aula
 - [ ] Logado não vê
 - [ ] X e CTA gravam `bc_black_infinita_popup_dismissed`; reload não reabre

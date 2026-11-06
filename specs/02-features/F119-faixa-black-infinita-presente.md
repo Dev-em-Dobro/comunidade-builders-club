@@ -13,8 +13,7 @@ lugar), [F078](F078-popup-aula-presente.md) / [F118](F118-popup-presente-sheet-p
 O Presente (`/presentes/[slug]` e `/presentes/[slug]/[utmContent]`) é o
 tráfego frio do Instagram. Quem chega **sem conta** ainda não viu a faixa
 da Black no Club (F117 — só o app logado). Esta feature põe um aviso
-discreto no topo da página pública, apontando para a live gratuita de
-05/11.
+discreto no topo da página pública, apontando para a oferta geral da Black.
 
 Não substitui a F117. Não mexe na pop-up da aula nem no aviso de cookies.
 
@@ -29,11 +28,12 @@ A sessão é a mesma da página: `getOptionalUser()`. Com user, a faixa
 
 Copy **exata**:
 
-> Black em Dobro Infinita: a melhor condição da história da Dev em Dobro. Live gratuita 05/11 às 20h.
+> Inscrições abertas para a Black em Dobro Infinita. Desconto de 75% nas nossas formações, acesso vitalício às aulas e atualizações e bônus exclusivos.
 
 O texto (a faixa inteira, menos o X) abre
-`https://blackinfinita.devemdobro.com/` em nova aba (`rel="noopener noreferrer"`).
-Sem UTM: a F117 também manda o href limpo; não inventar parâmetros.
+`https://blackinfinita.devemdobro.com/oferta-geral?utm_source=builders-club&utm_medium=presente-faixa&utm_campaign=black-infinita`
+em nova aba (`rel="noopener noreferrer"`). Desde 06/11/2026, as UTMs
+identificam os acessos pela faixa, separados dos acessos pela pop-up (F121).
 
 X fecha. Área de toque ≥ 44×44, `aria-label`. Dispensa em `localStorage`
 na chave `bc_black_infinita_dismissed`. Fechou, **não volta** neste
@@ -64,13 +64,13 @@ Sem migration. Sem env nova.
 ## Fora de escopo
 
 - Faixa no Club logado (é F117)
-- UTM no destino
 - Esconder ou empurrar a pop-up / o aviso de cookies
 - Persistência no banco
 
 ## Critérios de aceitação
 
 - [x] Spec antes do código
+- [x] Link abre `/oferta-geral` com UTMs `builders-club` / `presente-faixa` / `black-infinita`
 - [ ] Deslogado vê a faixa no topo do Presente, copy exata, link em nova aba
 - [ ] Logado não vê
 - [ ] Fechar grava `bc_black_infinita_dismissed` e a faixa não volta no reload
