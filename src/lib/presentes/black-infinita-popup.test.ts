@@ -155,7 +155,7 @@ describe("copy, destino e markup da pop-up Black (F121)", () => {
       BLACK_INFINITA_POPUP_HREF,
       "https://blackinfinita.devemdobro.com/",
     );
-    assert.equal(BLACK_INFINITA_POPUP_CTA, "Entrar na lista da live");
+    assert.equal(BLACK_INFINITA_POPUP_CTA, "Acessar oferta");
     assert.equal(BLACK_INFINITA_POPUP_KEY, "bc_black_infinita_popup_dismissed");
     assert.doesNotMatch(BLACK_INFINITA_POPUP_HREF, /utm_/);
   });
