@@ -44,8 +44,16 @@ export const COMMENTS_DISABLED_SPACE_SLUGS = [
   PRESENTES_SPACE_SLUG,
 ] as const;
 
-/** Não listar no sidebar nem no Feed global. */
-export const HIDDEN_NAV_SPACE_SLUGS = [AULA_THREADS_SPACE_SLUG] as const;
+/**
+ * Fora de `listSpaces` (menu lateral, seletor de /nova e aba Spaces do admin).
+ * Feed global e busca não usam esta lista.
+ */
+export const HIDDEN_NAV_SPACE_SLUGS = [
+  AULA_THREADS_SPACE_SLUG,
+  AVISOS_SPACE_SLUG,
+  "freelas",
+  "geral",
+] as const;
 
 export function isAdminOnlyPublishSpace(slug: string): boolean {
   return (ADMIN_ONLY_PUBLISH_SLUGS as readonly string[]).includes(slug);
