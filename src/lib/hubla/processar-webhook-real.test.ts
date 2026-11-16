@@ -36,6 +36,9 @@ let deliveries: Map<string, Delivery>;
 let memberships: Map<string, Membership>;
 let users: Map<string, { id: string; email: string }>;
 let allowed: Map<string, Allowed>;
+/** F126 — módulos vendidos avulso (hublaProductId → moduleId) e compras. */
+let modulosAvulsos: Map<string, string>;
+let compras: Set<string>;
 let falhas: {
   allowedUpsert: boolean;
   deliveryUpdate: boolean;
@@ -48,6 +51,8 @@ function resetDb() {
   memberships = new Map();
   users = new Map();
   allowed = new Map();
+  modulosAvulsos = new Map();
+  compras = new Set();
   falhas = { allowedUpsert: false, deliveryUpdate: false, deliveryLiberar: false };
 }
 
@@ -159,6 +164,22 @@ const fakePrisma = {
       if (!row) throw new Error("Not found");
       allowed.delete(args.where.email);
       return row;
+    },
+  },
+  module: {
+    findUnique: async (args: { where: { hublaProductId: string } }) => {
+      const id = modulosAvulsos.get(args.where.hublaProductId);
+      return id ? { id } : null;
+    },
+  },
+  modulePurchase: {
+    createMany: async (args: { data: { email: string; moduleId: string }[] }) => {
+      for (const c of args.data) compras.add(`${c.email}|${c.moduleId}`);
+      return { count: args.data.length };
+    },
+    deleteMany: async (args: { where: { moduleId: string; email: { in: string[] } } }) => {
+      for (const email of args.where.email.in) compras.delete(`${email}|${args.where.moduleId}`);
+      return { count: 0 };
     },
   },
 };
@@ -289,6 +310,59 @@ describe("processarWebhookHubla — código REAL com Prisma fake", () => {
 
       const t = memberships.get(membershipId)!.convertedToPaidAt!.getTime();
       assert.ok(t >= antes && t <= Date.now(), "deve ser ~agora");
+    });
+  });
+
+  describe("F126: aula avulsa", () => {
+    const AULA = "prod-aula-site";
+
+    it("compra libera só o módulo: sem allowlist, tier continua free", async () => {
+      modulosAvulsos.set(AULA, "mod-site");
+      const { membershipId } = usuarioFree("aluno@teste.com");
+
+      const r = await processar(
+        payloadFatura({ email: "Aluno@Teste.com", productId: AULA, offerId: "oferta-19" }),
+        "avulsa-1",
+      );
+
+      assert.deepEqual(r, { ignorado: false });
+      assert.ok(compras.has("aluno@teste.com|mod-site"));
+      assert.equal(allowed.size, 0);
+      assert.equal(memberships.get(membershipId)!.tier, "free");
+      assert.equal(deliveries.get("avulsa-1")!.status, "processed");
+      assert.equal(deliveries.get("avulsa-1")!.membershipId, membershipId);
+    });
+
+    it("compra antes da conta também grava (por e-mail)", async () => {
+      modulosAvulsos.set(AULA, "mod-site");
+      await processar(payloadFatura({ email: "semconta@teste.com", productId: AULA }), "avulsa-2");
+      assert.ok(compras.has("semconta@teste.com|mod-site"));
+      assert.equal(allowed.size, 0);
+    });
+
+    it("reembolso retira o módulo e não rebaixa um PRO", async () => {
+      modulosAvulsos.set(AULA, "mod-site");
+      const { membershipId } = usuarioFree("pro@teste.com");
+      memberships.get(membershipId)!.tier = "pro";
+      compras.add("pro@teste.com|mod-site");
+
+      await processar(
+        { ...payloadFatura({ email: "pro@teste.com", productId: AULA }), type: "invoice.refunded" },
+        "avulsa-3",
+      );
+
+      assert.equal(compras.has("pro@teste.com|mod-site"), false);
+      assert.equal(memberships.get(membershipId)!.tier, "pro");
+    });
+
+    it("produto do Club ignora vínculo de módulo e segue o fluxo atual", async () => {
+      modulosAvulsos.set(PRODUTO, "mod-errado");
+      usuarioFree("club@teste.com");
+
+      await processar(payloadFatura({ email: "club@teste.com" }), "avulsa-4");
+
+      assert.equal(compras.size, 0);
+      assert.ok(allowed.get("club@teste.com"));
     });
   });
 

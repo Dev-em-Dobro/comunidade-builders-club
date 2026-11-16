@@ -2,7 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
 import { isPaidMembership } from "@/lib/membership/capabilities";
 import { AULAS_FREE_HREF, canWatchLesson } from "@/lib/aulas/access";
-import { listCompletedLessonIds } from "@/lib/aulas";
+import { listCompletedLessonIds, listPurchasedModuleIds } from "@/lib/aulas";
 import { listPublishedModules } from "@/lib/aulas/published-modules";
 import { EmptyState } from "@/components/empty-state";
 import { AulaBreadcrumb } from "@/components/aula-breadcrumb";
@@ -21,12 +21,14 @@ export default async function AulasModulePage({ params }: Props) {
   const { moduleSlug } = await params;
   const member = await requireActiveMemberOrRedirect();
   const isPaid = isPaidMembership(member.membership);
-  const [modules, completed] = await Promise.all([
+  const [modules, completed, purchased] = await Promise.all([
     listPublishedModules(),
     listCompletedLessonIds(member.user.id),
+    listPurchasedModuleIds({ email: member.user.email, isPaid }),
   ]);
 
-  const catalog = modules.map((mod) => mapModule(mod, completed));
+  // F126 — compra avulsa vira `freeAccess` no card; o gate abaixo já lê isso.
+  const catalog = modules.map((mod) => mapModule(mod, completed, false, purchased));
   const mod = findModuleBySlug(catalog, moduleSlug);
   if (!mod) notFound();
 

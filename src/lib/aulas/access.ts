@@ -26,10 +26,24 @@ export function lessonVideoId(opts: {
 }
 
 export type ModuleAccessNode = {
+  id?: string;
   freeAccess: boolean;
   slug?: string;
   parent?: ModuleAccessNode | null;
 };
+
+/** F126 — módulo (ou ancestral) comprado avulso pelo membro. */
+export function moduleIsPurchased(
+  mod: ModuleAccessNode,
+  purchased: ReadonlySet<string>,
+): boolean {
+  let cur: ModuleAccessNode | null | undefined = mod;
+  while (cur) {
+    if (cur.id && purchased.has(cur.id)) return true;
+    cur = cur.parent;
+  }
+  return false;
+}
 
 export function moduleAllowsFree(mod: ModuleAccessNode): boolean {
   let cur: ModuleAccessNode | null | undefined = mod;
@@ -43,6 +57,7 @@ export function moduleAllowsFree(mod: ModuleAccessNode): boolean {
 export function canWatchLesson(
   isPaid: boolean,
   mod: ModuleAccessNode,
+  purchased: ReadonlySet<string> = new Set(),
 ): boolean {
-  return isPaid || moduleAllowsFree(mod);
+  return isPaid || moduleAllowsFree(mod) || moduleIsPurchased(mod, purchased);
 }

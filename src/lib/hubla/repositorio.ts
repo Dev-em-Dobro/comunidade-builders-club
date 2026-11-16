@@ -15,7 +15,8 @@ import { prisma } from "@/lib/db";
 import { addAllowedEmail, findUserByEmail, removeAllowedEmail } from "@/lib/membership/allowlist";
 import { interpretarEventoHubla } from "./interpretar";
 import { emailDoEvento, offerIdsDoEvento, productIdDoEvento } from "./normalizar";
-import { mapaOfertasHubla, type PlanoPagoHubla } from "./produtos";
+import { mapaOfertasHubla, mapaProdutosHubla, type PlanoPagoHubla } from "./produtos";
+import { aplicarAulaAvulsa, interpretarAulaAvulsa, moduloDaAulaAvulsa } from "./aula-avulsa";
 import {
   isPago,
   statusEhFinal,
@@ -588,17 +589,35 @@ export async function processarWebhookHubla(
   let falha: unknown = null;
 
   try {
-    const acao = interpretarEventoHubla(payload as HublaWebhookPayload, {
-      productPlanMap: opts.productPlanMap,
-      offerPlanMap: opts.offerPlanMap,
-    });
+    // F126 — produto do Club tem precedência; só fora dele procura aula avulsa.
+    const produtoDoClub =
+      !!dadosPayload.productId &&
+      (opts.productPlanMap ?? mapaProdutosHubla()).has(dadosPayload.productId);
+    const modulo = produtoDoClub ? null : await moduloDaAulaAvulsa(dadosPayload.productId);
+    const acao = modulo
+      ? null
+      : interpretarEventoHubla(payload as HublaWebhookPayload, {
+          productPlanMap: opts.productPlanMap,
+          offerPlanMap: opts.offerPlanMap,
+        });
 
-    if (acao.acao === "ignorar") {
+    if (modulo) {
+      const acaoAvulsa = interpretarAulaAvulsa(payload as HublaWebhookPayload);
+      membershipId = await buscarMembershipIdPorEmail(dadosPayload.email);
+      if (acaoAvulsa.acao === "ignorar") {
+        status = "ignored";
+        erro = acaoAvulsa.motivo;
+        resultado = { ignorado: true, motivo: acaoAvulsa.motivo };
+      } else {
+        await aplicarAulaAvulsa(modulo.id, acaoAvulsa);
+        resultado = { ignorado: false };
+      }
+    } else if (acao?.acao === "ignorar") {
       status = "ignored";
       erro = acao.motivo;
       membershipId = await buscarMembershipIdPorEmail(dadosPayload.email);
       resultado = { ignorado: true, motivo: acao.motivo };
-    } else {
+    } else if (acao) {
       const res = await aplicarAcaoAllowlist(acao, recebidoEm);
       membershipId = res.membershipId;
       if (!membershipId) {
