@@ -18,6 +18,7 @@ import {
   getLessonForMember,
   getLessonProgress,
   listCompletedLessonIds,
+  listPurchasedModuleIds,
   pandaEmbedUrl,
 } from "@/lib/aulas";
 import { listPublishedModules } from "@/lib/aulas/published-modules";
@@ -50,10 +51,13 @@ export default async function LessonPage({ params }: Props) {
   const member = await requireActiveMemberOrRedirect();
   const isPaid = isPaidMembership(member.membership);
 
-  const lesson = await getLessonForMember(moduleSlug, lessonSlug);
+  const [lesson, purchased] = await Promise.all([
+    getLessonForMember(moduleSlug, lessonSlug),
+    listPurchasedModuleIds({ email: member.user.email, isPaid }),
+  ]);
   if (!lesson) notFound();
 
-  const canWatch = canWatchLesson(isPaid, lesson.module);
+  const canWatch = canWatchLesson(isPaid, lesson.module, purchased);
   if (!canWatch) redirect(AULAS_FREE_HREF);
   const videoId = lessonVideoId({
     isPaid,
@@ -88,7 +92,7 @@ export default async function LessonPage({ params }: Props) {
     viewerId: member.user.id,
   });
   const isAdmin = member.membership.role === "admin";
-  const catalog = modules.map((mod) => mapModule(mod, completed));
+  const catalog = modules.map((mod) => mapModule(mod, completed, false, purchased));
   const root = findRootContaining(catalog, moduleSlug);
   const breadcrumbPath = findModulePath(catalog, moduleSlug);
   const playlist = root ? flattenLessons(root) : [];
