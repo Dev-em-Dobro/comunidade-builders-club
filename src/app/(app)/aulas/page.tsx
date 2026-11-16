@@ -1,19 +1,29 @@
 import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
 import { isPaidMembership } from "@/lib/membership/capabilities";
-import { listCompletedLessonIds } from "@/lib/aulas";
+import { listCompletedLessonIds, listPurchasedModuleIds } from "@/lib/aulas";
 import { listPublishedModules } from "@/lib/aulas/published-modules";
 import { EmptyState } from "@/components/empty-state";
-import { AulasCatalog, mapModule } from "@/components/aulas-catalog";
+import {
+  AulasCatalog,
+  mapModule,
+  type AulaModuleCard,
+} from "@/components/aulas-catalog";
 
 export default async function AulasPage() {
   const member = await requireActiveMemberOrRedirect();
   const isPaid = isPaidMembership(member.membership);
-  const [modules, completed] = await Promise.all([
+  const [modules, completed, purchased] = await Promise.all([
     listPublishedModules(),
     listCompletedLessonIds(member.user.id),
+    listPurchasedModuleIds({ email: member.user.email, isPaid }),
   ]);
 
-  const catalog = modules.map((mod) => mapModule(mod, completed));
+  // F126 — o módulo comprado avulso vem primeiro; sort é estável.
+  const temCompra = (mod: AulaModuleCard): boolean =>
+    purchased.has(mod.id) || (mod.children ?? []).some(temCompra);
+  const catalog = modules
+    .map((mod) => mapModule(mod, completed, false, purchased))
+    .sort((a, b) => Number(temCompra(b)) - Number(temCompra(a)));
 
   return (
     <div className="feed-wrap-wide">
@@ -23,7 +33,9 @@ export default async function AulasPage() {
             é a última coisa que ela lê antes de escolher onde clicar. */}
         {isPaid
           ? "Escolha um módulo para ver as aulas."
-          : "O Comece por aqui está liberado no gratuito. PRO e Elite abrem o resto da formação — nicho, prospecção, abordagem e fechamento."}
+          : purchased.size > 0
+            ? "A aula que você comprou está liberada logo no início. PRO e Elite abrem o resto da formação — nicho, prospecção, abordagem e fechamento."
+            : "O Comece por aqui está liberado no gratuito. PRO e Elite abrem o resto da formação — nicho, prospecção, abordagem e fechamento."}
       </p>
 
       {catalog.length === 0 ? (

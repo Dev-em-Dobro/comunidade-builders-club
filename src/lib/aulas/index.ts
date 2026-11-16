@@ -8,6 +8,19 @@ export { canWatchLesson, moduleAllowsFree, FASE_1_M01_SLUG, AULAS_FREE_HREF } fr
 export type { ModuleAccessNode } from "./access";
 export { listPublishedModules } from "./published-modules";
 
+/** F126 — ids dos módulos comprados avulso. Pago não precisa: já vê tudo. */
+export async function listPurchasedModuleIds(opts: {
+  email: string;
+  isPaid: boolean;
+}): Promise<Set<string>> {
+  if (opts.isPaid) return new Set();
+  const rows = await prisma.modulePurchase.findMany({
+    where: { email: opts.email.trim().toLowerCase() },
+    select: { moduleId: true },
+  });
+  return new Set(rows.map((r) => r.moduleId));
+}
+
 /**
  * F078 — quantas aulas o membro grátis assiste hoje.
  *
@@ -322,7 +335,7 @@ export async function setLessonCompleted(
   userId: string,
   lessonId: string,
   completed: boolean,
-  opts: { isPaid: boolean },
+  opts: { isPaid: boolean; purchased?: ReadonlySet<string> },
 ) {
   const lesson = await prisma.lesson.findFirst({
     where: { id: lessonId, published: true, module: { published: true } },
@@ -335,7 +348,7 @@ export async function setLessonCompleted(
     if (!ancestor.published) throw new Error("Aula não encontrada.");
     ancestor = ancestor.parent ?? null;
   }
-  if (!canWatchLesson(opts.isPaid, lesson.module)) {
+  if (!canWatchLesson(opts.isPaid, lesson.module, opts.purchased)) {
     throw new ForbiddenError(UPGRADE_REQUIRED);
   }
   const completedAt = completed ? new Date() : null;

@@ -483,6 +483,9 @@ model Module {
   published     Boolean  @default(false)
   /// F065 — free assiste este módulo e os descendentes.
   freeAccess    Boolean  @default(false)
+  /// F126 — produto Hubla que vende este módulo avulso (low ticket).
+  hublaProductId String? @unique @map("hubla_product_id")
+  purchases     ModulePurchase[]
   /// F050 — módulo interno (subpasta). Null = primeiro nível do catálogo.
   parentId      String?
   parent        Module?  @relation("ModuleTree", fields: [parentId], references: [id], onDelete: Cascade)
@@ -493,6 +496,19 @@ model Module {
 
   @@index([parentId, sortOrder])
   @@map("module")
+}
+
+/// F126 — módulo comprado avulso. Por e-mail: a compra chega antes da conta.
+model ModulePurchase {
+  id        String   @id @default(cuid())
+  email     String
+  moduleId  String   @map("module_id")
+  module    Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([email, moduleId])
+  @@index([moduleId])
+  @@map("module_purchase")
 }
 
 model Lesson {
