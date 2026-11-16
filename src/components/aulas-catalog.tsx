@@ -60,13 +60,21 @@ export function LockMark({ className }: { className?: string }) {
   );
 }
 
+/**
+ * F126 — módulo comprado avulso entra como `freeAccess` para aquele membro:
+ * catálogo, sidebar e cadeados já leem essa flag.
+ */
 export function mapModule(
   mod: ModuleNode,
   completed: Set<string>,
   inheritedFree = false,
+  purchased: ReadonlySet<string> = new Set(),
 ): AulaModuleCard {
   const freeAccess =
-    inheritedFree || Boolean(mod.freeAccess) || mod.slug === FASE_1_M01_SLUG;
+    inheritedFree ||
+    Boolean(mod.freeAccess) ||
+    mod.slug === FASE_1_M01_SLUG ||
+    purchased.has(mod.id);
   return {
     id: mod.id,
     slug: mod.slug,
@@ -85,7 +93,7 @@ export function mapModule(
       freeAccess,
     })),
     children: (mod.children ?? []).map((child) =>
-      mapModule(child, completed, freeAccess),
+      mapModule(child, completed, freeAccess, purchased),
     ),
   };
 }

@@ -6,7 +6,32 @@ import {
   canWatchLesson,
   lessonVideoId,
   moduleAllowsFree,
+  moduleIsPurchased,
 } from "./access";
+
+describe("aula avulsa — F126", () => {
+  const comprado = new Set(["site"]);
+
+  it("libera o módulo comprado e os descendentes", () => {
+    assert.equal(moduleIsPurchased({ id: "site", freeAccess: false }, comprado), true);
+    assert.equal(
+      moduleIsPurchased(
+        { id: "sub", freeAccess: false, parent: { id: "site", freeAccess: false } },
+        comprado,
+      ),
+      true,
+    );
+  });
+
+  it("free sem compra continua sem acesso a módulo pago", () => {
+    assert.equal(canWatchLesson(false, { id: "crm", freeAccess: false }, comprado), false);
+    assert.equal(canWatchLesson(false, { id: "site", freeAccess: false }), false);
+  });
+
+  it("free com compra assiste o módulo comprado", () => {
+    assert.equal(canWatchLesson(false, { id: "site", freeAccess: false }, comprado), true);
+  });
+});
 
 describe("moduleAllowsFree — F065", () => {
   it("libera quando o próprio módulo tem a flag", () => {
