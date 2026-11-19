@@ -27,6 +27,7 @@ export const HUBLA_OFFER_ID_BLACK_ALUNOS = "NZKc6aZXwbD4ihw9vvPN";
 export const HUBLA_OFFER_ID_BLACK_NAO_ALUNOS = "6njIGlJgossHQysj6WA7";
 export const HUBLA_OFFER_ID_BLACK_NAO_ALUNOS_PARC_INT = "WzHaleRp5TWfaCiCyR2u";
 export const HUBLA_OFFER_ID_BLACK_ALUNOS_PARC_INT = "aOdZtdHjFnnoeWaVPNHy";
+export const HUBLA_OFFER_ID_BLACK_ALUNOS_2025_PARC_INT = "aKMxLQaZtYwZO8NCHf74";
 /** Produto Hubla "DevQuest 2.0 - Black Friday" que hospeda as ofertas Black. */
 export const HUBLA_PRODUCT_ID_BLACK_FRIDAY = "hXQcK8O5fZGvRK4RVMxJ";
 
@@ -47,6 +48,7 @@ export const HUBLA_OFFER_IDS_VITALICIO_OFICIAIS = [
   HUBLA_OFFER_ID_BLACK_NAO_ALUNOS,
   HUBLA_OFFER_ID_BLACK_NAO_ALUNOS_PARC_INT,
   HUBLA_OFFER_ID_BLACK_ALUNOS_PARC_INT,
+  HUBLA_OFFER_ID_BLACK_ALUNOS_2025_PARC_INT,
 ] as const;
 
 export function isOfertaVitaliciaHubla(offerId: string | null | undefined): boolean {

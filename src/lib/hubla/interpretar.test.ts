@@ -231,7 +231,11 @@ describe("interpretarEventoHubla — F014 / F059", () => {
     assert.equal(acao.vitalicio, true);
   });
 
-  for (const offerId of ["WzHaleRp5TWfaCiCyR2u", "aOdZtdHjFnnoeWaVPNHy"]) {
+  for (const offerId of [
+    "WzHaleRp5TWfaCiCyR2u",
+    "aOdZtdHjFnnoeWaVPNHy",
+    "aKMxLQaZtYwZO8NCHf74",
+  ]) {
     it(`F120 — nova oferta ${offerId} concede Elite vitalício`, () => {
       const catalog = "hXQcK8O5fZGvRK4RVMxJ";
       const acao = interpretarEventoHubla({

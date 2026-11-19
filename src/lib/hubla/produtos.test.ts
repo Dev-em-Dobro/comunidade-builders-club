@@ -82,6 +82,7 @@ describe("mapaOfertasHubla — fallback oficial", () => {
         "6njIGlJgossHQysj6WA7",
         "WzHaleRp5TWfaCiCyR2u",
         "aOdZtdHjFnnoeWaVPNHy",
+        "aKMxLQaZtYwZO8NCHf74",
       ]) {
         assert.equal(
           planoDoEventoHubla({

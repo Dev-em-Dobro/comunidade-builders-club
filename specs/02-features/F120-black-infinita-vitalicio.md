@@ -19,9 +19,10 @@ cancelláveis. No Orion, a mesma compra dispara só a **cortesia Pro de 1 ano**
 | Black não alunos | `6njIGlJgossHQysj6WA7` | R$ 997 |
 | Black não alunos — parcelamento interno | `WzHaleRp5TWfaCiCyR2u` | — |
 | Black alunos — parcelamento interno | `aOdZtdHjFnnoeWaVPNHy` | — |
+| Black alunos 2025 — parcelamento interno | `aKMxLQaZtYwZO8NCHf74` | — |
 
-Os payloads enviados em 2026-11-19 para as ofertas novas 1 e 2 repetem
-`WzHaleRp5TWfaCiCyR2u`; há dois IDs novos distintos confirmados.
+O payload adicional de 2026-11-19 confirmou o terceiro ID distinto de
+parcelamento interno.
 
 Produto Club continua `HUBLA_PRODUCT_ID` / `VL3e0iDO3A32SyjJWr9S` para PRO/Elite
 normais. Black Infinita roda no produto Hubla **DevQuest 2.0 - Black Friday**:

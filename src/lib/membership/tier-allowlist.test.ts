@@ -92,6 +92,7 @@ describe("vitalicioDaNotaAllowlist — F120", () => {
       "NZKc6aZXwbD4ihw9vvPN",
       "WzHaleRp5TWfaCiCyR2u",
       "aOdZtdHjFnnoeWaVPNHy",
+      "aKMxLQaZtYwZO8NCHf74",
     ]) {
       assert.equal(
         vitalicioDaNotaAllowlist(`product:VL3e0iDO3A32SyjJWr9S offer:${offerId}`),
