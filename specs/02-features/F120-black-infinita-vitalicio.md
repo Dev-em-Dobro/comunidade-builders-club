@@ -5,9 +5,9 @@ Em implementação — 2026-10-26
 
 ## Contexto
 
-Campanha **Black Infinita 2026**. Três checkouts Hubla concedem acesso
+Campanha **Black Infinita 2026**. Os checkouts Hubla abaixo concedem acesso
 **permanente** à comunidade (tag **Vitalício** no perfil), distinto de PRO/Elite
-cancelláveis. No Orion, a mesma compra dispara só a **cortesia Pro de 90 dias**
+cancelláveis. No Orion, a mesma compra dispara só a **cortesia Pro de 1 ano**
 (F042) — o Orion não fica vitalício.
 
 ## Ofertas Hubla (`offers[].id` = slug pay.hub.la)
@@ -17,6 +17,11 @@ cancelláveis. No Orion, a mesma compra dispara só a **cortesia Pro de 90 dias*
 | Black alunos 2025 | `YKPMuMwSBhPBb7UUuDlX` | R$ 597 |
 | Black alunos | `NZKc6aZXwbD4ihw9vvPN` | R$ 797 |
 | Black não alunos | `6njIGlJgossHQysj6WA7` | R$ 997 |
+| Black não alunos — parcelamento interno | `WzHaleRp5TWfaCiCyR2u` | — |
+| Black alunos — parcelamento interno | `aOdZtdHjFnnoeWaVPNHy` | — |
+
+Os payloads enviados em 2026-11-19 para as ofertas novas 1 e 2 repetem
+`WzHaleRp5TWfaCiCyR2u`; há dois IDs novos distintos confirmados.
 
 Produto Club continua `HUBLA_PRODUCT_ID` / `VL3e0iDO3A32SyjJWr9S` para PRO/Elite
 normais. Black Infinita roda no produto Hubla **DevQuest 2.0 - Black Friday**:
@@ -24,7 +29,7 @@ normais. Black Infinita roda no produto Hubla **DevQuest 2.0 - Black Friday**:
 | Campo | Valor |
 |-------|-------|
 | Product catalog id | `hXQcK8O5fZGvRK4RVMxJ` |
-| Discriminador | `offers[].id` (os 3 links acima) |
+| Discriminador | `offers[].id` (os IDs acima) |
 
 ### Quirk Hubla (sandbox/prod)
 
@@ -63,11 +68,11 @@ e/ou offer id Black na `note`, para conta criada **depois** do webhook.
 
 ## Env (opcional)
 
-`HUBLA_OFFER_ID_VITALICIO` — CSV extra além dos três oficiais hardcoded.
+`HUBLA_OFFER_ID_VITALICIO` — CSV extra além dos IDs oficiais hardcoded.
 
 ## Critérios
 
-- [x] Compra de qualquer um dos 3 links → Club `elite` + `vitalicio=true` + badge Vitalício
+- [x] Compra de qualquer um dos links acima → Club `elite` + `vitalicio=true` + badge Vitalício
 - [x] Revoke Hubla **não** tira acesso vitalício
 - [x] Compra Elite/PRO normal continua cancellável (sem flag)
 - [x] Offer id Black desconhecido sem mapa → não concede elite por engano via product.id só
@@ -75,6 +80,6 @@ e/ou offer id Black na `note`, para conta criada **depois** do webhook.
 
 ## Fora de escopo
 
-- Orion vitalício (é trial 90d — F042)
+- Orion vitalício (é trial de 1 ano — F042)
 - UI de `/planos` com cards Black (campanha externa)
 - Admin “revogar vitalício”

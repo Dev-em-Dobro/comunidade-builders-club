@@ -21,11 +21,13 @@ export const HUBLA_OFFER_ID_ELITE_EUROPA_50 = "1mGgy9MVD11CJdnsLEov";
 /** Elite Europa (€60) — checkout próprio, não aparece em `/planos`. */
 export const HUBLA_OFFER_ID_ELITE_EUROPA_60 = "cXqc4mz6YZFE4GKjGFUz";
 
-/** F120 — Black Infinita 2026 (acesso Club vitalício; Orion = cortesia 90d). */
+/** F120 — Black Infinita 2026 (acesso Club vitalício; Orion = cortesia 1 ano). */
 export const HUBLA_OFFER_ID_BLACK_ALUNOS_2025 = "YKPMuMwSBhPBb7UUuDlX";
 export const HUBLA_OFFER_ID_BLACK_ALUNOS = "NZKc6aZXwbD4ihw9vvPN";
 export const HUBLA_OFFER_ID_BLACK_NAO_ALUNOS = "6njIGlJgossHQysj6WA7";
-/** Produto Hubla "DevQuest 2.0 - Black Friday" que hospeda as 3 ofertas. */
+export const HUBLA_OFFER_ID_BLACK_NAO_ALUNOS_PARC_INT = "WzHaleRp5TWfaCiCyR2u";
+export const HUBLA_OFFER_ID_BLACK_ALUNOS_PARC_INT = "aOdZtdHjFnnoeWaVPNHy";
+/** Produto Hubla "DevQuest 2.0 - Black Friday" que hospeda as ofertas Black. */
 export const HUBLA_PRODUCT_ID_BLACK_FRIDAY = "hXQcK8O5fZGvRK4RVMxJ";
 
 export const HUBLA_OFFER_IDS_PRO_OFICIAIS = [
@@ -43,6 +45,8 @@ export const HUBLA_OFFER_IDS_VITALICIO_OFICIAIS = [
   HUBLA_OFFER_ID_BLACK_ALUNOS_2025,
   HUBLA_OFFER_ID_BLACK_ALUNOS,
   HUBLA_OFFER_ID_BLACK_NAO_ALUNOS,
+  HUBLA_OFFER_ID_BLACK_NAO_ALUNOS_PARC_INT,
+  HUBLA_OFFER_ID_BLACK_ALUNOS_PARC_INT,
 ] as const;
 
 export function isOfertaVitaliciaHubla(offerId: string | null | undefined): boolean {

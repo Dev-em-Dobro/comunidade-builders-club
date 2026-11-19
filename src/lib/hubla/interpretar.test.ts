@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { interpretarEventoHubla } from "./interpretar";
+import { mapaOfertasHubla, mapaProdutosHubla } from "./produtos";
 import { emailsDoEvento } from "./normalizar";
 import type { HublaWebhookPayload } from "./tipos";
 
@@ -229,6 +230,30 @@ describe("interpretarEventoHubla — F014 / F059", () => {
     assert.equal(acao.offerId, offerId);
     assert.equal(acao.vitalicio, true);
   });
+
+  for (const offerId of ["WzHaleRp5TWfaCiCyR2u", "aOdZtdHjFnnoeWaVPNHy"]) {
+    it(`F120 — nova oferta ${offerId} concede Elite vitalício`, () => {
+      const catalog = "hXQcK8O5fZGvRK4RVMxJ";
+      const acao = interpretarEventoHubla({
+        type: "customer.member_added",
+        event: {
+          product: { id: offerId, name: "DevQuest 2.0 - Black Friday" },
+          products: [{ id: catalog, offers: [{ id: offerId }] }],
+          user: { email: "comprador@example.com" },
+          subscription: { status: "active" },
+        },
+      }, {
+        productPlanMap: mapaProdutosHubla(),
+        offerPlanMap: mapaOfertasHubla(),
+      });
+      assert.equal(acao.acao, "conceder");
+      if (acao.acao !== "conceder") return;
+      assert.equal(acao.productId, catalog);
+      assert.equal(acao.offerId, offerId);
+      assert.equal(acao.plan, "elite");
+      assert.equal(acao.vitalicio, true);
+    });
+  }
 
   it("reúne e-mails do user, pagador da assinatura e da fatura", () => {
     const emails = emailsDoEvento({

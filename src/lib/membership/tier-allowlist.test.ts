@@ -88,12 +88,16 @@ describe("vitalicioDaNotaAllowlist — F120", () => {
   });
 
   it("offer Black Infinita sem vitalicio=1", () => {
-    assert.equal(
-      vitalicioDaNotaAllowlist(
-        "product:VL3e0iDO3A32SyjJWr9S offer:NZKc6aZXwbD4ihw9vvPN",
-      ),
-      true,
-    );
+    for (const offerId of [
+      "NZKc6aZXwbD4ihw9vvPN",
+      "WzHaleRp5TWfaCiCyR2u",
+      "aOdZtdHjFnnoeWaVPNHy",
+    ]) {
+      assert.equal(
+        vitalicioDaNotaAllowlist(`product:VL3e0iDO3A32SyjJWr9S offer:${offerId}`),
+        true,
+      );
+    }
   });
 
   it("Elite comum não é vitalício", () => {
