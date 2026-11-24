@@ -1,5 +1,5 @@
 /**
- * F124 — módulo CRM com IA (5 aulas gravadas + 3 em breve).
+ * F124 — módulo CRM com IA (5 aulas gravadas + 1 em texto (QR) + 3 em breve).
  *
  *   npx tsx scripts/seed-f124-crm-com-ia.mts --target=hml
  *   npx tsx scripts/seed-f124-crm-com-ia.mts --target=prod --confirm
@@ -13,8 +13,43 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 config({ path: resolve(root, ".env"), override: true });
 
 const libraryId = "77c52f03-dc6";
-const zip = "/materiais/crm-para-alunos-template.zip";
+const zip = "/materiais/crm-para-alunos-template-1.0.5.zip";
 const emBreve = "Em breve — esta aula ainda não foi gravada.";
+
+/** F124 (1.0.5) — aula em texto: WhatsApp via QR (WAHA), base no WHATSAPP_QR.md. */
+const whatsappQr = `Nesta aula você conecta o WhatsApp do atendimento só lendo um QR code: sem aplicativo na Meta, sem aprovação e sem janela de 24 horas. O template 1.0.5 faz isso com o WAHA, que roda no Docker junto com o banco e o Redis.
+
+A API oficial da aula anterior continua valendo. Os dois canais podem ficar ligados ao mesmo tempo.
+
+## Antes de usar
+- A conexão é **não oficial**: o WhatsApp pode desconectar a sessão ou bloquear o número.
+- O risco sobe com disparo frio, lista comprada, volume alto e texto igual em massa. Responder quem escreveu primeiro é o uso de menor risco.
+- Prefira um número com histórico. Para atendimento crítico de cliente, prefira a API oficial.
+- Um número por instalação: se você ler o QR no CRM local e no do Railway, o cliente recebe resposta em dobro.
+
+## Passo a passo (local)
+- Baixe o template 1.0.5 abaixo. Quem instalou o 1.0.4 precisa do projeto novo.
+- Rode \`npm run setup\`. Ele gera a \`WAQR_API_KEY\` e o \`WAQR_WEBHOOK_SECRET\` no \`.env\`.
+- No \`.env\`, confira \`WAQR_BASE_URL=http://127.0.0.1:3000\` e \`WAQR_WEBHOOK_BASE_URL=http://host.docker.internal:3100\`. Não precisa de ngrok.
+- Suba o WAHA com \`docker compose --profile waha up -d --wait\` e espere o serviço \`waha\` ficar \`healthy\`.
+- Reinicie o CRM: \`Ctrl+C\` e \`npm run dev\`.
+- No CRM, abra **Onboarding → Canais** e clique em **Conectar WhatsApp** no card **WhatsApp via QR**.
+- No celular do número de atendimento: WhatsApp → **Aparelhos conectados** → **Conectar aparelho**, e leia o QR.
+- Quando o card mostrar **Conectado**, mande uma mensagem de outro celular. Ela aparece em **Conversas** e o agente responde.
+
+Para parar sem perder a sessão, use \`docker compose --profile waha stop\`. Não use \`down -v\`: ele apaga a sessão e você vai ter que ler o QR de novo.
+
+## Se travar
+- **WAHA inacessível:** o container está parado ou o \`WAQR_BASE_URL\` está errado. Rode \`docker compose --profile waha ps\`.
+- **WAHA recusou a chave:** a \`WAQR_API_KEY\` não bate com a do container. Recrie com \`docker compose --profile waha up -d\`.
+- **Mensagem não chega:** o recebimento está pausado. Clique em **Ativar recebimento** no card.
+- **Sessão FAILED:** o celular desconectou o aparelho. Clique em **Conectar WhatsApp** e leia o QR de novo.
+
+O guia completo é o \`WHATSAPP_QR.md\`, na pasta de guias do ZIP. Para colocar no ar, veja a seção 11 do \`RAILWAY.md\`.
+
+## Materiais
+- [Baixar template 1.0.5 e guias (ZIP)](${zip})
+- [Documentação do WAHA](https://waha.devlike.pro)`;
 
 const lessons: Array<{
   slug: string;
@@ -28,9 +63,9 @@ const lessons: Array<{
     title: "Visão geral do CRM",
     sortOrder: 0,
     videoId: "ae0cabc2-254e-48ed-98cc-3daf0cfc6f13",
-    description: `Nesta aula você vê o CRM com IA do ponto de vista do aluno: uma instalação independente por negócio, com WhatsApp Cloud API, Instagram Direct e agente de atendimento.
+    description: `Nesta aula você vê o CRM com IA do ponto de vista do aluno: uma instalação independente por negócio, com WhatsApp Cloud API, WhatsApp via QR code, Instagram Direct e agente de atendimento.
 
-A ideia é começar o caminho — o ZIP traz o template 1.0.4, os guias e os prompts de instalação assistida.
+A ideia é começar o caminho — o ZIP traz o template 1.0.5, os guias e os prompts de instalação assistida.
 
 ## Materiais
 - [Baixar template e guias (ZIP)](${zip})`,
@@ -76,26 +111,34 @@ Você precisa de uma chave de API da Anthropic ou da OpenAI — assinatura de ch
 
 O guia META.md está no ZIP da aula 1. A Meta não alcança localhost: para webhook no desenvolvimento use um túnel HTTPS; na produção entra o domínio da aula de deploy.
 
+Prefere não passar pela Meta? Na próxima aula você conecta o WhatsApp só lendo um QR code.
+
 ## Links
 - [WhatsApp Cloud API](https://developers.facebook.com/docs/whatsapp/cloud-api)
 - [Meta for Developers](https://developers.facebook.com/)`,
   },
   {
+    slug: "whatsapp-via-qr-code",
+    title: "WhatsApp via QR code (sem Meta)",
+    sortOrder: 5,
+    description: whatsappQr,
+  },
+  {
     slug: "deploy-no-railway",
     title: "Deploy no Railway",
-    sortOrder: 5,
+    sortOrder: 6,
     description: emBreve,
   },
   {
     slug: "configurar-dominio-https-e-migrar-callbacks-da-meta",
     title: "Configurar domínio HTTPS e migrar os callbacks da Meta",
-    sortOrder: 6,
+    sortOrder: 7,
     description: emBreve,
   },
   {
     slug: "testes-de-aceitacao-operacao-custos-e-backup",
     title: "Testes de aceitação, operação, custos e backup",
-    sortOrder: 7,
+    sortOrder: 8,
     description: emBreve,
   },
 ];

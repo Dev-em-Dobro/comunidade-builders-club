@@ -121,7 +121,7 @@ export function AulaCourseSidebar({
                               ) : null}
                             </span>
                             <span className="min-w-0 flex-1">{l.title}</span>
-                            {!l.thumbnailUrl ? (
+                            {/^\s*em breve/i.test(l.description ?? "") ? (
                               <span className="mt-0.5 shrink-0 rounded-full bg-accent/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-accent">
                                 Em breve
                               </span>
