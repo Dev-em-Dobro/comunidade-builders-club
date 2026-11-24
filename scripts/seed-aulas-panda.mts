@@ -935,7 +935,7 @@ Nesta live a gente abre o modelo: o que entra no pacote, como explicar o valor s
         slug: "visao-geral-do-crm",
         title: "Visão geral do CRM",
         description:
-          "Nesta aula você vê o CRM com IA do ponto de vista do aluno: uma instalação independente por negócio, com WhatsApp Cloud API, Instagram Direct e agente de atendimento.\n\nA ideia é começar o caminho — o ZIP traz o template 1.0.4, os guias e os prompts de instalação assistida.\n\n## Materiais\n- [Baixar template e guias (ZIP)](/materiais/crm-para-alunos-template.zip)",
+          "Nesta aula você vê o CRM com IA do ponto de vista do aluno: uma instalação independente por negócio, com WhatsApp Cloud API, WhatsApp via QR code, Instagram Direct e agente de atendimento.\n\nA ideia é começar o caminho — o ZIP traz o template 1.0.5, os guias e os prompts de instalação assistida.\n\n## Materiais\n- [Baixar template e guias (ZIP)](/materiais/crm-para-alunos-template-1.0.5.zip)",
         pandaVideoExternalId: "ae0cabc2-254e-48ed-98cc-3daf0cfc6f13",
         sortOrder: 0,
       },
@@ -943,7 +943,7 @@ Nesta live a gente abre o modelo: o que entra no pacote, como explicar o valor s
         slug: "arquivos-e-instalacao",
         title: "Arquivos e instalação",
         description:
-          "Aqui você baixa o pacote, extrai o template, confere Node.js 22 LTS e Docker Desktop, e sobe a instalação local com o setup.\n\nO ZIP da aula 1 tem o template e o guia de instalação assistida (prompts para o agente). Sem Docker aberto e sem Node 22, o setup não anda.\n\n## Materiais\n- [Baixar template e guias (ZIP)](/materiais/crm-para-alunos-template.zip) — o mesmo pacote da aula 1\n- [Node.js 22 LTS](https://nodejs.org/)\n- [Docker Desktop](https://www.docker.com/products/docker-desktop/)",
+          "Aqui você baixa o pacote, extrai o template, confere Node.js 22 LTS e Docker Desktop, e sobe a instalação local com o setup.\n\nO ZIP da aula 1 tem o template e o guia de instalação assistida (prompts para o agente). Sem Docker aberto e sem Node 22, o setup não anda.\n\n## Materiais\n- [Baixar template e guias (ZIP)](/materiais/crm-para-alunos-template-1.0.5.zip) — o mesmo pacote da aula 1\n- [Node.js 22 LTS](https://nodejs.org/)\n- [Docker Desktop](https://www.docker.com/products/docker-desktop/)",
         pandaVideoExternalId: "d7b922aa-0484-45af-b0cc-41e1b9dfa6da",
         sortOrder: 1,
       },
@@ -967,27 +967,66 @@ Nesta live a gente abre o modelo: o que entra no pacote, como explicar o valor s
         slug: "whatsapp-e-proximos-passos",
         title: "WhatsApp e próximos passos",
         description:
-          "Aqui você conecta WhatsApp Cloud API (e Instagram Direct, se for usar) com os ativos da sua própria conta Meta.\n\nO guia META.md está no ZIP da aula 1. A Meta não alcança localhost: para webhook no desenvolvimento use um túnel HTTPS; na produção entra o domínio da aula de deploy.\n\n## Links\n- [WhatsApp Cloud API](https://developers.facebook.com/docs/whatsapp/cloud-api)\n- [Meta for Developers](https://developers.facebook.com/)",
+          "Aqui você conecta WhatsApp Cloud API (e Instagram Direct, se for usar) com os ativos da sua própria conta Meta.\n\nO guia META.md está no ZIP da aula 1. A Meta não alcança localhost: para webhook no desenvolvimento use um túnel HTTPS; na produção entra o domínio da aula de deploy.\n\nPrefere não passar pela Meta? Na próxima aula você conecta o WhatsApp só lendo um QR code.\n\n## Links\n- [WhatsApp Cloud API](https://developers.facebook.com/docs/whatsapp/cloud-api)\n- [Meta for Developers](https://developers.facebook.com/)",
         pandaVideoExternalId: "fef3b100-d72d-4242-82e7-949bb9e67aa9",
         sortOrder: 4,
+      },
+      {
+        // F124 (1.0.5) — aula em texto, sem vídeo. Texto igual ao seed-f124-crm-com-ia.mts.
+        slug: "whatsapp-via-qr-code",
+        title: "WhatsApp via QR code (sem Meta)",
+        description: `Nesta aula você conecta o WhatsApp do atendimento só lendo um QR code: sem aplicativo na Meta, sem aprovação e sem janela de 24 horas. O template 1.0.5 faz isso com o WAHA, que roda no Docker junto com o banco e o Redis.
+
+A API oficial da aula anterior continua valendo. Os dois canais podem ficar ligados ao mesmo tempo.
+
+## Antes de usar
+- A conexão é **não oficial**: o WhatsApp pode desconectar a sessão ou bloquear o número.
+- O risco sobe com disparo frio, lista comprada, volume alto e texto igual em massa. Responder quem escreveu primeiro é o uso de menor risco.
+- Prefira um número com histórico. Para atendimento crítico de cliente, prefira a API oficial.
+- Um número por instalação: se você ler o QR no CRM local e no do Railway, o cliente recebe resposta em dobro.
+
+## Passo a passo (local)
+- Baixe o template 1.0.5 abaixo. Quem instalou o 1.0.4 precisa do projeto novo.
+- Rode \`npm run setup\`. Ele gera a \`WAQR_API_KEY\` e o \`WAQR_WEBHOOK_SECRET\` no \`.env\`.
+- No \`.env\`, confira \`WAQR_BASE_URL=http://127.0.0.1:3000\` e \`WAQR_WEBHOOK_BASE_URL=http://host.docker.internal:3100\`. Não precisa de ngrok.
+- Suba o WAHA com \`docker compose --profile waha up -d --wait\` e espere o serviço \`waha\` ficar \`healthy\`.
+- Reinicie o CRM: \`Ctrl+C\` e \`npm run dev\`.
+- No CRM, abra **Onboarding → Canais** e clique em **Conectar WhatsApp** no card **WhatsApp via QR**.
+- No celular do número de atendimento: WhatsApp → **Aparelhos conectados** → **Conectar aparelho**, e leia o QR.
+- Quando o card mostrar **Conectado**, mande uma mensagem de outro celular. Ela aparece em **Conversas** e o agente responde.
+
+Para parar sem perder a sessão, use \`docker compose --profile waha stop\`. Não use \`down -v\`: ele apaga a sessão e você vai ter que ler o QR de novo.
+
+## Se travar
+- **WAHA inacessível:** o container está parado ou o \`WAQR_BASE_URL\` está errado. Rode \`docker compose --profile waha ps\`.
+- **WAHA recusou a chave:** a \`WAQR_API_KEY\` não bate com a do container. Recrie com \`docker compose --profile waha up -d\`.
+- **Mensagem não chega:** o recebimento está pausado. Clique em **Ativar recebimento** no card.
+- **Sessão FAILED:** o celular desconectou o aparelho. Clique em **Conectar WhatsApp** e leia o QR de novo.
+
+O guia completo é o \`WHATSAPP_QR.md\`, na pasta de guias do ZIP. Para colocar no ar, veja a seção 11 do \`RAILWAY.md\`.
+
+## Materiais
+- [Baixar template 1.0.5 e guias (ZIP)](/materiais/crm-para-alunos-template-1.0.5.zip)
+- [Documentação do WAHA](https://waha.devlike.pro)`,
+        sortOrder: 5,
       },
       {
         slug: "deploy-no-railway",
         title: "Deploy no Railway",
         description: "Em breve — esta aula ainda não foi gravada.",
-        sortOrder: 5,
+        sortOrder: 6,
       },
       {
         slug: "configurar-dominio-https-e-migrar-callbacks-da-meta",
         title: "Configurar domínio HTTPS e migrar os callbacks da Meta",
         description: "Em breve — esta aula ainda não foi gravada.",
-        sortOrder: 6,
+        sortOrder: 7,
       },
       {
         slug: "testes-de-aceitacao-operacao-custos-e-backup",
         title: "Testes de aceitação, operação, custos e backup",
         description: "Em breve — esta aula ainda não foi gravada.",
-        sortOrder: 7,
+        sortOrder: 8,
       },
     ],
   },
