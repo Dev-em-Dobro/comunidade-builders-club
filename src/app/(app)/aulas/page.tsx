@@ -38,7 +38,9 @@ export default async function AulasPage() {
         {isPaid
           ? "Escolha um módulo para ver as aulas."
           : restrito
-            ? "O módulo que você comprou está liberado logo no início. O Elite abre o resto da formação — nicho, prospecção, abordagem e fechamento."
+            ? purchased.size > 0
+              ? "O módulo que você comprou está liberado logo no início. O Elite abre o resto da formação — nicho, prospecção, abordagem e fechamento."
+              : "O Elite abre a formação completa — nicho, prospecção, abordagem e fechamento."
           : purchased.size > 0
             ? "A aula que você comprou está liberada logo no início. PRO e Elite abrem o resto da formação — nicho, prospecção, abordagem e fechamento."
             : "O Comece por aqui está liberado no gratuito. PRO e Elite abrem o resto da formação — nicho, prospecção, abordagem e fechamento."}
