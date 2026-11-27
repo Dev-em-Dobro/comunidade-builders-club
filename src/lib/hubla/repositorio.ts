@@ -18,6 +18,13 @@ import { emailDoEvento, offerIdsDoEvento, productIdDoEvento } from "./normalizar
 import { mapaOfertasHubla, mapaProdutosHubla, type PlanoPagoHubla } from "./produtos";
 import { aplicarAulaAvulsa, interpretarAulaAvulsa, moduloDaAulaAvulsa } from "./aula-avulsa";
 import {
+  CHAVES_COMPRA_PLANO,
+  avisarCompra,
+  chaveCompraModulo,
+  chaveCompraPlano,
+  esquecerAvisoCompra,
+} from "./email-compra";
+import {
   isPago,
   statusEhFinal,
   calcularProximoTier,
@@ -610,6 +617,16 @@ export async function processarWebhookHubla(
         resultado = { ignorado: true, motivo: acaoAvulsa.motivo };
       } else {
         await aplicarAulaAvulsa(modulo.id, acaoAvulsa);
+        // F127 — depois do acesso; nenhuma das duas lança.
+        const chave = chaveCompraModulo(modulo.id);
+        if (acaoAvulsa.acao === "liberar") {
+          await avisarCompra(acaoAvulsa.emails, chave, {
+            tipo: "modulo",
+            tituloModulo: modulo.title,
+          });
+        } else {
+          await esquecerAvisoCompra(acaoAvulsa.emails, [chave]);
+        }
         resultado = { ignorado: false };
       }
     } else if (acao?.acao === "ignorar") {
@@ -622,6 +639,16 @@ export async function processarWebhookHubla(
       membershipId = res.membershipId;
       if (!membershipId) {
         membershipId = await buscarMembershipIdPorEmail(dadosPayload.email);
+      }
+      // F127 — depois do acesso; nenhuma das duas lança.
+      if (acao.acao === "conceder") {
+        await avisarCompra(
+          acao.emails.length > 0 ? acao.emails : [acao.email],
+          chaveCompraPlano(acao.plan),
+          { tipo: acao.plan },
+        );
+      } else {
+        await esquecerAvisoCompra([acao.email], CHAVES_COMPRA_PLANO);
       }
       status = "processed";
       resultado = { ignorado: false, conversao: res.conversao };

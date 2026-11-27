@@ -6,6 +6,12 @@ import {
   type EmailCategoria,
 } from "./categorias";
 import { resendApiKey } from "./resend-key";
+import {
+  INSTRUCAO_LOGIN_COMPRA,
+  conteudoCompraEmail,
+  textoCompraEmail,
+  type CompraEmail,
+} from "./compra";
 
 type EmailProvider = "mailpit" | "resend";
 
@@ -175,6 +181,27 @@ export async function sendMagicLinkEmail(opts: {
     <p style="margin:24px 0;"><a href="${escapeHtml(opts.url)}" style="display:inline-block;background:#0d9488;color:#fff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:600;">Entrar</a></p>`,
   );
   await sendMail({ to: opts.to, subject, text, html, category: "login" });
+}
+
+/**
+ * F127 — e-mail de acesso após a compra. O botão leva ao `/login`: o login
+ * continua o de sempre (código no e-mail), sem link que loga sozinho.
+ */
+export async function sendCompraEmail(opts: {
+  to: string;
+  compra: CompraEmail;
+}): Promise<void> {
+  const loginUrl = `${requireAuthEnv("BETTER_AUTH_URL").replace(/\/$/, "")}/login`;
+  const c = conteudoCompraEmail(opts.compra);
+  const text = textoCompraEmail(opts.compra, { email: opts.to, loginUrl });
+  const html = wrapHtml(
+    c.titulo,
+    `<p style="color:#64748b;font-size:15px;line-height:1.5;">${escapeHtml(c.liberado)}</p>
+    <p style="color:#0f172a;font-size:15px;line-height:1.5;">Para entrar, use o e-mail da compra: <strong>${escapeHtml(opts.to)}</strong></p>
+    <p style="margin:24px 0;"><a href="${escapeHtml(loginUrl)}" style="display:inline-block;background:#0d9488;color:#fff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:600;">Entrar no ${escapeHtml(NOME_PRODUTO)}</a></p>
+    <p style="color:#64748b;font-size:14px;line-height:1.5;">${escapeHtml(INSTRUCAO_LOGIN_COMPRA)}</p>`,
+  );
+  await sendMail({ to: opts.to, subject: c.subject, text, html, category: "compra" });
 }
 
 export async function sendOtpEmail(opts: { to: string; otp: string }): Promise<void> {

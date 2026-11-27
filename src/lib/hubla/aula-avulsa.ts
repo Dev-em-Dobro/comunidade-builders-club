@@ -40,7 +40,7 @@ export async function moduloDaAulaAvulsa(productId: string | null) {
   if (!productId) return null;
   return prisma.module.findUnique({
     where: { hublaProductId: productId },
-    select: { id: true },
+    select: { id: true, title: true },
   });
 }
 

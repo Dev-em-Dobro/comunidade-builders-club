@@ -511,6 +511,20 @@ model ModulePurchase {
   @@map("module_purchase")
 }
 
+/// F127 — e-mail de acesso já enviado para esta compra. Único por e-mail + chave
+/// (`modulo:<id>`, `plano:pro`, `plano:elite`): aviso repetido não reenvia.
+model PurchaseEmailSend {
+  id        String    @id @default(cuid())
+  email     String
+  chave     String
+  sentAt    DateTime? @map("sent_at")
+  erro      String?
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  @@unique([email, chave])
+  @@map("purchase_email_send")
+}
+
 model Lesson {
   id                   String           @id @default(cuid())
   moduleId             String
