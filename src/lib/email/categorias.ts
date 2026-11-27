@@ -7,6 +7,7 @@ export const EMAIL_CATEGORIAS = [
   "live",
   "regua",
   "respostas",
+  "compra",
   "outro",
 ] as const;
 
@@ -17,6 +18,7 @@ export const EMAIL_CATEGORIA_LABEL: Record<EmailCategoria, string> = {
   live: "Lives",
   regua: "Régua",
   respostas: "Respostas",
+  compra: "Compra",
   outro: "Outros",
 };
 
@@ -46,7 +48,7 @@ export function ehEmailBuildersClub(opts: {
 
 /**
  * Classifica pelo assunto — só chamar depois de `ehEmailBuildersClub`.
- * Ordem: live → login → régua → respostas → outro.
+ * Ordem: live → login → régua → respostas → compra → outro.
  */
 export function categorizarPorAssunto(subject: string): EmailCategoria {
   const s = subject.toLowerCase();
@@ -84,6 +86,9 @@ export function categorizarPorAssunto(subject: string): EmailCategoria {
   ) {
     return "respostas";
   }
+
+  // F127 — "Seu acesso ao CRM com IA — Builders Club" / "Seu acesso PRO — …"
+  if (s.startsWith("seu acesso ") && s.includes(NOME_PRODUTO_LC)) return "compra";
 
   return "outro";
 }
