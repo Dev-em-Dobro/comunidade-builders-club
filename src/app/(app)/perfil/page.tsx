@@ -8,7 +8,7 @@ import { ProfileForm } from "@/components/profile-form";
 import { PlanBadge } from "@/components/plan-badge";
 
 export default async function PerfilPage() {
-  const member = await requireActiveMemberOrRedirect();
+  const member = await requireActiveMemberOrRedirect({ restritoOk: true });
   const { profile, membership } = member;
   const isPaid = isPaidMembership(membership);
   const isElite = isEliteMembership(membership);

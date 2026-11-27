@@ -26,6 +26,14 @@ export function calcularConversaoBootstrap(
   return deveMarcarConversaoBootstrap({ source, paidAt });
 }
 
+/**
+ * F128 — a restrição só nasce no primeiro login, e só para quem chega free
+ * com compra de módulo avulso. Conta que já existia nunca vira restrita.
+ */
+export function nasceRestrita(opts: { pago: boolean; comprasDeModulo: number }): boolean {
+  return !opts.pago && opts.comprasDeModulo > 0;
+}
+
 export type BootstrapResult = {
   membership: Membership;
   profile: Profile;
@@ -144,9 +152,17 @@ async function resolverBootstrap(
       sourceAllowlist,
       paidAtAllowlist,
     );
+    // F128 — conta que nasce de compra de módulo avulso (e não é paga) fica restrita.
+    const acessoRestrito = nasceRestrita({
+      pago: allowed,
+      comprasDeModulo: allowed
+        ? 0
+        : await prisma.modulePurchase.count({ where: { email } }),
+    });
     const membership = await prisma.membership.create({
       data: {
         userId,
+        acessoRestrito,
         status: "active",
         tier: isBootstrapAdmin ? "elite" : allowed ? tierAllowlist : "free",
         role: isBootstrapAdmin ? "admin" : "member",

@@ -78,6 +78,16 @@ export function isFreeMembership(
   return m.status === "active" && !isPaidMembership(m);
 }
 
+/**
+ * F128 — conta que nasceu de compra de módulo avulso e segue free: só vê o
+ * módulo comprado. Quem sobe de plano deixa de ser restrito sem mexer no campo.
+ */
+export function isRestritoMembership(
+  m: Pick<Membership, "tier" | "role" | "status" | "acessoRestrito">,
+): boolean {
+  return m.status === "active" && m.acessoRestrito === true && !isPaidMembership(m);
+}
+
 /** Rotas do app liberadas para free (além dos spaces free). */
 export function isFreeAppPath(pathname: string): boolean {
   if (pathname === "/" || pathname === "") return true;
@@ -122,6 +132,8 @@ export type UpgradeReason =
   | "aula-descricao"
   /** F105 — passo WhatsApp na tela Método (só Elite). */
   | "whatsapp-elite"
+  /** F128 — conta restrita ao módulo comprado: todo cadeado usa este motivo. */
+  | "restrito"
   | "geral";
 
 const UPGRADE_REASONS: readonly UpgradeReason[] = [
@@ -137,6 +149,7 @@ const UPGRADE_REASONS: readonly UpgradeReason[] = [
   "boas-vindas",
   "aula-descricao",
   "whatsapp-elite",
+  "restrito",
   "geral",
 ];
 
@@ -217,6 +230,14 @@ export const UPGRADE_REASON_COPY: Record<
   "whatsapp-elite": {
     title: "Grupo de WhatsApp",
     body: "O grupo é exclusivo do plano Elite. No Elite você entra no grupo com acompanhamento mais próximo. Se quiser, veja o Elite na página de planos.",
+  },
+  /**
+   * F128 — quem comprou só um módulo. O convite é para o Elite: a página de
+   * planos mostra só ele (F114).
+   */
+  restrito: {
+    title: "Isso entra no Elite",
+    body: "Seu acesso hoje é ao módulo que você comprou. O Elite abre a formação completa, os materiais de apoio, a comunidade e o grupo de WhatsApp.",
   },
   geral: {
     title: PROMESSA_PRIMEIRO_CLIENTE,

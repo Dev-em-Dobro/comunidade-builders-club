@@ -189,6 +189,8 @@ model Membership {
   vitalicio           Boolean   @default(false)
   vitalicioOfferId    String?   @map("vitalicio_offer_id")
   vitalicioGrantedAt  DateTime? @map("vitalicio_granted_at")
+  /// F128 — conta nasceu de compra de módulo avulso: enquanto free, só vê o módulo comprado.
+  acessoRestrito      Boolean   @default(false) @map("acesso_restrito")
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
 
