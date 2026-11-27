@@ -1,7 +1,7 @@
 # F050 — Desafio 45 dias até o primeiro freela
 
 ## Status
-Rascunho — 2026-11-26 (aguardando aprovação antes do código)
+Em implementação — 2026-11-26 (fatia A em Preview; decisões provisórias marcadas em "Decisões em aberto")
 
 ## Objetivo
 Levar qualquer membro pago — veterano ou recém-chegado — a fechar o **primeiro
@@ -50,7 +50,10 @@ Regras:
 - Respostas ficam visíveis para a equipe no painel (`/admin/desafio`).
 - Status do cadastro: `pendente` → `aprovado` | `recusado`; admin pode remover
   depois (`removido`), com motivo.
-- Modo de aprovação: ver "Decisões em aberto".
+- Modo de aprovação: flag `CHALLENGE_AUTO_APPROVE`. Com `true`, o cadastro nasce
+  `aprovado` quando os 5 compromissos estão marcados e as horas são ≥ 3h/semana;
+  em qualquer outro caso (flag ausente ou `false`, ou `menos de 3h`) nasce `pendente`.
+- `recusado`/`removido` mostram o motivo; o membro não reenvia sozinho.
 - Enquanto `pendente`, `/desafio` mostra "Cadastro em análise".
 
 ## Fases
@@ -201,11 +204,31 @@ Item **Desafio** na lateral (após Aulas).
 | `/desafio/ranking` | Ranking da semana e geral, selos |
 
 Missões diárias, metas, fases e textos do calendário ficam versionados no repo
-(`src/lib/desafio/calendario.ts`), conforme o roteiro do desafio.
+(`src/lib/desafio/calendario.ts`), conforme o roteiro do desafio (texto curto de
+cada dia do canvas de design; dias marcados como `leve` = pausa/opcional).
+
+Detalhes de tela:
+- Abas internas: Hoje · Calendário · Contatos quentes (N) · Check-in · Ranking
+  (Ranking entra com a fatia C).
+- Farol sempre com texto: verde "Em dia", amarelo "Atenção", vermelho "Atrasado".
+- Fase concluída aparece em verde com estrela na faixa de fases do Hoje.
+- Na fatia A, frias aparecem como "Integração com o Orion em breve" e o marco
+  da semana ignora a meta de frias.
+- Celular (< 768px): ações "+ Contato quente" e "Abrir Orion" fixas no rodapé.
+- Item do menu: bloco destacado "Desafio 45 dias" com "Dia X de 45 · Fase N"
+  (antes de 1/12: "Começa em 1/12"); sem selo de texto até a decisão em aberto.
+- Contato quente: "Agendar retorno" grava a data combinada (evento
+  `agendamento`) e conta como próximo passo na S3. Alertas no quadro:
+  "Responder hoje" (respondeu e ainda sem retorno) e "Sem resposta há N dias"
+  (abordado ou proposta parados há 3+ dias).
+- QA: admin/instructor podem simular a data com `?agora=AAAA-MM-DD` fora de
+  produção (`VERCEL_ENV != production`); só muda a leitura, nunca as gravações.
 
 
 ## Painel da equipe
-`/admin/desafio` (admin e instructor):
+`/admin/desafio` (admin e instructor; aprovar/recusar/remover só admin,
+instructor só leitura). Abas: **Inscritos** e **Cadastros pendentes** (Prêmios a
+entregar entra com a fatia C). Link a partir do `/admin`.
 - Lista de inscritos: nome, semana de entrada, farol, quentes/frias da semana e
   acumulado, aulas obrigatórias X/N, último check-in, "onde travou", portfólio,
   último registro, conta Orion vinculada, vendas declaradas.
@@ -250,9 +273,14 @@ aula concluída ou check-in.
 - Múltiplas turmas simultâneas (o modelo deixa espaço, mas a UI assume uma).
 
 ## Decisões em aberto
-- [ ] Aprovação do cadastro: automática (com compromissos marcados e ≥3h/semana) ou manual pela equipe?
+- [ ] Aprovação do cadastro: automática ou manual? **Provisório:** suportadas as
+  duas pela flag `CHALLENGE_AUTO_APPROVE` (padrão manual).
 - [ ] Frias nas semanas 2 e 3: 30 (calendário atual) ou 40 (resumo do roteiro)?
+  **Provisório:** 30.
 - [ ] Confirmar mapeamento das aulas obrigatórias com os módulos de produção.
+  `scripts/seed-desafio-aulas.mts` casa por título e lista o que não achou; os
+  títulos acima não existem no catálogo de homologação (26/11).
+- [ ] Texto do selo do menu: "AO VIVO", "NOVO" ou nenhum.
 - [ ] Prêmios finais.
 
 ## Critérios de aceitação
