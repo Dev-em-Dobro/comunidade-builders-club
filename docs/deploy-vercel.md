@@ -102,7 +102,7 @@ Na TMB (Vendas → Webhook):
 
 Codes liberados por default: `1AS249898VN` (PRO / Mentoria), `3XB272209KV` e
 `9DW254247E5` (Elite boleto). Override Elite: `TMB_ELITE_CODES`.
-DevQuest continua via seed sazonal (não passa neste webhook).
+A oferta base DevQuest Black Infinita `ZBS345545R7` passa neste webhook como Elite vitalício. Outras ofertas DevQuest continuam fora da regra.
 
 
 ### E-mail (Resend) — Production + Preview
