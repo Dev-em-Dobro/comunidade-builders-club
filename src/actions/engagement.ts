@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import {
   requireAdmin,
-  requireActiveMember,
+  requireMemberSemRestricao,
   requirePaidMember,
 } from "@/lib/membership/require-member";
 import { isPaidMembership } from "@/lib/membership/capabilities";
@@ -17,7 +17,7 @@ import {
 } from "@/lib/engagement";
 
 export async function createCommentAction(formData: FormData) {
-  const { user, membership } = await requireActiveMember();
+  const { user, membership } = await requireMemberSemRestricao();
   const parentRaw = String(formData.get("parentId") ?? "").trim();
   const raw = {
     postId: String(formData.get("postId") ?? ""),
@@ -34,7 +34,7 @@ export async function createCommentAction(formData: FormData) {
 }
 
 export async function updateCommentAction(formData: FormData) {
-  const { user, membership } = await requireActiveMember();
+  const { user, membership } = await requireMemberSemRestricao();
   const commentId = String(formData.get("commentId") ?? "");
   const postId = String(formData.get("postId") ?? "");
   const raw = { body: String(formData.get("body") ?? "") };

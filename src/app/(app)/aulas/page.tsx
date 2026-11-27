@@ -1,5 +1,8 @@
 import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
-import { isPaidMembership } from "@/lib/membership/capabilities";
+import {
+  isPaidMembership,
+  isRestritoMembership,
+} from "@/lib/membership/capabilities";
 import { listCompletedLessonIds, listPurchasedModuleIds } from "@/lib/aulas";
 import { listPublishedModules } from "@/lib/aulas/published-modules";
 import { EmptyState } from "@/components/empty-state";
@@ -10,8 +13,9 @@ import {
 } from "@/components/aulas-catalog";
 
 export default async function AulasPage() {
-  const member = await requireActiveMemberOrRedirect();
+  const member = await requireActiveMemberOrRedirect({ restritoOk: true });
   const isPaid = isPaidMembership(member.membership);
+  const restrito = isRestritoMembership(member.membership);
   const [modules, completed, purchased] = await Promise.all([
     listPublishedModules(),
     listCompletedLessonIds(member.user.id),
@@ -22,7 +26,7 @@ export default async function AulasPage() {
   const temCompra = (mod: AulaModuleCard): boolean =>
     purchased.has(mod.id) || (mod.children ?? []).some(temCompra);
   const catalog = modules
-    .map((mod) => mapModule(mod, completed, false, purchased))
+    .map((mod) => mapModule(mod, completed, false, purchased, restrito))
     .sort((a, b) => Number(temCompra(b)) - Number(temCompra(a)));
 
   return (
@@ -33,6 +37,10 @@ export default async function AulasPage() {
             é a última coisa que ela lê antes de escolher onde clicar. */}
         {isPaid
           ? "Escolha um módulo para ver as aulas."
+          : restrito
+            ? purchased.size > 0
+              ? "O módulo que você comprou está liberado logo no início. O Elite abre o resto da formação — nicho, prospecção, abordagem e fechamento."
+              : "O Elite abre a formação completa — nicho, prospecção, abordagem e fechamento."
           : purchased.size > 0
             ? "A aula que você comprou está liberada logo no início. PRO e Elite abrem o resto da formação — nicho, prospecção, abordagem e fechamento."
             : "O Comece por aqui está liberado no gratuito. PRO e Elite abrem o resto da formação — nicho, prospecção, abordagem e fechamento."}

@@ -58,6 +58,12 @@ export function canWatchLesson(
   isPaid: boolean,
   mod: ModuleAccessNode,
   purchased: ReadonlySet<string> = new Set(),
+  /** F128 — conta restrita: módulo gratuito não libera, só o comprado. */
+  restrito = false,
 ): boolean {
-  return isPaid || moduleAllowsFree(mod) || moduleIsPurchased(mod, purchased);
+  return (
+    isPaid ||
+    (!restrito && moduleAllowsFree(mod)) ||
+    moduleIsPurchased(mod, purchased)
+  );
 }

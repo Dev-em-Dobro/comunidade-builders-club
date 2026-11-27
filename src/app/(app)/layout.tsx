@@ -2,6 +2,7 @@ import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
 import {
   isEliteMembership,
   isPaidMembership,
+  isRestritoMembership,
   isVitalicioMembership,
 } from "@/lib/membership/capabilities";
 import { temAceiteGarantiaVigente } from "@/lib/membership/aceite-garantia";
@@ -19,7 +20,7 @@ export default async function AppSegmentLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const member = await requireActiveMemberOrRedirect();
+  const member = await requireActiveMemberOrRedirect({ restritoOk: true });
   const isPaid = isPaidMembership(member.membership);
   const isElite = isEliteMembership(member.membership);
   const isVitalicio = isVitalicioMembership(member.membership);
@@ -66,6 +67,7 @@ export default async function AppSegmentLayout({
       isPaid={isPaid}
       isElite={isElite}
       isVitalicio={isVitalicio}
+      isRestrito={isRestritoMembership(member.membership)}
       displayName={member.profile.displayName}
       email={member.user.email}
       avatarUrl={member.profile.avatarUrl}

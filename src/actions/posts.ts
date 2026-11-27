@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { ZodError } from "zod";
 import {
   requireAdmin,
-  requireActiveMember,
+  requireMemberSemRestricao,
 } from "@/lib/membership/require-member";
 import { isPaidMembership } from "@/lib/membership/capabilities";
 import {
@@ -25,7 +25,7 @@ function actionError(e: unknown): never {
 }
 
 export async function createPostAction(formData: FormData) {
-  const { user, membership } = await requireActiveMember();
+  const { user, membership } = await requireMemberSemRestricao();
   const isAdmin = membership.role === "admin";
   const isPaid = isPaidMembership(membership);
   const raw = {
@@ -49,7 +49,7 @@ export async function createPostAction(formData: FormData) {
 }
 
 export async function updatePostAction(formData: FormData) {
-  const { user, membership } = await requireActiveMember();
+  const { user, membership } = await requireMemberSemRestricao();
   const isAdmin = membership.role === "admin";
   const isPaid = isPaidMembership(membership);
   const postId = String(formData.get("postId") ?? "");
@@ -72,7 +72,7 @@ export async function updatePostAction(formData: FormData) {
 }
 
 export async function deletePostAction(postId: string, spaceSlug: string) {
-  const { user, membership } = await requireActiveMember();
+  const { user, membership } = await requireMemberSemRestricao();
   const isAdmin = membership.role === "admin";
   const isPaid = isPaidMembership(membership);
   try {

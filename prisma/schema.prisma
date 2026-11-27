@@ -189,6 +189,8 @@ model Membership {
   vitalicio           Boolean   @default(false)
   vitalicioOfferId    String?   @map("vitalicio_offer_id")
   vitalicioGrantedAt  DateTime? @map("vitalicio_granted_at")
+  /// F128 — conta nasceu de compra de módulo avulso: enquanto free, só vê o módulo comprado.
+  acessoRestrito      Boolean   @default(false) @map("acesso_restrito")
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
 
@@ -509,6 +511,20 @@ model ModulePurchase {
   @@unique([email, moduleId])
   @@index([moduleId])
   @@map("module_purchase")
+}
+
+/// F127 — e-mail de acesso já enviado para esta compra. Único por e-mail + chave
+/// (`modulo:<id>`, `plano:pro`, `plano:elite`): aviso repetido não reenvia.
+model PurchaseEmailSend {
+  id        String    @id @default(cuid())
+  email     String
+  chave     String
+  sentAt    DateTime? @map("sent_at")
+  erro      String?
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  @@unique([email, chave])
+  @@map("purchase_email_send")
 }
 
 model Lesson {
