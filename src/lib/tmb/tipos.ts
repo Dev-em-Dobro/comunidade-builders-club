@@ -15,12 +15,16 @@ export type TmbVendaPayload = {
 
 export type PlanoTmb = "pro" | "elite";
 
+/** Oferta base Black Infinita 2026 na TMB: Elite vitalício. */
+export const TMB_CODE_BLACK_INFINITA = "ZBS345545R7";
+
 export type AcaoTmb =
   | {
       acao: "conceder";
       email: string;
       productId: string;
       plan: PlanoTmb;
+      vitalicio?: boolean;
       pedido: string;
       nome?: string;
       lancamentoId?: string;
