@@ -120,7 +120,20 @@ Bancos continuam **separados**. O Orion expõe um endpoint de estatísticas
     funil: { respondeu, qualificado, proposta, ganho } }] }` (máx. 500 e-mails por chamada)
 - **Retroativo**: como o Orion guarda `enviado_em`, abordagens feitas antes da
   integração entrar no ar contam normalmente.
-- Builders faz cache de ~10 min (sem worker/fila; consulta no request).
+- Contrato final especificado no Orion em `specs/02-features/F044-estatisticas-builders.md`.
+- Builders faz cache de ~10 min (sem worker/fila; consulta no request): memória
+  do processo + `revalidate` do fetch, chave = e-mails + janela. Timeout de 5 s.
+  Variáveis: `ORION_URL` e `BUILDERS_INTEGRATION_SECRET` (um por ambiente).
+- Janela consultada: 1/12 até hoje (máx. 14/1). Membro: 1 e-mail por chamada;
+  painel da equipe e CSV: todos os aprovados em lotes de até 500.
+- Orion fora do ar, sem configuração ou timeout: telas mostram "Números do Orion
+  indisponíveis agora", o farol usa só os dados locais e o marco **não** cobra
+  as frias daquela semana (nunca derruba a página nem pune o membro pela falha).
+- `encontrado: false`: aviso "Conta Orion não encontrada com este e-mail" no
+  Hoje e no painel (filtro "Sem conta Orion"); frias contam 0 e o marco cobra.
+- Frias entram em metas, marco, farol (ritmo e "registro"), check-in
+  pré-preenchido, funil (abordados frios + respondeu/qualificado→briefing/
+  proposta/ganho→fechado) e CSV.
 - Limitação conhecida: o Orion não guarda a data de cada mudança de
   `LeadStatus`; o funil frio é um retrato do status atual dos leads criados
   dentro da janela do desafio.

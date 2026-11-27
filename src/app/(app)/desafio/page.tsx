@@ -2,8 +2,8 @@ import Link from "next/link";
 import { enroll } from "@/actions/desafio";
 import { EnrollmentForm } from "@/components/desafio/forms";
 import {
-  COLD_PENDING, ChallengeHeading, ChallengeNav, Check, Farol, Field, GoalBar, PhaseStrip, StatCard, YesNo,
-  brandEyebrow, displayTitle, eyebrow, field, link, panel,
+  ChallengeHeading, ChallengeNav, Check, Farol, Field, GoalBar, PhaseStrip, StatCard, YesNo,
+  brandEyebrow, coldNotice, displayTitle, eyebrow, field, link, panel,
 } from "@/components/desafio/ui";
 import { challengeNow, getEnrollment, requireChallengeMember } from "@/lib/desafio/acesso";
 import {
@@ -40,7 +40,7 @@ export default async function ChallengePage({ searchParams }: {
     return <Presentation status={enrollment?.status} reason={enrollment?.removedReason} open={dayInSaoPaulo(now) <= LAST_ENROLLMENT_DAY} staff={staff} />;
   }
 
-  const progress = await getParticipantProgress(enrollment, now.toISOString());
+  const progress = await getParticipantProgress(enrollment, member.user.email, now.toISOString());
   const { current, today, waitingReply } = progress;
   const moment = challengeMoment(today);
   const orionUrl = urlOrionApp();
@@ -50,6 +50,9 @@ export default async function ChallengePage({ searchParams }: {
   const daysLeftInWeek = Math.max(1, dayDistance(today < current.start ? current.start : today, current.end) + 1);
   const warmMissing = Math.max(0, current.warm - current.warmCount);
   const phaseEnd = WEEKS.findLast((week) => week.phase === current.phase)!.end;
+  const coldMessage = coldNotice(progress.coldStatus);
+  const coldKnown = progress.coldStatus !== "indisponivel";
+  const coldMissing = Math.max(0, current.cold - current.coldCount);
 
   const title = moment.stage === "durante" ? `Dia ${moment.day.number} de 45`
     : moment.stage === "antes" ? `Começa em ${moment.daysToStart} ${moment.daysToStart === 1 ? "dia" : "dias"}` : "Desafio encerrado";
@@ -64,7 +67,9 @@ export default async function ChallengePage({ searchParams }: {
     ...(warmMissing > 0 && moment.stage !== "depois" ? [{ label: `Abordar mais ${warmMissing} contatos quentes nesta semana (mínimo ${current.warm})`, done: false, href: "/desafio/contatos" }] : []),
     ...(current.warm > 0 && warmMissing === 0 ? [{ label: `Meta de ${current.warm} quentes da semana batida`, done: true, href: undefined }] : []),
     ...(pendingLessons[0] ? [{ label: `Assistir “${pendingLessons[0].lesson.title}”`, done: false, href: `/aulas/${pendingLessons[0].lesson.module.slug}/${pendingLessons[0].lesson.slug}` }] : []),
-    ...(current.cold > 0 ? [{ label: `Abordagens frias no Orion (meta da semana: ${current.cold})`, done: false, href: orionUrl }] : []),
+    ...(current.cold > 0 ? [coldKnown && coldMissing === 0
+      ? { label: `Meta de ${current.cold} frias da semana batida`, done: true, href: undefined }
+      : { label: coldKnown ? `Mais ${coldMissing} abordagens frias no Orion nesta semana (meta ${current.cold})` : `Abordagens frias no Orion (meta da semana: ${current.cold})`, done: false, href: orionUrl }] : []),
     ...(now >= window.opens && now < window.closes && current.number >= (enrollment.joinedWeek ?? 1)
       ? [{ label: current.checkin ? "Check-in da semana enviado" : "Enviar o check-in (até terça, 12h)", done: Boolean(current.checkin), href: "/desafio/checkin" }] : []),
   ];
@@ -117,9 +122,13 @@ export default async function ChallengePage({ searchParams }: {
             <GoalBar label="Abordagens quentes" value={current.warmCount} total={current.warm}
               hint={warmMissing > 0 ? `Faltam ${warmMissing} em ${daysLeftInWeek} ${daysLeftInWeek === 1 ? "dia" : "dias"} — cerca de ${Math.ceil(warmMissing / daysLeftInWeek)} por dia` : "Mínimo batido. Pode e deve fazer mais."} />
           )}
-          {current.cold > 0 && <GoalBar label="Abordagens frias (Orion)" value={0} total={current.cold} pending={`meta ${current.cold}`} hint={COLD_PENDING} />}
+          {current.cold > 0 && (
+            <GoalBar label="Abordagens frias (Orion)" value={current.coldCount} total={current.cold}
+              pending={coldKnown ? undefined : `meta ${current.cold}`}
+              hint={coldMessage ?? (coldMissing > 0 ? `Faltam ${coldMissing} em ${daysLeftInWeek} ${daysLeftInWeek === 1 ? "dia" : "dias"} — cerca de ${Math.ceil(coldMissing / daysLeftInWeek)} por dia` : "Meta batida. Pode e deve fazer mais.")} />
+          )}
           {current.number >= 2 && current.number <= 3 && (
-            <GoalBar label="Retornos feitos" value={current.returns} total={Math.max(current.returns, current.returns + waitingReply.length) || 1}
+            <GoalBar label="Retornos feitos" value={current.returns + current.coldReturns} total={current.returns + current.coldReturns + waitingReply.length || 1}
               hint={waitingReply.length ? `${waitingReply.length} ${waitingReply.length === 1 ? "contato respondeu e espera" : "contatos responderam e esperam"} seu retorno` : "Ninguém esperando retorno agora"} />
           )}
           {current.required > 0 && <GoalBar label={`Aulas da Fase ${current.phase}`} value={current.completed} total={current.required} hint={`Prazo: ${longDay(phaseEnd)}`} />}
@@ -127,6 +136,15 @@ export default async function ChallengePage({ searchParams }: {
             hint={current.number === 7 ? "Registre até 14/1" : `Abre ${windowLabel.format(window.opens)} · fecha ${windowLabel.format(window.closes)}, 12h`} />
         </section>
       </div>
+
+      {coldMessage && (
+        <p role="status" className="rounded-xl border border-border bg-surface px-4 py-3 text-sm">
+          <strong>{coldMessage}.</strong>{" "}
+          {progress.coldStatus === "nao-encontrado"
+            ? "Use no Orion o mesmo e-mail da comunidade para suas abordagens frias contarem aqui."
+            : "Suas frias continuam salvas no Orion e aparecem aqui assim que a conexão voltar."}
+        </p>
+      )}
 
       {waitingReply.length > 0 && (
         <p role="status" className="rounded-xl border border-[#fcd34d] bg-[#fef3c7] px-4 py-3 text-sm text-[#92400e]">
@@ -138,12 +156,12 @@ export default async function ChallengePage({ searchParams }: {
       <section aria-labelledby="funil" className="space-y-3">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h2 id="funil" className={`${displayTitle} text-xl`}>Seu funil até agora</h2>
-          <span className="text-[13px] text-muted">Quentes registrados aqui · frios do Orion em breve</span>
+          <span className="text-[13px] text-muted">Quentes registrados aqui · frios vêm do Orion</span>
         </div>
         <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
           {progress.funnel.map((step) => (
             <StatCard key={step.type} label={funnelLabels[step.type]} value={step.total}
-              detail={step.type === "fechado" && step.total === 0 ? "o primeiro vem aí" : "quentes"} />
+              detail={step.type === "fechado" && step.total === 0 ? "o primeiro vem aí" : `${step.warm} quentes · ${coldKnown ? step.cold : "—"} frios`} />
           ))}
         </div>
       </section>

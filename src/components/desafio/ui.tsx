@@ -182,4 +182,10 @@ export function Check({ done }: { done: boolean }) {
   );
 }
 
-export const COLD_PENDING = "Integração com o Orion em breve";
+export const COLD_UNAVAILABLE = "Números do Orion indisponíveis agora";
+export const COLD_NOT_FOUND = "Conta Orion não encontrada com este e-mail";
+
+/** Aviso sobre as frias do Orion; `null` quando os números chegaram. */
+export function coldNotice(status: "ok" | "nao-encontrado" | "indisponivel") {
+  return status === "ok" ? null : status === "nao-encontrado" ? COLD_NOT_FOUND : COLD_UNAVAILABLE;
+}

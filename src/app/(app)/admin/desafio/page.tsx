@@ -23,7 +23,8 @@ export default async function TeamChallengePage({ searchParams }: {
   const tab: Tab = params.aba && params.aba in TABS ? (params.aba as Tab) : "inscritos";
   const filter = isTeamFilter(params.filtro) ? params.filtro : undefined;
 
-  const rows = (await getTeamDashboard(now.toISOString())).map(teamRow);
+  const dashboard = await getTeamDashboard(now.toISOString());
+  const rows = dashboard.entries.map(teamRow);
   const totals = teamTotals(rows);
   const approved = rows.filter((row) => row.status === "aprovado");
   const byTab: Record<Tab, TeamRow[]> = {
@@ -49,7 +50,7 @@ export default async function TeamChallengePage({ searchParams }: {
           <h1 className="page-title">Acompanhamento da turma</h1>
           <p className="text-[15px] text-muted">
             {moment.stage === "durante" ? `Dia ${moment.day.number} · semana ${moment.day.week.number}` : moment.stage === "antes" ? `Começa em ${moment.daysToStart} dias` : "Turma encerrada"}
-            {" · frias do Orion entram com a integração"}
+            {dashboard.orionAvailable ? " · números do Orion com cache de até 10 min" : " · números do Orion indisponíveis agora"}
             {!canDecide && " · instructor: somente leitura"}
           </p>
         </div>
@@ -68,8 +69,8 @@ export default async function TeamChallengePage({ searchParams }: {
       <div className="grid grid-cols-2 gap-2.5 md:grid-cols-3 xl:grid-cols-5">
         <StatCard label="Inscritos" value={totals.enrolled} detail={`${totals.pending} aguardando aprovação`} />
         <StatCard label="Em dia" value={totals.onTrackPct === null ? "—" : `${totals.onTrackPct}%`} detail={`${totals.colors.green} verdes · ${totals.colors.yellow} amarelos · ${totals.colors.red} vermelhos`} />
-        <StatCard label="Abordagens quentes" value={totals.warm.toLocaleString("pt-BR")} detail="frias: integração em breve" />
-        <StatCard label="Propostas abertas" value={totals.proposals} detail="contatos quentes" />
+        <StatCard label="Abordagens" value={(totals.warm + totals.cold).toLocaleString("pt-BR")} detail={`${totals.warm.toLocaleString("pt-BR")} quentes · ${dashboard.orionAvailable ? totals.cold.toLocaleString("pt-BR") : "—"} frias`} />
+        <StatCard label="Propostas" value={totals.proposals} detail="quentes abertas + frias no Orion" />
         <StatCard label="Vendas" value={totals.sales} detail={`${totals.declaredSales} declaradas no check-in`} />
       </div>
 
@@ -116,6 +117,7 @@ function EnrolledTable({ rows, canDecide }: { rows: TeamRow[]; canDecide: boolea
           <tr>
             <th scope="col" className={th}>Membro</th>
             <th scope="col" className={th}>Farol</th>
+            <th scope="col" className={th}>Frias sem.</th>
             <th scope="col" className={th}>Quentes sem./total</th>
             <th scope="col" className={th}>Aulas</th>
             <th scope="col" className={th}>Check-in</th>
@@ -134,6 +136,11 @@ function EnrolledTable({ rows, canDecide }: { rows: TeamRow[]; canDecide: boolea
                 <p className="text-xs text-muted">{row.email} · {row.whatsapp}</p>
               </td>
               <td className={td}>{row.farol && <Farol {...row.farol} small />}</td>
+              <td className={td}>
+                {row.orion === "ok" && <><strong>{row.coldWeek}</strong>{row.coldTarget > 0 && <span className="text-muted">/{row.coldTarget}</span>}<span className="block text-xs text-muted">{row.coldTotal} no total</span></>}
+                {row.orion === "nao-encontrado" && <span className="text-xs font-semibold text-[#991b1b]">Conta Orion não encontrada</span>}
+                {row.orion === "indisponivel" && <span className="text-xs text-muted">—</span>}
+              </td>
               <td className={td}><strong>{row.warmWeek}</strong><span className="text-muted"> / {row.warmTotal}</span></td>
               <td className={td}>{row.lessons}</td>
               <td className={td}>
