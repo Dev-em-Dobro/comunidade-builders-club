@@ -69,11 +69,12 @@ export function mapModule(
   completed: Set<string>,
   inheritedFree = false,
   purchased: ReadonlySet<string> = new Set(),
+  /** F128 — conta restrita: só o módulo comprado abre; o gratuito fica com cadeado. */
+  restrito = false,
 ): AulaModuleCard {
   const freeAccess =
     inheritedFree ||
-    Boolean(mod.freeAccess) ||
-    mod.slug === FASE_1_M01_SLUG ||
+    (!restrito && (Boolean(mod.freeAccess) || mod.slug === FASE_1_M01_SLUG)) ||
     purchased.has(mod.id);
   return {
     id: mod.id,
@@ -93,7 +94,7 @@ export function mapModule(
       freeAccess,
     })),
     children: (mod.children ?? []).map((child) =>
-      mapModule(child, completed, freeAccess, purchased),
+      mapModule(child, completed, freeAccess, purchased, restrito),
     ),
   };
 }

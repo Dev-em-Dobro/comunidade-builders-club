@@ -18,6 +18,8 @@ import {
 type UpgradeCtx = {
   isPaid: boolean;
   isElite: boolean;
+  /** F128 — conta restrita ao módulo comprado. */
+  isRestrito: boolean;
   openUpgrade: (reason?: UpgradeReason) => void;
   requirePaid: (reason?: UpgradeReason) => boolean;
   requireElite: (reason?: UpgradeReason) => boolean;
@@ -41,21 +43,27 @@ export function useUpgradeOptional() {
 export function UpgradeProvider({
   isPaid,
   isElite = false,
+  isRestrito = false,
   children,
   autoOpen = false,
 }: {
   isPaid: boolean;
   isElite?: boolean;
+  isRestrito?: boolean;
   children: React.ReactNode;
   autoOpen?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState<UpgradeReason>("geral");
 
-  const openUpgrade = useCallback((r: UpgradeReason = "geral") => {
-    setReason(r);
-    setOpen(true);
-  }, []);
+  const openUpgrade = useCallback(
+    (r: UpgradeReason = "geral") => {
+      // F128 — para a conta restrita, todo cadeado convida para o Elite.
+      setReason(isRestrito ? "restrito" : r);
+      setOpen(true);
+    },
+    [isRestrito],
+  );
 
   const requirePaid = useCallback(
     (r: UpgradeReason = "geral") => {
@@ -77,10 +85,10 @@ export function UpgradeProvider({
 
   useEffect(() => {
     if (autoOpen && !isPaid) {
-      setReason("geral");
+      setReason(isRestrito ? "restrito" : "geral");
       setOpen(true);
     }
-  }, [autoOpen, isPaid]);
+  }, [autoOpen, isPaid, isRestrito]);
 
   useEffect(() => {
     if (!open) return;
@@ -95,11 +103,12 @@ export function UpgradeProvider({
     () => ({
       isPaid,
       isElite,
+      isRestrito,
       openUpgrade,
       requirePaid,
       requireElite,
     }),
-    [isPaid, isElite, openUpgrade, requirePaid, requireElite],
+    [isPaid, isElite, isRestrito, openUpgrade, requirePaid, requireElite],
   );
 
   const copy = UPGRADE_REASON_COPY[reason];
@@ -108,7 +117,7 @@ export function UpgradeProvider({
   const usarCopyMotivo = !eliteOnly || reason === "whatsapp-elite";
   const planosHref = hrefPlanos({
     motivo: reason,
-    destaque: eliteOnly ? "elite" : undefined,
+    destaque: eliteOnly || isRestrito ? "elite" : undefined,
   });
 
   return (

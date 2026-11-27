@@ -83,8 +83,42 @@ function LockIcon({ className }: { className?: string }) {
   );
 }
 
+/**
+ * F128 — item do menu fechado para a conta restrita ao módulo comprado.
+ * Mesmo desenho dos cadeados de Materiais e Spaces.
+ */
+function ItemTrancado({
+  icon,
+  label,
+  onNavigate,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  onNavigate?: () => void;
+}) {
+  const { openUpgrade } = useUpgrade();
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        openUpgrade("restrito");
+        onNavigate?.();
+      }}
+      className="nav-space flex w-full cursor-pointer items-center gap-2 text-left opacity-80"
+    >
+      {icon}
+      <span className="min-w-0 flex-1 truncate">{label}</span>
+      <LockIcon />
+    </button>
+  );
+}
+
 function FeedLink({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
+  const { isRestrito } = useUpgrade();
+  if (isRestrito) {
+    return <ItemTrancado icon={ICON_TODOS} label="Feed" onNavigate={onNavigate} />;
+  }
   return (
     <Link
       href="/"
@@ -104,6 +138,27 @@ function ComecePorAquiNav({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   const comoUsarActive = pathname.startsWith(COMO_USAR_HREF);
   const metodoActive = pathname.startsWith(METODO_HREF);
+  const { isRestrito } = useUpgrade();
+
+  if (isRestrito) {
+    return (
+      <nav className="flex flex-col gap-0.5" aria-label="Comece por aqui">
+        <p className="mb-1.5 px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">
+          Comece por aqui
+        </p>
+        <ItemTrancado
+          icon={ICON_BOAS_VINDAS}
+          label="Como usar a comunidade"
+          onNavigate={onNavigate}
+        />
+        <ItemTrancado
+          icon={ICON_AULAS}
+          label="Comece por aqui"
+          onNavigate={onNavigate}
+        />
+      </nav>
+    );
+  }
 
   return (
     <nav className="flex flex-col gap-0.5" aria-label="Comece por aqui">
@@ -204,7 +259,7 @@ function SpaceNav({
   onNavigate?: () => void;
 }) {
   const pathname = usePathname();
-  const { openUpgrade } = useUpgrade();
+  const { openUpgrade, isRestrito } = useUpgrade();
   // F104 — boas-vindas sobe pro bloco "Comece por aqui"; some da lista flat.
   const spacesNoMenu = spaces.filter((s) => s.slug !== WELCOME_SPACE_SLUG);
 
@@ -216,7 +271,8 @@ function SpaceNav({
       {spacesNoMenu.map((s) => {
         const href = `/spaces/${s.slug}`;
         const active = pathname === href;
-        const locked = !isPaid && !isFreeSpaceSlug(s.slug);
+        // F128 — conta restrita: todo space fechado, inclusive os do gratuito.
+        const locked = isRestrito || (!isPaid && !isFreeSpaceSlug(s.slug));
         if (locked) {
           return (
             <button
@@ -319,7 +375,7 @@ function SidebarFooter({
   onNavigate?: () => void;
 }) {
   const pathname = usePathname();
-  const { openUpgrade } = useUpgrade();
+  const { openUpgrade, isRestrito } = useUpgrade();
 
   return (
     <div className="relative z-[100] mt-auto flex flex-col gap-0.5 border-t border-border pt-3">
@@ -348,7 +404,10 @@ function SidebarFooter({
           <LockIcon />
         </button>
       )}
-      <NotificationBell unread={unread} items={notifPreview} />
+      {/* F128 — conta restrita não tem notificações. */}
+      {isRestrito ? null : (
+        <NotificationBell unread={unread} items={notifPreview} />
+      )}
       {isAdmin ? (
         <>
           <Link
@@ -491,6 +550,7 @@ function ShellInner({
 }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const pathname = usePathname();
+  const { isRestrito } = useUpgrade();
 
   useEffect(() => {
     setDrawerOpen(false);
@@ -640,7 +700,9 @@ function ShellInner({
           </Link>
           <div className="flex items-center gap-0.5">
             <ThemeToggle variant="icon" />
-            <NotificationBell unread={unread} items={notifPreview} compact />
+            {isRestrito ? null : (
+              <NotificationBell unread={unread} items={notifPreview} compact />
+            )}
           </div>
         </header>
 
@@ -667,6 +729,7 @@ export function AppShellClient({
   isPaid,
   isElite,
   isVitalicio = false,
+  isRestrito = false,
   orionUrl,
   unread,
   spaces: initialSpaces,
@@ -682,6 +745,8 @@ export function AppShellClient({
   isPaid: boolean;
   isElite: boolean;
   isVitalicio?: boolean;
+  /** F128 — conta restrita ao módulo comprado. */
+  isRestrito?: boolean;
   orionUrl: string;
   unread: number;
   spaces: SpaceLink[];
@@ -733,6 +798,7 @@ export function AppShellClient({
     <UpgradeProvider
       isPaid={isPaid}
       isElite={isElite}
+      isRestrito={isRestrito}
       autoOpen={autoOpen}
     >
       <ShellInner

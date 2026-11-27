@@ -7,8 +7,14 @@ import { requireUser } from "@/lib/auth/require-user";
 import { AuthError, ForbiddenError } from "@/lib/auth/errors";
 import { ensureMemberBootstrap } from "./bootstrap";
 import { contextoAceiteDeHeaders, type ContextoAceite } from "./aceite-legal";
-import { hrefPlanos, isEliteMembership, isPaidMembership } from "./capabilities";
+import {
+  hrefPlanos,
+  isEliteMembership,
+  isPaidMembership,
+  isRestritoMembership,
+} from "./capabilities";
 import { UPGRADE_REQUIRED } from "./errors";
+import { entradaContaRestrita } from "./restrito";
 
 export type ActiveMember = {
   user: AuthUser;
@@ -71,15 +77,40 @@ export async function requireAdmin(): Promise<ActiveMember> {
   return member;
 }
 
-/** Sem sessão → /login. Membership pending/revoked → /aguardando. */
-export async function requireActiveMemberOrRedirect(): Promise<ActiveMember> {
+/**
+ * F128 — ação do servidor aberta ao gratuito, mas fechada para conta restrita
+ * (publicar, comentar, menções, notificações).
+ */
+export async function requireMemberSemRestricao(): Promise<ActiveMember> {
+  const member = await requireActiveMember();
+  if (isRestritoMembership(member.membership)) {
+    throw new ForbiddenError(UPGRADE_REQUIRED);
+  }
+  return member;
+}
+
+/**
+ * Sem sessão → /login. Membership pending/revoked → /aguardando.
+ *
+ * F128 — conta restrita é **negada por padrão** e vai para a entrada dela (o
+ * módulo comprado). Só as páginas que ela pode abrir passam `restritoOk`.
+ * Página nova nasce fechada.
+ */
+export async function requireActiveMemberOrRedirect(
+  opts: { restritoOk?: boolean } = {},
+): Promise<ActiveMember> {
+  let member: ActiveMember;
   try {
-    return await requireActiveMember();
+    member = await requireActiveMember();
   } catch (e) {
     if (e instanceof AuthError) redirect("/login");
     if (e instanceof ForbiddenError) redirect("/aguardando");
     throw e;
   }
+  if (!opts.restritoOk && isRestritoMembership(member.membership)) {
+    redirect(await entradaContaRestrita(member.user.email));
+  }
+  return member;
 }
 
 export async function requirePaidMemberOrRedirect(

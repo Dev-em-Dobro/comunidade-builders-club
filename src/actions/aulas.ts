@@ -2,7 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { requireActiveMember } from "@/lib/membership/require-member";
-import { isPaidMembership } from "@/lib/membership/capabilities";
+import {
+  isPaidMembership,
+  isRestritoMembership,
+} from "@/lib/membership/capabilities";
 import { listPurchasedModuleIds, setLessonCompleted } from "@/lib/aulas";
 
 export async function setLessonCompletedAction(
@@ -17,6 +20,7 @@ export async function setLessonCompletedAction(
   await setLessonCompleted(user.id, lessonId, completed, {
     isPaid,
     purchased: await listPurchasedModuleIds({ email: user.email, isPaid }),
+    restrito: isRestritoMembership(membership),
   });
   revalidatePath("/aulas");
   revalidatePath(`/aulas/${moduleSlug}`);

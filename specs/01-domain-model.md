@@ -17,6 +17,9 @@ Diagnóstico, Outreach, Entregável — este último só na Fase 2 de migração
 | **Membro** | Usuário com membership na comunidade. |
 | **Membership** | Estado de acesso: `pending` \| `active` \| `revoked` + papel + **tier** `free` \| `pro` \| `elite` (`paid` legado = PRO; F041/F053). Dinheiro da compra Hubla (F081): `valor_centavos`, `plano_pago`, `moeda`, `ultima_cobranca_em` — nulos no legado. |
 | **Allowlist** | E-mails pré-aprovados (`AllowedEmail`); login → `active` (F012). |
+| **Módulo avulso** | Módulo do catálogo vendido sozinho por um produto Hubla (F126). A compra fica por e-mail (`ModulePurchase`) e não muda o tier. |
+| **Acesso restrito** | Conta que **nasceu** de uma compra de módulo avulso e segue `free` (F128): vê só o módulo comprado, Planos, Perfil e Configurações. Quem já tinha conta gratuita e compra o módulo **não** é restrito. |
+| **E-mail de acesso** | E-mail que o Club manda quando o webhook libera uma compra (módulo avulso, PRO ou Elite), uma vez por compra (F127). |
 | **Tentativa recusada** | Pedido de entrada com e-mail **fora** da allowlist (`DeniedLoginAttempt`). Não bloqueia o login free (F041). Gravação histórica (F054); **sem** aba Admin desde 07/09. |
 | **Papel (Role)** | `member` \| `instructor` \| `admin`. |
 | **Perfil** | Foto, nome de exibição, bio, data de entrada. |
