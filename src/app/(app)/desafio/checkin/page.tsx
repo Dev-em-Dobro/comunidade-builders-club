@@ -1,6 +1,6 @@
 import { submitCheckin } from "@/actions/desafio";
 import { ChallengeForm } from "@/components/desafio/forms";
-import { COLD_PENDING, ChallengeHeading, ChallengeNav, Check, Field, YesNo, displayTitle, eyebrow, field, panel } from "@/components/desafio/ui";
+import { ChallengeHeading, ChallengeNav, Check, Field, YesNo, coldNotice, displayTitle, eyebrow, field, panel } from "@/components/desafio/ui";
 import { challengeNow, requireChallengeParticipant } from "@/lib/desafio/acesso";
 import { canCheckIn, checkinWindow } from "@/lib/desafio/calendario";
 import { getParticipantProgress } from "@/lib/desafio/painel";
@@ -16,7 +16,7 @@ const money = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL
 export default async function CheckinPage({ searchParams }: { searchParams: Promise<{ agora?: string }> }) {
   const { member, enrollment } = await requireChallengeParticipant();
   const now = challengeNow(member.membership.role, (await searchParams).agora);
-  const progress = await getParticipantProgress(enrollment, now.toISOString());
+  const progress = await getParticipantProgress(enrollment, member.user.email, now.toISOString());
   const joinedWeek = enrollment.joinedWeek ?? 1;
   const week = progress.weeks.find((item) => !item.checkin && canCheckIn(item, joinedWeek, now));
   const history = progress.weeks.filter((item) => item.checkin);
@@ -24,12 +24,15 @@ export default async function CheckinPage({ searchParams }: { searchParams: Prom
 
   const numbers = week && [
     { label: "Quentes abordados", value: String(week.warmCount), meta: week.warm ? `mínimo ${week.warm}${week.warmCount >= week.warm ? " ✓" : ""}` : "sem meta nesta semana", ok: week.warm > 0 && week.warmCount >= week.warm },
-    { label: "Frias (Orion)", value: "—", meta: week.cold ? `meta ${week.cold} · ${COLD_PENDING}` : COLD_PENDING, ok: false },
-    { label: "Responderam", value: String(week.responded), meta: `${week.returns} ${week.returns === 1 ? "retorno feito" : "retornos feitos"}`, ok: false },
+    progress.coldStatus === "indisponivel"
+      ? { label: "Frias (Orion)", value: "—", meta: coldNotice(progress.coldStatus)!, ok: false }
+      : { label: "Frias (Orion)", value: String(week.coldCount), meta: progress.coldStatus === "nao-encontrado" ? coldNotice(progress.coldStatus)! : week.cold ? `meta ${week.cold}${week.coldCount >= week.cold ? " ✓" : ""}` : "sem meta nesta semana", ok: week.cold > 0 && week.coldCount >= week.cold },
+    { label: "Responderam (quentes)", value: String(week.responded), meta: `${week.returns + week.coldReturns} ${week.returns + week.coldReturns === 1 ? "retorno feito" : "retornos feitos"}`, ok: false },
     ...(week.required ? [{ label: `Aulas da Fase ${week.phase}`, value: `${week.completed}/${week.required}`, meta: week.completed >= week.required ? "concluídas ✓" : "pendentes", ok: week.completed >= week.required }] : []),
   ];
   const milestone = week && [
     ...(week.warm ? [{ label: `No mínimo ${week.warm} abordagens quentes`, done: week.warmCount >= week.warm }] : []),
+    ...(week.cold ? [{ label: `${week.cold} abordagens frias${progress.coldStatus === "indisponivel" ? " (Orion indisponível: não cobrado)" : ""}`, done: progress.coldStatus === "indisponivel" || week.coldCount >= week.cold }] : []),
     ...(week.required ? [{ label: `Aulas da Fase ${week.phase}`, done: week.completed >= week.required }] : []),
     ...(week.number === 2 ? [{ label: "Retorno a todos que responderam", done: week.pendingFollowUps === 0 }] : []),
     ...(week.number === 3 ? [{ label: "Interessados com próximo passo", done: week.pendingFollowUps === 0 }] : []),
@@ -117,7 +120,7 @@ export default async function CheckinPage({ searchParams }: { searchParams: Prom
                       {item.achieved ? "✓ Marco batido" : "Marco não batido"}
                     </span>
                   </div>
-                  <p className="text-xs text-muted">Enviado {when.format(item.checkin!.submittedAt)} · {item.warmCount} quentes · {item.returns} retornos</p>
+                  <p className="text-xs text-muted">Enviado {when.format(item.checkin!.submittedAt)} · {item.warmCount} quentes · {item.coldCount} frias · {item.returns + item.coldReturns} retornos</p>
                   <p className="text-sm"><span className="text-muted">Onde travou:</span> {item.checkin!.blocker}</p>
                   {item.checkin!.portfolioUrl && <p className="text-sm"><span className="text-muted">Portfólio:</span> <a href={item.checkin!.portfolioUrl} target="_blank" rel="noopener noreferrer" className="break-all text-accent hover:underline">{item.checkin!.portfolioUrl}</a></p>}
                   {item.checkin!.soldThisWeek && <p className="text-sm font-semibold text-[#166534]">Venda fechada{item.checkin!.soldValue ? `: ${money.format(Number(item.checkin!.soldValue))}` : ""}</p>}

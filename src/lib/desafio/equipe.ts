@@ -1,4 +1,4 @@
-import { dayDistance, dayInSaoPaulo } from "./calendario";
+import { dayDistance } from "./calendario";
 import type { challengeProgress } from "./progresso";
 
 type Progress = ReturnType<typeof challengeProgress>;
@@ -16,6 +16,7 @@ export type TeamEntry = {
 export const TEAM_FILTERS = {
   atrasados: "Atrasados",
   "sem-checkin": "Sem check-in",
+  "sem-orion": "Sem conta Orion",
   proposta: "Com proposta aberta",
 } as const;
 export type TeamFilter = keyof typeof TEAM_FILTERS;
@@ -28,7 +29,7 @@ export function teamRow(entry: TeamEntry) {
   const { enrollment, user, progress } = entry;
   const lastCheckin = progress?.weeks.filter((week) => week.checkin).at(-1);
   const lessonsDone = progress?.lessons.filter((lesson) => lesson.completedAt).length ?? 0;
-  const lastRecordDay = progress?.lastRecord ? dayInSaoPaulo(progress.lastRecord) : null;
+  const lastRecordDay = progress?.lastRecordDay ?? null;
   // Sem check-in = a última semana com janela encerrada (desde a entrada) ficou sem envio.
   const lastClosed = progress?.weeks.filter((week) => week.eligible && week.expired).at(-1);
   return {
@@ -47,14 +48,18 @@ export function teamRow(entry: TeamEntry) {
     farol: progress?.farol ?? null,
     warmWeek: progress?.current.warmCount ?? 0,
     warmTotal: progress?.totalWarm ?? 0,
+    coldWeek: progress?.current.coldCount ?? 0,
+    coldTarget: progress?.current.cold ?? 0,
+    coldTotal: progress?.coldTotal ?? 0,
+    orion: progress?.coldStatus ?? null,
     lessons: progress ? `${lessonsDone}/${progress.lessons.length}` : "—",
     lastCheckinWeek: lastCheckin?.number ?? null,
     blocker: lastCheckin?.checkin?.blocker ?? "",
     portfolioUrl: progress?.weeks.find((week) => week.checkin?.portfolioUrl)?.checkin?.portfolioUrl ?? "",
     lastRecordDay,
     lastRecordAgo: lastRecordDay && progress ? relativeDays(dayDistance(lastRecordDay, progress.today)) : "sem registro",
-    proposals: progress?.proposals ?? 0,
-    sales: progress?.sales ?? 0,
+    proposals: (progress?.proposals ?? 0) + (progress?.coldProposals ?? 0),
+    sales: (progress?.sales ?? 0) + (progress?.coldSales ?? 0),
     declaredSales: progress?.declaredSales ?? 0,
     missingCheckin: Boolean(lastClosed && !lastClosed.checkin),
   };
@@ -66,6 +71,7 @@ export function filterRows(rows: TeamRow[], filter: TeamFilter | undefined) {
   if (!filter) return rows;
   if (filter === "atrasados") return rows.filter((row) => row.farol?.color === "red");
   if (filter === "sem-checkin") return rows.filter((row) => row.missingCheckin);
+  if (filter === "sem-orion") return rows.filter((row) => row.orion === "nao-encontrado");
   return rows.filter((row) => row.proposals > 0);
 }
 
@@ -80,6 +86,7 @@ export function teamTotals(rows: TeamRow[]) {
     onTrackPct: rated ? Math.round((colors.green / rated) * 100) : null,
     colors,
     warm: approved.reduce((sum, row) => sum + row.warmTotal, 0),
+    cold: approved.reduce((sum, row) => sum + row.coldTotal, 0),
     proposals: approved.reduce((sum, row) => sum + row.proposals, 0),
     sales: approved.reduce((sum, row) => sum + row.sales, 0),
     declaredSales: approved.reduce((sum, row) => sum + row.declaredSales, 0),
@@ -101,7 +108,9 @@ const CSV_COLUMNS: [string, (row: TeamRow) => string | number | null][] = [
   ["farol", (row) => row.farol?.label ?? ""],
   ["quentes_semana", (row) => row.warmWeek],
   ["quentes_total", (row) => row.warmTotal],
-  ["frias", () => "integração Orion em breve"],
+  ["frias_semana", (row) => (row.orion === "indisponivel" ? "" : row.coldWeek)],
+  ["frias_total", (row) => (row.orion === "indisponivel" ? "" : row.coldTotal)],
+  ["conta_orion", (row) => ({ ok: "vinculada", "nao-encontrado": "não encontrada", indisponivel: "indisponível" } as const)[row.orion ?? "indisponivel"]],
   ["aulas_obrigatorias", (row) => row.lessons],
   ["ultimo_checkin_semana", (row) => row.lastCheckinWeek],
   ["onde_travou", (row) => row.blocker],

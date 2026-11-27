@@ -30,7 +30,7 @@ export default async function WarmContactsPage({ searchParams }: { searchParams:
   const { member, enrollment } = await requireChallengeParticipant();
   const now = challengeNow(member.membership.role, (await searchParams).agora);
   const [contacts, progress] = await Promise.all([
-    getContacts(member.user.id), getParticipantProgress(enrollment, now.toISOString()),
+    getContacts(member.user.id), getParticipantProgress(enrollment, member.user.email, now.toISOString()),
   ]);
   const today = progress.today;
   const ended = today > END;

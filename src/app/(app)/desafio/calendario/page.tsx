@@ -27,7 +27,7 @@ const pill = {
 export default async function ChallengeCalendarPage({ searchParams }: { searchParams: Promise<{ agora?: string }> }) {
   const { member, enrollment } = await requireChallengeParticipant();
   const now = challengeNow(member.membership.role, (await searchParams).agora);
-  const { weeks, today, current, totalContacts } = await getParticipantProgress(enrollment, now.toISOString());
+  const { weeks, today, current, totalContacts } = await getParticipantProgress(enrollment, member.user.email, now.toISOString());
 
   return (
     <div className="feed-wrap space-y-6">

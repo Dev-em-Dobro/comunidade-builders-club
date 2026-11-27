@@ -1,4 +1,5 @@
 import type { ChallengeCheckin, ChallengeEnrollment, WarmContact, WarmContactEvent } from "@prisma/client";
+import type { ColdStats } from "./orion";
 import { addDays, checkinWindow, dayDistance, dayInSaoPaulo, END, START, weekOn, WEEKS } from "./calendario";
 
 type Contact = WarmContact & { events: WarmContactEvent[] };
@@ -7,7 +8,7 @@ type Completion = { lessonId: string; completedAt: Date | null };
 const COLORS = { green: "Em dia", yellow: "Atenção", red: "Atrasado", upcoming: "Aguardando início" } as const;
 
 export function challengeProgress<T extends Lesson>({
-  enrollment, contacts, checkins, lessons, completions, now,
+  enrollment, contacts, checkins, lessons, completions, now, cold,
 }: {
   enrollment: ChallengeEnrollment;
   contacts: Contact[];
@@ -15,6 +16,8 @@ export function challengeProgress<T extends Lesson>({
   lessons: T[];
   completions: Completion[];
   now: Date;
+  /** Frias do Orion (fatia B). `undefined` = indisponível: marco não cobra frias. */
+  cold?: ColdStats;
 }) {
   const today = dayInSaoPaulo(now);
   const through = today > END ? END : today;
@@ -24,6 +27,9 @@ export function challengeProgress<T extends Lesson>({
   const events = contacts.flatMap((contact) => contact.events.map((event) => ({
     ...event, day: dayInSaoPaulo(event.at),
   }))).filter((event) => event.day >= START && event.day <= through);
+  const coldDays = (cold?.dias ?? []).filter((day) => day.data >= START && day.data <= through);
+  const coldIn = (start: string, end: string, field: "abordagens" | "retornos") =>
+    coldDays.filter((day) => day.data >= start && day.data <= end).reduce((sum, day) => sum + day[field], 0);
   const completionById = new Map(completions.map((completion) => [completion.lessonId, completion.completedAt]));
   const lessonsWithProgress = lessons.map((lesson) => {
     const completedAt = completionById.get(lesson.lessonId);
@@ -52,11 +58,14 @@ export function challengeProgress<T extends Lesson>({
       );
     });
     const eligible = week.number >= joinedWeek;
+    const coldCount = coldIn(week.start, week.end, "abordagens");
+    const coldReturns = coldIn(week.start, week.end, "retornos");
     const achieved = eligible && Boolean(checkin) && warm >= week.warm && completed >= required
+      && (!cold || coldCount >= week.cold)
       && (week.number !== 1 || Boolean(checkin?.portfolioUrl))
       && (![2, 3].includes(week.number) || contactsToFollow.length === 0);
     const expired = now >= checkinWindow(week).closes;
-    return { ...week, checkin, warmCount: warm, returns, responded, pendingFollowUps: contactsToFollow.length, required, completed, achieved, expired, eligible };
+    return { ...week, checkin, warmCount: warm, coldCount, coldReturns, returns, responded, pendingFollowUps: contactsToFollow.length, required, completed, achieved, expired, eligible };
   });
 
   const current = weeks[currentWeek.number - 1]!;
@@ -66,8 +75,11 @@ export function challengeProgress<T extends Lesson>({
     ...completions.flatMap((item) => item.completedAt ? [item.completedAt] : [])
       .filter((date) => dayInSaoPaulo(date) >= START && dayInSaoPaulo(date) <= through),
   ].sort((a, b) => b.getTime() - a.getTime())[0];
+  const lastColdDay = coldDays.filter((day) => day.abordagens + day.retornos > 0).at(-1)?.data;
+  const lastRecordDay = [lastRecord ? dayInSaoPaulo(lastRecord) : null, lastColdDay ?? null]
+    .filter((day): day is string => Boolean(day)).sort().at(-1) ?? null;
   const quietDays = dayDistance(
-    [joinedOn, lastRecord ? dayInSaoPaulo(lastRecord) : START, START].sort().at(-1)!,
+    [joinedOn, lastRecordDay ?? START, START].sort().at(-1)!,
     through,
   );
   const previous = weeks[currentWeek.number - 2];
@@ -75,22 +87,33 @@ export function challengeProgress<T extends Lesson>({
     && (current.phase === 3 ? !previous.checkin : !previous.achieved);
   const holiday = current.phase === 3;
   const elapsed = Math.max(0, dayDistance(current.start, through) + 1);
-  const pace = Math.ceil(current.warm * elapsed / (dayDistance(current.start, current.end) + 1));
+  const length = dayDistance(current.start, current.end) + 1;
+  const pace = Math.ceil(current.warm * elapsed / length);
+  const coldPace = Math.ceil(current.cold * elapsed / length);
   let color: keyof typeof COLORS = "green";
   if (today < START) color = "upcoming";
   else if (previousMissed || (!holiday && quietDays >= 4) ||
     (holiday && !current.checkin && now >= checkinWindow(current).closes)) color = "red";
-  else if (current.warmCount < pace || quietDays >= 2) color = "yellow";
+  else if (current.warmCount < pace || (cold && current.coldCount < coldPace) || quietDays >= 2) color = "yellow";
 
   const reached = (contact: Contact, type: WarmContactEvent["type"]) =>
     contact.events.some((event) => event.type === type && dayInSaoPaulo(event.at) <= through);
-  const funnel = (["abordado", "respondeu", "briefing", "proposta", "fechado"] as const).map((type) => ({
-    type, total: contacts.filter((contact) => reached(contact, type)).length,
-  }));
+  const coldTotal = coldDays.reduce((sum, day) => sum + day.abordagens, 0);
+  const coldFunnel = {
+    abordado: coldTotal, respondeu: cold?.funil.respondeu ?? 0, briefing: cold?.funil.qualificado ?? 0,
+    proposta: cold?.funil.proposta ?? 0, fechado: cold?.funil.ganho ?? 0,
+  };
+  const funnel = (["abordado", "respondeu", "briefing", "proposta", "fechado"] as const).map((type) => {
+    const warm = contacts.filter((contact) => reached(contact, type)).length;
+    return { type, warm, cold: coldFunnel[type], total: warm + coldFunnel[type] };
+  });
+  const coldStatus = !cold ? "indisponivel" as const : cold.encontrado ? "ok" as const : "nao-encontrado" as const;
   const waitingReply = contacts.filter((contact) => contact.status === "respondeu" && awaitingReply(contact));
 
   return {
     funnel, waitingReply, totalContacts: contacts.length,
+    coldStatus, coldTotal, coldReturnsTotal: coldDays.reduce((sum, day) => sum + day.retornos, 0),
+    lastRecordDay, coldSales: cold?.funil.ganho ?? 0, coldProposals: cold?.funil.proposta ?? 0,
     today, current, weeks, lessons: lessonsWithProgress, lastRecord,
     farol: { color, label: COLORS[color] },
     totalWarm: events.filter((event) => event.type === "abordado").length,

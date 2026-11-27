@@ -9,7 +9,8 @@ export async function GET(request: Request) {
   const params = new URL(request.url).searchParams;
   const filter = params.get("filtro") ?? undefined;
   const now = challengeNow(staff.membership.role, params.get("agora") ?? undefined);
-  const rows = (await getTeamDashboard(now.toISOString())).map(teamRow);
+  const dashboard = await getTeamDashboard(now.toISOString());
+  const rows = dashboard.entries.map(teamRow);
   const approved = rows.filter((row) => row.status === "aprovado");
   const body = toCsv(isTeamFilter(filter) ? filterRows(approved, filter) : rows);
   return new Response(body, {
