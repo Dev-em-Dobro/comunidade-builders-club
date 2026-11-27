@@ -4,6 +4,7 @@ import { dayInSaoPaulo } from "./calendario";
 import { getCheckins, getContacts, getEnrollments, getProgressByUsers, getRequiredLessons } from "./dados";
 import { buscarEstatisticasOrion, coldForEmail } from "./orion";
 import { challengeProgress } from "./progresso";
+import type { RankingSource } from "./ranking";
 
 export const getParticipantProgress = cache(async (enrollment: ChallengeEnrollment, email: string, nowIso?: string) => {
   const now = nowIso ? new Date(nowIso) : new Date();
@@ -38,4 +39,20 @@ export const getTeamDashboard = cache(async (nowIso?: string) => {
     return { enrollment, user, progress };
   });
   return { entries, orionAvailable: orion !== null };
+});
+
+/** Fontes do ranking: todos os inscritos aprovados (mesma leitura do painel da equipe). */
+export const getRankingSources = cache(async (nowIso?: string): Promise<RankingSource[]> => {
+  const { entries } = await getTeamDashboard(nowIso);
+  return entries.flatMap(({ enrollment, user, progress }) => progress ? [{
+    userId: enrollment.userId,
+    name: user.profile?.displayName || user.name,
+    avatarUrl: user.profile?.avatarUrl ?? null,
+    score: progress.score,
+    approaches: {
+      total: progress.totalWarm + progress.coldTotal,
+      byWeek: progress.weeks.map((week) => week.warmCount + week.coldCount),
+    },
+    badges: progress.badges,
+  }] : []);
 });

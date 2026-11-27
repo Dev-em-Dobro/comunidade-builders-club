@@ -6,6 +6,9 @@ import {
 } from "@/lib/membership/capabilities";
 import { ProfileForm } from "@/components/profile-form";
 import { PlanBadge } from "@/components/plan-badge";
+import { BadgeGrid } from "@/components/desafio/badge";
+import { getEnrollment } from "@/lib/desafio/acesso";
+import { getParticipantProgress } from "@/lib/desafio/painel";
 
 export default async function PerfilPage() {
   const member = await requireActiveMemberOrRedirect();
@@ -13,6 +16,11 @@ export default async function PerfilPage() {
   const isPaid = isPaidMembership(membership);
   const isElite = isEliteMembership(membership);
   const isVitalicio = isVitalicioMembership(membership);
+  // F050 — selos do Desafio 45 dias para quem foi aprovado na turma.
+  const enrollment = isPaid ? await getEnrollment(member.user.id) : null;
+  const challenge = enrollment?.status === "aprovado"
+    ? await getParticipantProgress(enrollment, member.user.email)
+    : null;
 
   return (
     <>
@@ -41,6 +49,16 @@ export default async function PerfilPage() {
         bio={profile.bio}
         avatarUrl={profile.avatarUrl}
       />
+
+      {challenge && (
+        <section aria-labelledby="selos-desafio" className="mt-10 space-y-3">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 id="selos-desafio" className="font-[family-name:var(--font-outfit)] text-lg font-bold">Selos do Desafio 45 dias</h2>
+            <span className="text-sm text-muted">{challenge.score.total} pontos · {challenge.badges.filter((badge) => badge.earned).length} de {challenge.badges.length} selos</span>
+          </div>
+          <BadgeGrid badges={challenge.badges} size={52} />
+        </section>
+      )}
     </>
   );
 }

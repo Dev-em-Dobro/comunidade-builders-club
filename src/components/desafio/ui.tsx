@@ -29,6 +29,7 @@ const TABS = [
   ["Calendário", "/desafio/calendario"],
   ["Contatos quentes", "/desafio/contatos"],
   ["Check-in", "/desafio/checkin"],
+  ["Ranking", "/desafio/ranking"],
 ] as const;
 
 export function ChallengeNav({ current, contacts, staff }: { current: string; contacts?: number; staff?: boolean }) {

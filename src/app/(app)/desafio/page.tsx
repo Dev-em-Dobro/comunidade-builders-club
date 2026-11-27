@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { enroll } from "@/actions/desafio";
+import { Badge } from "@/components/desafio/badge";
 import { EnrollmentForm } from "@/components/desafio/forms";
 import {
   ChallengeHeading, ChallengeNav, Check, Farol, Field, GoalBar, PhaseStrip, StatCard, YesNo,
@@ -9,7 +10,8 @@ import { challengeNow, getEnrollment, requireChallengeMember } from "@/lib/desaf
 import {
   END, LAST_ENROLLMENT_DAY, WEEKS, challengeMoment, checkinWindow, dayDistance, dayInSaoPaulo, longDay,
 } from "@/lib/desafio/calendario";
-import { getParticipantProgress } from "@/lib/desafio/painel";
+import { getParticipantProgress, getRankingSources } from "@/lib/desafio/painel";
+import { buildRanking, positionOf } from "@/lib/desafio/ranking";
 import { COMMITMENTS, HOURS, WORK_STAGES } from "@/lib/desafio/regras";
 import { urlOrionApp } from "@/lib/membership/checkout";
 import { isStaff } from "@/lib/membership/require-member";
@@ -40,7 +42,10 @@ export default async function ChallengePage({ searchParams }: {
     return <Presentation status={enrollment?.status} reason={enrollment?.removedReason} open={dayInSaoPaulo(now) <= LAST_ENROLLMENT_DAY} staff={staff} />;
   }
 
-  const progress = await getParticipantProgress(enrollment, member.user.email, now.toISOString());
+  const [progress, rankingSources] = await Promise.all([
+    getParticipantProgress(enrollment, member.user.email, now.toISOString()),
+    getRankingSources(now.toISOString()),
+  ]);
   const { current, today, waitingReply } = progress;
   const moment = challengeMoment(today);
   const orionUrl = urlOrionApp();
@@ -50,6 +55,9 @@ export default async function ChallengePage({ searchParams }: {
   const daysLeftInWeek = Math.max(1, dayDistance(today < current.start ? current.start : today, current.end) + 1);
   const warmMissing = Math.max(0, current.warm - current.warmCount);
   const phaseEnd = WEEKS.findLast((week) => week.phase === current.phase)!.end;
+  const weekPoints = progress.score.weekTotals[current.number - 1] ?? 0;
+  const weekPosition = positionOf(buildRanking(rankingSources, current.number), member.user.id);
+  const shownBadges = progress.badges.filter((badge) => badge.kind !== "semana" || badge.earned || badge.week === current.number);
   const coldMessage = coldNotice(progress.coldStatus);
   const coldKnown = progress.coldStatus !== "indisponivel";
   const coldMissing = Math.max(0, current.cold - current.coldCount);
@@ -82,7 +90,13 @@ export default async function ChallengePage({ searchParams }: {
         eyebrow={`Desafio 45 dias · Fase ${current.phase} · ${current.phaseName}`}
         title={title}
         details={details}
-        aside={<Farol {...progress.farol} />}
+        aside={<>
+          <Farol {...progress.farol} />
+          <Link href="/desafio/ranking" className="inline-flex items-baseline gap-1.5 rounded-full bg-accent/10 px-3 py-1.5 text-sm font-semibold text-accent-hover hover:bg-accent/15">
+            <span className={`${displayTitle} text-lg`}>{progress.score.total}</span> pontos
+            {weekPosition && moment.stage !== "antes" ? ` · ${weekPosition}º da semana (${weekPoints})` : ""}
+          </Link>
+        </>}
       />
       <ChallengeNav current="/desafio" contacts={progress.totalContacts} staff={staff} />
       <PhaseStrip currentPhase={moment.stage === "durante" ? current.phase : null} today={today} />
@@ -186,6 +200,21 @@ export default async function ChallengePage({ searchParams }: {
               {current.phase <= 2 && <p className="text-xs text-muted">Prazo da Fase {current.phase}: {longDay(phaseEnd)}</p>}
             </>
           )}
+      </section>
+
+      <section aria-labelledby="selos" className="space-y-3">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 id="selos" className={`${displayTitle} text-lg`}>Selos</h2>
+          <Link href="/desafio/ranking" className={`${link} text-sm`}>Ranking e todos os selos →</Link>
+        </div>
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 lg:grid-cols-8">
+          {shownBadges.map((badge) => <Badge key={badge.id} badge={badge} size={52} />)}
+        </div>
+        <p className="text-[13px] text-muted">
+          {progress.streak.longest >= 7
+            ? `Sequência atual: ${progress.streak.current} ${progress.streak.current === 1 ? "dia" : "dias"} seguidos prospectando.`
+            : `Sequência atual: ${progress.streak.current} ${progress.streak.current === 1 ? "dia" : "dias"} seguidos prospectando. Mais ${7 - progress.streak.current} e você ganha o selo Sequência 7.`}
+        </p>
       </section>
 
       {today > END && <Link href="/desafio/checkin" className={link}>Ver histórico de check-ins</Link>}
