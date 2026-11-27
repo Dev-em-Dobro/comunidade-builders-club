@@ -183,7 +183,14 @@ export default async function AdminPage({ searchParams }: Props) {
         >
           Progresso
         </Link>
-        .
+        ; a turma do{" "}
+        <Link
+          href="/admin/desafio"
+          className="font-medium text-accent hover:underline"
+        >
+          Desafio 45 dias
+        </Link>
+        {" "}tem painel próprio.
       </p>
 
       <Suspense fallback={<div className="mt-6 h-11 animate-pulse rounded-xl bg-surface" />}>

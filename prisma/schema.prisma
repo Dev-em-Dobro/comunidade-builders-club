@@ -12,6 +12,9 @@ datasource db {
 // ---------------------------------------------------------------------------
 
 model User {
+  challengeEnrollment    ChallengeEnrollment?
+  challengeCheckins      ChallengeCheckin[]
+  warmContacts           WarmContact[]
   id            String   @id
   name          String
   email         String
@@ -512,6 +515,7 @@ model ModulePurchase {
 }
 
 model Lesson {
+  challengeRequirement ChallengeRequiredLesson?
   id                   String           @id @default(cuid())
   moduleId             String
   module               Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
@@ -530,6 +534,114 @@ model Lesson {
   @@unique([moduleId, slug])
   @@index([moduleId, sortOrder])
   @@map("lesson")
+}
+
+enum ChallengeEnrollmentStatus {
+  pendente
+  aprovado
+  recusado
+  removido
+}
+
+enum WarmContactKind {
+  pessoa
+  negocio
+}
+
+enum WarmContactStatus {
+  listado
+  abordado
+  respondeu
+  briefing
+  proposta
+  fechado
+  perdido
+}
+
+enum WarmContactEventType {
+  listado
+  abordado
+  respondeu
+  briefing
+  proposta
+  fechado
+  perdido
+  retorno
+  agendamento
+}
+
+model ChallengeEnrollment {
+  userId           String                    @id
+  user             User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status           ChallengeEnrollmentStatus @default(pendente)
+  whatsapp         String
+  workStage        String
+  offer            String
+  weeklyHours      String
+  hasPortfolio     Boolean
+  hasWarmContacts  Boolean
+  motivation       String
+  commitments     String[]
+  appliedAt       DateTime                  @default(now())
+  approvedAt      DateTime?
+  joinedWeek      Int?
+  removedReason   String?
+
+  @@index([status])
+  @@map("challenge_enrollment")
+}
+
+model WarmContact {
+  id           String             @id @default(cuid())
+  userId       String
+  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String
+  kind         WarmContactKind
+  note         String?
+  status       WarmContactStatus  @default(listado)
+  approachedAt DateTime?
+  followUps    Int                @default(0)
+  closedValue  Decimal?           @db.Decimal(12, 2)
+  nextFollowUpOn String?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  events       WarmContactEvent[]
+
+  @@index([userId])
+  @@map("warm_contact")
+}
+
+model WarmContactEvent {
+  id        String               @id @default(cuid())
+  contactId String
+  contact   WarmContact          @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  type      WarmContactEventType
+  at        DateTime             @default(now())
+
+  @@index([contactId, at])
+  @@map("warm_contact_event")
+}
+
+model ChallengeCheckin {
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  week          Int
+  blocker       String
+  portfolioUrl  String?
+  soldThisWeek  Boolean
+  soldValue     Decimal? @db.Decimal(12, 2)
+  submittedAt   DateTime @default(now())
+
+  @@id([userId, week])
+  @@map("challenge_checkin")
+}
+
+model ChallengeRequiredLesson {
+  lessonId String @id
+  lesson   Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  phase    Int
+
+  @@map("challenge_required_lesson")
 }
 
 model LessonProgress {

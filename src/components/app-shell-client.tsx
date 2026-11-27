@@ -150,6 +150,48 @@ function AulasLink({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
+function DesafioLink({ locked, subtitle, onNavigate }: { locked: boolean; subtitle: string; onNavigate?: () => void }) {
+  const pathname = usePathname();
+  const { openUpgrade } = useUpgrade();
+  const active = !locked && pathname.startsWith("/desafio");
+  const box = `my-1.5 flex w-full items-center gap-2.5 rounded-xl py-2.5 pl-2 pr-2.5 text-left transition-colors ${
+    active
+      ? "bg-accent text-accent-foreground shadow-sm"
+      : "border border-accent/30 bg-accent/10 text-foreground hover:bg-accent/15"
+  }`;
+  const content = (
+    <>
+      <span aria-hidden="true" className={`inline-flex size-8 shrink-0 items-center justify-center rounded-[10px] ${
+        active ? "bg-white/20" : "bg-accent text-accent-foreground"
+      }`}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="5" /><circle cx="12" cy="12" r="1" />
+        </svg>
+      </span>
+      <span className="flex min-w-0 flex-1 flex-col">
+        <span className="truncate text-[15px] font-semibold">Desafio 45 dias</span>
+        <span className={`truncate text-xs ${active ? "text-white/85" : "text-muted"}`}>{locked ? "PRO e Elite" : subtitle}</span>
+      </span>
+      {locked && <LockIcon />}
+    </>
+  );
+  if (locked) {
+    return (
+      <button type="button" className={box} onClick={() => {
+        openUpgrade("desafio");
+        onNavigate?.();
+      }}>
+        {content}
+      </button>
+    );
+  }
+  return (
+    <Link href="/desafio" onClick={onNavigate} aria-current={active ? "page" : undefined} className={box}>
+      {content}
+    </Link>
+  );
+}
+
 /**
  * F062 — um item só para os materiais. As categorias continuam existindo em
  * `/entregaveis/{slug}`, mas agora se chega nelas pela própria página.
@@ -474,6 +516,7 @@ function ShellInner({
   avatarUrl,
   notifPreview,
   simulatingEmail = null,
+  desafioSubtitle = "",
 }: {
   children: React.ReactNode;
   displayName: string;
@@ -488,6 +531,8 @@ function ShellInner({
   avatarUrl?: string | null;
   notifPreview: NotifPreview[];
   simulatingEmail?: string | null;
+  /** F050 — "Dia X de 45 · Fase N", calculado no servidor (fuso de SP). */
+  desafioSubtitle?: string;
 }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const pathname = usePathname();
@@ -521,6 +566,7 @@ function ShellInner({
           <div className="my-3 border-t border-border" />
           <FeedLink />
           <AulasLink />
+          <DesafioLink locked={!isPaid} subtitle={desafioSubtitle} />
           <div className="my-3 border-t border-border" />
           <SpaceNav spaces={spaces} isPaid={isPaid} />
           <div className="my-3 border-t border-border" />
@@ -570,6 +616,7 @@ function ShellInner({
               <div className="my-3 border-t border-border" />
               <FeedLink onNavigate={() => setDrawerOpen(false)} />
               <AulasLink onNavigate={() => setDrawerOpen(false)} />
+              <DesafioLink locked={!isPaid} subtitle={desafioSubtitle} onNavigate={() => setDrawerOpen(false)} />
               <div className="my-3 border-t border-border" />
               <SpaceNav
                 spaces={spaces}
@@ -674,6 +721,7 @@ export function AppShellClient({
   notifPreview,
   hydrateNav = false,
   simulatingEmail = null,
+  desafioSubtitle = "",
 }: {
   children: React.ReactNode;
   displayName: string;
@@ -691,6 +739,8 @@ export function AppShellClient({
   hydrateNav?: boolean;
   /** F123 */
   simulatingEmail?: string | null;
+  /** F050 — "Dia X de 45 · Fase N", calculado no servidor (fuso de SP). */
+  desafioSubtitle?: string;
 }) {
   const pathname = usePathname();
   const search = useSearchParams();
@@ -748,6 +798,7 @@ export function AppShellClient({
         avatarUrl={avatarUrl}
         notifPreview={notifPreview}
         simulatingEmail={simulatingEmail}
+        desafioSubtitle={desafioSubtitle}
       >
         {children}
       </ShellInner>

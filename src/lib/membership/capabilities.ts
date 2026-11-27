@@ -116,6 +116,7 @@ export type UpgradeReason =
   | "comentar"
   | "reagir"
   | "orion"
+  | "desafio"
   /** F069 — origem: faixa da tela de Boas-vindas. Nunca abre modal. */
   | "boas-vindas"
   /** F091 — origem: CTA na descrição da aula gratuita. Nunca abre modal. */
@@ -134,6 +135,7 @@ const UPGRADE_REASONS: readonly UpgradeReason[] = [
   "comentar",
   "reagir",
   "orion",
+  "desafio",
   "boas-vindas",
   "aula-descricao",
   "whatsapp-elite",
@@ -194,6 +196,10 @@ export const UPGRADE_REASON_COPY: Record<
   orion: {
     title: "Orion entra no PRO",
     body: "O motor de prospecção para achar e priorizar cliente local. O PRO libera no teto Free; o Elite roda com limites de Pro por 90 dias.",
+  },
+  desafio: {
+    title: "Desafio 45 dias",
+    body: "Participe da turma e acompanhe sua prospecção até o primeiro cliente. Disponível no PRO e no Elite.",
   },
   /**
    * F069 — continuidade da faixa de Boas-vindas: quem clicou lá cai numa

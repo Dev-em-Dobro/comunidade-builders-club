@@ -1,5 +1,6 @@
 import { urlOrionApp } from "@/lib/membership/checkout";
 import { AppShellClient } from "@/components/app-shell-client";
+import { dayInSaoPaulo, navSubtitle } from "@/lib/desafio/calendario";
 
 const EMPTY_SPACES: { id: string; slug: string; name: string }[] = [];
 
@@ -46,6 +47,7 @@ export function AppShell({
       notifPreview={[]}
       hydrateNav
       simulatingEmail={simulatingEmail}
+      desafioSubtitle={navSubtitle(dayInSaoPaulo(new Date()))}
     >
       {children}
     </AppShellClient>
