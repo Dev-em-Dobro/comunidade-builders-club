@@ -640,9 +640,31 @@ O guia completo é o \`WHATSAPP_QR.md\`, na pasta de guias do ZIP. Para colocar 
 - [Baixar template 1.0.5 e guias (ZIP)](/materiais/crm-para-alunos-template-1.0.5.zip)
 - [Documentação do WAHA](https://waha.devlike.pro)`,
 
-  "crm-com-ia/deploy-no-railway": `Em breve — esta aula ainda não foi gravada.`,
+  "crm-com-ia/deploy-no-railway": `Nesta aula, colocamos o CRM no ar usando Railway e Claude Code. Você acompanha a criação do projeto, o envio do código ao GitHub, a configuração do banco de dados e do Redis, e a conexão do repositório ao serviço.
 
-  "crm-com-ia/configurar-dominio-https-e-migrar-callbacks-da-meta": `Em breve — esta aula ainda não foi gravada.`,
+Também mostramos como investigar erros de build e de banco, até validar o acesso ao CRM publicado e trocar a senha inicial. Na próxima aula, vamos configurar os dados, as chaves e os agentes no ambiente de produção.
+
+## Links úteis
+- [Railway](https://railway.com/)
+- [Claude Code](https://code.claude.com/docs/en/overview)
+- [GitHub](https://github.com/)
+- [Railway CLI](https://docs.railway.com/cli)
+- [Docker Desktop](https://docs.docker.com/desktop/)`,
+
+  "crm-com-ia/configurar-dominio-https-e-migrar-callbacks-da-meta": `Nesta aula, continuo a configuração do CRM publicado no Railway e testo a integração com o WhatsApp pela Meta. Mostro como levar as configurações do ambiente local para a produção, atualizar a chave da API, conferir o webhook e validar o envio e o recebimento de uma mensagem real.
+
+Também explico os próximos passos para usar um número próprio: configurar a cobrança, verificar a empresa, criar um usuário do sistema, gerar um token duradouro e conferir suas permissões. Ao seguir a aula, use o Business, o aplicativo, o número e as credenciais da sua própria empresa.
+
+## Links da aula
+- [Railway](https://railway.com/)
+- [Chaves da API Claude](https://platform.claude.com/settings/keys)
+- [Aplicativos no Meta for Developers](https://developers.facebook.com/apps/)
+- [Graph API Explorer](https://developers.facebook.com/tools/explorer/)
+- [Depurador de tokens da Meta](https://developers.facebook.com/tools/debug/accesstoken/)
+- [WhatsApp Manager](https://business.facebook.com/wa/manage/home/)
+- [Números no WhatsApp Manager](https://business.facebook.com/wa/manage/phone-numbers/)
+- [Usuários do sistema no Meta Business](https://business.facebook.com/settings/system-users)
+- [Configurações de pagamento da Meta](https://business.facebook.com/billing_hub/payment_settings)`,
 
   "crm-com-ia/testes-de-aceitacao-operacao-custos-e-backup": `Em breve — esta aula ainda não foi gravada.`,
 

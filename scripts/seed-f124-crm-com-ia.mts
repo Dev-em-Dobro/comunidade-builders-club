@@ -1,5 +1,8 @@
 /**
- * F124 — módulo CRM com IA (5 aulas gravadas + 1 em texto (QR) + 3 em breve).
+ * F124 — módulo CRM com IA (7 aulas gravadas + 1 em texto (QR) + 1 em breve).
+ *
+ * Sobrescreve vídeo, título e descrição de todas as aulas do módulo. Aula
+ * gravada ou editada em produção precisa entrar aqui antes de rodar de novo.
  *
  *   npx tsx scripts/seed-f124-crm-com-ia.mts --target=hml
  *   npx tsx scripts/seed-f124-crm-com-ia.mts --target=prod --confirm
@@ -124,16 +127,43 @@ Prefere não passar pela Meta? Na próxima aula você conecta o WhatsApp só len
     description: whatsappQr,
   },
   {
+    // Gravada e cadastrada em produção em 2026-11-06 — copiada de lá.
     slug: "deploy-no-railway",
     title: "Deploy no Railway",
     sortOrder: 6,
-    description: emBreve,
+    videoId: "422f16ef-c630-4345-8ec6-888ddd708c6b",
+    description: `Nesta aula, colocamos o CRM no ar usando Railway e Claude Code. Você acompanha a criação do projeto, o envio do código ao GitHub, a configuração do banco de dados e do Redis, e a conexão do repositório ao serviço.
+
+Também mostramos como investigar erros de build e de banco, até validar o acesso ao CRM publicado e trocar a senha inicial. Na próxima aula, vamos configurar os dados, as chaves e os agentes no ambiente de produção.
+
+## Links úteis
+- [Railway](https://railway.com/)
+- [Claude Code](https://code.claude.com/docs/en/overview)
+- [GitHub](https://github.com/)
+- [Railway CLI](https://docs.railway.com/cli)
+- [Docker Desktop](https://docs.docker.com/desktop/)`,
   },
   {
+    // Gravada e cadastrada em produção em 2026-11-06 — copiada de lá.
+    // O slug ficou o antigo; só o título mudou.
     slug: "configurar-dominio-https-e-migrar-callbacks-da-meta",
-    title: "Configurar domínio HTTPS e migrar os callbacks da Meta",
+    title: "Configurações em produção e WhatsApp",
     sortOrder: 7,
-    description: emBreve,
+    videoId: "8d4d0746-17fa-4454-879a-9fff355828d1",
+    description: `Nesta aula, continuo a configuração do CRM publicado no Railway e testo a integração com o WhatsApp pela Meta. Mostro como levar as configurações do ambiente local para a produção, atualizar a chave da API, conferir o webhook e validar o envio e o recebimento de uma mensagem real.
+
+Também explico os próximos passos para usar um número próprio: configurar a cobrança, verificar a empresa, criar um usuário do sistema, gerar um token duradouro e conferir suas permissões. Ao seguir a aula, use o Business, o aplicativo, o número e as credenciais da sua própria empresa.
+
+## Links da aula
+- [Railway](https://railway.com/)
+- [Chaves da API Claude](https://platform.claude.com/settings/keys)
+- [Aplicativos no Meta for Developers](https://developers.facebook.com/apps/)
+- [Graph API Explorer](https://developers.facebook.com/tools/explorer/)
+- [Depurador de tokens da Meta](https://developers.facebook.com/tools/debug/accesstoken/)
+- [WhatsApp Manager](https://business.facebook.com/wa/manage/home/)
+- [Números no WhatsApp Manager](https://business.facebook.com/wa/manage/phone-numbers/)
+- [Usuários do sistema no Meta Business](https://business.facebook.com/settings/system-users)
+- [Configurações de pagamento da Meta](https://business.facebook.com/billing_hub/payment_settings)`,
   },
   {
     slug: "testes-de-aceitacao-operacao-custos-e-backup",
