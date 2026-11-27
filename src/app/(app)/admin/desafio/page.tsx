@@ -5,11 +5,13 @@ import { Farol, Field, StatCard, brandEyebrow, displayTitle, field, panel } from
 import { canDecideEnrollments, challengeNow, requireChallengeStaff } from "@/lib/desafio/acesso";
 import { challengeMoment, dayInSaoPaulo } from "@/lib/desafio/calendario";
 import { TEAM_FILTERS, filterRows, isTeamFilter, teamRow, teamTotals, type TeamRow } from "@/lib/desafio/equipe";
-import { getTeamDashboard } from "@/lib/desafio/painel";
+import { getRankingSources, getTeamDashboard } from "@/lib/desafio/painel";
+import { prizeWinners } from "@/lib/desafio/premios";
+import { buildRanking } from "@/lib/desafio/ranking";
 
 export const dynamic = "force-dynamic";
 
-const TABS = { inscritos: "Inscritos", pendentes: "Cadastros pendentes", outros: "Recusados e removidos" } as const;
+const TABS = { inscritos: "Inscritos", pendentes: "Cadastros pendentes", premios: "Prêmios a entregar", outros: "Recusados e removidos" } as const;
 type Tab = keyof typeof TABS;
 const applied = new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", day: "numeric", month: "numeric", hour: "2-digit", minute: "2-digit" });
 
@@ -26,10 +28,19 @@ export default async function TeamChallengePage({ searchParams }: {
   const dashboard = await getTeamDashboard(now.toISOString());
   const rows = dashboard.entries.map(teamRow);
   const totals = teamTotals(rows);
+  const ranking = buildRanking(await getRankingSources(now.toISOString()));
+  const prizes = prizeWinners(
+    dashboard.entries.flatMap(({ enrollment, user, progress }) => progress ? [{
+      userId: enrollment.userId, name: user.profile?.displayName || user.name, email: user.email,
+      weeksAchieved: progress.weeks.map((week) => week.achieved), badges: progress.badges,
+    }] : []),
+    ranking, dayInSaoPaulo(now),
+  );
   const approved = rows.filter((row) => row.status === "aprovado");
   const byTab: Record<Tab, TeamRow[]> = {
     inscritos: approved,
     pendentes: rows.filter((row) => row.status === "pendente"),
+    premios: [],
     outros: rows.filter((row) => row.status === "recusado" || row.status === "removido"),
   };
   const visible = tab === "inscritos" ? filterRows(approved, filter) : byTab[tab];
@@ -61,7 +72,7 @@ export default async function TeamChallengePage({ searchParams }: {
         {(Object.keys(TABS) as Tab[]).map((key) => (
           <Link key={key} href={query({ aba: key, filtro: undefined })} aria-current={tab === key ? "page" : undefined}
             className={`shrink-0 rounded-lg px-3.5 py-2 text-sm font-medium ${tab === key ? "bg-accent text-white shadow-sm" : "text-muted hover:bg-surface hover:text-foreground"}`}>
-            {TABS[key]} ({byTab[key].length})
+            {TABS[key]} ({key === "premios" ? prizes.reduce((sum, prize) => sum + prize.winners.length, 0) : byTab[key].length})
           </Link>
         ))}
       </nav>
@@ -88,7 +99,26 @@ export default async function TeamChallengePage({ searchParams }: {
         </div>
       )}
 
-      {visible.length === 0
+      {tab === "premios" ? (
+        <ul className="space-y-3">
+          {prizes.map((prize) => (
+            <li key={prize.id} className={`${panel} space-y-2`}>
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <p className={`${displayTitle} text-base`}>{prize.title}</p>
+                <span className="text-sm text-muted">{prize.prize}</span>
+              </div>
+              {prize.pending
+                ? <p className="text-sm text-muted">Definido após o encerramento (14/1).</p>
+                : prize.winners.length === 0
+                  ? <p className="text-sm text-muted">Ninguém ainda.</p>
+                  : <ul className="flex flex-wrap gap-2 text-sm">{prize.winners.map((winner) => (
+                    <li key={winner.userId} className="rounded-full border border-border px-3 py-1" title={winner.email}>{winner.name}</li>
+                  ))}</ul>}
+            </li>
+          ))}
+          <li className="text-xs text-muted">A entrega dos prêmios é manual; esta lista só mostra quem conquistou.</li>
+        </ul>
+      ) : visible.length === 0
         ? <p className={`${panel} text-sm text-muted`}>Nada por aqui.</p>
         : tab === "inscritos"
           ? <EnrolledTable rows={visible} canDecide={canDecide} />

@@ -178,6 +178,22 @@ Check-in pode ser enviado de segunda até terça 12h (antes do encontro).
 Aula vale 1 ponto, para que assistir vídeo nunca valha mais que prospectar
 (o bônus de "todas as aulas da fase" saiu junto).
 
+Regras de cálculo (fatia C):
+- Briefing, proposta e fechado pontuam **uma vez por contato**, no primeiro dia
+  em que o contato chega ao estágio (voltar e avançar de novo não repete).
+  Chegar em proposta implica ter passado por briefing (o status avança um passo
+  por vez); no frio, o funil do Orion já é cumulativo (`ganho` conta em
+  qualificado e proposta).
+- Pontos datados entram na semana do dia (fuso SP). Check-in (5) e marco (+30)
+  entram na semana a que se referem, mesmo enviados na terça seguinte.
+- Briefing/proposta/ganho do **frio** não têm data (o Orion só guarda o status
+  atual): entram só no **ranking geral**.
+- Aula obrigatória: 1 ponto na semana da conclusão (concluída antes de 1/12
+  conta na S1). Abordagem fria fora da janela do desafio não pontua.
+- Limite de 40 quentes pontuadas por semana: as 41ª em diante da mesma semana
+  contam para a meta, mas valem 0 ponto.
+- Sem tabela de saldo: tudo calculado no request a partir dos eventos.
+
 ### Selos
 - **Semana N** — marco da semana batido (um selo por semana).
 - **Sequência 7** — 7 dias seguidos com pelo menos uma abordagem ou retorno.
@@ -190,6 +206,14 @@ Selos aparecem no painel do desafio e no perfil do membro.
 - **Ranking da semana** por pontos ganhos na semana; zera toda terça (quem
   entrou atrasado ainda disputa).
 - **Ranking geral** dos 45 dias.
+- Só inscritos aprovados aparecem. Empate: quem tem mais abordagens no período,
+  depois ordem alfabética. Cada linha mostra a origem dos pontos (frias,
+  quentes, retornos, funil, aulas, check-ins e marcos).
+- Selos aparecem no ranking, no Hoje e na página `/perfil` do próprio membro
+  (o Builders não tem perfil público de outros membros).
+- Painel da equipe ganha a aba **Prêmios a entregar**: lista quem conquistou
+  cada prêmio (marco S1, marcos S1–S3, primeiro cliente, constância total e,
+  após 14/1, top 3 do geral). A entrega continua manual (fora de escopo).
 
 ### Prêmios (proposta — equipe escolhe)
 | Conquista | Prêmio |

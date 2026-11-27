@@ -1,5 +1,6 @@
 import type { ChallengeCheckin, ChallengeEnrollment, WarmContact, WarmContactEvent } from "@prisma/client";
 import type { ColdStats } from "./orion";
+import { activeDays, challengeBadges, scoreChallenge, streaks } from "./pontos";
 import { addDays, checkinWindow, dayDistance, dayInSaoPaulo, END, START, weekOn, WEEKS } from "./calendario";
 
 type Contact = WarmContact & { events: WarmContactEvent[] };
@@ -110,7 +111,18 @@ export function challengeProgress<T extends Lesson>({
   const coldStatus = !cold ? "indisponivel" as const : cold.encontrado ? "ok" as const : "nao-encontrado" as const;
   const waitingReply = contacts.filter((contact) => contact.status === "respondeu" && awaitingReply(contact));
 
+  const score = scoreChallenge({
+    contacts, coldDays, coldFunnel: cold?.encontrado ? cold.funil : null,
+    lessons: lessonsWithProgress, checkins, weeks, through,
+  });
+  const streak = streaks(activeDays(contacts, coldDays, through), through);
+  const badges = challengeBadges({
+    weeks, longestStreak: streak.longest,
+    firstClient: events.some((event) => event.type === "fechado") || (cold?.funil.ganho ?? 0) > 0,
+  });
+
   return {
+    score, streak, badges,
     funnel, waitingReply, totalContacts: contacts.length,
     coldStatus, coldTotal, coldReturnsTotal: coldDays.reduce((sum, day) => sum + day.retornos, 0),
     lastRecordDay, coldSales: cold?.funil.ganho ?? 0, coldProposals: cold?.funil.proposta ?? 0,

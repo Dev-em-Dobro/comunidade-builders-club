@@ -29,7 +29,7 @@ export const getEnrollments = cache(() => db.challengeEnrollment.findMany({
   orderBy: { appliedAt: "desc" },
   include: { user: { select: {
     name: true, email: true,
-    profile: { select: { displayName: true } },
+    profile: { select: { displayName: true, avatarUrl: true } },
     membership: { select: { status: true, tier: true, role: true } },
     warmContacts: { orderBy: { createdAt: "desc" }, include: { events: { orderBy: [{ at: "asc" }, { id: "asc" }] } } },
     challengeCheckins: { orderBy: { week: "desc" } },
