@@ -335,7 +335,7 @@ export async function setLessonCompleted(
   userId: string,
   lessonId: string,
   completed: boolean,
-  opts: { isPaid: boolean; purchased?: ReadonlySet<string> },
+  opts: { isPaid: boolean; purchased?: ReadonlySet<string>; restrito?: boolean },
 ) {
   const lesson = await prisma.lesson.findFirst({
     where: { id: lessonId, published: true, module: { published: true } },
@@ -348,7 +348,7 @@ export async function setLessonCompleted(
     if (!ancestor.published) throw new Error("Aula não encontrada.");
     ancestor = ancestor.parent ?? null;
   }
-  if (!canWatchLesson(opts.isPaid, lesson.module, opts.purchased)) {
+  if (!canWatchLesson(opts.isPaid, lesson.module, opts.purchased, opts.restrito)) {
     throw new ForbiddenError(UPGRADE_REQUIRED);
   }
   const completedAt = completed ? new Date() : null;

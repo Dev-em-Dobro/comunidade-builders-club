@@ -67,7 +67,7 @@ function Linha({ rotulo, valor }: { rotulo: string; valor: string }) {
 }
 
 export default async function ConfiguracoesPage() {
-  const member = await requireActiveMemberOrRedirect();
+  const member = await requireActiveMemberOrRedirect({ restritoOk: true });
   const { user, profile, membership } = member;
   const isPaid = isPaidMembership(membership);
   const isElite = isEliteMembership(membership);

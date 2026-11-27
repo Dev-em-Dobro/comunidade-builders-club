@@ -1,6 +1,6 @@
 "use server";
 
-import { requireActiveMember } from "@/lib/membership/require-member";
+import { requireMemberSemRestricao } from "@/lib/membership/require-member";
 import {
   canFreeReadPost,
   isPaidMembership,
@@ -66,7 +66,7 @@ export type PostDetailDto = {
 export async function getPostDetailAction(
   postId: string,
 ): Promise<PostDetailDto | null> {
-  const member = await requireActiveMember();
+  const member = await requireMemberSemRestricao();
   const post = await getPost(postId, { viewerId: member.user.id });
   if (!post) return null;
 

@@ -14,6 +14,7 @@ export function AppShell({
   isPaid,
   isElite,
   isVitalicio = false,
+  isRestrito = false,
   displayName,
   email,
   avatarUrl,
@@ -25,6 +26,8 @@ export function AppShell({
   isPaid: boolean;
   isElite: boolean;
   isVitalicio?: boolean;
+  /** F128 — conta restrita ao módulo comprado. */
+  isRestrito?: boolean;
   displayName: string;
   /** F062 — exibido no topo do popup da pill do usuário. */
   email: string;
@@ -40,6 +43,7 @@ export function AppShell({
       isPaid={isPaid}
       isElite={isElite}
       isVitalicio={isVitalicio}
+      isRestrito={isRestrito}
       orionUrl={urlOrionApp()}
       unread={0}
       spaces={EMPTY_SPACES}

@@ -4,6 +4,7 @@ import {
   STATUS_PEDIDO_GRANT,
   STATUS_PEDIDO_REVOKE,
   TMB_ELITE_CODES_DEFAULT,
+  TMB_CODE_BLACK_INFINITA,
   TMB_MENTORIA_CODES_DEFAULT,
   type AcaoTmb,
   type PlanoTmb,
@@ -44,7 +45,7 @@ export function codesPermitidos(): Set<string> {
   const list = raw
     ? raw.split(",").map((c) => c.trim()).filter(Boolean)
     : [...TMB_MENTORIA_CODES_DEFAULT];
-  return new Set(list.map((c) => c.toUpperCase()));
+  return new Set([...list, TMB_CODE_BLACK_INFINITA].map((c) => c.toUpperCase()));
 }
 
 export function codesElite(): Set<string> {
@@ -52,7 +53,7 @@ export function codesElite(): Set<string> {
   const list = raw
     ? raw.split(",").map((c) => c.trim()).filter(Boolean)
     : [...TMB_ELITE_CODES_DEFAULT];
-  return new Set(list.map((c) => c.toUpperCase()));
+  return new Set([...list, TMB_CODE_BLACK_INFINITA].map((c) => c.toUpperCase()));
 }
 
 export function planoDoCodeTmb(code: string): PlanoTmb {
@@ -92,7 +93,7 @@ export function interpretarVendaTmb(payload: unknown): AcaoTmb {
   }
 
   const lancamentoFiltro = lancamentoIdFiltro();
-  if (lancamentoFiltro != null && lancamentoFiltro !== "") {
+  if (lancamentoFiltro && productId.toUpperCase() !== TMB_CODE_BLACK_INFINITA) {
     const lid = String(venda.lancamento_id ?? "").trim();
     if (lid && lid !== lancamentoFiltro) {
       return { acao: "ignorar", motivo: "lancamento_id não filtrado" };
@@ -126,6 +127,7 @@ export function interpretarVendaTmb(payload: unknown): AcaoTmb {
       email,
       productId,
       plan: planoDoCodeTmb(productId),
+      ...(productId.toUpperCase() === TMB_CODE_BLACK_INFINITA ? { vitalicio: true } : {}),
       pedido,
       nome,
       lancamentoId,

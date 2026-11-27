@@ -6,7 +6,9 @@ import { requireActiveMemberOrRedirect } from "@/lib/membership/require-member";
 import {
   hrefPlanos,
   isPaidMembership,
+  isRestritoMembership,
 } from "@/lib/membership/capabilities";
+import { entradaContaRestrita } from "@/lib/membership/restrito";
 import {
   AULAS_FREE_HREF,
   canWatchLesson,
@@ -48,8 +50,9 @@ type Props = {
 
 export default async function LessonPage({ params }: Props) {
   const { moduleSlug, lessonSlug } = await params;
-  const member = await requireActiveMemberOrRedirect();
+  const member = await requireActiveMemberOrRedirect({ restritoOk: true });
   const isPaid = isPaidMembership(member.membership);
+  const restrito = isRestritoMembership(member.membership);
 
   const [lesson, purchased] = await Promise.all([
     getLessonForMember(moduleSlug, lessonSlug),
@@ -57,8 +60,15 @@ export default async function LessonPage({ params }: Props) {
   ]);
   if (!lesson) notFound();
 
-  const canWatch = canWatchLesson(isPaid, lesson.module, purchased);
-  if (!canWatch) redirect(AULAS_FREE_HREF);
+  const canWatch = canWatchLesson(isPaid, lesson.module, purchased, restrito);
+  if (!canWatch) {
+    // F128 — conta restrita volta para o módulo dela, não para a aula gratuita.
+    redirect(
+      restrito
+        ? await entradaContaRestrita(member.user.email)
+        : AULAS_FREE_HREF,
+    );
+  }
   const videoId = lessonVideoId({
     isPaid,
     moduleSlug,
@@ -92,7 +102,9 @@ export default async function LessonPage({ params }: Props) {
     viewerId: member.user.id,
   });
   const isAdmin = member.membership.role === "admin";
-  const catalog = modules.map((mod) => mapModule(mod, completed, false, purchased));
+  const catalog = modules.map((mod) =>
+    mapModule(mod, completed, false, purchased, restrito),
+  );
   const root = findRootContaining(catalog, moduleSlug);
   const breadcrumbPath = findModulePath(catalog, moduleSlug);
   const playlist = root ? flattenLessons(root) : [];

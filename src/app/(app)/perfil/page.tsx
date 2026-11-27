@@ -11,7 +11,7 @@ import { getEnrollment } from "@/lib/desafio/acesso";
 import { getParticipantProgress } from "@/lib/desafio/painel";
 
 export default async function PerfilPage() {
-  const member = await requireActiveMemberOrRedirect();
+  const member = await requireActiveMemberOrRedirect({ restritoOk: true });
   const { profile, membership } = member;
   const isPaid = isPaidMembership(membership);
   const isElite = isEliteMembership(membership);

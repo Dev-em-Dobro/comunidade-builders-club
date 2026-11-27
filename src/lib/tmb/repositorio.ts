@@ -34,7 +34,12 @@ async function registrarEntrega(
   });
 }
 
-async function concederPago(email: string, plan: PlanoTmb): Promise<void> {
+async function concederPago(
+  email: string,
+  plan: PlanoTmb,
+  vitalicio = false,
+  offerId?: string,
+): Promise<void> {
   const user = await findUserByEmail(email);
   if (!user) return;
   const m = await prisma.membership.findUnique({ where: { userId: user.id } });
@@ -45,6 +50,11 @@ async function concederPago(email: string, plan: PlanoTmb): Promise<void> {
         status: "active",
         tier: plan,
         role: "member",
+        ...(vitalicio ? {
+          vitalicio: true,
+          vitalicioOfferId: offerId,
+          vitalicioGrantedAt: new Date(),
+        } : {}),
       },
     });
     return;
@@ -52,7 +62,15 @@ async function concederPago(email: string, plan: PlanoTmb): Promise<void> {
   const nextTier = rankPago(plan) >= rankPago(m.tier) ? plan : m.tier;
   await prisma.membership.update({
     where: { userId: user.id },
-    data: { status: "active", tier: nextTier },
+    data: {
+      status: "active",
+      tier: nextTier,
+      ...(vitalicio ? {
+        vitalicio: true,
+        vitalicioOfferId: m.vitalicioOfferId ?? offerId,
+        vitalicioGrantedAt: m.vitalicioGrantedAt ?? new Date(),
+      } : {}),
+    },
   });
 }
 
@@ -60,7 +78,7 @@ async function downgradeParaFree(email: string): Promise<void> {
   const user = await findUserByEmail(email);
   if (!user) return;
   const m = await prisma.membership.findUnique({ where: { userId: user.id } });
-  if (!m || m.role === "admin") return;
+  if (!m || m.role === "admin" || m.vitalicio) return;
   await prisma.membership.update({
     where: { userId: user.id },
     data: { status: "active", tier: "free" },
@@ -77,17 +95,27 @@ async function aplicarAcao(acao: AcaoTmb): Promise<void> {
       acao.nome ? `name=${acao.nome}` : null,
       `pedido=${acao.pedido}`,
       `plan=${acao.plan}`,
+      acao.vitalicio ? "vitalicio=1" : null,
     ].filter(Boolean);
+    await concederPago(acao.email, acao.plan, acao.vitalicio, acao.productId);
     await addAllowedEmail({
       email: acao.email,
       source: "tmb",
       note: noteParts.join("; "),
       tier: acao.plan,
+      vitalicio: acao.vitalicio,
     });
-    await concederPago(acao.email, acao.plan);
     return;
   }
 
+  const userRevogar = await findUserByEmail(acao.email);
+  if (userRevogar) {
+    const membership = await prisma.membership.findUnique({
+      where: { userId: userRevogar.id },
+      select: { vitalicio: true },
+    });
+    if (membership?.vitalicio) return;
+  }
   try {
     await removeAllowedEmail(acao.email);
   } catch {
